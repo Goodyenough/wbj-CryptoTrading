@@ -1,0 +1,757 @@
+from __future__ import annotations
+
+from dataclasses import asdict
+from datetime import datetime, timedelta, timezone
+import json
+from pathlib import Path
+import sqlite3
+import uuid
+
+from .config import Settings
+from .market_data import BinanceClient
+from .models import PaperTrade, PaperTradeEvent
+
+
+OPEN_STATUSES = {"WATCHING", "ENTERED", "TP1_HIT"}
+CLOSED_STATUSES = {"STOPPED", "CLOSED", "INVALIDATED", "ARCHIVED"}
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _local_timestamp(timestamp_utc: str) -> str:
+    dt = datetime.fromisoformat(timestamp_utc)
+    return dt.astimezone(timezone(timedelta(hours=8), name="CST")).strftime("%Y-%m-%d %H:%M:%S %Z")
+
+
+def _local_date(timestamp_utc: str) -> str:
+    dt = datetime.fromisoformat(timestamp_utc)
+    return dt.astimezone(timezone(timedelta(hours=8), name="CST")).strftime("%Y-%m-%d")
+
+
+def _project_report_dir(settings: Settings, timestamp_utc: str) -> Path:
+    return settings.output.reports_dir / _local_date(timestamp_utc)
+
+
+def _obsidian_report_dir(settings: Settings, timestamp_utc: str) -> Path | None:
+    if settings.output.obsidian_dir is None:
+        return None
+    return settings.output.obsidian_dir / "Reports" / _local_date(timestamp_utc)
+
+
+def _fmt_price(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    if value >= 10_000:
+        return f"{value:,.2f}"
+    if value >= 100:
+        return f"{value:,.2f}"
+    if value >= 1:
+        return f"{value:.4f}"
+    if value >= 0.01:
+        return f"{value:.5f}"
+    return f"{value:.8g}"
+
+
+def _fmt_money(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value:,.2f}"
+
+
+def _latest_scan_id(connection: sqlite3.Connection) -> str:
+    row = connection.execute(
+        """
+        SELECT scan_id
+        FROM scan_runs
+        WHERE scan_id NOT LIKE 'verify_%'
+        ORDER BY timestamp_utc DESC
+        LIMIT 1
+        """
+    ).fetchone()
+    if row is None:
+        raise ValueError("No market scan found. Run `python main.py scan` first.")
+    return str(row[0])
+
+
+def _paper_trade_from_row(row: sqlite3.Row) -> PaperTrade:
+    return PaperTrade(
+        paper_trade_id=row["paper_trade_id"],
+        account_name=row["account_name"],
+        source_scan_id=row["source_scan_id"],
+        source_rank=int(row["source_rank"]),
+        symbol=row["symbol"],
+        base_asset=row["base_asset"],
+        status=row["status"],
+        created_at_utc=row["created_at_utc"],
+        updated_at_utc=row["updated_at_utc"],
+        setup=row["setup"],
+        verdict=row["verdict"],
+        entry_low=float(row["entry_low"]),
+        entry_high=float(row["entry_high"]),
+        planned_entry_mid=float(row["planned_entry_mid"]),
+        stop_loss=float(row["stop_loss"]),
+        take_profit_1=float(row["take_profit_1"]),
+        take_profit_2=float(row["take_profit_2"]),
+        risk_reward_1=float(row["risk_reward_1"]),
+        risk_reward_2=float(row["risk_reward_2"]),
+        account_equity=float(row["account_equity"]),
+        risk_per_trade_pct=float(row["risk_per_trade_pct"]),
+        cash_risk=float(row["cash_risk"]),
+        quantity=None if row["quantity"] is None else float(row["quantity"]),
+        entry_price=None if row["entry_price"] is None else float(row["entry_price"]),
+        entered_at_utc=row["entered_at_utc"],
+        tp1_hit_at_utc=row["tp1_hit_at_utc"],
+        closed_at_utc=row["closed_at_utc"],
+        exit_price=None if row["exit_price"] is None else float(row["exit_price"]),
+        realized_pnl=float(row["realized_pnl"]),
+        unrealized_pnl=float(row["unrealized_pnl"]),
+        last_price=None if row["last_price"] is None else float(row["last_price"]),
+        notes=row["notes"],
+    )
+
+
+def _paper_event_from_row(row: sqlite3.Row) -> PaperTradeEvent:
+    return PaperTradeEvent(
+        event_id=row["event_id"],
+        paper_trade_id=row["paper_trade_id"],
+        account_name=row["account_name"],
+        symbol=row["symbol"],
+        event_type=row["event_type"],
+        event_time_utc=row["event_time_utc"],
+        price=None if row["price"] is None else float(row["price"]),
+        quantity=None if row["quantity"] is None else float(row["quantity"]),
+        realized_pnl=float(row["realized_pnl"]),
+        unrealized_pnl=float(row["unrealized_pnl"]),
+        message=row["message"],
+    )
+
+
+def _record_event(
+    connection: sqlite3.Connection,
+    trade: PaperTrade,
+    event_type: str,
+    message: str,
+    event_time_utc: str | None = None,
+    price: float | None = None,
+) -> None:
+    event_time = event_time_utc or _utc_now()
+    connection.execute(
+        """
+        INSERT INTO paper_trade_events (
+            event_id, paper_trade_id, account_name, symbol, event_type, event_time_utc,
+            price, quantity, realized_pnl, unrealized_pnl, message
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            uuid.uuid4().hex[:12],
+            trade.paper_trade_id,
+            trade.account_name,
+            trade.symbol,
+            event_type,
+            event_time,
+            trade.last_price if price is None else price,
+            trade.quantity,
+            trade.realized_pnl,
+            trade.unrealized_pnl,
+            message,
+        ),
+    )
+
+
+def _insert_paper_trade(connection: sqlite3.Connection, trade: PaperTrade, payload: dict) -> bool:
+    try:
+        connection.execute(
+            """
+            INSERT INTO paper_trades (
+                paper_trade_id, account_name, source_scan_id, source_rank,
+                symbol, base_asset, status, created_at_utc, updated_at_utc,
+                setup, verdict, entry_low, entry_high, planned_entry_mid,
+                stop_loss, take_profit_1, take_profit_2, risk_reward_1, risk_reward_2,
+                account_equity, risk_per_trade_pct, cash_risk, quantity, entry_price,
+                entered_at_utc, tp1_hit_at_utc, closed_at_utc, exit_price,
+                realized_pnl, unrealized_pnl, last_price, notes, payload_json
+            )
+            VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+            """,
+            (
+                trade.paper_trade_id,
+                trade.account_name,
+                trade.source_scan_id,
+                trade.source_rank,
+                trade.symbol,
+                trade.base_asset,
+                trade.status,
+                trade.created_at_utc,
+                trade.updated_at_utc,
+                trade.setup,
+                trade.verdict,
+                trade.entry_low,
+                trade.entry_high,
+                trade.planned_entry_mid,
+                trade.stop_loss,
+                trade.take_profit_1,
+                trade.take_profit_2,
+                trade.risk_reward_1,
+                trade.risk_reward_2,
+                trade.account_equity,
+                trade.risk_per_trade_pct,
+                trade.cash_risk,
+                trade.quantity,
+                trade.entry_price,
+                trade.entered_at_utc,
+                trade.tp1_hit_at_utc,
+                trade.closed_at_utc,
+                trade.exit_price,
+                trade.realized_pnl,
+                trade.unrealized_pnl,
+                trade.last_price,
+                trade.notes,
+                json.dumps(payload, ensure_ascii=False),
+            ),
+        )
+        return True
+    except sqlite3.IntegrityError:
+        return False
+
+
+def _archive_replaced_watching_trades(
+    connection: sqlite3.Connection,
+    account_name: str,
+    symbol: str,
+    replacement_scan_id: str,
+    now: str,
+) -> int:
+    connection.row_factory = sqlite3.Row
+    rows = connection.execute(
+        """
+        SELECT *
+        FROM paper_trades
+        WHERE account_name = ?
+          AND symbol = ?
+          AND status = 'WATCHING'
+          AND source_scan_id <> ?
+        """,
+        (account_name, symbol, replacement_scan_id),
+    ).fetchall()
+
+    archived = 0
+    for row in rows:
+        old_trade = _paper_trade_from_row(row)
+        old_trade.status = "ARCHIVED"
+        old_trade.updated_at_utc = now
+        old_trade.closed_at_utc = now
+        old_trade.notes = f"Archived because scan {replacement_scan_id} created a newer WATCHING plan for {symbol}."
+        _save_trade_update(connection, old_trade)
+        _record_event(
+            connection,
+            old_trade,
+            "ARCHIVED",
+            old_trade.notes,
+            event_time_utc=now,
+            price=old_trade.last_price,
+        )
+        archived += 1
+    return archived
+
+
+def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: str | None = None) -> dict:
+    account = account_name or settings.paper.account_name
+    now = _utc_now()
+    added = 0
+    skipped = 0
+    archived = 0
+
+    with sqlite3.connect(settings.output.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        chosen_scan_id = scan_id or _latest_scan_id(connection)
+        rows = connection.execute(
+            """
+            SELECT rank, payload_json
+            FROM scan_candidates
+            WHERE scan_id = ?
+            ORDER BY rank
+            """,
+            (chosen_scan_id,),
+        ).fetchall()
+        if not rows:
+            raise ValueError(f"No candidates found for scan_id={chosen_scan_id}")
+
+        for row in rows:
+            payload = json.loads(row["payload_json"])
+            archived += _archive_replaced_watching_trades(
+                connection,
+                account,
+                payload["symbol"],
+                chosen_scan_id,
+                now,
+            )
+            entry_low = float(payload["entry_low"])
+            entry_high = float(payload["entry_high"])
+            planned_entry_mid = (entry_low + entry_high) / 2
+            cash_risk = settings.paper.account_equity * settings.paper.risk_per_trade_pct
+            trade = PaperTrade(
+                paper_trade_id=uuid.uuid4().hex[:12],
+                account_name=account,
+                source_scan_id=chosen_scan_id,
+                source_rank=int(row["rank"]),
+                symbol=payload["symbol"],
+                base_asset=payload["base_asset"],
+                status="WATCHING",
+                created_at_utc=now,
+                updated_at_utc=now,
+                setup=payload["setup"],
+                verdict=payload["verdict"],
+                entry_low=entry_low,
+                entry_high=entry_high,
+                planned_entry_mid=planned_entry_mid,
+                stop_loss=float(payload["stop_loss"]),
+                take_profit_1=float(payload["take_profit_1"]),
+                take_profit_2=float(payload["take_profit_2"]),
+                risk_reward_1=float(payload["risk_reward_1"]),
+                risk_reward_2=float(payload["risk_reward_2"]),
+                account_equity=settings.paper.account_equity,
+                risk_per_trade_pct=settings.paper.risk_per_trade_pct,
+                cash_risk=cash_risk,
+                last_price=float(payload["price"]),
+                notes="Imported from scan candidate.",
+            )
+            if _insert_paper_trade(connection, trade, payload):
+                _record_event(
+                    connection,
+                    trade,
+                    "WATCHLIST_ADDED",
+                    (
+                        f"Imported rank {trade.source_rank} from scan {trade.source_scan_id}; "
+                        f"entry zone {trade.entry_low:.8g}-{trade.entry_high:.8g}."
+                    ),
+                    event_time_utc=now,
+                    price=trade.last_price,
+                )
+                added += 1
+            else:
+                skipped += 1
+
+    return {
+        "scan_id": chosen_scan_id,
+        "account_name": account,
+        "added": added,
+        "skipped": skipped,
+        "archived": archived,
+    }
+
+
+def _load_open_trades(connection: sqlite3.Connection, account_name: str) -> list[PaperTrade]:
+    connection.row_factory = sqlite3.Row
+    rows = connection.execute(
+        """
+        SELECT *
+        FROM paper_trades
+        WHERE account_name = ? AND status IN ('WATCHING', 'ENTERED', 'TP1_HIT')
+        ORDER BY created_at_utc, source_rank
+        """,
+        (account_name,),
+    ).fetchall()
+    return [_paper_trade_from_row(row) for row in rows]
+
+
+def _save_trade_update(connection: sqlite3.Connection, trade: PaperTrade) -> None:
+    connection.execute(
+        """
+        UPDATE paper_trades
+        SET status = ?, updated_at_utc = ?, quantity = ?, entry_price = ?,
+            entered_at_utc = ?, tp1_hit_at_utc = ?, closed_at_utc = ?, exit_price = ?,
+            realized_pnl = ?, unrealized_pnl = ?, last_price = ?, notes = ?
+        WHERE paper_trade_id = ?
+        """,
+        (
+            trade.status,
+            trade.updated_at_utc,
+            trade.quantity,
+            trade.entry_price,
+            trade.entered_at_utc,
+            trade.tp1_hit_at_utc,
+            trade.closed_at_utc,
+            trade.exit_price,
+            trade.realized_pnl,
+            trade.unrealized_pnl,
+            trade.last_price,
+            trade.notes,
+            trade.paper_trade_id,
+        ),
+    )
+
+
+def update_paper_trades(settings: Settings, account_name: str | None = None) -> list[PaperTrade]:
+    account = account_name or settings.paper.account_name
+    client = BinanceClient(
+        settings.market.base_url,
+        timeout_seconds=settings.market.request_timeout_seconds,
+        pause_seconds=settings.market.request_pause_seconds,
+    )
+    ticker_map = {item["symbol"]: float(item["lastPrice"]) for item in client.ticker_24hr()}
+    updated: list[PaperTrade] = []
+    now = _utc_now()
+
+    with sqlite3.connect(settings.output.database_path) as connection:
+        trades = _load_open_trades(connection, account)
+        for trade in trades:
+            old_status = trade.status
+            current_price = ticker_map.get(trade.symbol)
+            if current_price is None:
+                trade.notes = f"{trade.notes} | No ticker price found during update."
+                continue
+
+            trade.last_price = current_price
+            trade.updated_at_utc = now
+
+            if trade.status == "WATCHING":
+                if current_price <= trade.stop_loss:
+                    trade.status = "INVALIDATED"
+                    trade.closed_at_utc = now
+                    trade.exit_price = current_price
+                    trade.notes = "Plan invalidated before entry: current price is below stop loss."
+                    _record_event(
+                        connection,
+                        trade,
+                        "INVALIDATED",
+                        "Plan invalidated before entry: current price is below stop loss.",
+                        event_time_utc=now,
+                        price=current_price,
+                    )
+                elif trade.entry_low <= current_price <= trade.entry_high:
+                    trade.status = "ENTERED"
+                    trade.entry_price = current_price
+                    per_unit_risk = current_price - trade.stop_loss
+                    if per_unit_risk > 0:
+                        trade.quantity = trade.cash_risk / per_unit_risk
+                    trade.entered_at_utc = now
+                    trade.notes = "Paper entry triggered inside entry zone."
+                    _record_event(
+                        connection,
+                        trade,
+                        "ENTERED",
+                        (
+                            f"Paper entry triggered at {current_price:.8g}; "
+                            f"quantity {trade.quantity:.8g}."
+                        ),
+                        event_time_utc=now,
+                        price=current_price,
+                    )
+                elif current_price > trade.entry_high:
+                    trade.notes = "Watching: price is above entry zone; waiting for pullback."
+                else:
+                    trade.notes = "Watching: price is below entry zone but above stop; waiting for recovery."
+
+            if trade.status in {"ENTERED", "TP1_HIT"} and trade.entry_price is not None and trade.quantity:
+                trade.unrealized_pnl = (current_price - trade.entry_price) * trade.quantity
+                if current_price <= trade.stop_loss:
+                    trade.status = "STOPPED"
+                    trade.closed_at_utc = now
+                    trade.exit_price = trade.stop_loss
+                    trade.realized_pnl = (trade.stop_loss - trade.entry_price) * trade.quantity
+                    trade.unrealized_pnl = 0
+                    trade.notes = "Stop loss hit."
+                    if old_status != "STOPPED":
+                        _record_event(
+                            connection,
+                            trade,
+                            "STOPPED",
+                            f"Stop loss hit at {trade.stop_loss:.8g}.",
+                            event_time_utc=now,
+                            price=trade.stop_loss,
+                        )
+                elif current_price >= trade.take_profit_2:
+                    trade.status = "CLOSED"
+                    trade.closed_at_utc = now
+                    trade.exit_price = trade.take_profit_2
+                    trade.realized_pnl = (trade.take_profit_2 - trade.entry_price) * trade.quantity
+                    trade.unrealized_pnl = 0
+                    trade.notes = "TP2 hit; paper trade closed."
+                    if old_status != "CLOSED":
+                        _record_event(
+                            connection,
+                            trade,
+                            "CLOSED",
+                            f"TP2 hit at {trade.take_profit_2:.8g}; trade closed.",
+                            event_time_utc=now,
+                            price=trade.take_profit_2,
+                        )
+                elif current_price >= trade.take_profit_1 and trade.status == "ENTERED":
+                    trade.status = "TP1_HIT"
+                    trade.tp1_hit_at_utc = now
+                    trade.notes = "TP1 hit; trade remains open for TP2 tracking."
+                    _record_event(
+                        connection,
+                        trade,
+                        "TP1_HIT",
+                        f"TP1 hit at {trade.take_profit_1:.8g}; trade remains open.",
+                        event_time_utc=now,
+                        price=trade.take_profit_1,
+                    )
+
+            _save_trade_update(connection, trade)
+            updated.append(trade)
+
+    return updated
+
+
+def load_paper_events(settings: Settings, account_name: str | None = None) -> dict[str, list[PaperTradeEvent]]:
+    account = account_name or settings.paper.account_name
+    with sqlite3.connect(settings.output.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            """
+            SELECT *
+            FROM paper_trade_events
+            WHERE account_name = ?
+            ORDER BY event_time_utc, event_type
+            """,
+            (account,),
+        ).fetchall()
+
+    events_by_trade: dict[str, list[PaperTradeEvent]] = {}
+    for row in rows:
+        event = _paper_event_from_row(row)
+        events_by_trade.setdefault(event.paper_trade_id, []).append(event)
+    return events_by_trade
+
+
+def backfill_missing_events(settings: Settings, account_name: str | None = None) -> int:
+    account = account_name or settings.paper.account_name
+    inserted = 0
+    with sqlite3.connect(settings.output.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        trades = load_all_paper_trades(settings, account)
+        for trade in trades:
+            existing = connection.execute(
+                "SELECT COUNT(*) FROM paper_trade_events WHERE paper_trade_id = ?",
+                (trade.paper_trade_id,),
+            ).fetchone()[0]
+            if existing:
+                continue
+            _record_event(
+                connection,
+                trade,
+                "WATCHLIST_ADDED",
+                "Backfilled event: trade existed before event logging was enabled.",
+                event_time_utc=trade.created_at_utc,
+                price=trade.last_price,
+            )
+            inserted += 1
+            if trade.entered_at_utc:
+                _record_event(
+                    connection,
+                    trade,
+                    "ENTERED",
+                    "Backfilled event: trade was already entered before event logging was enabled.",
+                    event_time_utc=trade.entered_at_utc,
+                    price=trade.entry_price,
+                )
+                inserted += 1
+            if trade.tp1_hit_at_utc:
+                _record_event(
+                    connection,
+                    trade,
+                    "TP1_HIT",
+                    "Backfilled event: TP1 had already been hit before event logging was enabled.",
+                    event_time_utc=trade.tp1_hit_at_utc,
+                    price=trade.take_profit_1,
+                )
+                inserted += 1
+            if trade.closed_at_utc:
+                event_type = trade.status if trade.status in CLOSED_STATUSES else "CLOSED"
+                _record_event(
+                    connection,
+                    trade,
+                    event_type,
+                    "Backfilled event: trade had already closed before event logging was enabled.",
+                    event_time_utc=trade.closed_at_utc,
+                    price=trade.exit_price,
+                )
+                inserted += 1
+    return inserted
+
+
+def load_all_paper_trades(settings: Settings, account_name: str | None = None) -> list[PaperTrade]:
+    account = account_name or settings.paper.account_name
+    with sqlite3.connect(settings.output.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            """
+            SELECT *
+            FROM paper_trades
+            WHERE account_name = ?
+            ORDER BY created_at_utc DESC, source_rank
+            """,
+            (account,),
+        ).fetchall()
+    return [_paper_trade_from_row(row) for row in rows]
+
+
+def generate_paper_report(settings: Settings, account_name: str | None = None) -> tuple[str, list[Path]]:
+    account = account_name or settings.paper.account_name
+    backfill_missing_events(settings, account)
+    trades = load_all_paper_trades(settings, account)
+    events_by_trade = load_paper_events(settings, account)
+    now = _utc_now()
+    open_trades = [trade for trade in trades if trade.status in OPEN_STATUSES]
+    closed_trades = [trade for trade in trades if trade.status in CLOSED_STATUSES]
+    realized = sum(trade.realized_pnl for trade in trades)
+    unrealized = sum(trade.unrealized_pnl for trade in open_trades)
+    entered_trades = [trade for trade in trades if trade.entered_at_utc is not None]
+    winning_closed = [trade for trade in closed_trades if trade.realized_pnl > 0]
+    losing_closed = [trade for trade in closed_trades if trade.realized_pnl < 0]
+    win_rate = (len(winning_closed) / len(closed_trades) * 100) if closed_trades else None
+    tp1_hits = [trade for trade in trades if trade.tp1_hit_at_utc is not None or trade.status == "TP1_HIT"]
+    tp1_rate = (len(tp1_hits) / len(entered_trades) * 100) if entered_trades else None
+
+    lines = [
+        "---",
+        f"created: {_local_timestamp(now)}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - paper-trading",
+        f"account: {account}",
+        "---",
+        "",
+        f"# 模拟盘报告 {account}",
+        "",
+        f"- 报告时间：{_local_timestamp(now)}",
+        f"- 模拟账户权益基准：{settings.paper.account_equity:,.2f} USDT",
+        f"- 单笔计划风险：{settings.paper.risk_per_trade_pct * 100:.2f}%",
+        f"- 开放交易/观察：{len(open_trades)}",
+        f"- 已结束交易：{len(closed_trades)}",
+        f"- 已实现 PnL：{realized:,.2f} USDT",
+        f"- 未实现 PnL：{unrealized:,.2f} USDT",
+        f"- 已入场交易数：{len(entered_trades)}",
+        f"- 胜率：{'n/a' if win_rate is None else f'{win_rate:.2f}%'}",
+        f"- TP1 命中率：{'n/a' if tp1_rate is None else f'{tp1_rate:.2f}%'}",
+        "",
+        "## 复盘统计",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| Total plans | {len(trades)} |",
+        f"| Open watching/positions | {len(open_trades)} |",
+        f"| Entered trades | {len(entered_trades)} |",
+        f"| Closed trades | {len(closed_trades)} |",
+        f"| Winning closed trades | {len(winning_closed)} |",
+        f"| Losing closed trades | {len(losing_closed)} |",
+        f"| Win rate | {'n/a' if win_rate is None else f'{win_rate:.2f}%'} |",
+        f"| TP1 hit rate | {'n/a' if tp1_rate is None else f'{tp1_rate:.2f}%'} |",
+        f"| Realized PnL | {realized:,.2f} USDT |",
+        f"| Unrealized PnL | {unrealized:,.2f} USDT |",
+        "",
+        "## 当前观察与持仓",
+        "",
+        "| Status | Symbol | Last | Entry Zone | Entry | Stop | TP1 | TP2 | Qty | Unrealized | Notes |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+    ]
+
+    for trade in open_trades:
+        lines.append(
+            "| "
+            f"{trade.status} | "
+            f"`{trade.symbol}` | "
+            f"{_fmt_price(trade.last_price)} | "
+            f"{_fmt_price(trade.entry_low)} - {_fmt_price(trade.entry_high)} | "
+            f"{_fmt_price(trade.entry_price)} | "
+            f"{_fmt_price(trade.stop_loss)} | "
+            f"{_fmt_price(trade.take_profit_1)} | "
+            f"{_fmt_price(trade.take_profit_2)} | "
+            f"{_fmt_money(trade.quantity)} | "
+            f"{_fmt_money(trade.unrealized_pnl)} | "
+            f"{trade.notes} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## 已结束交易",
+            "",
+            "| Status | Symbol | Entry | Exit | Qty | Realized PnL | Source Scan | Notes |",
+            "|---|---|---:|---:|---:|---:|---|---|",
+        ]
+    )
+    for trade in closed_trades:
+        lines.append(
+            "| "
+            f"{trade.status} | "
+            f"`{trade.symbol}` | "
+            f"{_fmt_price(trade.entry_price)} | "
+            f"{_fmt_price(trade.exit_price)} | "
+            f"{_fmt_money(trade.quantity)} | "
+            f"{_fmt_money(trade.realized_pnl)} | "
+            f"{trade.source_scan_id} | "
+            f"{trade.notes} |"
+        )
+
+    lines.extend(["", "## 交易生命周期", ""])
+    for trade in trades:
+        lines.extend(
+            [
+                f"### {trade.symbol} `{trade.paper_trade_id}`",
+                "",
+                f"- 当前状态：`{trade.status}`",
+                f"- 来源扫描：`{trade.source_scan_id}` rank {trade.source_rank}",
+                "",
+                "| Time | Event | Price | Qty | Realized | Unrealized | Message |",
+                "|---|---|---:|---:|---:|---:|---|",
+            ]
+        )
+        for event in events_by_trade.get(trade.paper_trade_id, []):
+            lines.append(
+                "| "
+                f"{_local_timestamp(event.event_time_utc)} | "
+                f"{event.event_type} | "
+                f"{_fmt_price(event.price)} | "
+                f"{_fmt_money(event.quantity)} | "
+                f"{_fmt_money(event.realized_pnl)} | "
+                f"{_fmt_money(event.unrealized_pnl)} | "
+                f"{event.message} |"
+            )
+        if not events_by_trade.get(trade.paper_trade_id):
+            lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | No events recorded. |")
+        lines.append("")
+
+    lines.extend(
+        [
+            "",
+            "## 状态说明",
+            "",
+            "- `WATCHING`：计划已加入模拟盘，等待价格进入入场区间。",
+            "- `ENTERED`：价格触发入场区，已模拟买入。",
+            "- `TP1_HIT`：已触发第一止盈，继续跟踪第二止盈。",
+            "- `STOPPED`：入场后触发止损。",
+            "- `CLOSED`：触发 TP2 后模拟平仓。",
+            "- `INVALIDATED`：尚未入场就跌破止损，计划失效。",
+            "- `ARCHIVED`：尚未入场的旧计划被同币种新计划替换。",
+            "",
+        ]
+    )
+
+    markdown = "\n".join(lines)
+    filename = f"paper_report_{now[:10]}_{account}.md"
+    paths: list[Path] = []
+
+    project_report_dir = _project_report_dir(settings, now)
+    project_report_dir.mkdir(parents=True, exist_ok=True)
+    project_path = project_report_dir / filename
+    project_path.write_text(markdown, encoding="utf-8")
+    paths.append(project_path)
+
+    obsidian_report_dir = _obsidian_report_dir(settings, now)
+    if obsidian_report_dir is not None:
+        obsidian_report_dir.mkdir(parents=True, exist_ok=True)
+        obsidian_path = obsidian_report_dir / filename
+        obsidian_path.write_text(markdown, encoding="utf-8")
+        paths.append(obsidian_path)
+
+    return markdown, paths

@@ -1,0 +1,2 @@
+"""CryptoTradingSystem MVP package."""
+

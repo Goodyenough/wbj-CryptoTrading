@@ -1,0 +1,27 @@
+[market]
+base_url = "https://api.binance.com"
+quote_asset = "USDT"
+min_quote_volume = 30000000
+min_trades = 30000
+max_universe = 50
+top_n = 5
+request_timeout_seconds = 30
+request_pause_seconds = 0.04
+exclude_bases = [
+  "USDT", "USDC", "FDUSD", "TUSD", "DAI", "USDP", "USDE",
+  "EUR", "EURI", "AEUR", "PAXG", "USTC"
+]
+
+[analysis]
+risk_reward_min = 2.0
+risk_per_trade_pct = 0.01
+
+[paper]
+account_name = "demo"
+account_equity = 10000
+risk_per_trade_pct = 0.01
+
+[output]
+database_path = "data/crypto_trading.db"
+reports_dir = "reports"
+obsidian_dir = "D:/MyNotebook-Obsidian/CryptoTradingSystem"
