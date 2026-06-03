@@ -15,6 +15,15 @@
 
 ## 2026-06-03
 
+### 22:20:37 +08:00 - 增加 doctor 命令和扫描进度输出
+- 类型：代码 / 报告 / 文档
+- 改动：新增 `src/crypto_trading_system/doctor.py`，支持 `python main.py doctor` 检查 Binance、CoinGecko、CoinMarketCap API Key、SQLite、项目报告目录和 Obsidian 目录。
+- 改动：`scan`、`daily`、`verify` 增加实时进度输出，显示加载 Binance 行情、逐个交易对分析、外部数据交叉验证、保存数据库和写报告等步骤。
+- 改动：更新 `README.md`，补充 `doctor` 命令和扫描进度说明。
+- 影响：运行耗时命令时不再长时间空白，API 或目录问题也可以用 `doctor` 快速定位。
+- 验证：运行 `python -m compileall main.py src`、`python main.py doctor`、`python main.py scan --top 1`；验证生成 `market_scan_2026-06-03_v5.md`，进度输出正常。
+- Git：随本次 doctor 和进度输出提交一起记录。
+
 ### 21:50:22 +08:00 - 增加数据交叉验证模块
 - 类型：代码 / 报告 / 数据库 / 文档
 - 改动：新增 `src/crypto_trading_system/data_validation.py`，支持 Binance 主源、CoinGecko 自动对照、CoinMarketCap API Key 可选对照。

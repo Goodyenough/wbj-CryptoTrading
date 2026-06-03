@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from datetime import datetime, timezone
+from collections.abc import Callable
 import uuid
 
 from .config import Settings
@@ -12,7 +13,7 @@ from .models import RawTicker, ScanResult
 from .scanner import _analyze_ticker
 
 
-def verify_symbol(settings: Settings, symbol: str) -> ScanResult:
+def verify_symbol(settings: Settings, symbol: str, progress: Callable[[str], None] | None = None) -> ScanResult:
     normalized = symbol.upper().replace("/", "").replace("-", "").replace("_", "")
     client = BinanceClient(
         settings.market.base_url,
@@ -20,11 +21,15 @@ def verify_symbol(settings: Settings, symbol: str) -> ScanResult:
         pause_seconds=settings.market.request_pause_seconds,
     )
 
+    if progress is not None:
+        progress(f"loading Binance metadata for {normalized}")
     exchange_info = client.exchange_info()
     symbol_meta = tradable_spot_symbols(exchange_info, settings.market.quote_asset)
     if normalized not in symbol_meta:
         raise ValueError(f"{normalized} is not a tradable Binance {settings.market.quote_asset} spot symbol")
 
+    if progress is not None:
+        progress(f"loading Binance 24h ticker for {normalized}")
     ticker_map = {item["symbol"]: item for item in client.ticker_24hr()}
     ticker = ticker_map.get(normalized)
     if ticker is None:
@@ -43,15 +48,19 @@ def verify_symbol(settings: Settings, symbol: str) -> ScanResult:
         high_low_range_24h=(high / low - 1) * 100 if low else 0,
     )
 
+    if progress is not None:
+        progress(f"loading 1h/4h/1d klines for {normalized}")
     k1h = client.klines(normalized, "1h", 168)
     k4h = client.klines(normalized, "4h", 120)
     k1d = client.klines(normalized, "1d", 100)
+    if progress is not None:
+        progress(f"building trade plan for {normalized}")
     candidate = _analyze_ticker(raw, k1h, k4h, k1d, settings.analysis.risk_reward_min)
     if candidate is None:
         raise ValueError(f"{normalized} did not produce a valid trade plan under current rules")
 
     candidate = replace(candidate, rank=1)
-    candidates, validation_notes = cross_validate_candidates(settings, [candidate])
+    candidates, validation_notes = cross_validate_candidates(settings, [candidate], progress=progress)
     now = datetime.now(timezone.utc)
     return ScanResult(
         scan_id=f"verify_{uuid.uuid4().hex[:8]}",

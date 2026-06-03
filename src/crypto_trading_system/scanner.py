@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from datetime import datetime, timezone
+from collections.abc import Callable
 import math
 import time
 import uuid
@@ -268,14 +269,18 @@ def _analyze_ticker(
     )
 
 
-def run_market_scan(settings: Settings) -> ScanResult:
+def run_market_scan(settings: Settings, progress: Callable[[str], None] | None = None) -> ScanResult:
     client = BinanceClient(
         settings.market.base_url,
         timeout_seconds=settings.market.request_timeout_seconds,
         pause_seconds=settings.market.request_pause_seconds,
     )
+    if progress is not None:
+        progress("loading Binance exchange info")
     exchange_info = client.exchange_info()
     symbol_meta = tradable_spot_symbols(exchange_info, settings.market.quote_asset)
+    if progress is not None:
+        progress("loading Binance 24h tickers")
     tickers = client.ticker_24hr()
     raw_tickers = filter_tickers(
         tickers,
@@ -293,6 +298,8 @@ def run_market_scan(settings: Settings) -> ScanResult:
         reverse=True,
     )
     raw_tickers = raw_tickers[: settings.market.max_universe]
+    if progress is not None:
+        progress(f"analyzing {len(raw_tickers)} filtered symbols")
 
     candidates: list[TradeCandidate] = []
     limitations: list[str] = [
@@ -300,16 +307,23 @@ def run_market_scan(settings: Settings) -> ScanResult:
         "结果是研究和模拟盘计划，不是确定收益或实盘下单指令。",
     ]
 
-    for ticker in raw_tickers:
+    total = len(raw_tickers)
+    for index, ticker in enumerate(raw_tickers, start=1):
         try:
+            if progress is not None:
+                progress(f"analyzing {index}/{total} {ticker.symbol}")
             k1h = client.klines(ticker.symbol, "1h", 168)
             k4h = client.klines(ticker.symbol, "4h", 120)
             k1d = client.klines(ticker.symbol, "1d", 100)
             candidate = _analyze_ticker(ticker, k1h, k4h, k1d, settings.analysis.risk_reward_min)
             if candidate is not None:
                 candidates.append(candidate)
+                if progress is not None:
+                    progress(f"candidate found: {ticker.symbol} score={candidate.score:.2f}")
         except Exception as exc:
             limitations.append(f"{ticker.symbol} 数据获取或分析失败：{exc}")
+            if progress is not None:
+                progress(f"analysis failed for {ticker.symbol}: {exc}")
         time.sleep(settings.market.request_pause_seconds)
 
     candidates.sort(key=lambda item: item.score, reverse=True)
@@ -317,8 +331,12 @@ def run_market_scan(settings: Settings) -> ScanResult:
         replace(candidate, rank=rank)
         for rank, candidate in enumerate(candidates[: settings.market.top_n], start=1)
     ]
-    ranked, validation_notes = cross_validate_candidates(settings, ranked)
+    if progress is not None:
+        progress(f"cross-checking {len(ranked)} ranked candidates")
+    ranked, validation_notes = cross_validate_candidates(settings, ranked, progress=progress)
     limitations.extend(validation_notes)
+    if progress is not None:
+        progress("market scan complete")
 
     now = datetime.now(timezone.utc)
     return ScanResult(

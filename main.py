@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 from pathlib import Path
 import sys
 
@@ -8,6 +9,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from crypto_trading_system.config import load_settings
+from crypto_trading_system.doctor import run_doctor
 from crypto_trading_system.paper_trader import add_from_scan, generate_paper_report, update_paper_trades
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.scanner import run_market_scan
@@ -23,6 +25,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to TOML settings file.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    subparsers.add_parser("doctor", help="Check API connectivity, local paths, and database readiness.")
 
     scan = subparsers.add_parser("scan", help="Scan the market and write reports.")
     scan.add_argument("--top", type=int, default=None, help="Override number of candidates.")
@@ -64,10 +68,19 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _run_scan_and_write(settings, include_obsidian: bool):
-    result = run_market_scan(settings)
+def _progress(message: str) -> None:
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    print(f"[{timestamp}] {message}", flush=True)
+
+
+def _run_scan_and_write(settings, include_obsidian: bool, progress=None):
+    result = run_market_scan(settings, progress=progress)
+    if progress is not None:
+        progress("saving scan result to SQLite")
     init_db(settings.output.database_path)
     save_scan_result(settings.output.database_path, result)
+    if progress is not None:
+        progress("writing Markdown reports")
     report_paths = write_scan_reports(
         result,
         settings,
@@ -87,17 +100,28 @@ def main() -> None:
     if args.command == "daily" and args.top is not None:
         settings.market.top_n = args.top
 
+    if args.command == "doctor":
+        checks = run_doctor(settings)
+        print("doctor=completed")
+        for check in checks:
+            print(f"{check.name}: {check.status} - {check.message}")
+        if any(check.status == "FAIL" for check in checks):
+            sys.exit(1)
+
     if args.command == "scan":
-        result, report_paths = _run_scan_and_write(settings, include_obsidian=not args.no_obsidian)
+        result, report_paths = _run_scan_and_write(settings, include_obsidian=not args.no_obsidian, progress=_progress)
         print(f"scan_id={result.scan_id}")
         print(f"candidates={len(result.candidates)}")
         for path in report_paths:
             print(f"report={path}")
 
     if args.command == "daily":
-        result, scan_report_paths = _run_scan_and_write(settings, include_obsidian=not args.no_obsidian)
+        result, scan_report_paths = _run_scan_and_write(settings, include_obsidian=not args.no_obsidian, progress=_progress)
+        _progress("adding latest candidates to paper trading")
         summary = add_from_scan(settings, scan_id=result.scan_id, account_name=args.account)
+        _progress("updating paper trading positions")
         updated = update_paper_trades(settings, account_name=args.account)
+        _progress("writing paper trading report")
         _, paper_report_paths = generate_paper_report(settings, account_name=args.account)
 
         print("daily=completed")
@@ -126,14 +150,17 @@ def main() -> None:
             print(f"paper_report={path}")
 
     if args.command == "verify":
-        result = verify_symbol(settings, args.symbol)
-        context = run_market_scan(settings)
+        result = verify_symbol(settings, args.symbol, progress=_progress)
+        _progress("running context market scan for comparison")
+        context = run_market_scan(settings, progress=_progress)
         result.context_candidates = context.candidates
         result.limitations.append(
             f"本报告同时附带当前大盘扫描候选，来源 scan_id={context.scan_id}。"
         )
+        _progress("saving verification result to SQLite")
         init_db(settings.output.database_path)
         save_scan_result(settings.output.database_path, result)
+        _progress("writing verification report")
         report_paths = write_scan_reports(
             result,
             settings,

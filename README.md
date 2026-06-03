@@ -49,11 +49,21 @@ python main.py paper update
 python main.py paper report
 ```
 
+检查 API、数据库和输出目录：
+
+```powershell
+python main.py doctor
+```
+
+`doctor` 会检查 Binance、CoinGecko、CoinMarketCap API Key、SQLite 数据库、项目报告目录和 Obsidian 目录。CoinMarketCap 未配置 API Key 时会显示 `SKIP`，不是错误。
+
 单独扫描大盘：
 
 ```powershell
 python main.py scan
 ```
+
+`scan` 和 `daily` 会在运行中输出进度，例如正在加载 Binance 行情、分析第几个交易对、检查 CoinGecko/CoinMarketCap、写入报告。
 
 只写项目报告，不写 Obsidian：
 

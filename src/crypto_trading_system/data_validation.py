@@ -8,6 +8,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Callable
 from typing import Any
 
 from .config import Settings
@@ -338,7 +339,11 @@ def _with_data_checks(candidate: TradeCandidate, checks: list[DataSourceCheck]) 
     )
 
 
-def cross_validate_candidates(settings: Settings, candidates: list[TradeCandidate]) -> tuple[list[TradeCandidate], list[str]]:
+def cross_validate_candidates(
+    settings: Settings,
+    candidates: list[TradeCandidate],
+    progress: Callable[[str], None] | None = None,
+) -> tuple[list[TradeCandidate], list[str]]:
     if not candidates:
         return candidates, []
 
@@ -368,15 +373,25 @@ def cross_validate_candidates(settings: Settings, candidates: list[TradeCandidat
     if not settings.data_validation.coinmarketcap_api_key:
         notes.append("CoinMarketCap 对照已跳过：未配置 CMC_API_KEY 或 COINMARKETCAP_API_KEY。")
 
-    for candidate in candidates:
+    total = len(candidates)
+    for index, candidate in enumerate(candidates, start=1):
+        if progress is not None:
+            progress(f"cross-checking {index}/{total} {candidate.symbol} with external providers")
         checks = [_binance_check(candidate, fetched_at)]
 
         try:
+            if progress is not None:
+                progress(f"checking CoinGecko for {candidate.symbol}")
             checks.append(coingecko.market_check(candidate, fetched_at))
         except ProviderError as exc:
             checks.append(_provider_failure("CoinGecko", candidate, fetched_at, str(exc), status=exc.status))
 
         try:
+            if progress is not None:
+                if settings.data_validation.coinmarketcap_api_key:
+                    progress(f"checking CoinMarketCap for {candidate.symbol}")
+                else:
+                    progress("skipping CoinMarketCap: API key not configured")
             checks.append(coinmarketcap.market_check(candidate, fetched_at))
         except ProviderError as exc:
             checks.append(_provider_failure("CoinMarketCap", candidate, fetched_at, str(exc), status=exc.status))
