@@ -110,16 +110,17 @@ python main.py paper report
 ## 输出
 
 - 本地数据库：`data/crypto_trading.db`
-- 项目报告：`reports/YYYY-MM-DD/market_scan_YYYY-MM-DD_<scan_id>.md`
-- 单币复核报告：`reports/YYYY-MM-DD/verify_<symbol>_YYYY-MM-DD_<scan_id>.md`
-- 模拟盘报告：`reports/YYYY-MM-DD/paper_report_YYYY-MM-DD_<account>.md`
+- 项目报告：`reports/YYYY-MM-DD/market_scan_YYYY-MM-DD_vN.md`
+- 单币复核报告：`reports/YYYY-MM-DD/verify_<symbol>_YYYY-MM-DD_vN.md`
+- 模拟盘报告：`reports/YYYY-MM-DD/paper_report_YYYY-MM-DD_<account>_vN.md`
 - 项目图表：`reports/YYYY-MM-DD/charts/<scan_id>_<symbol>.svg`
-- Obsidian 报告：`D:/MyNotebook-Obsidian/CryptoTradingSystem/Reports/YYYY-MM-DD/market_scan_YYYY-MM-DD_<scan_id>.md`
-- Obsidian 单币复核报告：`D:/MyNotebook-Obsidian/CryptoTradingSystem/Reports/YYYY-MM-DD/verify_<symbol>_YYYY-MM-DD_<scan_id>.md`
-- Obsidian 模拟盘报告：`D:/MyNotebook-Obsidian/CryptoTradingSystem/Reports/YYYY-MM-DD/paper_report_YYYY-MM-DD_<account>.md`
+- Obsidian 报告：`D:/MyNotebook-Obsidian/CryptoTradingSystem/Reports/YYYY-MM-DD/market_scan_YYYY-MM-DD_vN.md`
+- Obsidian 单币复核报告：`D:/MyNotebook-Obsidian/CryptoTradingSystem/Reports/YYYY-MM-DD/verify_<symbol>_YYYY-MM-DD_vN.md`
+- Obsidian 模拟盘报告：`D:/MyNotebook-Obsidian/CryptoTradingSystem/Reports/YYYY-MM-DD/paper_report_YYYY-MM-DD_<account>_vN.md`
 - Obsidian 图表：`D:/MyNotebook-Obsidian/CryptoTradingSystem/Reports/YYYY-MM-DD/charts/<scan_id>_<symbol>.svg`
 
 Obsidian `CryptoTradingSystem` 根目录用于保留开发计划、实现日志和后续手写交易笔记；脚本自动生成的报告统一进入 `Reports/YYYY-MM-DD/`。
+同一天多次运行会自动生成 `v1`、`v2`、`v3` 等版本号；原始 `scan_id` 会保留在报告正文和图表文件名中，便于回溯数据库记录。
 
 ## 人工验证方式
 

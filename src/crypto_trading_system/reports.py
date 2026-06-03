@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .config import Settings
 from .models import ScanResult, TradeCandidate
+from .report_versions import next_report_version, versioned_markdown_filename
 
 
 def _fmt_price(value: float) -> str:
@@ -66,11 +67,20 @@ def _is_verify_report(result: ScanResult) -> bool:
     return result.scan_id.startswith("verify_")
 
 
-def _report_title(result: ScanResult) -> str:
+def _report_title(result: ScanResult, report_version: str | None = None) -> str:
+    version_suffix = f" {report_version}" if report_version else ""
     if _is_verify_report(result):
         symbol = result.candidates[0].symbol if result.candidates else "UNKNOWN"
-        return f"Crypto 单币复核报告 {symbol}"
-    return f"Crypto 市场扫描报告 {result.scan_id}"
+        return f"Crypto 单币复核报告 {symbol}{version_suffix}"
+    return f"Crypto 市场扫描报告{version_suffix}"
+
+
+def _report_filename_prefix(result: ScanResult) -> str:
+    report_date = _local_date(result.timestamp_utc)
+    if _is_verify_report(result):
+        symbol = result.candidates[0].symbol if result.candidates else "UNKNOWN"
+        return f"verify_{symbol}_{report_date}"
+    return f"market_scan_{report_date}"
 
 
 def _plan_heading(result: ScanResult) -> str:
@@ -207,8 +217,10 @@ def write_candidate_charts(result: ScanResult, report_dir: Path) -> None:
         chart_path.write_text(render_candidate_chart(candidate), encoding="utf-8")
 
 
-def generate_scan_report(result: ScanResult, settings: Settings) -> str:
-    report_title = _report_title(result)
+def generate_scan_report(result: ScanResult, settings: Settings, report_version: str | None = None) -> str:
+    report_title = _report_title(result, report_version)
+    version_lines = [] if report_version is None else [f"report_version: {report_version}"]
+    version_summary = [] if report_version is None else [f"- 报告版本：{report_version}"]
     lines: list[str] = [
         "---",
         f"created: {_local_timestamp(result.timestamp_utc)}",
@@ -217,11 +229,14 @@ def generate_scan_report(result: ScanResult, settings: Settings) -> str:
         "  - trading-system",
         f"  - {'single-symbol-verify' if _is_verify_report(result) else 'market-scan'}",
         f"scan_id: {result.scan_id}",
+        *version_lines,
         "---",
         "",
         f"# {report_title}",
         "",
         f"- 报告时间：{_local_timestamp(result.timestamp_utc)}",
+        *version_summary,
+        f"- 扫描 ID：{result.scan_id}",
         f"- 数据源：{result.source}",
         f"- 过滤条件：{result.filters}",
         f"- 默认单笔风险：账户权益的 {settings.analysis.risk_per_trade_pct * 100:.2f}%",
@@ -345,21 +360,25 @@ def write_scan_reports(
     settings: Settings,
     include_obsidian: bool = True,
 ) -> list[Path]:
-    markdown = generate_scan_report(result, settings)
-    if _is_verify_report(result) and result.candidates:
-        filename = f"verify_{result.candidates[0].symbol}_{result.timestamp_utc[:10]}_{result.scan_id}.md"
-    else:
-        filename = f"market_scan_{result.timestamp_utc[:10]}_{result.scan_id}.md"
+    project_report_dir = _project_report_dir(settings, result.timestamp_utc)
+    obsidian_report_dir = _obsidian_report_dir(settings, result.timestamp_utc)
+    target_dirs = [project_report_dir]
+    if include_obsidian and obsidian_report_dir is not None:
+        target_dirs.append(obsidian_report_dir)
+
+    filename_prefix = _report_filename_prefix(result)
+    report_version_number = next_report_version(target_dirs, filename_prefix)
+    report_version = f"v{report_version_number}"
+    filename = versioned_markdown_filename(filename_prefix, report_version_number)
+    markdown = generate_scan_report(result, settings, report_version=report_version)
     paths: list[Path] = []
 
-    project_report_dir = _project_report_dir(settings, result.timestamp_utc)
     project_report_dir.mkdir(parents=True, exist_ok=True)
     write_candidate_charts(result, project_report_dir)
     project_path = project_report_dir / filename
     project_path.write_text(markdown, encoding="utf-8")
     paths.append(project_path)
 
-    obsidian_report_dir = _obsidian_report_dir(settings, result.timestamp_utc)
     if include_obsidian and obsidian_report_dir is not None:
         obsidian_report_dir.mkdir(parents=True, exist_ok=True)
         write_candidate_charts(result, obsidian_report_dir)

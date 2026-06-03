@@ -10,6 +10,7 @@ import uuid
 from .config import Settings
 from .market_data import BinanceClient
 from .models import PaperTrade, PaperTradeEvent
+from .report_versions import next_report_version, versioned_markdown_filename
 
 
 OPEN_STATUSES = {"WATCHING", "ENTERED", "TP1_HIT"}
@@ -600,6 +601,14 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
     trades = load_all_paper_trades(settings, account)
     events_by_trade = load_paper_events(settings, account)
     now = _utc_now()
+    project_report_dir = _project_report_dir(settings, now)
+    obsidian_report_dir = _obsidian_report_dir(settings, now)
+    filename_prefix = f"paper_report_{_local_date(now)}_{account}"
+    target_dirs = [project_report_dir]
+    if obsidian_report_dir is not None:
+        target_dirs.append(obsidian_report_dir)
+    report_version_number = next_report_version(target_dirs, filename_prefix)
+    report_version = f"v{report_version_number}"
     open_trades = [trade for trade in trades if trade.status in OPEN_STATUSES]
     closed_trades = [trade for trade in trades if trade.status in CLOSED_STATUSES]
     realized = sum(trade.realized_pnl for trade in trades)
@@ -619,11 +628,13 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
         "  - trading-system",
         "  - paper-trading",
         f"account: {account}",
+        f"report_version: {report_version}",
         "---",
         "",
-        f"# 模拟盘报告 {account}",
+        f"# 模拟盘报告 {account} {report_version}",
         "",
         f"- 报告时间：{_local_timestamp(now)}",
+        f"- 报告版本：{report_version}",
         f"- 模拟账户权益基准：{settings.paper.account_equity:,.2f} USDT",
         f"- 单笔计划风险：{settings.paper.risk_per_trade_pct * 100:.2f}%",
         f"- 开放交易/观察：{len(open_trades)}",
@@ -738,16 +749,14 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
     )
 
     markdown = "\n".join(lines)
-    filename = f"paper_report_{now[:10]}_{account}.md"
+    filename = versioned_markdown_filename(filename_prefix, report_version_number)
     paths: list[Path] = []
 
-    project_report_dir = _project_report_dir(settings, now)
     project_report_dir.mkdir(parents=True, exist_ok=True)
     project_path = project_report_dir / filename
     project_path.write_text(markdown, encoding="utf-8")
     paths.append(project_path)
 
-    obsidian_report_dir = _obsidian_report_dir(settings, now)
     if obsidian_report_dir is not None:
         obsidian_report_dir.mkdir(parents=True, exist_ok=True)
         obsidian_path = obsidian_report_dir / filename
