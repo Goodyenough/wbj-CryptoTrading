@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from pathlib import Path
 import tomllib
 
@@ -35,6 +36,21 @@ class PaperSettings:
 
 
 @dataclass
+class DataValidationSettings:
+    enabled: bool
+    coingecko_base_url: str
+    coinmarketcap_base_url: str
+    coinmarketcap_api_key: str | None
+    price_warning_pct: float
+    price_error_pct: float
+    pct_24h_warning_points: float
+    request_timeout_seconds: int
+    request_pause_seconds: float
+    coin_id_overrides: dict[str, str]
+    cmc_id_overrides: dict[str, int]
+
+
+@dataclass
 class OutputSettings:
     database_path: Path
     reports_dir: Path
@@ -46,6 +62,7 @@ class Settings:
     market: MarketSettings
     analysis: AnalysisSettings
     paper: PaperSettings
+    data_validation: DataValidationSettings
     output: OutputSettings
 
 
@@ -66,7 +83,12 @@ def load_settings(path: Path) -> Settings:
     market = data["market"]
     analysis = data["analysis"]
     paper = data.get("paper", {})
+    data_validation = data.get("data_validation", {})
     output = data["output"]
+
+    coinmarketcap_api_key = data_validation.get("coinmarketcap_api_key")
+    if not coinmarketcap_api_key:
+        coinmarketcap_api_key = os.environ.get("CMC_API_KEY") or os.environ.get("COINMARKETCAP_API_KEY")
 
     return Settings(
         market=MarketSettings(
@@ -88,6 +110,19 @@ def load_settings(path: Path) -> Settings:
             account_name=str(paper.get("account_name", "demo")),
             account_equity=float(paper.get("account_equity", 10_000)),
             risk_per_trade_pct=float(paper.get("risk_per_trade_pct", analysis.get("risk_per_trade_pct", 0.01))),
+        ),
+        data_validation=DataValidationSettings(
+            enabled=bool(data_validation.get("enabled", True)),
+            coingecko_base_url=str(data_validation.get("coingecko_base_url", "https://api.coingecko.com/api/v3")).rstrip("/"),
+            coinmarketcap_base_url=str(data_validation.get("coinmarketcap_base_url", "https://pro-api.coinmarketcap.com")).rstrip("/"),
+            coinmarketcap_api_key=None if not coinmarketcap_api_key else str(coinmarketcap_api_key),
+            price_warning_pct=float(data_validation.get("price_warning_pct", 1.0)),
+            price_error_pct=float(data_validation.get("price_error_pct", 2.0)),
+            pct_24h_warning_points=float(data_validation.get("pct_24h_warning_points", 3.0)),
+            request_timeout_seconds=int(data_validation.get("request_timeout_seconds", market.get("request_timeout_seconds", 30))),
+            request_pause_seconds=float(data_validation.get("request_pause_seconds", market.get("request_pause_seconds", 0.04))),
+            coin_id_overrides={str(k).upper(): str(v) for k, v in data_validation.get("coin_id_overrides", {}).items()},
+            cmc_id_overrides={str(k).upper(): int(v) for k, v in data_validation.get("cmc_id_overrides", {}).items()},
         ),
         output=OutputSettings(
             database_path=_resolve_path(output.get("database_path"), PROJECT_ROOT),

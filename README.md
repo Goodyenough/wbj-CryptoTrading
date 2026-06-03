@@ -11,6 +11,8 @@
 - 5 个候选币交易计划生成
 - 入场区间、止损、止盈、风险收益比、风险提示
 - 人工可验证证据：Binance/TradingView 链接、指标表、推导公式、最近 4h K线表
+- 数据交叉验证：Binance + CoinGecko 自动对照，CoinMarketCap API Key 可选对照
+- DATA_OK / DATA_WARNING / DATA_ERROR 标记和多数据源对照表
 - 本地 SVG 证据图：K线 + 入场区 + 止损 + TP1 + TP2
 - 单币复核命令
 - 模拟盘观察列表和虚拟持仓
@@ -129,6 +131,11 @@ Obsidian `CryptoTradingSystem` 根目录用于保留开发计划、实现日志�
 - Binance 交易页链接
 - TradingView 图表链接
 - CoinGecko / CoinMarketCap 搜索链接
+- Binance / CoinGecko / CoinMarketCap 多数据源对照表
+- 数据状态：
+  - `DATA_OK`：外部来源与 Binance 在阈值内一致
+  - `DATA_WARNING`：价格、24h 涨跌或映射需要人工复核
+  - `DATA_ERROR`：出现重大差异或映射失败，候选会降级为只观察
 - 当前价、24h/7d 涨跌、EMA、RSI、ATR、支撑位等指标证据表
 - 入场区间、止损、TP1、TP2 的推导公式
 - 最近 10 根 4h K线明细

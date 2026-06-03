@@ -7,6 +7,7 @@ import time
 import uuid
 
 from .config import Settings
+from .data_validation import cross_validate_candidates
 from .data_quality import filter_tickers, tradable_spot_symbols
 from .indicators import atr, ema, macd, percent_change, rsi
 from .market_data import BinanceClient
@@ -295,7 +296,7 @@ def run_market_scan(settings: Settings) -> ScanResult:
 
     candidates: list[TradeCandidate] = []
     limitations: list[str] = [
-        "MVP 当前只使用 Binance 现货公开数据，暂未接入 CoinGecko/CoinMarketCap 交叉验证。",
+        "交易信号仍以 Binance 现货公开 K 线为主源；外部数据源用于一致性复核。",
         "结果是研究和模拟盘计划，不是确定收益或实盘下单指令。",
     ]
 
@@ -316,12 +317,14 @@ def run_market_scan(settings: Settings) -> ScanResult:
         replace(candidate, rank=rank)
         for rank, candidate in enumerate(candidates[: settings.market.top_n], start=1)
     ]
+    ranked, validation_notes = cross_validate_candidates(settings, ranked)
+    limitations.extend(validation_notes)
 
     now = datetime.now(timezone.utc)
     return ScanResult(
         scan_id=uuid.uuid4().hex[:12],
         timestamp_utc=now.isoformat(timespec="seconds"),
-        source="Binance public spot API",
+        source="Binance public spot API + CoinGecko/CoinMarketCap cross-check",
         filters=(
             f"{settings.market.quote_asset} spot; 24h quote volume >= "
             f"{settings.market.min_quote_volume:,.0f}; trades >= {settings.market.min_trades:,}; "

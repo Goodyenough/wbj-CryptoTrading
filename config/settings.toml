@@ -21,6 +21,33 @@ account_name = "demo"
 account_equity = 10000
 risk_per_trade_pct = 0.01
 
+[data_validation]
+enabled = true
+coingecko_base_url = "https://api.coingecko.com/api/v3"
+coinmarketcap_base_url = "https://pro-api.coinmarketcap.com"
+price_warning_pct = 1.0
+price_error_pct = 2.0
+pct_24h_warning_points = 3.0
+request_timeout_seconds = 30
+request_pause_seconds = 0.08
+
+[data_validation.coin_id_overrides]
+BTC = "bitcoin"
+ETH = "ethereum"
+BNB = "binancecoin"
+SOL = "solana"
+XRP = "ripple"
+DOGE = "dogecoin"
+ADA = "cardano"
+AVAX = "avalanche-2"
+TRX = "tron"
+TON = "the-open-network"
+WLD = "worldcoin-wld"
+ZEC = "zcash"
+NEAR = "near"
+ONDO = "ondo-finance"
+PORTAL = "portal-2"
+
 [output]
 database_path = "data/crypto_trading.db"
 reports_dir = "reports"

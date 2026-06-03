@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import uuid
 
 from .config import Settings
+from .data_validation import cross_validate_candidates
 from .data_quality import tradable_spot_symbols
 from .market_data import BinanceClient
 from .models import RawTicker, ScanResult
@@ -50,16 +51,17 @@ def verify_symbol(settings: Settings, symbol: str) -> ScanResult:
         raise ValueError(f"{normalized} did not produce a valid trade plan under current rules")
 
     candidate = replace(candidate, rank=1)
+    candidates, validation_notes = cross_validate_candidates(settings, [candidate])
     now = datetime.now(timezone.utc)
     return ScanResult(
         scan_id=f"verify_{uuid.uuid4().hex[:8]}",
         timestamp_utc=now.isoformat(timespec="seconds"),
-        source="Binance public spot API",
+        source="Binance public spot API + CoinGecko/CoinMarketCap cross-check",
         filters=f"single-symbol verification for {normalized}; analyze 1h/4h/1d klines",
         limitations=[
             "单币复核报告用于人工核对数据、指标和交易计划推导。",
-            "当前复核只使用 Binance 公开现货数据；请用报告里的 Binance/TradingView 链接人工对照。",
+            "交易信号仍以 Binance 公开现货 K 线为主源；外部数据源用于一致性复核。",
+            *validation_notes,
         ],
-        candidates=[candidate],
+        candidates=candidates,
     )
-

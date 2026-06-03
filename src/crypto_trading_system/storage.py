@@ -99,6 +99,33 @@ def init_db(path: Path) -> None:
             "CREATE INDEX IF NOT EXISTS idx_paper_trade_events_trade_time "
             "ON paper_trade_events (paper_trade_id, event_time_utc)"
         )
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS data_cross_checks (
+                scan_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                provider TEXT NOT NULL,
+                status TEXT NOT NULL,
+                provider_asset_id TEXT,
+                provider_symbol TEXT,
+                price_usd REAL,
+                pct_24h REAL,
+                volume_24h REAL,
+                last_updated TEXT,
+                fetched_at_utc TEXT NOT NULL,
+                price_diff_pct REAL,
+                pct_24h_diff REAL,
+                volume_note TEXT NOT NULL,
+                message TEXT NOT NULL,
+                PRIMARY KEY (scan_id, symbol, provider),
+                FOREIGN KEY (scan_id) REFERENCES scan_runs(scan_id)
+            )
+            """
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_data_cross_checks_scan_symbol "
+            "ON data_cross_checks (scan_id, symbol)"
+        )
 
 
 def save_scan_result(path: Path, result: ScanResult) -> None:
@@ -119,6 +146,7 @@ def save_scan_result(path: Path, result: ScanResult) -> None:
             ),
         )
         connection.execute("DELETE FROM scan_candidates WHERE scan_id = ?", (result.scan_id,))
+        connection.execute("DELETE FROM data_cross_checks WHERE scan_id = ?", (result.scan_id,))
         for candidate in result.candidates:
             connection.execute(
                 """
@@ -136,3 +164,31 @@ def save_scan_result(path: Path, result: ScanResult) -> None:
                     json.dumps(asdict(candidate), ensure_ascii=False),
                 ),
             )
+            for check in candidate.data_checks:
+                connection.execute(
+                    """
+                    INSERT INTO data_cross_checks (
+                        scan_id, symbol, provider, status, provider_asset_id, provider_symbol,
+                        price_usd, pct_24h, volume_24h, last_updated, fetched_at_utc,
+                        price_diff_pct, pct_24h_diff, volume_note, message
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        result.scan_id,
+                        candidate.symbol,
+                        check.provider,
+                        check.status,
+                        check.provider_asset_id,
+                        check.provider_symbol,
+                        check.price_usd,
+                        check.pct_24h,
+                        check.volume_24h,
+                        check.last_updated,
+                        check.fetched_at_utc,
+                        check.price_diff_pct,
+                        check.pct_24h_diff,
+                        check.volume_note,
+                        check.message,
+                    ),
+                )

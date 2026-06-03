@@ -37,10 +37,28 @@ def _fmt_money(value: float) -> str:
     return f"${value:,.0f}"
 
 
+def _fmt_money_optional(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    return _fmt_money(value)
+
+
 def _fmt_optional(value: float | None) -> str:
     if value is None:
         return "n/a"
     return _fmt_price(value)
+
+
+def _fmt_diff_pct(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value:.2f}%"
+
+
+def _fmt_point_diff(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value:.2f} pts"
 
 
 def _local_timestamp(timestamp_utc: str) -> str:
@@ -115,6 +133,61 @@ def _append_candidate_table(lines: list[str], candidates: list[TradeCandidate]) 
             f"{_fmt_price(candidate.take_profit_2)} 或跌破 4h 关键支撑 | "
             f"{candidate.risk_reward_1:.2f}-{candidate.risk_reward_2:.2f} | "
             f"{candidate.verdict} |"
+        )
+
+
+def _append_data_cross_check_summary(lines: list[str], candidates: list[TradeCandidate]) -> None:
+    lines.extend(
+        [
+            "| Rank | Coin | Data Status | Max Price Diff | Max 24h Diff | Message |",
+            "|---:|---|---|---:|---:|---|",
+        ]
+    )
+    for candidate in candidates:
+        price_diffs = [
+            check.price_diff_pct
+            for check in candidate.data_checks
+            if check.provider != "Binance" and check.price_diff_pct is not None
+        ]
+        pct_diffs = [
+            check.pct_24h_diff
+            for check in candidate.data_checks
+            if check.provider != "Binance" and check.pct_24h_diff is not None
+        ]
+        lines.append(
+            "| "
+            f"{candidate.rank} | "
+            f"`{candidate.base_asset}` | "
+            f"{candidate.data_quality_status} | "
+            f"{_fmt_diff_pct(max(price_diffs) if price_diffs else None)} | "
+            f"{_fmt_point_diff(max(pct_diffs) if pct_diffs else None)} | "
+            f"{candidate.data_quality_message} |"
+        )
+
+
+def _append_data_cross_check_table(lines: list[str], candidate: TradeCandidate) -> None:
+    lines.extend(
+        [
+            "| Source | Status | Asset ID | Price | 24h Change | 24h Volume | Price Diff | 24h Diff | Updated | Message |",
+            "|---|---|---|---:|---:|---:|---:|---:|---|---|",
+        ]
+    )
+    if not candidate.data_checks:
+        lines.append("| n/a | DATA_NOT_CHECKED | n/a | n/a | n/a | n/a | n/a | n/a | n/a | No cross-check data recorded. |")
+        return
+    for check in candidate.data_checks:
+        lines.append(
+            "| "
+            f"{check.provider} | "
+            f"{check.status} | "
+            f"{check.provider_asset_id or 'n/a'} | "
+            f"{_fmt_optional(check.price_usd)} | "
+            f"{_fmt_pct(check.pct_24h)} | "
+            f"{_fmt_money_optional(check.volume_24h)} | "
+            f"{_fmt_diff_pct(check.price_diff_pct)} | "
+            f"{_fmt_point_diff(check.pct_24h_diff)} | "
+            f"{check.last_updated or check.fetched_at_utc} | "
+            f"{check.message} |"
         )
 
 
@@ -257,6 +330,17 @@ def generate_scan_report(result: ScanResult, settings: Settings, report_version:
     )
     _append_candidate_table(lines, result.candidates)
 
+    lines.extend(
+        [
+            "",
+            "## 数据交叉验证摘要",
+            "",
+            "价格差异以 Binance 当前价为基准；成交量口径不同，Binance 是 USDT 现货成交额，CoinGecko/CoinMarketCap 通常是全市场成交量。",
+            "",
+        ]
+    )
+    _append_data_cross_check_summary(lines, result.candidates)
+
     if _is_verify_report(result) and result.context_candidates:
         verified_symbol = result.candidates[0].symbol if result.candidates else ""
         lines.extend(
@@ -269,6 +353,14 @@ def generate_scan_report(result: ScanResult, settings: Settings, report_version:
             ]
         )
         _append_candidate_table(lines, result.context_candidates)
+        lines.extend(
+            [
+                "",
+                "### 当前大盘候选数据交叉验证摘要",
+                "",
+            ]
+        )
+        _append_data_cross_check_summary(lines, result.context_candidates)
 
     lines.extend(["", f"## {_candidate_section_heading(result)}", ""])
     for candidate in result.candidates:
@@ -283,6 +375,7 @@ def generate_scan_report(result: ScanResult, settings: Settings, report_version:
                 f"- 入选原因：{candidate.setup}；24h {_fmt_pct(candidate.pct_24h)}，7d {_fmt_pct(candidate.pct_7d)}，4h RSI {rsi_text}，24h 成交额 {volume_text}。",
                 f"- 交易失效条件：{candidate.invalidation}。",
                 f"- 主要风险：{'；'.join(candidate.risks)}。",
+                f"- 数据交叉验证：{candidate.data_quality_status}；{candidate.data_quality_message}",
                 "",
                 "#### 可点击人工验证",
                 "",
@@ -290,6 +383,14 @@ def generate_scan_report(result: ScanResult, settings: Settings, report_version:
                 f"- [TradingView 图表]({candidate.tradingview_url})",
                 f"- [CoinGecko 搜索]({candidate.coingecko_search_url})",
                 f"- [CoinMarketCap 搜索]({candidate.coinmarketcap_search_url})",
+                "",
+                "#### 多数据源对照",
+                "",
+            ]
+        )
+        _append_data_cross_check_table(lines, candidate)
+        lines.extend(
+            [
                 "",
                 "#### 指标证据",
                 "",

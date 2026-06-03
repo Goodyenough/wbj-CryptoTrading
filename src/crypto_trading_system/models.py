@@ -4,6 +4,23 @@ from dataclasses import dataclass, field
 
 
 @dataclass
+class DataSourceCheck:
+    provider: str
+    status: str
+    provider_asset_id: str | None
+    provider_symbol: str | None
+    price_usd: float | None
+    pct_24h: float | None
+    volume_24h: float | None
+    last_updated: str | None
+    fetched_at_utc: str
+    price_diff_pct: float | None
+    pct_24h_diff: float | None
+    volume_note: str
+    message: str
+
+
+@dataclass
 class RawTicker:
     symbol: str
     base_asset: str
@@ -56,6 +73,9 @@ class TradeCandidate:
     invalidation: str
     recent_4h_klines: list[dict[str, float | int | str]] = field(default_factory=list)
     risks: list[str] = field(default_factory=list)
+    data_quality_status: str = "DATA_NOT_CHECKED"
+    data_quality_message: str = "Data cross-check has not run."
+    data_checks: list[DataSourceCheck] = field(default_factory=list)
 
 
 @dataclass
