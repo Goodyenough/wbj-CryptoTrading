@@ -25,6 +25,15 @@
 - 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`，均通过。
 - Git：待本次回测基础设施提交后回填。
 
+### 11:47:56 +08:00 - 增加回测引擎、指标、报告和 CLI
+- 类型：代码 / 报告 / 数据库
+- 改动：新增 `backtest/costs.py`、`backtest/replay.py`、`backtest/metrics.py`、`backtest/runner.py`，实现 4h 全局时间轴历史回放、手续费/滑点、组合权益曲线、绩效指标和 Markdown 报告。
+- 改动：`main.py` 新增 `backtest` 子命令，支持 `--symbols`、`--start`、`--end`、`--interval`、`--intrabar`、`--allow-data-gaps`、`--no-obsidian`。
+- 改动：新增 `tests/test_replay.py`，验证历史 ticker 重建不读取未来数据、未收盘 K 线不会进入决策切片。
+- 影响：可以运行 `python main.py backtest --symbols BTCUSDT --start 2024-06-01 --end 2024-09-01 --interval 4h` 生成回测报告并写入 SQLite。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`、`python tests/test_replay.py`，并完成 BTCUSDT 2024-06-01 至 2024-09-01 回测烟测。
+- Git：待本次回测引擎提交后回填。
+
 ## 2026-06-03
 
 ### 22:20:37 +08:00 - 增加 doctor 命令和扫描进度输出

@@ -8,6 +8,7 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.doctor import run_doctor
 from crypto_trading_system.paper_trader import add_from_scan, generate_paper_report, update_paper_trades
@@ -48,6 +49,19 @@ def build_parser() -> argparse.ArgumentParser:
     verify = subparsers.add_parser("verify", help="Verify one symbol and write an evidence report.")
     verify.add_argument("--symbol", required=True, help="Symbol to verify, e.g. ZECUSDT or ZEC/USDT.")
     verify.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
+    backtest = subparsers.add_parser("backtest", help="Replay historical klines and write a backtest report.")
+    backtest.add_argument("--symbols", required=True, help="Comma-separated symbols, e.g. BTCUSDT,ETHUSDT.")
+    backtest.add_argument("--start", required=True, help="UTC start date, e.g. 2024-01-01.")
+    backtest.add_argument("--end", required=True, help="UTC end date, e.g. 2024-12-31.")
+    backtest.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
+    backtest.add_argument("--intrabar", default=None, choices=["stop_first", "tp_first"], help="Intrabar fill policy.")
+    backtest.add_argument("--allow-data-gaps", action="store_true", help="Continue when historical kline gaps are found.")
+    backtest.add_argument(
         "--no-obsidian",
         action="store_true",
         help="Write only to the project reports directory.",
@@ -168,6 +182,32 @@ def main() -> None:
         )
         print(f"scan_id={result.scan_id}")
         print(f"symbol={result.candidates[0].symbol}")
+        for path in report_paths:
+            print(f"report={path}")
+
+    if args.command == "backtest":
+        symbols = [symbol.strip().upper() for symbol in args.symbols.split(",") if symbol.strip()]
+        if not symbols:
+            raise ValueError("--symbols must include at least one symbol")
+        _progress(f"starting backtest for {', '.join(symbols)}")
+        result, metrics, report_paths = run_backtest(
+            settings,
+            symbols,
+            args.start,
+            args.end,
+            interval=args.interval,
+            intrabar=args.intrabar,
+            allow_data_gaps=args.allow_data_gaps,
+            include_obsidian=not args.no_obsidian,
+            progress=_progress,
+        )
+        print("backtest=completed")
+        print(f"backtest_run_id={result.run_id}")
+        print(f"symbols={','.join(result.symbols)}")
+        print(f"trades={metrics.trades}")
+        print(f"closed_trades={metrics.closed_trades}")
+        print(f"net_return_pct={metrics.net_return_pct:.2f}")
+        print(f"max_drawdown_pct={metrics.max_drawdown_pct:.2f}")
         for path in report_paths:
             print(f"report={path}")
 
