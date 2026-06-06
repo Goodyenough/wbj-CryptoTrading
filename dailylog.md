@@ -41,6 +41,14 @@
 - 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`、`python tests/test_replay.py`、`python main.py backtest --symbols BTCUSDT --start 2024-06-01 --end 2024-09-01 --interval 4h --no-obsidian`，全部通过。
 - Git：待本次验收报告提交后回填。
 
+### 12:09:21 +08:00 - 回测报告增加中英文术语对照
+- 类型：代码 / 报告
+- 改动：在回测报告核心指标、benchmark、交易明细、开放持仓、过期计划和数据质量表中，将英文表头、指标名、状态名改为英文 + 中文对照。
+- 改动：新增“术语速查”段，解释 PnL、Gross PnL、Net PnL、R、Drawdown、Profit factor、Sharpe、Sortino、Exposure、Turnover 等术语。
+- 影响：阅读回测报告时可以直接理解英文指标含义，降低复盘门槛；不改变回测计算逻辑。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`、`python tests/test_replay.py`、短区间 `python main.py backtest --symbols BTCUSDT --start 2024-06-01 --end 2024-06-15 --interval 4h --no-obsidian`，确认报告显示中英文对照；临时短报告未纳入提交。
+- Git：待本次术语对照提交后回填。
+
 ## 2026-06-03
 
 ### 22:20:37 +08:00 - 增加 doctor 命令和扫描进度输出

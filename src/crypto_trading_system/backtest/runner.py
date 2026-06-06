@@ -44,6 +44,90 @@ def _fmt(value: float | None, suffix: str = "") -> str:
     return f"{value:,.2f}{suffix}"
 
 
+METRIC_LABELS = {
+    "Trades": "Trades（计划总数）",
+    "Closed trades": "Closed trades（已结束交易）",
+    "Open trades": "Open trades（仍开放持仓）",
+    "Win rate": "Win rate（胜率）",
+    "Profit factor": "Profit factor（盈利因子）",
+    "Avg R": "Avg R（平均R倍数）",
+    "Net return": "Net return（净收益率）",
+    "Max drawdown": "Max drawdown（最大回撤）",
+    "Intrabar max drawdown": "Intrabar max drawdown（K线内最大回撤）",
+    "TP1 touched rate": "TP1 touched rate（第一止盈触达率）",
+    "TP2 close rate": "TP2 close rate（第二止盈平仓率）",
+    "Stop rate": "Stop rate（止损率）",
+    "Fee drag": "Fee drag（手续费拖累）",
+    "Tail max single loss": "Tail max single loss（最大单笔亏损）",
+    "CAGR": "CAGR（年化复合收益率）",
+    "Sharpe": "Sharpe（夏普比率）",
+    "Sortino": "Sortino（索提诺比率）",
+    "Exposure": "Exposure（持仓暴露时间）",
+    "Turnover": "Turnover（换手率）",
+}
+
+
+BENCHMARK_LABELS = {
+    "BTC buy-hold": "BTC buy-hold（买入并持有BTC）",
+    "ETH buy-hold": "ETH buy-hold（买入并持有ETH）",
+    "Cash": "Cash（现金不交易）",
+    "Equal-weight symbols": "Equal-weight symbols（等权持有本次币种）",
+}
+
+
+STATUS_LABELS = {
+    "WATCHING": "WATCHING（观察中/等待入场）",
+    "ENTERED": "ENTERED（已入场）",
+    "TP1_HIT": "TP1_HIT（第一止盈已触达）",
+    "STOPPED": "STOPPED（已止损）",
+    "CLOSED": "CLOSED（已按TP2平仓）",
+    "INVALIDATED": "INVALIDATED（未入场前失效）",
+    "EXPIRED": "EXPIRED（观察计划过期）",
+    "EXPIRED_END": "EXPIRED_END（回测结束仍未入场）",
+}
+
+
+TABLE_LABELS = {
+    "Metric": "Metric（指标）",
+    "Value": "Value（数值）",
+    "Benchmark": "Benchmark（基准）",
+    "Return": "Return（收益率）",
+    "Symbol": "Symbol（交易对）",
+    "Status": "Status（状态）",
+    "Created": "Created（创建时间）",
+    "Entry": "Entry（入场价）",
+    "Exit": "Exit（出场价）",
+    "Qty": "Qty（数量）",
+    "Gross PnL": "Gross PnL（毛盈亏）",
+    "Net PnL": "Net PnL（净盈亏）",
+    "Net R": "Net R（净R倍数）",
+    "Fees": "Fees（手续费）",
+    "Notes": "Notes（备注）",
+    "Unrealized Handling": "Unrealized Handling（未实现盈亏处理）",
+    "Entry Zone": "Entry Zone（入场区间）",
+    "Score": "Score（评分）",
+    "Severity": "Severity（严重程度）",
+    "Interval": "Interval（周期）",
+    "Message": "Message（说明）",
+}
+
+
+def _metric_label(name: str) -> str:
+    return METRIC_LABELS.get(name, name)
+
+
+def _benchmark_label(name: str) -> str:
+    return BENCHMARK_LABELS.get(name, name)
+
+
+def _status_label(status: str) -> str:
+    return STATUS_LABELS.get(status, status)
+
+
+def _header(*names: str) -> str:
+    return "| " + " | ".join(TABLE_LABELS.get(name, name) for name in names) + " |"
+
+
 def _commit_hash() -> str:
     try:
         completed = subprocess.run(
@@ -162,49 +246,62 @@ def _render_report(
         "",
         "## 核心指标",
         "",
-        "| Metric | Value |",
+        _header("Metric", "Value"),
         "|---|---:|",
-        f"| Trades | {metrics.trades} |",
-        f"| Closed trades | {metrics.closed_trades} |",
-        f"| Open trades | {metrics.open_trades} |",
-        f"| Win rate | {_fmt(metrics.win_rate, '%')} |",
-        f"| Profit factor | {_fmt(metrics.profit_factor)} |",
-        f"| Avg R | {_fmt(metrics.avg_r)} |",
-        f"| Net return | {_fmt(metrics.net_return_pct, '%')} |",
-        f"| Max drawdown | {metrics.max_drawdown:,.2f} / {metrics.max_drawdown_pct:.2f}% |",
-        f"| Intrabar max drawdown | {metrics.intrabar_max_drawdown:,.2f} / {metrics.intrabar_max_drawdown_pct:.2f}% |",
-        f"| TP1 touched rate | {_fmt(metrics.tp1_rate, '%')} |",
-        f"| TP2 close rate | {_fmt(metrics.tp2_rate, '%')} |",
-        f"| Stop rate | {_fmt(metrics.stop_rate, '%')} |",
-        f"| Fee drag | {metrics.fee_drag:,.2f} USDT |",
-        f"| Tail max single loss | {metrics.tail_max_loss:,.2f} USDT |",
-        f"| CAGR | {_fmt(metrics.cagr, '%')} |",
-        f"| Sharpe | {_fmt(metrics.sharpe)} |",
-        f"| Sortino | {_fmt(metrics.sortino)} |",
-        f"| Exposure | {_fmt(metrics.exposure_pct, '%')} |",
-        f"| Turnover | {_fmt(metrics.turnover)} |",
+        f"| {_metric_label('Trades')} | {metrics.trades} |",
+        f"| {_metric_label('Closed trades')} | {metrics.closed_trades} |",
+        f"| {_metric_label('Open trades')} | {metrics.open_trades} |",
+        f"| {_metric_label('Win rate')} | {_fmt(metrics.win_rate, '%')} |",
+        f"| {_metric_label('Profit factor')} | {_fmt(metrics.profit_factor)} |",
+        f"| {_metric_label('Avg R')} | {_fmt(metrics.avg_r)} |",
+        f"| {_metric_label('Net return')} | {_fmt(metrics.net_return_pct, '%')} |",
+        f"| {_metric_label('Max drawdown')} | {metrics.max_drawdown:,.2f} / {metrics.max_drawdown_pct:.2f}% |",
+        f"| {_metric_label('Intrabar max drawdown')} | {metrics.intrabar_max_drawdown:,.2f} / {metrics.intrabar_max_drawdown_pct:.2f}% |",
+        f"| {_metric_label('TP1 touched rate')} | {_fmt(metrics.tp1_rate, '%')} |",
+        f"| {_metric_label('TP2 close rate')} | {_fmt(metrics.tp2_rate, '%')} |",
+        f"| {_metric_label('Stop rate')} | {_fmt(metrics.stop_rate, '%')} |",
+        f"| {_metric_label('Fee drag')} | {metrics.fee_drag:,.2f} USDT |",
+        f"| {_metric_label('Tail max single loss')} | {metrics.tail_max_loss:,.2f} USDT |",
+        f"| {_metric_label('CAGR')} | {_fmt(metrics.cagr, '%')} |",
+        f"| {_metric_label('Sharpe')} | {_fmt(metrics.sharpe)} |",
+        f"| {_metric_label('Sortino')} | {_fmt(metrics.sortino)} |",
+        f"| {_metric_label('Exposure')} | {_fmt(metrics.exposure_pct, '%')} |",
+        f"| {_metric_label('Turnover')} | {_fmt(metrics.turnover)} |",
+        "",
+        "## 术语速查",
+        "",
+        "- PnL（Profit and Loss，盈亏）：交易赚了或亏了多少钱。",
+        "- Gross PnL（毛盈亏）：未扣手续费和滑点前的盈亏。",
+        "- Net PnL（净盈亏）：扣除手续费和滑点后的真实模拟盈亏。",
+        "- R / Net R（风险倍数）：以单笔预设亏损风险为单位衡量结果，-1R 约等于亏掉一笔计划风险。",
+        "- Drawdown（回撤）：账户从阶段高点跌到低点的幅度，用来衡量过程中的最大压力。",
+        "- Profit factor（盈利因子）：总盈利除以总亏损，大于 1 才说明已闭合交易整体赚钱。",
+        "- Sharpe（夏普比率）：单位波动获得的收益，样本少时容易失真。",
+        "- Sortino（索提诺比率）：只惩罚下行波动的风险收益指标，样本少时也要谨慎看。",
+        "- Exposure（持仓暴露时间）：回测期间有仓位在市场里的时间比例。",
+        "- Turnover（换手率）：交易名义金额相对初始资金的规模。",
         "",
         "## Benchmark",
         "",
-        "| Benchmark | Return |",
+        _header("Benchmark", "Return"),
         "|---|---:|",
     ]
     for name, value in benchmarks.items():
-        lines.append(f"| {name} | {_fmt(value, '%')} |")
+        lines.append(f"| {_benchmark_label(name)} | {_fmt(value, '%')} |")
 
     lines.extend(
         [
             "",
             "## 已结束交易",
             "",
-            "| Symbol | Status | Created | Entry | Exit | Qty | Gross PnL | Net PnL | Net R | Fees | Notes |",
+            _header("Symbol", "Status", "Created", "Entry", "Exit", "Qty", "Gross PnL", "Net PnL", "Net R", "Fees", "Notes"),
             "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
         ]
     )
     for trade in closed:
         lines.append(
             "| "
-            f"`{trade.symbol}` | {trade.status} | {trade.created_at_utc} | "
+            f"`{trade.symbol}` | {_status_label(trade.status)} | {trade.created_at_utc} | "
             f"{_fmt(trade.entry_price_filled)} | {_fmt(trade.exit_price_filled)} | {_fmt(trade.quantity)} | "
             f"{trade.gross_pnl:,.2f} | {trade.net_pnl:,.2f} | {_fmt(trade.r_multiple_net)} | "
             f"{trade.entry_fee + trade.exit_fee:,.2f} | {trade.notes} |"
@@ -215,14 +312,14 @@ def _render_report(
             "",
             "## 回测结束仍开放",
             "",
-            "| Symbol | Status | Entry | Qty | Unrealized Handling | Notes |",
+            _header("Symbol", "Status", "Entry", "Qty", "Unrealized Handling", "Notes"),
             "|---|---|---:|---:|---|---|",
         ]
     )
     for trade in open_trades:
         lines.append(
             "| "
-            f"`{trade.symbol}` | {trade.status} | {_fmt(trade.entry_price_filled)} | {_fmt(trade.quantity)} | "
+            f"`{trade.symbol}` | {_status_label(trade.status)} | {_fmt(trade.entry_price_filled)} | {_fmt(trade.quantity)} | "
             "按最后 close 计入净值，不计入胜率/profit_factor/avg_R | "
             f"{trade.notes} |"
         )
@@ -232,7 +329,7 @@ def _render_report(
             "",
             "## 未入场/过期计划",
             "",
-            "| Symbol | Status | Created | Entry Zone | Score | Notes |",
+            _header("Symbol", "Status", "Created", "Entry Zone", "Score", "Notes"),
             "|---|---|---|---:|---:|---|",
         ]
     )
@@ -241,7 +338,7 @@ def _render_report(
     for trade in inactive:
         lines.append(
             "| "
-            f"`{trade.symbol}` | {trade.status} | {trade.created_at_utc} | "
+            f"`{trade.symbol}` | {_status_label(trade.status)} | {trade.created_at_utc} | "
             f"{_fmt(trade.entry_low)} - {_fmt(trade.entry_high)} | {trade.score:.2f} | {trade.notes} |"
         )
 
@@ -250,7 +347,7 @@ def _render_report(
             "",
             "## 数据质量摘要",
             "",
-            "| Severity | Symbol | Interval | Message |",
+            _header("Severity", "Symbol", "Interval", "Message"),
             "|---|---|---|---|",
         ]
     )
