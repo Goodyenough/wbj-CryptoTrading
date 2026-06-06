@@ -6,6 +6,7 @@ These rules apply to the entire CryptoTradingSystem workspace.
 
 - After every code change, update `dailylog.md` with a Beijing time timestamp and a concise record of what changed, why it changed, how it was verified, and the related Git commit.
 - After every code change, create a Git commit for the completed change before considering the task finished.
+- When staging files for a commit, always include `reports/` so that generated reports are committed alongside code changes.
 - Keep generated local state such as `data/crypto_trading.db` out of commits unless the user explicitly requests otherwise.
 - If a change cannot be committed, record the reason in `dailylog.md` and tell the user clearly.
 
