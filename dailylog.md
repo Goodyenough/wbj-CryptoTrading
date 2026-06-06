@@ -15,6 +15,15 @@
 
 ## 2026-06-06
 
+### 21:46:06 +08:00 - Add project memory rules
+- Type: docs / rules / Git
+- Change: Updated `AGENTS.md` with Project Memory Rules, separating responsibilities for `dailylog.md`, `TODO.md`, the Obsidian development plan, and the Obsidian experiment log.
+- Change: Created Obsidian note `D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTrading Experiment Log.md` using the intended Chinese filename; added usage notes, a fixed experiment template, and the 2026-06-06 A/B selection-parameter review.
+- Reason: `dailylog.md` only audits engineering changes, so experiment outcomes and research conclusions were easy to lose after a few days.
+- Impact: Future tasks must decide which memory files to update before finishing; backtests, A/B runs, paper-trading evaluations, and scan comparisons with conclusions must update the Obsidian experiment log.
+- Verification: Confirmed `AGENTS.md` contains Project Memory Rules; confirmed the Obsidian experiment log exists with the expected filename, title, template, and A/B review section.
+- Git: `Update project memory rules` (this entry is included in that commit).
+
 ### 19:51:07 +08:00 - 增加 A/B 实验框架
 - 类型：代码 / 配置 / 回测 / 报告 / 测试
 - 改动：新增 `config/experiments.toml`，定义 `history_250`、`history_365`、`pump_chase_strict`、`liquidity_50m` 等配置覆盖类实验，并将需要结构性逻辑支持的实验标记为 disabled。
