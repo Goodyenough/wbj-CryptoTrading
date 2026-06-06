@@ -14,6 +14,7 @@ from ..ticker_utils import reconstruct_ticker
 from ..trade_state import step_trade
 from .costs import entry_fill, stop_exit_fill, target_exit_fill
 from .history import KlineQualityIssue, fetch_klines_cached, interval_ms
+from .universe import fetch_universe_snapshot
 
 
 @dataclass
@@ -75,6 +76,8 @@ class BacktestResult:
     data_issues: list[KlineQualityIssue]
     config_snapshot: dict
     limitations: list[str]
+    universe_mode: bool = False
+    universe_snapshot: dict | None = None
 
 
 @dataclass
@@ -247,6 +250,8 @@ def run_backtest_replay(
     interval: str | None = None,
     intrabar: str | None = None,
     allow_data_gaps: bool = False,
+    universe_mode: bool = False,
+    max_universe_symbols: int | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> BacktestResult:
     primary_interval = interval or settings.backtest.primary_interval
@@ -262,7 +267,15 @@ def run_backtest_replay(
     warmup_ms = _effective_warmup_ms(settings)
     fetch_start_ms = start_ms - warmup_ms
     fetch_end_ms = end_ms + interval_ms(primary_interval)
+    universe_snapshot = None
+    if universe_mode:
+        snapshot = fetch_universe_snapshot(settings, max_symbols=max_universe_symbols, progress=progress)
+        universe_snapshot = snapshot.to_dict()
+        symbols = snapshot.selected_symbols
     symbols = [symbol.replace("/", "").upper() for symbol in symbols]
+    if not symbols:
+        raise ValueError("Backtest requires at least one symbol after universe selection.")
+    skipped_symbols_no_history: list[str] = []
 
     klines_by_symbol: dict[str, dict[str, list[list]]] = {}
     regime_klines: dict[str, list[list]] = {}
@@ -298,6 +311,29 @@ def run_backtest_replay(
             regime_klines[regime_symbol] = fetched.klines
             data_issues.extend(fetched.issues)
 
+    usable_symbols: list[str] = []
+    for symbol in symbols:
+        period_bars = [kline for kline in klines_by_symbol[symbol]["4h"] if start_ms <= int(kline[0]) < end_ms]
+        if period_bars:
+            usable_symbols.append(symbol)
+        else:
+            skipped_symbols_no_history.append(symbol)
+            data_issues.append(
+                KlineQualityIssue(
+                    symbol,
+                    primary_interval,
+                    "ERROR",
+                    "No primary interval klines inside requested backtest period.",
+                )
+            )
+    symbols = usable_symbols
+    if universe_snapshot is not None:
+        universe_snapshot["replay_symbols"] = symbols
+        universe_snapshot["replay_count"] = len(symbols)
+        universe_snapshot["skipped_symbols_no_history"] = skipped_symbols_no_history
+    if not symbols:
+        raise ValueError("Backtest has no symbols with primary interval history inside the requested period.")
+
     reference = klines_by_symbol[symbols[0]]["4h"]
     bars = [kline for kline in reference if start_ms <= int(kline[0]) < end_ms]
     cash = settings.backtest.initial_equity
@@ -308,6 +344,14 @@ def run_backtest_replay(
         "24h ticker fields are reconstructed from 1h klines and differ from live rolling /ticker/24hr precision.",
         "4h candles decide execution; no 5m/15m intrabar path reconstruction in this version.",
     ]
+    if universe_mode:
+        limitations.extend(
+            [
+                "Universe snapshot mode uses a current Binance market snapshot to choose symbols before historical replay.",
+                "Universe snapshot mode is not a full historical dynamic universe; it can still have survivorship bias.",
+                "Universe snapshot symbols with no primary-interval history inside the requested period are skipped.",
+            ]
+        )
 
     for bar_index, reference_bar in enumerate(bars):
         bar_open_ms = int(reference_bar[0])
@@ -541,6 +585,10 @@ def run_backtest_replay(
             "backtest": asdict(settings.backtest),
             "analysis": asdict(settings.analysis),
             "market_top_n": settings.market.top_n,
+            "universe_mode": universe_mode,
+            "universe_snapshot": universe_snapshot,
         },
         limitations=limitations,
+        universe_mode=universe_mode,
+        universe_snapshot=universe_snapshot,
     )

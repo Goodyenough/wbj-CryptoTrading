@@ -49,6 +49,8 @@ These numbers suggest the system is still opening too many low-quality plans, or
 
 ## Priority 4: Backtest A/B Testing Discipline
 
+- [x] Add `backtest-universe` snapshot mode: select symbols from the current Binance market snapshot, replay historical klines, and write snapshot metadata plus survivorship-bias warning into the report.
+- [ ] Build full historical dynamic universe backtest: at each historical decision point, reconstruct the tradable universe from historical data before selecting candidates. Source: universe snapshot smoke test on 2026-06-06.
 - [ ] Change only one strategy dimension per experiment.
 - [ ] Run each experiment on the same symbol universe and date range.
 - [ ] Compare net return, max drawdown, win rate, profit factor, average R, stop-loss rate, and trade count.

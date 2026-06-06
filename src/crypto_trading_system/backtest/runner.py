@@ -222,6 +222,7 @@ def _render_report(
         f"backtest_run_id: {result.run_id}",
         f"report_version: {report_version}",
         f"sample_sufficient: {str(metrics.sample_sufficient).lower()}",
+        f"universe_mode: {str(result.universe_mode).lower()}",
         "---",
         "",
         f"# 回测报告 {result.start_utc[:10]} 至 {result.end_utc[:10]} {report_version}",
@@ -235,6 +236,7 @@ def _render_report(
         f"- 代码 commit：`{commit_hash}`",
         f"- 样本是否充分：{str(metrics.sample_sufficient).lower()}",
         f"- 样本提示：{metrics.sample_warning or '样本数量未触发警告。'}",
+        f"- Universe mode：{'snapshot / 当前快照选币' if result.universe_mode else 'manual symbols / 手动指定币种'}",
         "",
         "## 回测假设",
         "",
@@ -245,8 +247,43 @@ def _render_report(
         "- 使用固定 stop/TP，不实现动态支撑退出；4h K 线裁决成交，未使用 5m/15m 还原真实路径。",
         "- 24h ticker 字段由 1h K 线重建，与实时 Binance /ticker/24hr 存在粒度差异。",
         "- 未处理 tick size、step size、min notional、历史费率变化、BNB 折扣和 VIP 费率。",
-        "- 只覆盖用户指定且可获取历史数据的 symbols，不代表完整历史市场 universe。",
+        "- 只覆盖本次手动输入或快照选中且可获取历史数据的 symbols，不代表完整历史市场 universe。",
         "",
+        *(
+            [
+                "## Universe Snapshot / 当前市场快照选币",
+                "",
+                f"- Source / 来源：{result.universe_snapshot.get('source', 'n/a')}",
+                f"- Snapshot time UTC / 快照时间：{result.universe_snapshot.get('snapshot_at_utc', 'n/a')}",
+                f"- Filters / 筛选条件：{result.universe_snapshot.get('filters', 'n/a')}",
+                (
+                    "- Selected count / 入选数量："
+                    f"{result.universe_snapshot.get('selected_count', len(result.universe_snapshot.get('selected_symbols', [])))}"
+                ),
+                f"- Replay count / 实际回放数量：{result.universe_snapshot.get('replay_count', len(result.symbols))}",
+                f"- Candidate count after initial filters / 初筛候选数：{result.universe_snapshot.get('candidate_count', 'n/a')}",
+                (
+                    "- Selected symbols / 入选币种："
+                    f"{', '.join(f'`{symbol}`' for symbol in result.universe_snapshot.get('selected_symbols', []))}"
+                ),
+                (
+                    "- Skipped symbols without period history / 因回测区间无历史 K 线跳过："
+                    f"{', '.join(f'`{symbol}`' for symbol in result.universe_snapshot.get('skipped_symbols_no_history', [])) or 'none'}"
+                ),
+                "",
+                (
+                    "> Warning / 警告：这是 universe snapshot 回测。它用当前 Binance 市场快照先选币，"
+                    "再回放历史 K 线，所以不是完整的历史动态 universe 回测，仍可能存在幸存者偏差。"
+                ),
+                (
+                    "> Limitation / 限制：当前快照只能验证“今天这个候选池”在历史中的表现，"
+                    "不能完全验证历史上每一天真实会被选入的币。"
+                ),
+                "",
+            ]
+            if result.universe_mode and result.universe_snapshot
+            else []
+        ),
         "## 核心指标",
         "",
         _header("Metric", "Value"),
@@ -388,7 +425,8 @@ def _write_report(
     target_dirs = [project_dir]
     if include_obsidian and obsidian_dir is not None:
         target_dirs.append(obsidian_dir)
-    prefix = f"backtest_{result.start_utc[:10]}_{result.end_utc[:10]}"
+    report_kind = "backtest_universe" if result.universe_mode else "backtest"
+    prefix = f"{report_kind}_{result.start_utc[:10]}_{result.end_utc[:10]}"
     version_number = next_report_version(target_dirs, prefix)
     version = f"v{version_number}"
     filename = versioned_markdown_filename(prefix, version_number)
@@ -486,6 +524,8 @@ def run_backtest(
     interval: str | None = None,
     intrabar: str | None = None,
     allow_data_gaps: bool = False,
+    universe_mode: bool = False,
+    max_universe_symbols: int | None = None,
     include_obsidian: bool = True,
     progress: Callable[[str], None] | None = None,
 ) -> tuple[BacktestResult, BacktestMetrics, list[Path]]:
@@ -497,6 +537,8 @@ def run_backtest(
         interval=interval,
         intrabar=intrabar,
         allow_data_gaps=allow_data_gaps,
+        universe_mode=universe_mode,
+        max_universe_symbols=max_universe_symbols,
         progress=progress,
     )
     metrics = calculate_metrics(result)

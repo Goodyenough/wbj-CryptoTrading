@@ -15,6 +15,17 @@
 
 ## 2026-06-06
 
+### 23:02:52 +08:00 - Add universe snapshot backtest
+- Type: code / report / test / docs / Git
+- Change: Added `src/crypto_trading_system/backtest/universe.py` and the `backtest-universe` CLI command, which builds a current Binance market snapshot, selects symbols, and replays historical klines.
+- Change: Extended backtest replay and reports with `universe_mode`, snapshot metadata, replay/skipped symbol counts, current-snapshot warnings, and `backtest_universe_*` report filenames.
+- Change: Skips snapshot symbols that have no primary-interval history inside the requested backtest period instead of crashing; those symbols are recorded in the report.
+- Change: Added `tests/test_universe.py`, updated `TODO.md`, synced development-plan notes, and wrote a universe snapshot smoke-test summary to the Obsidian experiment log.
+- Reason: Fixed-symbol backtests were not suitable for evaluating coin-selection filters; this snapshot MVP gives a broader, reproducible first step while clearly documenting its survivorship-bias limitation.
+- Impact: Users can run `python main.py backtest-universe --start 2025-01-01 --end 2025-02-01 --max-symbols 3 --no-obsidian --allow-data-gaps` to generate a universe snapshot backtest report.
+- Verification: Ran `python -m compileall main.py src tests`, `python tests\test_trade_state.py`, `python tests\test_replay.py`, `python tests\test_abtest.py`, `python tests\test_universe.py`; smoke test generated `reports/2026-06-06/backtest_universe_2025-01-01_2025-02-01_v1.md` with trades=1, closed_trades=1, sample_sufficient=false.
+- Git: `Add universe snapshot backtest` (this entry is included in that commit).
+
 ### 21:46:06 +08:00 - Add project memory rules
 - Type: docs / rules / Git
 - Change: Updated `AGENTS.md` with Project Memory Rules, separating responsibilities for `dailylog.md`, `TODO.md`, the Obsidian development plan, and the Obsidian experiment log.

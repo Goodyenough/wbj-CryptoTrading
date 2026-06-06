@@ -68,6 +68,36 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write only to the project reports directory.",
     )
 
+    backtest_universe = subparsers.add_parser(
+        "backtest-universe",
+        help="Build a current Binance universe snapshot, replay historical klines, and write a backtest report.",
+    )
+    backtest_universe.add_argument("--start", required=True, help="UTC start date, e.g. 2024-01-01.")
+    backtest_universe.add_argument("--end", required=True, help="UTC end date, e.g. 2024-12-31.")
+    backtest_universe.add_argument(
+        "--max-symbols",
+        type=int,
+        default=None,
+        help="Override settings.market.max_universe for this universe snapshot.",
+    )
+    backtest_universe.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
+    backtest_universe.add_argument(
+        "--intrabar",
+        default=None,
+        choices=["stop_first", "tp_first"],
+        help="Intrabar fill policy.",
+    )
+    backtest_universe.add_argument(
+        "--allow-data-gaps",
+        action="store_true",
+        help="Continue when historical kline gaps are found.",
+    )
+    backtest_universe.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
     abtest = subparsers.add_parser("abtest", help="Run baseline versus variant backtests for one experiment.")
     abtest.add_argument("--experiment", required=True, help="Experiment id from config/experiments.toml.")
     abtest.add_argument("--experiments", default="config/experiments.toml", help="Path to TOML experiment definitions.")
@@ -225,6 +255,33 @@ def main() -> None:
         print(f"closed_trades={metrics.closed_trades}")
         print(f"net_return_pct={metrics.net_return_pct:.2f}")
         print(f"max_drawdown_pct={metrics.max_drawdown_pct:.2f}")
+        for path in report_paths:
+            print(f"report={path}")
+
+    if args.command == "backtest-universe":
+        _progress("starting universe snapshot backtest")
+        result, metrics, report_paths = run_backtest(
+            settings,
+            [],
+            args.start,
+            args.end,
+            interval=args.interval,
+            intrabar=args.intrabar,
+            allow_data_gaps=args.allow_data_gaps,
+            universe_mode=True,
+            max_universe_symbols=args.max_symbols,
+            include_obsidian=not args.no_obsidian,
+            progress=_progress,
+        )
+        print("backtest_universe=completed")
+        print(f"backtest_run_id={result.run_id}")
+        print(f"universe_selected={len(result.symbols)}")
+        print(f"symbols={','.join(result.symbols)}")
+        print(f"trades={metrics.trades}")
+        print(f"closed_trades={metrics.closed_trades}")
+        print(f"net_return_pct={metrics.net_return_pct:.2f}")
+        print(f"max_drawdown_pct={metrics.max_drawdown_pct:.2f}")
+        print(f"sample_sufficient={str(metrics.sample_sufficient).lower()}")
         for path in report_paths:
             print(f"report={path}")
 
