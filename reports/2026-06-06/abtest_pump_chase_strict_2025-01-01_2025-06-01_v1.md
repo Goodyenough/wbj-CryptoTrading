@@ -1,0 +1,116 @@
+---
+created: 2026-06-06 20:04:39 CST
+tags:
+  - crypto
+  - trading-system
+  - abtest
+experiment_id: pump_chase_strict
+baseline_run_id: 36d64abadf49
+variant_run_id: bc4cda3c07a2
+changed_param: analysis.pump_chase_24h_pct, analysis.pump_chase_distance_pct, analysis.pump_chase_penalty
+old_value: 20.0, 8.0, 8.0
+new_value: 12.0, 6.0, 12.0
+sample_sufficient: false
+verdict: retest
+report_version: v1
+---
+
+# A/B 实验报告 pump_chase_strict v1
+
+- experiment_id: `pump_chase_strict`
+- description: Test stricter pump-chasing score penalties.
+- baseline_run_id: `36d64abadf49`
+- variant_run_id: `bc4cda3c07a2`
+- symbols: `BTCUSDT`, `ETHUSDT`, `SOLUSDT`
+- time_periods_tested: `2025-01-01` -> `2025-06-01`
+- changed_param: `analysis.pump_chase_24h_pct, analysis.pump_chase_distance_pct, analysis.pump_chase_penalty`
+- old_value: `20.0, 8.0, 8.0`
+- new_value: `12.0, 6.0, 12.0`
+- sample_sufficient: false
+- possible_over_filtering: false
+- verdict: `retest`
+- reason: Variant closed_trades is below 20, so the sample is insufficient for a keep decision.
+
+## 指标对比
+
+| Metric | Baseline | Variant | Delta |
+|---|---:|---:|---:|
+| closed_trades | 12.00 | 12.00 | 0.00 |
+| stop_rate | 83.33% | 83.33% | 0.00% |
+| profit_factor | 0.49 | 0.49 | 0.00 |
+| avg_r | -0.42 | -0.42 | 0.00 |
+| max_drawdown_pct | 10.65% | 10.65% | 0.00% |
+| net_return_pct | -5.63% | -5.63% | 0.00% |
+| sharpe | -1.35 | -1.35 | 0.00 |
+| first_trade_created_at | 2025-01-02T12:00:00+00:00 | 2025-01-02T12:00:00+00:00 | n/a |
+
+## 样本规则
+
+- closed_trades < 20 时，默认 verdict 为 `retest`。
+- 交易数下降超过 50% 时，标记 possible_over_filtering=true。
+- 自动报告不会直接写 `keep`；采用默认策略前需要跨时段复测和人工复盘。
+
+## 变更明细
+
+| changed_param | old_value | new_value |
+|---|---:|---:|
+| `analysis.pump_chase_24h_pct` | `20.0` | `12.0` |
+| `analysis.pump_chase_distance_pct` | `8.0` | `6.0` |
+| `analysis.pump_chase_penalty` | `8.0` | `12.0` |
+
+## Raw Metrics
+
+```json
+{
+  "baseline": {
+    "trades": 15,
+    "closed_trades": 12,
+    "open_trades": 2,
+    "win_rate": 16.666666666666664,
+    "profit_factor": 0.4872336038550303,
+    "avg_r": -0.4170584958095684,
+    "net_return_pct": -5.627857931724467,
+    "max_drawdown": 1083.323936673869,
+    "max_drawdown_pct": 10.647050831984567,
+    "intrabar_max_drawdown": 1057.4259056801966,
+    "intrabar_max_drawdown_pct": 10.422464111283984,
+    "tp1_rate": 16.666666666666664,
+    "tp2_rate": 16.666666666666664,
+    "stop_rate": 83.33333333333334,
+    "fee_drag": 22.354361174833734,
+    "tail_max_loss": -110.09449451498116,
+    "cagr": -13.065532581119388,
+    "sharpe": -1.3494936942029678,
+    "sortino": -1.411483100954615,
+    "exposure_pct": 81.56732891832229,
+    "turnover": 1.8755182666148995,
+    "sample_sufficient": false,
+    "sample_warning": "样本不足，Sharpe/Sortino/CAGR 需要谨慎解读。"
+  },
+  "variant": {
+    "trades": 15,
+    "closed_trades": 12,
+    "open_trades": 2,
+    "win_rate": 16.666666666666664,
+    "profit_factor": 0.4872336038550303,
+    "avg_r": -0.4170584958095684,
+    "net_return_pct": -5.627857931724467,
+    "max_drawdown": 1083.323936673869,
+    "max_drawdown_pct": 10.647050831984567,
+    "intrabar_max_drawdown": 1057.4259056801966,
+    "intrabar_max_drawdown_pct": 10.422464111283984,
+    "tp1_rate": 16.666666666666664,
+    "tp2_rate": 16.666666666666664,
+    "stop_rate": 83.33333333333334,
+    "fee_drag": 22.354361174833734,
+    "tail_max_loss": -110.09449451498116,
+    "cagr": -13.065532581119388,
+    "sharpe": -1.3494936942029678,
+    "sortino": -1.411483100954615,
+    "exposure_pct": 81.56732891832229,
+    "turnover": 1.8755182666148995,
+    "sample_sufficient": false,
+    "sample_warning": "样本不足，Sharpe/Sortino/CAGR 需要谨慎解读。"
+  }
+}
+```
