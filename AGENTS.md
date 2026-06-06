@@ -15,8 +15,8 @@ Use these files as separate memory layers:
 
 - `dailylog.md`: engineering audit log for code/config/project-file changes.
 - `TODO.md`: actionable engineering tasks.
-- `D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTradingSystem 开发计划.md`: roadmap, module status, and next priority.
-- `D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTrading 实验日志.md`: backtest, A/B, paper-trading experiments, results, and conclusions.
+- `开发计划.md`: roadmap, module status, and next priority.
+- `D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTrading 实验日志.md`（Obsidian 仓库相对路径：`CryptoTradingSystem/CryptoTrading 实验日志.md`）: backtest, A/B, paper-trading experiments, results, and conclusions.
 
 Before finishing any task, decide which files must be updated:
 
@@ -56,31 +56,31 @@ Use this event-to-file decision table:
 Use this template for experiment-log entries:
 
 ```markdown
-## YYYY-MM-DD HH:mm +08:00 - Experiment title
+## YYYY-MM-DD HH:mm +08:00 - 实验标题
 
-### Background
-Why this experiment was run.
+### 背景
+为什么做这个实验。
 
-### Hypothesis
-What the experiment is testing.
+### 假设
+这次想验证什么。
 
-### Experiment
-- Experiment: [name]
-- Change: [specific change]
-- Sample: [symbols / date range / parameters]
+### 实验
+- 实验：[项目名]
+- 变更：[具体改了什么]
+- 样本：[symbols / 时间段 / 参数]
 
-### Results
-- trades: baseline -> variant, delta X%
-- closed_trades: baseline -> variant, delta X%
-- win_rate: baseline -> variant, delta X%
-- Profit factor: baseline -> variant
-- Sharpe: baseline -> variant
-- Max drawdown: baseline -> variant
-- Net return: baseline -> variant
+### 结果
+- trades：baseline -> variant，变化 X%
+- closed_trades：baseline -> variant，变化 X%
+- 胜率：baseline -> variant，变化 X%
+- Profit factor：baseline -> variant
+- Sharpe：baseline -> variant
+- 最大回撤：baseline -> variant
+- 净收益：baseline -> variant
 
-### Conclusion
-keep / revert / retest: one-sentence reason.
+### 结论
+keep / revert / retest：原因一句话。
 
-### Next Action
-What should happen next.
+### 下一步
+下一步要做什么。
 ```
