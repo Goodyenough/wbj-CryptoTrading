@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-06-07
+
+### 00:06:21 +08:00 - Convert TODO to Chinese
+- Type: docs / rules / Git
+- Change: Rewrote `TODO.md` in Chinese while preserving exact command names, config keys, statuses, and code identifiers.
+- Change: Added a `TODO.md` maintenance rule to `AGENTS.md` requiring future TODO entries to be written primarily in Chinese.
+- Reason: The TODO file is a daily planning surface, and English-only tasks made it harder to quickly resume project context.
+- Impact: Future task tracking should be easier to read; technical tokens such as `BUY_CANDIDATE`, `sample_sufficient`, and `python main.py ...` remain unchanged.
+- Verification: Reviewed `TODO.md` and confirmed `AGENTS.md` contains the new TODO language rule; docs-only change, no code tests run.
+- Git: `Convert TODO to Chinese` (this entry is included in that commit).
+
 ## 2026-06-06
 
 ### 23:49:57 +08:00 - Add dynamic universe backtest MVP

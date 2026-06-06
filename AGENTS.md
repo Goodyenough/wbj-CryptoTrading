@@ -23,6 +23,7 @@ Before finishing any task, decide which files must be updated:
 
 - If code/config/tests/docs inside the repo changed, update `dailylog.md` and create a Git commit.
 - If an actionable task is created, completed, cancelled, or reprioritized, update `TODO.md`.
+- Write `TODO.md` entries primarily in Chinese. Keep exact English command names, config keys, statuses, and code identifiers when useful, for example `BUY_CANDIDATE`, `sample_sufficient`, and `python main.py ...`.
 - If module status, project phase, or next priority changes, update the Obsidian development plan.
 - If a backtest, A/B experiment, scan comparison, or paper-trading evaluation was run and produced a judgment, update the Obsidian experiment log.
 
