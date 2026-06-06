@@ -15,13 +15,20 @@ These numbers suggest the system is still opening too many low-quality plans, or
 ## Priority 1: Improve Coin Selection
 
 - [x] Add data quality filter: prioritize `DATA_OK`; downgrade or reject `DATA_WARNING` and `DATA_ERROR` buy candidates.
+- [x] Validate a larger candidate pool before final ranking: cross-check `min(top_n * 2, 10)` candidates, then refill final `top_n` after data-quality downgrades.
 - [x] Add history length filter: require at least 180 daily candles by default before a coin can become a buy candidate.
+- [x] Fix backtest warmup so historical replay fetches at least `min_history_days + 60` daily candles before the start date.
 - [x] Add BTC/ETH market regime filter: when the broad market is weak or unclear, downgrade altcoin buy candidates to watch-only.
-- [ ] Test stricter history filter options, especially 365 daily candles versus the current 180 daily candles.
-- [ ] Exclude coins that have already pumped too far from support after a strong 24h move.
+- [x] Parameterize pump-chasing and high-volatility score penalties while keeping default behavior equivalent to the old hard-coded rules.
+- [x] Align paper trading imports with backtest behavior: default `paper add-from-scan` imports only `BUY_CANDIDATE`.
+- [x] Add `sample_sufficient` to backtest reports so closed-trade samples below 20 are explicitly marked as insufficient.
+- [ ] A/B test stricter history filter options: current 180 daily candles versus 250 and 365.
+- [ ] Split history handling into `min_indicator_history_days`, hard-reject days, and short-history score penalty.
+- [ ] A/B test stricter pump-chasing rules: exclude or downgrade coins that are far from support after a strong 24h move.
 - [ ] Raise liquidity thresholds and test the impact on trade count, win rate, and drawdown.
-- [ ] Add stronger trend filter: only allow coins with daily `EMA20 > EMA50` and price above both averages.
-- [ ] Add candidate score penalties for high volatility without confirmed trend continuation.
+- [ ] A/B test stronger trend filter: only allow buy candidates with daily `price > EMA20 > EMA50`.
+- [ ] A/B test high-volatility penalties that depend on missing trend confirmation, not just raw 24h range.
+- [ ] Add an experiment comparison note after each A/B run: keep, revert, or retest.
 
 ## Priority 2: Improve Entry Rules
 
@@ -47,4 +54,3 @@ These numbers suggest the system is still opening too many low-quality plans, or
 - [ ] Compare net return, max drawdown, win rate, profit factor, average R, stop-loss rate, and trade count.
 - [ ] Save each experiment report with a clear rule name and version.
 - [ ] Keep a short decision note explaining whether the rule should be kept, reverted, or retested.
-
