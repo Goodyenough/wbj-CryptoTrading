@@ -117,6 +117,11 @@ def _analyze_ticker(
     risk_reward_min: float,
     min_history_days: int = 60,
     market_regime_allows_buy: bool = True,
+    pump_chase_24h_pct: float = 20.0,
+    pump_chase_distance_pct: float = 8.0,
+    pump_chase_penalty: float = 8.0,
+    high_volatility_range_pct: float = 35.0,
+    high_volatility_penalty: float = 6.0,
 ) -> TradeCandidate | None:
     closes_1h = _quote_closes(k1h)
     closes_4h = _quote_closes(k4h)
@@ -182,10 +187,10 @@ def _analyze_ticker(
         score += 6
     elif distance_to_support > 12:
         score -= 10
-    if ticker.high_low_range_24h > 35:
-        score -= 6
-    if ticker.pct_24h > 20 and distance_to_support > 8:
-        score -= 8
+    if ticker.high_low_range_24h > high_volatility_range_pct:
+        score -= high_volatility_penalty
+    if ticker.pct_24h > pump_chase_24h_pct and distance_to_support > pump_chase_distance_pct:
+        score -= pump_chase_penalty
     if ticker.pct_24h < 0:
         score -= 4
     if pct_7d is not None and pct_7d < 0:
@@ -409,6 +414,11 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
                 settings.analysis.risk_reward_min,
                 min_history_days=settings.analysis.min_history_days,
                 market_regime_allows_buy=market_regime_allows_buy,
+                pump_chase_24h_pct=settings.analysis.pump_chase_24h_pct,
+                pump_chase_distance_pct=settings.analysis.pump_chase_distance_pct,
+                pump_chase_penalty=settings.analysis.pump_chase_penalty,
+                high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
+                high_volatility_penalty=settings.analysis.high_volatility_penalty,
             )
             if candidate is not None:
                 candidates.append(candidate)

@@ -30,6 +30,11 @@ class AnalysisSettings:
     market_regime_filter_enabled: bool
     data_quality_filter_enabled: bool
     strict_data_quality_for_buy: bool
+    pump_chase_24h_pct: float
+    pump_chase_distance_pct: float
+    pump_chase_penalty: float
+    high_volatility_range_pct: float
+    high_volatility_penalty: float
 
 
 @dataclass
@@ -137,6 +142,11 @@ def load_settings(path: Path) -> Settings:
             market_regime_filter_enabled=bool(analysis.get("market_regime_filter_enabled", True)),
             data_quality_filter_enabled=bool(analysis.get("data_quality_filter_enabled", True)),
             strict_data_quality_for_buy=bool(analysis.get("strict_data_quality_for_buy", True)),
+            pump_chase_24h_pct=float(analysis.get("pump_chase_24h_pct", 20.0)),
+            pump_chase_distance_pct=float(analysis.get("pump_chase_distance_pct", 8.0)),
+            pump_chase_penalty=float(analysis.get("pump_chase_penalty", 8.0)),
+            high_volatility_range_pct=float(analysis.get("high_volatility_range_pct", 35.0)),
+            high_volatility_penalty=float(analysis.get("high_volatility_penalty", 6.0)),
         ),
         paper=PaperSettings(
             account_name=str(paper.get("account_name", "demo")),

@@ -55,7 +55,18 @@ def verify_symbol(settings: Settings, symbol: str, progress: Callable[[str], Non
     k1d = client.klines(normalized, "1d", 100)
     if progress is not None:
         progress(f"building trade plan for {normalized}")
-    candidate = _analyze_ticker(raw, k1h, k4h, k1d, settings.analysis.risk_reward_min)
+    candidate = _analyze_ticker(
+        raw,
+        k1h,
+        k4h,
+        k1d,
+        settings.analysis.risk_reward_min,
+        pump_chase_24h_pct=settings.analysis.pump_chase_24h_pct,
+        pump_chase_distance_pct=settings.analysis.pump_chase_distance_pct,
+        pump_chase_penalty=settings.analysis.pump_chase_penalty,
+        high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
+        high_volatility_penalty=settings.analysis.high_volatility_penalty,
+    )
     if candidate is None:
         raise ValueError(f"{normalized} did not produce a valid trade plan under current rules")
 

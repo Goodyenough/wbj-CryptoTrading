@@ -471,6 +471,11 @@ def run_backtest_replay(
                 settings.analysis.risk_reward_min,
                 min_history_days=settings.analysis.min_history_days,
                 market_regime_allows_buy=market_regime_allows_buy,
+                pump_chase_24h_pct=settings.analysis.pump_chase_24h_pct,
+                pump_chase_distance_pct=settings.analysis.pump_chase_distance_pct,
+                pump_chase_penalty=settings.analysis.pump_chase_penalty,
+                high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
+                high_volatility_penalty=settings.analysis.high_volatility_penalty,
             )
             if candidate is not None and candidate.action == "BUY_CANDIDATE":
                 candidate_pool.append(candidate)

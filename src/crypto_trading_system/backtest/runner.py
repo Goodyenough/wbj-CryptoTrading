@@ -64,6 +64,7 @@ METRIC_LABELS = {
     "Sortino": "Sortino（索提诺比率）",
     "Exposure": "Exposure（持仓暴露时间）",
     "Turnover": "Turnover（换手率）",
+    "Sample sufficient": "Sample sufficient（样本是否充分）",
 }
 
 
@@ -220,6 +221,7 @@ def _render_report(
         "  - backtest",
         f"backtest_run_id: {result.run_id}",
         f"report_version: {report_version}",
+        f"sample_sufficient: {str(metrics.sample_sufficient).lower()}",
         "---",
         "",
         f"# 回测报告 {result.start_utc[:10]} 至 {result.end_utc[:10]} {report_version}",
@@ -231,6 +233,7 @@ def _render_report(
         f"- 最终权益：{result.final_equity:,.2f} USDT",
         f"- 净收益：{_fmt(metrics.net_return_pct, '%')}",
         f"- 代码 commit：`{commit_hash}`",
+        f"- 样本是否充分：{str(metrics.sample_sufficient).lower()}",
         f"- 样本提示：{metrics.sample_warning or '样本数量未触发警告。'}",
         "",
         "## 回测假设",
@@ -267,6 +270,7 @@ def _render_report(
         f"| {_metric_label('Sortino')} | {_fmt(metrics.sortino)} |",
         f"| {_metric_label('Exposure')} | {_fmt(metrics.exposure_pct, '%')} |",
         f"| {_metric_label('Turnover')} | {_fmt(metrics.turnover)} |",
+        f"| {_metric_label('Sample sufficient')} | {str(metrics.sample_sufficient).lower()} |",
         "",
         "## 术语速查",
         "",

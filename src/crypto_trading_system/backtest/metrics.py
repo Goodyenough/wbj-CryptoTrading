@@ -29,6 +29,7 @@ class BacktestMetrics:
     sortino: float | None
     exposure_pct: float | None
     turnover: float | None
+    sample_sufficient: bool
     sample_warning: str
 
 
@@ -125,5 +126,6 @@ def calculate_metrics(result: BacktestResult) -> BacktestMetrics:
         sortino=sortino,
         exposure_pct=exposure,
         turnover=turnover,
+        sample_sufficient=len(closed) >= 20,
         sample_warning=sample_warning,
     )

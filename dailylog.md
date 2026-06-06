@@ -15,6 +15,14 @@
 
 ## 2026-06-06
 
+### 18:33:47 +08:00 - 参数化选币扣分并增加回测样本字段
+- 类型：代码 / 配置 / 回测 / 报告
+- 改动：将追高扣分和 24h 高波动扣分从扫描器硬编码提取为 `[analysis]` 配置项，默认值保持旧逻辑等效。
+- 改动：扫描、回测和单币复核共用新的扣分配置；回测报告新增 `sample_sufficient` 字段，闭合交易少于 20 笔时显式标记样本不足。
+- 影响：默认参数下交易判定不应改变；新增字段用于防止把小样本回测指标误读为策略改善。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`，均通过；BTCUSDT/ETHUSDT/SOLUSDT 2025-01-01 至 2025-06-01 阶段 A before/after 回测均为 trades=6、closed_trades=3、net_return=3.77%、max_drawdown=3.34%、win_rate=66.67%、profit_factor=4.80、stop_rate=33.33%。
+- Git：`Parameterize selection penalties`（本条随该提交一并提交）。
+
 ### 17:44:49 +08:00 - 新增策略优化 TODO 清单
 - 类型：文档 / 计划
 - 改动：新增根目录 `TODO.md`，记录选币策略、买入规则、卖出规则和回测 A/B 测试的后续优化路线。
