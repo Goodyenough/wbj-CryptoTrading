@@ -6,7 +6,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from crypto_trading_system.backtest.replay import _closed_slice
+from crypto_trading_system.backtest.history import interval_ms
+from crypto_trading_system.backtest.replay import _closed_slice, _effective_warmup_ms
+from crypto_trading_system.config import load_settings
 from crypto_trading_system.ticker_utils import reconstruct_ticker
 
 
@@ -53,8 +55,15 @@ def test_closed_slice_includes_signal_bar_only_after_close() -> None:
     assert len(_closed_slice(klines, "4h", four_h)) == 1
 
 
+def test_effective_warmup_covers_min_history_plus_margin() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    minimum = (settings.analysis.min_history_days + 60) * interval_ms("1d")
+    assert _effective_warmup_ms(settings) >= minimum
+
+
 if __name__ == "__main__":
     test_reconstruct_ticker_ignores_future_data()
     test_closed_slice_excludes_unclosed_daily_bar()
     test_closed_slice_includes_signal_bar_only_after_close()
+    test_effective_warmup_covers_min_history_plus_margin()
     print("test_replay=passed")

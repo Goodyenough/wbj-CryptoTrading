@@ -117,8 +117,8 @@ def _candidate_section_heading(result: ScanResult) -> str:
 def _append_candidate_table(lines: list[str], candidates: list[TradeCandidate]) -> None:
     lines.extend(
         [
-            "| Rank | Coin | Setup | Entry Zone | Stop Loss | TP1 | TP2 / Exit Rule | R/R | Verdict |",
-            "|---:|---|---|---:|---:|---:|---|---:|---|",
+            "| Rank | Coin | Action | Setup | Entry Zone | Stop Loss | TP1 | TP2 / Exit Rule | R/R | Verdict |",
+            "|---:|---|---|---|---:|---:|---:|---|---:|---|",
         ]
     )
     for candidate in candidates:
@@ -126,6 +126,7 @@ def _append_candidate_table(lines: list[str], candidates: list[TradeCandidate]) 
             "| "
             f"{candidate.rank} | "
             f"`{candidate.base_asset}` | "
+            f"`{candidate.action}` | "
             f"{candidate.setup} | "
             f"{_fmt_price(candidate.entry_low)} - {_fmt_price(candidate.entry_high)} | "
             f"{_fmt_price(candidate.stop_loss)} | "

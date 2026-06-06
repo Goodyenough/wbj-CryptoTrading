@@ -17,8 +17,35 @@ from .models import RawTicker, ScanResult, TradeCandidate
 from .risk import reward_to_risk
 
 
+ACTION_PRIORITY = {
+    "BUY_CANDIDATE": 0,
+    "WAIT_PULLBACK": 1,
+    "WATCH_ONLY": 2,
+    "REJECT": 3,
+}
+
+
 def _clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
+
+
+def _action_sort_key(candidate: TradeCandidate) -> tuple[int, float]:
+    return (ACTION_PRIORITY.get(candidate.action, 99), -candidate.score)
+
+
+def _validation_pool_size(settings: Settings, candidate_count: int) -> int:
+    pool_target = settings.market.top_n * settings.analysis.validation_pool_multiplier
+    pool_target = min(pool_target, settings.analysis.validation_pool_max)
+    pool_target = max(settings.market.top_n, pool_target)
+    return min(candidate_count, pool_target)
+
+
+def _rank_final_candidates(candidates: list[TradeCandidate], top_n: int) -> list[TradeCandidate]:
+    sorted_candidates = sorted(candidates, key=_action_sort_key)
+    return [
+        replace(candidate, rank=rank)
+        for rank, candidate in enumerate(sorted_candidates[:top_n], start=1)
+    ]
 
 
 def _quote_closes(klines: list[list]) -> list[float]:
@@ -394,6 +421,11 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
         "交易信号仍以 Binance 现货公开 K 线为主源；外部数据源用于一致性复核。",
         "结果是研究和模拟盘计划，不是确定收益或实盘下单指令。",
         f"历史长度过滤：候选币至少需要 {settings.analysis.min_history_days} 根 1d K 线。",
+        (
+            "数据质量验证池：先验证 score 排名前 "
+            f"min(top_n * {settings.analysis.validation_pool_multiplier}, "
+            f"{settings.analysis.validation_pool_max}) 的候选，再按 action + score 补足最终名单。"
+        ),
     ]
     market_regime = _detect_market_regime(client, settings, limitations, progress)
     market_regime_allows_buy = True if market_regime is None else market_regime.allows_alt_buy
@@ -431,14 +463,13 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
         time.sleep(settings.market.request_pause_seconds)
 
     candidates.sort(key=lambda item: item.score, reverse=True)
-    ranked = [
-        replace(candidate, rank=rank)
-        for rank, candidate in enumerate(candidates[: settings.market.top_n], start=1)
-    ]
+    pool_size = _validation_pool_size(settings, len(candidates))
+    validation_pool = candidates[:pool_size]
     if progress is not None:
-        progress(f"cross-checking {len(ranked)} ranked candidates")
-    ranked, validation_notes = cross_validate_candidates(settings, ranked, progress=progress)
-    ranked = _apply_data_quality_filter(ranked, settings)
+        progress(f"cross-checking {len(validation_pool)} candidate validation pool")
+    checked_pool, validation_notes = cross_validate_candidates(settings, validation_pool, progress=progress)
+    checked_pool = _apply_data_quality_filter(checked_pool, settings)
+    ranked = _rank_final_candidates(checked_pool, settings.market.top_n)
     limitations.extend(validation_notes)
     if progress is not None:
         progress("market scan complete")

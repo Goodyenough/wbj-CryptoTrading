@@ -35,6 +35,8 @@ class AnalysisSettings:
     pump_chase_penalty: float
     high_volatility_range_pct: float
     high_volatility_penalty: float
+    validation_pool_multiplier: int
+    validation_pool_max: int
 
 
 @dataclass
@@ -42,6 +44,7 @@ class PaperSettings:
     account_name: str
     account_equity: float
     risk_per_trade_pct: float
+    import_actions: tuple[str, ...]
 
 
 @dataclass
@@ -147,11 +150,14 @@ def load_settings(path: Path) -> Settings:
             pump_chase_penalty=float(analysis.get("pump_chase_penalty", 8.0)),
             high_volatility_range_pct=float(analysis.get("high_volatility_range_pct", 35.0)),
             high_volatility_penalty=float(analysis.get("high_volatility_penalty", 6.0)),
+            validation_pool_multiplier=int(analysis.get("validation_pool_multiplier", 2)),
+            validation_pool_max=int(analysis.get("validation_pool_max", 10)),
         ),
         paper=PaperSettings(
             account_name=str(paper.get("account_name", "demo")),
             account_equity=float(paper.get("account_equity", 10_000)),
             risk_per_trade_pct=float(paper.get("risk_per_trade_pct", analysis.get("risk_per_trade_pct", 0.01))),
+            import_actions=tuple(str(item).upper() for item in paper.get("import_actions", ["BUY_CANDIDATE"])),
         ),
         backtest=BacktestSettings(
             maker_fee_bps=float(backtest.get("maker_fee_bps", 4)),

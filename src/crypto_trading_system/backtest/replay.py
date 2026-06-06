@@ -109,6 +109,18 @@ def _closed_slice(klines: list[list], interval: str, decision_ms: int) -> list[l
     return [kline for kline in klines if int(kline[0]) + step <= decision_ms]
 
 
+def _effective_warmup_ms(settings: Settings) -> int:
+    effective_1d_bars = max(
+        settings.backtest.warmup_1d_bars,
+        settings.analysis.min_history_days + 60,
+    )
+    return max(
+        settings.backtest.warmup_1h_bars * interval_ms("1h"),
+        settings.backtest.warmup_4h_bars * interval_ms("4h"),
+        effective_1d_bars * interval_ms("1d"),
+    )
+
+
 def _active_positions(trades: list[_SimTrade]) -> list[_SimTrade]:
     return [item for item in trades if item.paper.status in {"ENTERED", "TP1_HIT"}]
 
@@ -247,11 +259,7 @@ def run_backtest_replay(
     run_id = uuid.uuid4().hex[:12]
     start_ms = _date_to_ms(f"{start_utc}T00:00:00+00:00" if len(start_utc) == 10 else start_utc)
     end_ms = _date_to_ms(f"{end_utc}T00:00:00+00:00" if len(end_utc) == 10 else end_utc)
-    warmup_ms = max(
-        settings.backtest.warmup_1h_bars * interval_ms("1h"),
-        settings.backtest.warmup_4h_bars * interval_ms("4h"),
-        settings.backtest.warmup_1d_bars * interval_ms("1d"),
-    )
+    warmup_ms = _effective_warmup_ms(settings)
     fetch_start_ms = start_ms - warmup_ms
     fetch_end_ms = end_ms + interval_ms(primary_interval)
     symbols = [symbol.replace("/", "").upper() for symbol in symbols]

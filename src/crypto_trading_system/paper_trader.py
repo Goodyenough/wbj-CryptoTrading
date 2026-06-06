@@ -267,7 +267,9 @@ def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: 
     now = _utc_now()
     added = 0
     skipped = 0
+    skipped_action = 0
     archived = 0
+    allowed_actions = {action.upper() for action in settings.paper.import_actions}
 
     with sqlite3.connect(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
@@ -286,6 +288,11 @@ def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: 
 
         for row in rows:
             payload = json.loads(row["payload_json"])
+            action = str(payload.get("action", "WATCH_ONLY")).upper()
+            if action not in allowed_actions:
+                skipped += 1
+                skipped_action += 1
+                continue
             archived += _archive_replaced_watching_trades(
                 connection,
                 account,
@@ -344,6 +351,8 @@ def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: 
         "account_name": account,
         "added": added,
         "skipped": skipped,
+        "skipped_action": skipped_action,
+        "import_actions": sorted(allowed_actions),
         "archived": archived,
     }
 

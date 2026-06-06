@@ -15,6 +15,15 @@
 
 ## 2026-06-06
 
+### 18:40:43 +08:00 - 收紧选币流程并修复回测预热
+- 类型：代码 / 配置 / 回测 / 扫描 / 模拟盘
+- 改动：回测预热改为动态覆盖 `min_history_days + 60` 根日线，避免回测早期因历史长度不足产生人为无信号盲区，并同步覆盖 BTC/ETH 大盘环境历史。
+- 改动：市场扫描先验证 `min(top_n * 2, 10)` 个候选，数据质量降级后再按 `BUY_CANDIDATE`、`WAIT_PULLBACK`、`WATCH_ONLY`、`REJECT` 优先级和 score 补足最终名单；扫描报告主表新增 `Action` 列。
+- 改动：模拟盘导入默认只接受 `[paper].import_actions = ["BUY_CANDIDATE"]`，非允许 action 会计入 `skipped_action`，且不会触发旧 WATCHING 计划归档。
+- 影响：回测、扫描和模拟盘的可交易信号口径更一致；该提交属于行为修复，回测结果允许变化。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`，均通过；`python main.py scan --top 5 --no-obsidian` 生成 scan_id=502521f405e0，验证池为 10 个候选，报告含 Action 列；`python main.py paper add-from-scan --scan-id 502521f405e0` 输出 added=0、skipped=5、skipped_action=5、archived=0；BTCUSDT/ETHUSDT/SOLUSDT 2025-01-01 至 2025-06-01 回测从 baseline trades=6、closed_trades=3、first_trade=2025-04-12 变为 trades=15、closed_trades=12、first_trade=2025-01-02，确认旧 warmup 早期盲区被修复，且报告标记 sample_sufficient=false。
+- Git：`Tighten selection workflow`（本条随该提交一并提交）。
+
 ### 18:33:47 +08:00 - 参数化选币扣分并增加回测样本字段
 - 类型：代码 / 配置 / 回测 / 报告
 - 改动：将追高扣分和 24h 高波动扣分从扫描器硬编码提取为 `[analysis]` 配置项，默认值保持旧逻辑等效。

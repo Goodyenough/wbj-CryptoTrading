@@ -24,11 +24,14 @@ pump_chase_distance_pct = 8.0
 pump_chase_penalty = 8.0
 high_volatility_range_pct = 35.0
 high_volatility_penalty = 6.0
+validation_pool_multiplier = 2
+validation_pool_max = 10
 
 [paper]
 account_name = "demo"
 account_equity = 10000
 risk_per_trade_pct = 0.01
+import_actions = ["BUY_CANDIDATE"]
 
 [backtest]
 maker_fee_bps = 4

@@ -143,6 +143,7 @@ def main() -> None:
         print(f"candidates={len(result.candidates)}")
         print(f"paper_added={summary['added']}")
         print(f"paper_skipped={summary['skipped']}")
+        print(f"paper_skipped_action={summary.get('skipped_action', 0)}")
         print(f"paper_archived={summary['archived']}")
         print(f"paper_updated={len(updated)}")
         print("candidate_summary:")
@@ -220,6 +221,8 @@ def main() -> None:
             print(f"scan_id={summary['scan_id']}")
             print(f"added={summary['added']}")
             print(f"skipped={summary['skipped']}")
+            print(f"skipped_action={summary.get('skipped_action', 0)}")
+            print(f"import_actions={','.join(summary.get('import_actions', []))}")
             print(f"archived={summary['archived']}")
 
         if args.paper_command == "update":
