@@ -7,6 +7,7 @@ from typing import Callable
 
 from ..config import Settings
 from ..models import PaperTrade, TradeCandidate
+from ..market_regime import classify_market_regime
 from ..risk import position_size
 from ..scanner import _analyze_ticker
 from ..ticker_utils import reconstruct_ticker
@@ -256,6 +257,7 @@ def run_backtest_replay(
     symbols = [symbol.replace("/", "").upper() for symbol in symbols]
 
     klines_by_symbol: dict[str, dict[str, list[list]]] = {}
+    regime_klines: dict[str, list[list]] = {}
     data_issues: list[KlineQualityIssue] = []
     for symbol in symbols:
         if progress is not None:
@@ -274,6 +276,19 @@ def run_backtest_replay(
             per_interval[item_interval] = fetched.klines
             data_issues.extend(fetched.issues)
         klines_by_symbol[symbol] = per_interval
+    if settings.analysis.market_regime_filter_enabled:
+        for regime_symbol in ("BTCUSDT", "ETHUSDT"):
+            fetched = fetch_klines_cached(
+                settings,
+                regime_symbol,
+                "1d",
+                fetch_start_ms,
+                fetch_end_ms,
+                allow_data_gaps=allow_data_gaps,
+                progress=progress,
+            )
+            regime_klines[regime_symbol] = fetched.klines
+            data_issues.extend(fetched.issues)
 
     reference = klines_by_symbol[symbols[0]]["4h"]
     bars = [kline for kline in reference if start_ms <= int(kline[0]) < end_ms]
@@ -428,6 +443,11 @@ def run_backtest_replay(
         # Generate new condition plans after this bar is fully closed.
         if progress is not None and bar_index % 20 == 0:
             progress(f"backtest replay {bar_index + 1}/{len(bars)} bars")
+        market_regime_allows_buy = True
+        if settings.analysis.market_regime_filter_enabled:
+            btc_1d = _closed_slice(regime_klines.get("BTCUSDT", []), "1d", bar_close_ms)
+            eth_1d = _closed_slice(regime_klines.get("ETHUSDT", []), "1d", bar_close_ms)
+            market_regime_allows_buy = classify_market_regime(btc_1d, eth_1d).allows_alt_buy
         unavailable = {item.paper.symbol for item in all_trades if item.paper.status in {"WATCHING", "ENTERED", "TP1_HIT"}}
         candidate_pool: list[TradeCandidate] = []
         for symbol in symbols:
@@ -436,14 +456,22 @@ def run_backtest_replay(
             k1h = _closed_slice(klines_by_symbol[symbol]["1h"], "1h", bar_close_ms)
             k4h = _closed_slice(klines_by_symbol[symbol]["4h"], "4h", bar_close_ms)
             k1d = _closed_slice(klines_by_symbol[symbol]["1d"], "1d", bar_close_ms)
-            if len(k1h) < 168 or len(k4h) < 80 or len(k1d) < 60:
+            if len(k1h) < 168 or len(k4h) < 80 or len(k1d) < max(60, settings.analysis.min_history_days):
                 continue
             ticker = reconstruct_ticker(
                 symbol,
                 _symbol_base(symbol, settings.market.quote_asset),
                 k1h,
             )
-            candidate = _analyze_ticker(ticker, k1h, k4h, k1d, settings.analysis.risk_reward_min)
+            candidate = _analyze_ticker(
+                ticker,
+                k1h,
+                k4h,
+                k1d,
+                settings.analysis.risk_reward_min,
+                min_history_days=settings.analysis.min_history_days,
+                market_regime_allows_buy=market_regime_allows_buy,
+            )
             if candidate is not None and candidate.action == "BUY_CANDIDATE":
                 candidate_pool.append(candidate)
         candidate_pool.sort(key=lambda item: item.score, reverse=True)

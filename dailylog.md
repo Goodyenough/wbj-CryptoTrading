@@ -15,6 +15,16 @@
 
 ## 2026-06-06
 
+### 17:35:59 +08:00 - 增加数据质量、历史长度和大盘环境过滤
+- 类型：代码 / 配置 / 回测 / 扫描
+- 改动：新增 `market_regime.py`，用 BTC/ETH 日线 EMA20、EMA50 和 7 日涨跌判断 `RISK_ON`、`NEUTRAL`、`RISK_OFF`，弱市时将山寨币买入候选降级为观察。
+- 改动：在 `[analysis]` 增加 `min_history_days`、`market_regime_filter_enabled`、`data_quality_filter_enabled`、`strict_data_quality_for_buy`，默认要求 180 根 1d K 线并启用严格数据质量过滤。
+- 改动：扫描器在生成候选前应用历史长度和大盘环境过滤，在 CoinGecko/CoinMarketCap 交叉验证后将非 `DATA_OK` 的买入候选降级为观察。
+- 改动：回测重放也接入同一套历史长度和 BTC/ETH 大盘环境过滤，避免回测与实时扫描使用不同买入门槛。
+- 影响：当前策略会更保守；弱市或数据交叉验证异常时不会直接给出买入候选，而是保留为关注对象。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`、`python main.py scan --top 3 --no-obsidian`，均通过；扫描结果显示 `RISK_OFF` 时候选被降级为 `WATCH_ONLY`。
+- Git：`Add strategy quality filters`（本条随该提交一并提交）。
+
 ### 11:39:08 +08:00 - 增加回测模块基础设施和共享状态机
 - 类型：代码 / 配置 / 数据库
 - 改动：新增 `[backtest]` 配置和 `BacktestSettings`，扩展 Binance K 线接口支持 `startTime/endTime` 分页参数。

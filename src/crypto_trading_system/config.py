@@ -26,6 +26,10 @@ class MarketSettings:
 class AnalysisSettings:
     risk_reward_min: float
     risk_per_trade_pct: float
+    min_history_days: int
+    market_regime_filter_enabled: bool
+    data_quality_filter_enabled: bool
+    strict_data_quality_for_buy: bool
 
 
 @dataclass
@@ -129,6 +133,10 @@ def load_settings(path: Path) -> Settings:
         analysis=AnalysisSettings(
             risk_reward_min=float(analysis.get("risk_reward_min", 2.0)),
             risk_per_trade_pct=float(analysis.get("risk_per_trade_pct", 0.01)),
+            min_history_days=int(analysis.get("min_history_days", 180)),
+            market_regime_filter_enabled=bool(analysis.get("market_regime_filter_enabled", True)),
+            data_quality_filter_enabled=bool(analysis.get("data_quality_filter_enabled", True)),
+            strict_data_quality_for_buy=bool(analysis.get("strict_data_quality_for_buy", True)),
         ),
         paper=PaperSettings(
             account_name=str(paper.get("account_name", "demo")),

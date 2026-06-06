@@ -12,6 +12,7 @@ from .data_validation import cross_validate_candidates
 from .data_quality import filter_tickers, tradable_spot_symbols
 from .indicators import atr, ema, macd, percent_change, rsi
 from .market_data import BinanceClient
+from .market_regime import MarketRegime, classify_market_regime
 from .models import RawTicker, ScanResult, TradeCandidate
 from .risk import reward_to_risk
 
@@ -114,12 +115,14 @@ def _analyze_ticker(
     k4h: list[list],
     k1d: list[list],
     risk_reward_min: float,
+    min_history_days: int = 60,
+    market_regime_allows_buy: bool = True,
 ) -> TradeCandidate | None:
     closes_1h = _quote_closes(k1h)
     closes_4h = _quote_closes(k4h)
     closes_1d = _quote_closes(k1d)
     volumes_1h = _quote_volumes(k1h)
-    if len(closes_1h) < 168 or len(closes_4h) < 80 or len(closes_1d) < 60:
+    if len(closes_1h) < 168 or len(closes_4h) < 80 or len(closes_1d) < max(60, min_history_days):
         return None
 
     price = closes_1h[-1]
@@ -187,6 +190,9 @@ def _analyze_ticker(
         score -= 4
     if pct_7d is not None and pct_7d < 0:
         score -= 6
+    market_regime_risk = not market_regime_allows_buy and ticker.symbol not in {"BTCUSDT", "ETHUSDT"}
+    if market_regime_risk:
+        score -= 10
 
     plan = _build_entry_plan(
         price=price,
@@ -221,6 +227,9 @@ def _analyze_ticker(
         action = "REJECT"
     else:
         action = "WATCH_ONLY"
+    if market_regime_risk and action == "BUY_CANDIDATE":
+        action = "WATCH_ONLY"
+        verdict = "只观察"
 
     risks: list[str] = []
     if distance_to_support > 8:
@@ -233,6 +242,8 @@ def _analyze_ticker(
         risks.append("成交量突增，可能是事件驱动")
     if not trend_1d:
         risks.append("日线趋势未完全确认")
+    if market_regime_risk:
+        risks.append("BTC/ETH 大盘环境未确认强势，山寨币买入信号降级")
     if ticker.pct_24h <= 0:
         risks.append("24h 动量未确认")
     if pct_7d is not None and pct_7d <= 0:
@@ -285,6 +296,62 @@ def _analyze_ticker(
     )
 
 
+def _detect_market_regime(client: BinanceClient, settings: Settings, limitations: list[str], progress: Callable[[str], None] | None) -> MarketRegime | None:
+    if not settings.analysis.market_regime_filter_enabled:
+        limitations.append("大盘环境过滤未启用。")
+        return None
+    try:
+        if progress is not None:
+            progress("checking BTC/ETH market regime")
+        btc_1d = client.klines("BTCUSDT", "1d", max(80, settings.analysis.min_history_days))
+        eth_1d = client.klines("ETHUSDT", "1d", max(80, settings.analysis.min_history_days))
+        regime = classify_market_regime(btc_1d, eth_1d)
+        limitations.append(
+            "大盘环境过滤："
+            f"{regime.status}; {regime.summary} "
+            f"BTC 7d={regime.btc_pct_7d if regime.btc_pct_7d is not None else 'n/a'}; "
+            f"ETH 7d={regime.eth_pct_7d if regime.eth_pct_7d is not None else 'n/a'}."
+        )
+        return regime
+    except Exception as exc:
+        limitations.append(f"大盘环境过滤失败：{exc}；默认不放开山寨币买入信号。")
+        return MarketRegime(
+            status="UNKNOWN",
+            allows_alt_buy=False,
+            btc_trend_ok=False,
+            eth_trend_ok=False,
+            btc_pct_7d=None,
+            eth_pct_7d=None,
+            summary="大盘环境检测失败。",
+        )
+
+
+def _apply_data_quality_filter(candidates: list[TradeCandidate], settings: Settings) -> list[TradeCandidate]:
+    if not settings.analysis.data_quality_filter_enabled:
+        return candidates
+    filtered: list[TradeCandidate] = []
+    for candidate in candidates:
+        if (
+            settings.analysis.strict_data_quality_for_buy
+            and candidate.action == "BUY_CANDIDATE"
+            and candidate.data_quality_status != "DATA_OK"
+        ):
+            filtered.append(
+                replace(
+                    candidate,
+                    action="WATCH_ONLY",
+                    verdict="只观察",
+                    risks=[
+                        *candidate.risks,
+                        f"数据交叉验证状态为 {candidate.data_quality_status}，买入候选降级为观察",
+                    ],
+                )
+            )
+        else:
+            filtered.append(candidate)
+    return filtered
+
+
 def run_market_scan(settings: Settings, progress: Callable[[str], None] | None = None) -> ScanResult:
     client = BinanceClient(
         settings.market.base_url,
@@ -321,7 +388,10 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
     limitations: list[str] = [
         "交易信号仍以 Binance 现货公开 K 线为主源；外部数据源用于一致性复核。",
         "结果是研究和模拟盘计划，不是确定收益或实盘下单指令。",
+        f"历史长度过滤：候选币至少需要 {settings.analysis.min_history_days} 根 1d K 线。",
     ]
+    market_regime = _detect_market_regime(client, settings, limitations, progress)
+    market_regime_allows_buy = True if market_regime is None else market_regime.allows_alt_buy
 
     total = len(raw_tickers)
     for index, ticker in enumerate(raw_tickers, start=1):
@@ -330,8 +400,16 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
                 progress(f"analyzing {index}/{total} {ticker.symbol}")
             k1h = client.klines(ticker.symbol, "1h", 168)
             k4h = client.klines(ticker.symbol, "4h", 120)
-            k1d = client.klines(ticker.symbol, "1d", 100)
-            candidate = _analyze_ticker(ticker, k1h, k4h, k1d, settings.analysis.risk_reward_min)
+            k1d = client.klines(ticker.symbol, "1d", max(100, settings.analysis.min_history_days))
+            candidate = _analyze_ticker(
+                ticker,
+                k1h,
+                k4h,
+                k1d,
+                settings.analysis.risk_reward_min,
+                min_history_days=settings.analysis.min_history_days,
+                market_regime_allows_buy=market_regime_allows_buy,
+            )
             if candidate is not None:
                 candidates.append(candidate)
                 if progress is not None:
@@ -350,6 +428,7 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
     if progress is not None:
         progress(f"cross-checking {len(ranked)} ranked candidates")
     ranked, validation_notes = cross_validate_candidates(settings, ranked, progress=progress)
+    ranked = _apply_data_quality_filter(ranked, settings)
     limitations.extend(validation_notes)
     if progress is not None:
         progress("market scan complete")
