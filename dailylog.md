@@ -15,6 +15,16 @@
 
 ## 2026-06-06
 
+### 19:51:07 +08:00 - 增加 A/B 实验框架
+- 类型：代码 / 配置 / 回测 / 报告 / 测试
+- 改动：新增 `config/experiments.toml`，定义 `history_250`、`history_365`、`pump_chase_strict`、`liquidity_50m` 等配置覆盖类实验，并将需要结构性逻辑支持的实验标记为 disabled。
+- 改动：新增 `abtest` runner 和 CLI，支持自动运行 baseline 与 variant 两次回测、受控应用实验 override、生成统一 A/B Markdown 报告。
+- 改动：A/B 报告固定输出 changed_param、old_value、new_value、closed_trades、stop_rate、profit_factor、avg_r、max_drawdown_pct、net_return_pct、sharpe、sample_sufficient、possible_over_filtering、verdict 和 reason。
+- 改动：新增 A/B 单元测试，覆盖未知实验、disabled 实验、baseline 不被 variant 污染、override 路径白名单。
+- 影响：参数类选币实验可以通过 `python main.py abtest --experiment ...` 复现和对比，不修改默认 `settings.toml`；结构性逻辑实验仍需单独分支实现。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`、`python tests\test_abtest.py`，均通过；烟测 `python main.py abtest --experiment history_250 --symbols BTCUSDT,ETHUSDT,SOLUSDT --start 2025-01-01 --end 2025-06-01 --no-obsidian` 生成 A/B 报告，因 closed_trades=12 自动标记 `sample_sufficient=false`、`verdict=retest`。
+- Git：`Add abtest experiment runner`（本条随该提交一并提交）。
+
 ### 18:42:44 +08:00 - 更新选币优化 TODO
 - 类型：文档 / 计划
 - 改动：更新 `TODO.md` 的 Priority 1 清单，将验证池补位、动态 warmup、扣分参数化、模拟盘只导入 `BUY_CANDIDATE`、`sample_sufficient` 标记列为已完成。

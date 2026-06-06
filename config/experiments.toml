@@ -1,0 +1,46 @@
+[history_250]
+enabled = true
+description = "Test min_history_days 250 versus baseline 180."
+dimension = "history"
+
+[history_250.overrides.analysis]
+min_history_days = 250
+
+[history_365]
+enabled = true
+description = "Test min_history_days 365 versus baseline 180."
+dimension = "history"
+
+[history_365.overrides.analysis]
+min_history_days = 365
+
+[pump_chase_strict]
+enabled = true
+description = "Test stricter pump-chasing score penalties."
+dimension = "pump_chase"
+
+[pump_chase_strict.overrides.analysis]
+pump_chase_24h_pct = 12.0
+pump_chase_distance_pct = 6.0
+pump_chase_penalty = 12.0
+
+[liquidity_50m]
+enabled = true
+description = "Test higher liquidity thresholds."
+dimension = "liquidity"
+
+[liquidity_50m.overrides.market]
+min_quote_volume = 50000000
+min_trades = 50000
+
+[daily_trend_required]
+enabled = false
+description = "Requires scanner logic support before this experiment can run."
+dimension = "daily_trend"
+requires_logic = true
+
+[volatility_without_trend_penalty]
+enabled = false
+description = "Requires scanner logic support before this experiment can run."
+dimension = "volatility_trend"
+requires_logic = true

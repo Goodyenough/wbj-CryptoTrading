@@ -8,6 +8,7 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from crypto_trading_system.abtest import run_abtest
 from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.doctor import run_doctor
@@ -62,6 +63,21 @@ def build_parser() -> argparse.ArgumentParser:
     backtest.add_argument("--intrabar", default=None, choices=["stop_first", "tp_first"], help="Intrabar fill policy.")
     backtest.add_argument("--allow-data-gaps", action="store_true", help="Continue when historical kline gaps are found.")
     backtest.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
+    abtest = subparsers.add_parser("abtest", help="Run baseline versus variant backtests for one experiment.")
+    abtest.add_argument("--experiment", required=True, help="Experiment id from config/experiments.toml.")
+    abtest.add_argument("--experiments", default="config/experiments.toml", help="Path to TOML experiment definitions.")
+    abtest.add_argument("--symbols", required=True, help="Comma-separated symbols, e.g. BTCUSDT,ETHUSDT.")
+    abtest.add_argument("--start", required=True, help="UTC start date, e.g. 2024-01-01.")
+    abtest.add_argument("--end", required=True, help="UTC end date, e.g. 2024-12-31.")
+    abtest.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
+    abtest.add_argument("--intrabar", default=None, choices=["stop_first", "tp_first"], help="Intrabar fill policy.")
+    abtest.add_argument("--allow-data-gaps", action="store_true", help="Continue when historical kline gaps are found.")
+    abtest.add_argument(
         "--no-obsidian",
         action="store_true",
         help="Write only to the project reports directory.",
@@ -210,6 +226,35 @@ def main() -> None:
         print(f"net_return_pct={metrics.net_return_pct:.2f}")
         print(f"max_drawdown_pct={metrics.max_drawdown_pct:.2f}")
         for path in report_paths:
+            print(f"report={path}")
+
+    if args.command == "abtest":
+        symbols = [symbol.strip().upper() for symbol in args.symbols.split(",") if symbol.strip()]
+        if not symbols:
+            raise ValueError("--symbols must include at least one symbol")
+        _progress(f"starting A/B test {args.experiment} for {', '.join(symbols)}")
+        summary = run_abtest(
+            settings,
+            args.experiment,
+            symbols,
+            args.start,
+            args.end,
+            experiments_path=Path(args.experiments),
+            interval=args.interval,
+            intrabar=args.intrabar,
+            allow_data_gaps=args.allow_data_gaps,
+            include_obsidian=not args.no_obsidian,
+            progress=_progress,
+        )
+        print("abtest=completed")
+        print(f"experiment_id={summary.experiment_id}")
+        print(f"baseline_run_id={summary.baseline_run_id}")
+        print(f"variant_run_id={summary.variant_run_id}")
+        print(f"sample_sufficient={str(summary.sample_sufficient).lower()}")
+        print(f"possible_over_filtering={str(summary.possible_over_filtering).lower()}")
+        print(f"verdict={summary.verdict}")
+        print(f"reason={summary.reason}")
+        for path in summary.report_paths:
             print(f"report={path}")
 
     if args.command == "paper":
