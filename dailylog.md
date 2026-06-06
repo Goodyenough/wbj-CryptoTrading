@@ -15,48 +15,57 @@
 
 ## 2026-06-07
 
-### 00:06:21 +08:00 - Convert TODO to Chinese
-- Type: docs / rules / Git
-- Change: Rewrote `TODO.md` in Chinese while preserving exact command names, config keys, statuses, and code identifiers.
-- Change: Added a `TODO.md` maintenance rule to `AGENTS.md` requiring future TODO entries to be written primarily in Chinese.
-- Reason: The TODO file is a daily planning surface, and English-only tasks made it harder to quickly resume project context.
-- Impact: Future task tracking should be easier to read; technical tokens such as `BUY_CANDIDATE`, `sample_sufficient`, and `python main.py ...` remain unchanged.
-- Verification: Reviewed `TODO.md` and confirmed `AGENTS.md` contains the new TODO language rule; docs-only change, no code tests run.
-- Git: `Convert TODO to Chinese` (this entry is included in that commit).
+### 00:13:28 +08:00 - 将近期 dailylog 改为中文
+- 类型：文档 / 规则 / Git
+- 改动：将 `dailylog.md` 近期英文记录改为中文表达，并保留必要的命令名、配置键、状态值和 Git commit message。
+- 改动：在 `AGENTS.md` 中增加规则，要求以后 `dailylog.md` 默认尽量使用中文记录。
+- 原因：dailylog 是恢复项目上下文的重要入口，中文记录更方便快速回顾当天做了什么。
+- 影响：后续工程审计日志会优先使用中文；技术标识如 `BUY_CANDIDATE`、`sample_sufficient`、`python main.py ...` 仍保持原样。
+- 验证：检查 `dailylog.md` 近期记录已改为中文，确认 `AGENTS.md` 包含 dailylog 中文记录规则；文档变更，未运行代码测试。
+- Git：`Localize dailylog entries`（本条随该提交一起提交）。
+
+### 00:06:21 +08:00 - 将 TODO 改为中文
+- 类型：文档 / 规则 / Git
+- 改动：将 `TODO.md` 重写为中文，同时保留准确的命令名、配置键、状态值和代码标识。
+- 改动：在 `AGENTS.md` 中增加 `TODO.md` 维护规则，要求后续 TODO 主要使用中文记录。
+- 原因：TODO 是日常规划入口，纯英文任务会让恢复项目上下文变慢。
+- 影响：后续任务清单更容易阅读；`BUY_CANDIDATE`、`sample_sufficient`、`python main.py ...` 等技术标识保持不变。
+- 验证：检查 `TODO.md` 已改为中文，并确认 `AGENTS.md` 包含 TODO 中文记录规则；文档变更，未运行代码测试。
+- Git：`Convert TODO to Chinese`（本条随该提交一起提交）。
 
 ## 2026-06-06
 
-### 23:49:57 +08:00 - Add dynamic universe backtest MVP
-- Type: code / backtest / report / test / docs / Git
-- Change: Added Dynamic Universe Backtest MVP: `backtest-dynamic-universe` rebuilds a daily historical universe from closed 1h klines, uses BTCUSDT 4h as the global timeline, and writes dynamic universe metadata into reports.
-- Change: Added dynamic universe helpers for current `exchangeInfo` symbol master, source-limit handling, preselection score, daily refresh keys, filter counts, and summary generation.
-- Change: Extended A/B testing with `--dynamic-universe`, `--max-symbols`, and `--source-limit`; baseline and variant now share one in-memory dynamic symbol master.
-- Change: Added tests for future-data exclusion, 24h universe filtering, source-limit ordering, BTC timeline failure, daily refresh key behavior, and shared dynamic A/B master reuse.
-- Change: Updated `TODO.md`, development plans, Obsidian experiment log, and generated final smoke reports under `reports/2026-06-06/`.
-- Reason: Fixed-symbol and current snapshot backtests were not sufficient to evaluate coin-selection filters; dynamic universe replay is needed before meaningful selection-rule A/B tests.
-- Impact: Users can run `python main.py backtest-dynamic-universe --start 2025-01-01 --end 2025-02-01 --source-limit 20 --max-symbols 5 --no-obsidian --allow-data-gaps` and dynamic A/B via `python main.py abtest --experiment history_250 --dynamic-universe ...`.
-- Verification: Ran `python -m compileall main.py src tests`, `python tests\test_trade_state.py`, `python tests\test_replay.py`, `python tests\test_universe.py`, `python tests\test_abtest.py`; smoke generated `backtest_dynamic_universe_2025-01-01_2025-02-01_v4.md` with trades=3, closed_trades=3, sample_sufficient=false; dynamic A/B generated `abtest_dynamic_universe_history_250_2025-01-01_2025-02-01_v2.md` with verdict=retest.
-- Git: `Add dynamic universe backtest MVP` (this entry is included in that commit).
+### 23:49:57 +08:00 - 增加 Dynamic Universe Backtest MVP
+- 类型：代码 / 回测 / 报告 / 测试 / 文档 / Git
+- 改动：新增 Dynamic Universe Backtest MVP，`backtest-dynamic-universe` 会基于已收盘 1h K 线每日重建历史 universe，使用 BTCUSDT 4h 作为全局时间轴，并把动态 universe 元数据写入报告。
+- 改动：新增动态 universe helper，支持当前 `exchangeInfo` symbol master、`--source-limit`、预筛分数、每日刷新 key、过滤统计和 summary 生成。
+- 改动：扩展 A/B 测试，支持 `--dynamic-universe`、`--max-symbols` 和 `--source-limit`；baseline 和 variant 共享同一份内存中的动态 symbol master。
+- 改动：新增测试，覆盖未来数据排除、24h universe 过滤、source-limit 排序、BTC 时间轴失败、每日刷新 key 行为和动态 A/B 共享 master。
+- 改动：更新 `TODO.md`、开发计划、Obsidian 实验日志，并生成 `reports/2026-06-06/` 下的最终 smoke 报告。
+- 原因：固定 symbols 回测和当前快照回测不足以验证选币过滤参数；要做有意义的选币规则 A/B，必须先有动态 universe 历史回放。
+- 影响：可以运行 `python main.py backtest-dynamic-universe --start 2025-01-01 --end 2025-02-01 --source-limit 20 --max-symbols 5 --no-obsidian --allow-data-gaps`，也可以用 `python main.py abtest --experiment history_250 --dynamic-universe ...` 做动态 A/B。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`、`python tests\test_universe.py`、`python tests\test_abtest.py`；smoke 生成 `backtest_dynamic_universe_2025-01-01_2025-02-01_v4.md`，trades=3、closed_trades=3、sample_sufficient=false；动态 A/B 生成 `abtest_dynamic_universe_history_250_2025-01-01_2025-02-01_v2.md`，verdict=retest。
+- Git：`Add dynamic universe backtest MVP`（本条随该提交一起提交）。
 
-### 23:02:52 +08:00 - Add universe snapshot backtest
-- Type: code / report / test / docs / Git
-- Change: Added `src/crypto_trading_system/backtest/universe.py` and the `backtest-universe` CLI command, which builds a current Binance market snapshot, selects symbols, and replays historical klines.
-- Change: Extended backtest replay and reports with `universe_mode`, snapshot metadata, replay/skipped symbol counts, current-snapshot warnings, and `backtest_universe_*` report filenames.
-- Change: Skips snapshot symbols that have no primary-interval history inside the requested backtest period instead of crashing; those symbols are recorded in the report.
-- Change: Added `tests/test_universe.py`, updated `TODO.md`, synced development-plan notes, and wrote a universe snapshot smoke-test summary to the Obsidian experiment log.
-- Reason: Fixed-symbol backtests were not suitable for evaluating coin-selection filters; this snapshot MVP gives a broader, reproducible first step while clearly documenting its survivorship-bias limitation.
-- Impact: Users can run `python main.py backtest-universe --start 2025-01-01 --end 2025-02-01 --max-symbols 3 --no-obsidian --allow-data-gaps` to generate a universe snapshot backtest report.
-- Verification: Ran `python -m compileall main.py src tests`, `python tests\test_trade_state.py`, `python tests\test_replay.py`, `python tests\test_abtest.py`, `python tests\test_universe.py`; smoke test generated `reports/2026-06-06/backtest_universe_2025-01-01_2025-02-01_v1.md` with trades=1, closed_trades=1, sample_sufficient=false.
-- Git: `Add universe snapshot backtest` (this entry is included in that commit).
+### 23:02:52 +08:00 - 增加 Universe Snapshot 回测
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：新增 `src/crypto_trading_system/backtest/universe.py` 和 `backtest-universe` CLI 命令，用当前 Binance 市场快照构建 symbol 池，筛选交易对并回放历史 K 线。
+- 改动：扩展回测 replay 和报告，加入 `universe_mode`、快照元数据、replay/skipped symbol 数量、当前快照警告和 `backtest_universe_*` 报告文件名。
+- 改动：当快照 symbol 在指定回测区间没有主周期历史数据时跳过，而不是让回测崩溃；被跳过的 symbol 会记录到报告里。
+- 改动：新增 `tests/test_universe.py`，更新 `TODO.md`，同步开发计划，并将 universe snapshot smoke-test 摘要写入 Obsidian 实验日志。
+- 原因：固定 symbols 回测不适合评估选币过滤参数；snapshot MVP 提供一个更广、更可复现的第一步，同时明确记录幸存者偏差限制。
+- 影响：可以运行 `python main.py backtest-universe --start 2025-01-01 --end 2025-02-01 --max-symbols 3 --no-obsidian --allow-data-gaps` 生成 universe snapshot 回测报告。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`、`python tests\test_abtest.py`、`python tests\test_universe.py`；smoke 生成 `reports/2026-06-06/backtest_universe_2025-01-01_2025-02-01_v1.md`，trades=1、closed_trades=1、sample_sufficient=false。
+- Git：`Add universe snapshot backtest`（本条随该提交一起提交）。
 
-### 21:46:06 +08:00 - Add project memory rules
-- Type: docs / rules / Git
-- Change: Updated `AGENTS.md` with Project Memory Rules, separating responsibilities for `dailylog.md`, `TODO.md`, the Obsidian development plan, and the Obsidian experiment log.
-- Change: Created Obsidian note `D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTrading Experiment Log.md` using the intended Chinese filename; added usage notes, a fixed experiment template, and the 2026-06-06 A/B selection-parameter review.
-- Reason: `dailylog.md` only audits engineering changes, so experiment outcomes and research conclusions were easy to lose after a few days.
-- Impact: Future tasks must decide which memory files to update before finishing; backtests, A/B runs, paper-trading evaluations, and scan comparisons with conclusions must update the Obsidian experiment log.
-- Verification: Confirmed `AGENTS.md` contains Project Memory Rules; confirmed the Obsidian experiment log exists with the expected filename, title, template, and A/B review section.
-- Git: `Update project memory rules` (this entry is included in that commit).
+### 21:46:06 +08:00 - 增加项目记忆规则
+- 类型：文档 / 规则 / Git
+- 改动：更新 `AGENTS.md`，增加 Project Memory Rules，将 `dailylog.md`、`TODO.md`、Obsidian 开发计划和 Obsidian 实验日志的职责拆开。
+- 改动：创建 Obsidian 笔记 `D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTrading Experiment Log.md`，使用预期的中文文件名；加入使用说明、固定实验模板和 2026-06-06 A/B 选币参数复盘。
+- 原因：`dailylog.md` 只适合审计工程改动，实验结果和研究结论容易在几天后丢失上下文。
+- 影响：以后每次任务结束前都要判断该更新哪些记忆文件；跑回测、A/B、模拟盘评估或扫盘对比并形成结论时，必须更新 Obsidian 实验日志。
+- 验证：确认 `AGENTS.md` 包含 Project Memory Rules；确认 Obsidian 实验日志存在，且包含预期文件名、标题、模板和 A/B 复盘章节。
+- Git：`Update project memory rules`（本条随该提交一起提交）。
 
 ### 19:51:07 +08:00 - 增加 A/B 实验框架
 - 类型：代码 / 配置 / 回测 / 报告 / 测试
