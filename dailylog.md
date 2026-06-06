@@ -15,6 +15,18 @@
 
 ## 2026-06-06
 
+### 23:49:57 +08:00 - Add dynamic universe backtest MVP
+- Type: code / backtest / report / test / docs / Git
+- Change: Added Dynamic Universe Backtest MVP: `backtest-dynamic-universe` rebuilds a daily historical universe from closed 1h klines, uses BTCUSDT 4h as the global timeline, and writes dynamic universe metadata into reports.
+- Change: Added dynamic universe helpers for current `exchangeInfo` symbol master, source-limit handling, preselection score, daily refresh keys, filter counts, and summary generation.
+- Change: Extended A/B testing with `--dynamic-universe`, `--max-symbols`, and `--source-limit`; baseline and variant now share one in-memory dynamic symbol master.
+- Change: Added tests for future-data exclusion, 24h universe filtering, source-limit ordering, BTC timeline failure, daily refresh key behavior, and shared dynamic A/B master reuse.
+- Change: Updated `TODO.md`, development plans, Obsidian experiment log, and generated final smoke reports under `reports/2026-06-06/`.
+- Reason: Fixed-symbol and current snapshot backtests were not sufficient to evaluate coin-selection filters; dynamic universe replay is needed before meaningful selection-rule A/B tests.
+- Impact: Users can run `python main.py backtest-dynamic-universe --start 2025-01-01 --end 2025-02-01 --source-limit 20 --max-symbols 5 --no-obsidian --allow-data-gaps` and dynamic A/B via `python main.py abtest --experiment history_250 --dynamic-universe ...`.
+- Verification: Ran `python -m compileall main.py src tests`, `python tests\test_trade_state.py`, `python tests\test_replay.py`, `python tests\test_universe.py`, `python tests\test_abtest.py`; smoke generated `backtest_dynamic_universe_2025-01-01_2025-02-01_v4.md` with trades=3, closed_trades=3, sample_sufficient=false; dynamic A/B generated `abtest_dynamic_universe_history_250_2025-01-01_2025-02-01_v2.md` with verdict=retest.
+- Git: `Add dynamic universe backtest MVP` (this entry is included in that commit).
+
 ### 23:02:52 +08:00 - Add universe snapshot backtest
 - Type: code / report / test / docs / Git
 - Change: Added `src/crypto_trading_system/backtest/universe.py` and the `backtest-universe` CLI command, which builds a current Binance market snapshot, selects symbols, and replays historical klines.

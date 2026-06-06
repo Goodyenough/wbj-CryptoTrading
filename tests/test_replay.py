@@ -7,7 +7,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system.backtest.history import interval_ms
+from crypto_trading_system.backtest.history import KlineFetchResult
+from crypto_trading_system.backtest import replay as replay_module
 from crypto_trading_system.backtest.replay import _closed_slice, _effective_warmup_ms
+from crypto_trading_system.backtest.universe import SymbolMaster
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.ticker_utils import reconstruct_ticker
 
@@ -61,9 +64,44 @@ def test_effective_warmup_covers_min_history_plus_margin() -> None:
     assert _effective_warmup_ms(settings) >= minimum
 
 
+def test_dynamic_universe_requires_btc_timeline() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    master = SymbolMaster(
+        source="test",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        symbols=["AAAUSDT"],
+        source_limit=None,
+        source_limit_applied=False,
+        filters="test",
+    )
+
+    def fake_fetch(settings, symbol, interval, start_time_ms, end_time_ms, **kwargs):
+        return KlineFetchResult(symbol=symbol, interval=interval, klines=[], issues=[], fetched_from_api=0)
+
+    original_fetch = replay_module.fetch_klines_cached
+    replay_module.fetch_klines_cached = fake_fetch
+    try:
+        try:
+            replay_module.run_backtest_replay(
+                settings,
+                [],
+                "2025-01-01",
+                "2025-01-02",
+                dynamic_universe_mode=True,
+                dynamic_symbol_master=master,
+            )
+        except ValueError as exc:
+            assert "requires BTCUSDT 4h klines" in str(exc)
+        else:
+            raise AssertionError("Expected missing BTCUSDT timeline to raise ValueError")
+    finally:
+        replay_module.fetch_klines_cached = original_fetch
+
+
 if __name__ == "__main__":
     test_reconstruct_ticker_ignores_future_data()
     test_closed_slice_excludes_unclosed_daily_bar()
     test_closed_slice_includes_signal_bar_only_after_close()
     test_effective_warmup_covers_min_history_plus_margin()
+    test_dynamic_universe_requires_btc_timeline()
     print("test_replay=passed")

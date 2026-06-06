@@ -223,6 +223,7 @@ def _render_report(
         f"report_version: {report_version}",
         f"sample_sufficient: {str(metrics.sample_sufficient).lower()}",
         f"universe_mode: {str(result.universe_mode).lower()}",
+        f"universe_type: {result.universe_type}",
         "---",
         "",
         f"# 回测报告 {result.start_utc[:10]} 至 {result.end_utc[:10]} {report_version}",
@@ -236,7 +237,7 @@ def _render_report(
         f"- 代码 commit：`{commit_hash}`",
         f"- 样本是否充分：{str(metrics.sample_sufficient).lower()}",
         f"- 样本提示：{metrics.sample_warning or '样本数量未触发警告。'}",
-        f"- Universe mode：{'snapshot / 当前快照选币' if result.universe_mode else 'manual symbols / 手动指定币种'}",
+        f"- Universe mode：{result.universe_type}",
         "",
         "## 回测假设",
         "",
@@ -247,7 +248,7 @@ def _render_report(
         "- 使用固定 stop/TP，不实现动态支撑退出；4h K 线裁决成交，未使用 5m/15m 还原真实路径。",
         "- 24h ticker 字段由 1h K 线重建，与实时 Binance /ticker/24hr 存在粒度差异。",
         "- 未处理 tick size、step size、min notional、历史费率变化、BNB 折扣和 VIP 费率。",
-        "- 只覆盖本次手动输入或快照选中且可获取历史数据的 symbols，不代表完整历史市场 universe。",
+        "- 只覆盖本次手动输入、快照选中或动态 universe 选中且可获取历史数据的 symbols，不代表完整历史市场 universe。",
         "",
         *(
             [
@@ -282,6 +283,52 @@ def _render_report(
                 "",
             ]
             if result.universe_mode and result.universe_snapshot
+            else []
+        ),
+        *(
+            [
+                "## Dynamic Universe / 历史动态 Universe",
+                "",
+                f"- Source / 来源：{result.dynamic_universe_summary.get('source', 'n/a')}",
+                f"- Master symbols / Master 币种数：{result.dynamic_universe_summary.get('master_count', 'n/a')}",
+                f"- Source limit / 调试截断：{result.dynamic_universe_summary.get('source_limit', 'none')}",
+                (
+                    "- Source limit applied / 是否截断："
+                    f"{str(result.dynamic_universe_summary.get('source_limit_applied', False)).lower()}"
+                ),
+                f"- Refresh frequency / 刷新频率：{result.dynamic_universe_summary.get('refresh_frequency', 'n/a')}",
+                f"- Universe refreshes / Universe 刷新次数：{result.dynamic_universe_summary.get('universe_refresh_count', 0)}",
+                (
+                    "- Selected symbols per refresh / 每次入选数量："
+                    f"min={result.dynamic_universe_summary.get('selected_count_min', 0)}, "
+                    f"avg={result.dynamic_universe_summary.get('selected_count_avg', 0):.2f}, "
+                    f"max={result.dynamic_universe_summary.get('selected_count_max', 0)}"
+                ),
+                (
+                    "- Top selected symbols / 最常入选："
+                    + (
+                        ", ".join(
+                            f"`{item['symbol']}`({item['days_selected']})"
+                            for item in result.dynamic_universe_summary.get("top_selected_symbols", [])[:10]
+                        )
+                        or "none"
+                    )
+                ),
+                "- Filter counts / 过滤统计：",
+                "```json",
+                json.dumps(result.dynamic_universe_summary.get("filter_counts", {}), ensure_ascii=False, indent=2),
+                "```",
+                (
+                    "> Warning / 警告：dynamic universe 的 symbol master 来自当前 Binance exchangeInfo；"
+                    "历史上曾交易但今天已退市的币不会进入 master list，因此仍有退市幸存者偏差。"
+                ),
+                (
+                    "> Runtime / 耗时提示：第一次完整运行需要缓存大量 1h/4h/1d K 线，可能很慢；"
+                    "缓存命中后后续回测会明显加快。"
+                ),
+                "",
+            ]
+            if result.universe_type == "dynamic" and result.dynamic_universe_summary
             else []
         ),
         "## 核心指标",
@@ -425,7 +472,12 @@ def _write_report(
     target_dirs = [project_dir]
     if include_obsidian and obsidian_dir is not None:
         target_dirs.append(obsidian_dir)
-    report_kind = "backtest_universe" if result.universe_mode else "backtest"
+    if result.universe_type == "dynamic":
+        report_kind = "backtest_dynamic_universe"
+    elif result.universe_type == "snapshot":
+        report_kind = "backtest_universe"
+    else:
+        report_kind = "backtest"
     prefix = f"{report_kind}_{result.start_utc[:10]}_{result.end_utc[:10]}"
     version_number = next_report_version(target_dirs, prefix)
     version = f"v{version_number}"
@@ -526,6 +578,9 @@ def run_backtest(
     allow_data_gaps: bool = False,
     universe_mode: bool = False,
     max_universe_symbols: int | None = None,
+    dynamic_universe_mode: bool = False,
+    source_limit: int | None = None,
+    dynamic_symbol_master=None,
     include_obsidian: bool = True,
     progress: Callable[[str], None] | None = None,
 ) -> tuple[BacktestResult, BacktestMetrics, list[Path]]:
@@ -539,6 +594,9 @@ def run_backtest(
         allow_data_gaps=allow_data_gaps,
         universe_mode=universe_mode,
         max_universe_symbols=max_universe_symbols,
+        dynamic_universe_mode=dynamic_universe_mode,
+        source_limit=source_limit,
+        dynamic_symbol_master=dynamic_symbol_master,
         progress=progress,
     )
     metrics = calculate_metrics(result)

@@ -14,7 +14,14 @@ from ..ticker_utils import reconstruct_ticker
 from ..trade_state import step_trade
 from .costs import entry_fill, stop_exit_fill, target_exit_fill
 from .history import KlineQualityIssue, fetch_klines_cached, interval_ms
-from .universe import fetch_universe_snapshot
+from .universe import (
+    SymbolMaster,
+    build_current_symbol_master,
+    build_dynamic_universe_summary,
+    dynamic_universe_refresh_key,
+    fetch_universe_snapshot,
+    select_dynamic_universe_for_day,
+)
 
 
 @dataclass
@@ -78,6 +85,8 @@ class BacktestResult:
     limitations: list[str]
     universe_mode: bool = False
     universe_snapshot: dict | None = None
+    universe_type: str = "manual"
+    dynamic_universe_summary: dict | None = None
 
 
 @dataclass
@@ -252,6 +261,9 @@ def run_backtest_replay(
     allow_data_gaps: bool = False,
     universe_mode: bool = False,
     max_universe_symbols: int | None = None,
+    dynamic_universe_mode: bool = False,
+    source_limit: int | None = None,
+    dynamic_symbol_master: SymbolMaster | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> BacktestResult:
     primary_interval = interval or settings.backtest.primary_interval
@@ -260,6 +272,8 @@ def run_backtest_replay(
     intrabar_policy = intrabar or settings.backtest.intrabar_policy
     if settings.backtest.allow_leverage:
         raise ValueError("MVP backtest is spot-only and does not allow leverage.")
+    if universe_mode and dynamic_universe_mode:
+        raise ValueError("Use either universe snapshot mode or dynamic universe mode, not both.")
 
     run_id = uuid.uuid4().hex[:12]
     start_ms = _date_to_ms(f"{start_utc}T00:00:00+00:00" if len(start_utc) == 10 else start_utc)
@@ -268,10 +282,17 @@ def run_backtest_replay(
     fetch_start_ms = start_ms - warmup_ms
     fetch_end_ms = end_ms + interval_ms(primary_interval)
     universe_snapshot = None
+    dynamic_master = dynamic_symbol_master
+    dynamic_selections = []
+    dynamic_universe_summary = None
     if universe_mode:
         snapshot = fetch_universe_snapshot(settings, max_symbols=max_universe_symbols, progress=progress)
         universe_snapshot = snapshot.to_dict()
         symbols = snapshot.selected_symbols
+    if dynamic_universe_mode:
+        if dynamic_master is None:
+            dynamic_master = build_current_symbol_master(settings, source_limit=source_limit, progress=progress)
+        symbols = dynamic_master.symbols
     symbols = [symbol.replace("/", "").upper() for symbol in symbols]
     if not symbols:
         raise ValueError("Backtest requires at least one symbol after universe selection.")
@@ -280,18 +301,25 @@ def run_backtest_replay(
     klines_by_symbol: dict[str, dict[str, list[list]]] = {}
     regime_klines: dict[str, list[list]] = {}
     data_issues: list[KlineQualityIssue] = []
-    for symbol in symbols:
+    symbols_to_fetch = list(dict.fromkeys(symbols + (["BTCUSDT", "ETHUSDT"] if dynamic_universe_mode else [])))
+    total_symbols_to_fetch = len(symbols_to_fetch)
+    for symbol_index, symbol in enumerate(symbols_to_fetch, start=1):
         if progress is not None:
-            progress(f"loading historical klines for {symbol}")
+            if dynamic_universe_mode:
+                progress(f"loading historical klines for dynamic universe symbol {symbol_index}/{total_symbols_to_fetch} {symbol}")
+            else:
+                progress(f"loading historical klines for {symbol}")
         per_interval: dict[str, list[list]] = {}
         for item_interval in ("1h", "4h", "1d"):
+            if progress is not None and dynamic_universe_mode:
+                progress(f"loading {symbol_index}/{total_symbols_to_fetch} {symbol} {item_interval} klines")
             fetched = fetch_klines_cached(
                 settings,
                 symbol,
                 item_interval,
                 fetch_start_ms,
                 fetch_end_ms,
-                allow_data_gaps=allow_data_gaps,
+                allow_data_gaps=True if dynamic_universe_mode else allow_data_gaps,
                 progress=progress,
             )
             per_interval[item_interval] = fetched.klines
@@ -326,19 +354,34 @@ def run_backtest_replay(
                     "No primary interval klines inside requested backtest period.",
                 )
             )
-    symbols = usable_symbols
+    symbols = symbols if dynamic_universe_mode else usable_symbols
     if universe_snapshot is not None:
-        universe_snapshot["replay_symbols"] = symbols
-        universe_snapshot["replay_count"] = len(symbols)
+        universe_snapshot["replay_symbols"] = usable_symbols
+        universe_snapshot["replay_count"] = len(usable_symbols)
         universe_snapshot["skipped_symbols_no_history"] = skipped_symbols_no_history
     if not symbols:
         raise ValueError("Backtest has no symbols with primary interval history inside the requested period.")
 
-    reference = klines_by_symbol[symbols[0]]["4h"]
+    reference_symbol = "BTCUSDT" if dynamic_universe_mode else symbols[0]
+    reference = klines_by_symbol.get(reference_symbol, {}).get("4h", [])
     bars = [kline for kline in reference if start_ms <= int(kline[0]) < end_ms]
+    if dynamic_universe_mode and not bars:
+        raise ValueError("Dynamic universe backtest requires BTCUSDT 4h klines for the requested period.")
+    if dynamic_universe_mode and not allow_data_gaps:
+        btc_errors = [
+            issue.message
+            for issue in data_issues
+            if issue.symbol == "BTCUSDT" and issue.interval == primary_interval and issue.severity == "ERROR"
+        ]
+        if btc_errors:
+            raise ValueError(f"BTCUSDT {primary_interval} data quality failed: {'; '.join(btc_errors[:3])}")
     cash = settings.backtest.initial_equity
     all_trades: list[_SimTrade] = []
     equity_curve: list[EquityPoint] = []
+    kline_4h_by_open = {
+        symbol: {int(kline[0]): kline for kline in per_interval["4h"]}
+        for symbol, per_interval in klines_by_symbol.items()
+    }
     limitations = [
         "MVP spot backtest: WATCHING is a condition plan, not an exchange-submitted limit order.",
         "24h ticker fields are reconstructed from 1h klines and differ from live rolling /ticker/24hr precision.",
@@ -352,6 +395,16 @@ def run_backtest_replay(
                 "Universe snapshot symbols with no primary-interval history inside the requested period are skipped.",
             ]
         )
+    if dynamic_universe_mode:
+        limitations.extend(
+            [
+                "Dynamic universe mode uses current Binance exchangeInfo as the symbol master.",
+                "Symbols that traded historically but are delisted today are not included in the symbol master.",
+                "Universe membership is refreshed daily using only closed historical klines available at that decision time.",
+                "First full dynamic-universe run can be slow because many 1h/4h/1d klines must be cached.",
+            ]
+        )
+    daily_universe_cache: dict[str, list[str]] = {}
 
     for bar_index, reference_bar in enumerate(bars):
         bar_open_ms = int(reference_bar[0])
@@ -359,11 +412,11 @@ def run_backtest_replay(
         bar_time = _iso_from_ms(bar_close_ms)
         current_bars: dict[str, list] = {}
         mark_prices: dict[str, float] = {}
-        for symbol in symbols:
-            matching = [kline for kline in klines_by_symbol[symbol]["4h"] if int(kline[0]) == bar_open_ms]
-            if matching:
-                current_bars[symbol] = matching[0]
-                mark_prices[symbol] = float(matching[0][4])
+        for symbol in symbols_to_fetch:
+            bar = kline_4h_by_open.get(symbol, {}).get(bar_open_ms)
+            if bar is not None:
+                current_bars[symbol] = bar
+                mark_prices[symbol] = float(bar[4])
 
         # First advance exits for active positions, then process existing condition plans.
         for item in sorted(_active_positions(all_trades), key=lambda x: (x.created_index, x.paper.symbol)):
@@ -502,7 +555,26 @@ def run_backtest_replay(
             market_regime_allows_buy = classify_market_regime(btc_1d, eth_1d).allows_alt_buy
         unavailable = {item.paper.symbol for item in all_trades if item.paper.status in {"WATCHING", "ENTERED", "TP1_HIT"}}
         candidate_pool: list[TradeCandidate] = []
-        for symbol in symbols:
+        analysis_symbols = symbols
+        if dynamic_universe_mode:
+            day_key = dynamic_universe_refresh_key(bar_close_ms)
+            if day_key not in daily_universe_cache:
+                selection = select_dynamic_universe_for_day(
+                    settings,
+                    symbols,
+                    klines_by_symbol,
+                    bar_close_ms,
+                    max_symbols=max_universe_symbols or settings.market.max_universe,
+                )
+                dynamic_selections.append(selection)
+                daily_universe_cache[day_key] = selection.selected_symbols
+                if progress is not None:
+                    progress(
+                        f"dynamic universe {day_key}: selected {len(selection.selected_symbols)}/"
+                        f"{selection.candidate_count} candidates"
+                    )
+            analysis_symbols = daily_universe_cache[day_key]
+        for symbol in analysis_symbols:
             if symbol in unavailable:
                 continue
             k1h = _closed_slice(klines_by_symbol[symbol]["1h"], "1h", bar_close_ms)
@@ -550,8 +622,10 @@ def run_backtest_replay(
             current_open_plans += 1
 
     final_mark = {
-        symbol: float([k for k in klines_by_symbol[symbol]["4h"] if int(k[0]) < end_ms][-1][4])
-        for symbol in symbols
+        symbol: float(prior[-1][4])
+        for symbol in symbols_to_fetch
+        for prior in [[kline for kline in klines_by_symbol[symbol]["4h"] if int(kline[0]) < end_ms]]
+        if prior
     }
     final_equity = _portfolio_equity(cash, all_trades, final_mark)
     final_time = _iso_from_ms(end_ms)
@@ -569,9 +643,22 @@ def run_backtest_replay(
             item.paper.notes = "Open at backtest end; mark-to-market only."
         _sync_record(item)
 
+    result_symbols = symbols
+    if dynamic_universe_mode:
+        selected_symbols = sorted({symbol for selection in dynamic_selections for symbol in selection.selected_symbols})
+        trade_symbols = sorted({item.record.symbol for item in all_trades})
+        result_symbols = sorted(set(selected_symbols) | set(trade_symbols))
+        if dynamic_master is None:
+            raise ValueError("Dynamic universe mode requires a symbol master.")
+        dynamic_universe_summary = build_dynamic_universe_summary(
+            dynamic_master,
+            dynamic_selections,
+            max_symbols=max_universe_symbols or settings.market.max_universe,
+        ).to_dict()
+
     return BacktestResult(
         run_id=run_id,
-        symbols=symbols,
+        symbols=result_symbols,
         start_utc=_iso_from_ms(start_ms),
         end_utc=_iso_from_ms(end_ms),
         created_at_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -587,8 +674,12 @@ def run_backtest_replay(
             "market_top_n": settings.market.top_n,
             "universe_mode": universe_mode,
             "universe_snapshot": universe_snapshot,
+            "dynamic_universe_mode": dynamic_universe_mode,
+            "dynamic_universe_summary": dynamic_universe_summary,
         },
         limitations=limitations,
-        universe_mode=universe_mode,
+        universe_mode=universe_mode or dynamic_universe_mode,
         universe_snapshot=universe_snapshot,
+        universe_type="dynamic" if dynamic_universe_mode else ("snapshot" if universe_mode else "manual"),
+        dynamic_universe_summary=dynamic_universe_summary,
     )

@@ -98,10 +98,63 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write only to the project reports directory.",
     )
 
+    backtest_dynamic = subparsers.add_parser(
+        "backtest-dynamic-universe",
+        help="Rebuild the historical universe daily from closed klines, replay trades, and write a backtest report.",
+    )
+    backtest_dynamic.add_argument("--start", required=True, help="UTC start date, e.g. 2024-01-01.")
+    backtest_dynamic.add_argument("--end", required=True, help="UTC end date, e.g. 2024-12-31.")
+    backtest_dynamic.add_argument(
+        "--max-symbols",
+        type=int,
+        default=None,
+        help="Daily dynamic universe size. Defaults to settings.market.max_universe.",
+    )
+    backtest_dynamic.add_argument(
+        "--source-limit",
+        type=int,
+        default=None,
+        help="Debug only: sort master symbols alphabetically and keep the first N before loading history.",
+    )
+    backtest_dynamic.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
+    backtest_dynamic.add_argument(
+        "--intrabar",
+        default=None,
+        choices=["stop_first", "tp_first"],
+        help="Intrabar fill policy.",
+    )
+    backtest_dynamic.add_argument(
+        "--allow-data-gaps",
+        action="store_true",
+        help="Continue when historical kline gaps are found.",
+    )
+    backtest_dynamic.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
     abtest = subparsers.add_parser("abtest", help="Run baseline versus variant backtests for one experiment.")
     abtest.add_argument("--experiment", required=True, help="Experiment id from config/experiments.toml.")
     abtest.add_argument("--experiments", default="config/experiments.toml", help="Path to TOML experiment definitions.")
-    abtest.add_argument("--symbols", required=True, help="Comma-separated symbols, e.g. BTCUSDT,ETHUSDT.")
+    abtest.add_argument("--symbols", default=None, help="Comma-separated symbols, e.g. BTCUSDT,ETHUSDT.")
+    abtest.add_argument(
+        "--dynamic-universe",
+        action="store_true",
+        help="Run baseline and variant with the same daily dynamic universe master list.",
+    )
+    abtest.add_argument(
+        "--max-symbols",
+        type=int,
+        default=None,
+        help="Daily dynamic universe size when --dynamic-universe is used.",
+    )
+    abtest.add_argument(
+        "--source-limit",
+        type=int,
+        default=None,
+        help="Debug only: limit the dynamic universe master list when --dynamic-universe is used.",
+    )
     abtest.add_argument("--start", required=True, help="UTC start date, e.g. 2024-01-01.")
     abtest.add_argument("--end", required=True, help="UTC end date, e.g. 2024-12-31.")
     abtest.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
@@ -285,11 +338,53 @@ def main() -> None:
         for path in report_paths:
             print(f"report={path}")
 
+    if args.command == "backtest-dynamic-universe":
+        _progress("starting dynamic universe backtest")
+        if args.source_limit is not None:
+            _progress("source-limit is enabled for smoke/debug; full universe results may differ")
+        result, metrics, report_paths = run_backtest(
+            settings,
+            [],
+            args.start,
+            args.end,
+            interval=args.interval,
+            intrabar=args.intrabar,
+            allow_data_gaps=args.allow_data_gaps,
+            dynamic_universe_mode=True,
+            max_universe_symbols=args.max_symbols,
+            source_limit=args.source_limit,
+            include_obsidian=not args.no_obsidian,
+            progress=_progress,
+        )
+        summary = result.dynamic_universe_summary or {}
+        print("backtest_dynamic_universe=completed")
+        print(f"backtest_run_id={result.run_id}")
+        print(f"master_symbols={summary.get('master_count', 0)}")
+        print(f"universe_refreshes={summary.get('universe_refresh_count', 0)}")
+        print(f"symbols={','.join(result.symbols)}")
+        print(f"trades={metrics.trades}")
+        print(f"closed_trades={metrics.closed_trades}")
+        print(f"net_return_pct={metrics.net_return_pct:.2f}")
+        print(f"max_drawdown_pct={metrics.max_drawdown_pct:.2f}")
+        print(f"sample_sufficient={str(metrics.sample_sufficient).lower()}")
+        print("runtime_note=first full dynamic-universe run can be slow; cached klines make later runs faster")
+        for path in report_paths:
+            print(f"report={path}")
+
     if args.command == "abtest":
-        symbols = [symbol.strip().upper() for symbol in args.symbols.split(",") if symbol.strip()]
-        if not symbols:
-            raise ValueError("--symbols must include at least one symbol")
-        _progress(f"starting A/B test {args.experiment} for {', '.join(symbols)}")
+        if args.dynamic_universe and args.symbols:
+            raise ValueError("--symbols and --dynamic-universe are mutually exclusive")
+        symbols = []
+        if args.symbols:
+            symbols = [symbol.strip().upper() for symbol in args.symbols.split(",") if symbol.strip()]
+        if not args.dynamic_universe and not symbols:
+            raise ValueError("--symbols must include at least one symbol unless --dynamic-universe is used")
+        if args.dynamic_universe:
+            _progress(f"starting dynamic-universe A/B test {args.experiment}")
+            if args.source_limit is not None:
+                _progress("source-limit is enabled for dynamic-universe A/B smoke/debug")
+        else:
+            _progress(f"starting A/B test {args.experiment} for {', '.join(symbols)}")
         summary = run_abtest(
             settings,
             args.experiment,
@@ -300,6 +395,9 @@ def main() -> None:
             interval=args.interval,
             intrabar=args.intrabar,
             allow_data_gaps=args.allow_data_gaps,
+            dynamic_universe=args.dynamic_universe,
+            max_universe_symbols=args.max_symbols,
+            source_limit=args.source_limit,
             include_obsidian=not args.no_obsidian,
             progress=_progress,
         )

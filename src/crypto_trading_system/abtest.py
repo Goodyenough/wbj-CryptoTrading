@@ -8,6 +8,7 @@ from pathlib import Path
 import tomllib
 from typing import Callable, Any
 
+from .backtest.universe import build_current_symbol_master
 from .backtest.metrics import BacktestMetrics
 from .backtest.runner import run_backtest
 from .config import PROJECT_ROOT, Settings
@@ -232,6 +233,7 @@ def _render_abtest_report(
         f"old_value: {old_value}",
         f"new_value: {new_value}",
         f"sample_sufficient: {str(sample_sufficient).lower()}",
+        f"universe_mode: {getattr(baseline_result, 'universe_type', 'manual')}",
         f"verdict: {verdict}",
         f"report_version: {report_version}",
         "---",
@@ -243,6 +245,7 @@ def _render_abtest_report(
         f"- baseline_run_id: `{baseline_result.run_id}`",
         f"- variant_run_id: `{variant_result.run_id}`",
         f"- symbols: {', '.join(f'`{symbol}`' for symbol in baseline_result.symbols)}",
+        f"- universe_mode: {getattr(baseline_result, 'universe_type', 'manual')}",
         f"- time_periods_tested: `{start}` -> `{end}`",
         f"- changed_param: `{changed_param}`",
         f"- old_value: `{old_value}`",
@@ -252,6 +255,27 @@ def _render_abtest_report(
         f"- verdict: `{verdict}`",
         f"- reason: {reason}",
         "",
+        *(
+            [
+                "## Dynamic Universe Metadata",
+                "",
+                f"- baseline_master_count: {baseline_result.dynamic_universe_summary.get('master_count', 'n/a')}",
+                f"- variant_master_count: {variant_result.dynamic_universe_summary.get('master_count', 'n/a')}",
+                f"- baseline_source_limit: {baseline_result.dynamic_universe_summary.get('source_limit', 'none')}",
+                f"- variant_source_limit: {variant_result.dynamic_universe_summary.get('source_limit', 'none')}",
+                (
+                    "- shared_master_expected: true "
+                    "(A/B runner builds the dynamic symbol master once before baseline and variant.)"
+                ),
+                f"- baseline_universe_refreshes: {baseline_result.dynamic_universe_summary.get('universe_refresh_count', 0)}",
+                f"- variant_universe_refreshes: {variant_result.dynamic_universe_summary.get('universe_refresh_count', 0)}",
+                "",
+            ]
+            if getattr(baseline_result, "universe_type", "manual") == "dynamic"
+            and baseline_result.dynamic_universe_summary
+            and variant_result.dynamic_universe_summary
+            else []
+        ),
         "## 指标对比",
         "",
         "| Metric | Baseline | Variant | Delta |",
@@ -321,7 +345,8 @@ def _write_abtest_report(
     if include_obsidian and obsidian_dir is not None:
         target_dirs.append(obsidian_dir)
 
-    prefix = f"abtest_{definition.experiment_id}_{start}_{end}"
+    mode = "dynamic_universe" if getattr(baseline_result, "universe_type", "manual") == "dynamic" else "symbols"
+    prefix = f"abtest_{mode}_{definition.experiment_id}_{start}_{end}"
     version_number = next_report_version(target_dirs, prefix)
     version = f"v{version_number}"
     filename = versioned_markdown_filename(prefix, version_number)
@@ -360,12 +385,24 @@ def run_abtest(
     interval: str | None = None,
     intrabar: str | None = None,
     allow_data_gaps: bool = False,
+    dynamic_universe: bool = False,
+    max_universe_symbols: int | None = None,
+    source_limit: int | None = None,
     include_obsidian: bool = True,
     progress: Callable[[str], None] | None = None,
 ) -> AbtestSummary:
     definition = load_experiment(experiment_id, experiments_path)
     baseline_settings = deepcopy(settings)
     variant_settings, changes = apply_experiment_overrides(settings, definition)
+    dynamic_symbol_master = None
+    if dynamic_universe:
+        if progress is not None:
+            progress("building shared dynamic universe symbol master for A/B")
+        dynamic_symbol_master = build_current_symbol_master(
+            baseline_settings,
+            source_limit=source_limit,
+            progress=progress,
+        )
 
     if progress is not None:
         progress(f"running baseline backtest for {experiment_id}")
@@ -377,6 +414,10 @@ def run_abtest(
         interval=interval,
         intrabar=intrabar,
         allow_data_gaps=allow_data_gaps,
+        dynamic_universe_mode=dynamic_universe,
+        max_universe_symbols=max_universe_symbols,
+        source_limit=source_limit,
+        dynamic_symbol_master=dynamic_symbol_master,
         include_obsidian=include_obsidian,
         progress=progress,
     )
@@ -391,6 +432,10 @@ def run_abtest(
         interval=interval,
         intrabar=intrabar,
         allow_data_gaps=allow_data_gaps,
+        dynamic_universe_mode=dynamic_universe,
+        max_universe_symbols=max_universe_symbols,
+        source_limit=source_limit,
+        dynamic_symbol_master=dynamic_symbol_master,
         include_obsidian=include_obsidian,
         progress=progress,
     )
