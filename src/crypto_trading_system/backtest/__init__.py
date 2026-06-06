@@ -1,0 +1,1 @@
+"""Backtesting support for CryptoTradingSystem."""

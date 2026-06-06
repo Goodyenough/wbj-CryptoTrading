@@ -13,6 +13,18 @@
 - Git：
 ```
 
+## 2026-06-06
+
+### 11:39:08 +08:00 - 增加回测模块基础设施和共享状态机
+- 类型：代码 / 配置 / 数据库
+- 改动：新增 `[backtest]` 配置和 `BacktestSettings`，扩展 Binance K 线接口支持 `startTime/endTime` 分页参数。
+- 改动：新增 `ticker_utils.reconstruct_ticker`、`trade_state.step_trade`、`backtest/history.py`，支持历史 1h ticker 重建、共享交易状态机、K 线缓存和数据质量检查。
+- 改动：扩展 SQLite 初始化，加入 `kline_cache`、`backtest_runs`、`backtest_trades`、`backtest_metrics` 表；`TradeCandidate` 增加结构化 `action` 字段。
+- 改动：`paper_trader.update_paper_trades` 改为调用共享 `step_trade`；修正扫描器 7 日涨幅为固定 168 根 1h K 线口径。
+- 影响：为回测引擎提供无前视 ticker 重建、历史数据缓存和可复用状态机，同时保持现有模拟盘更新路径行为一致。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`，均通过。
+- Git：待本次回测基础设施提交后回填。
+
 ## 2026-06-03
 
 ### 22:20:37 +08:00 - 增加 doctor 命令和扫描进度输出

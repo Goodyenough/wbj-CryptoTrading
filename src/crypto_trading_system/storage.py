@@ -126,6 +126,87 @@ def init_db(path: Path) -> None:
             "CREATE INDEX IF NOT EXISTS idx_data_cross_checks_scan_symbol "
             "ON data_cross_checks (scan_id, symbol)"
         )
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS kline_cache (
+                source TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                interval TEXT NOT NULL,
+                open_time INTEGER NOT NULL,
+                open REAL NOT NULL,
+                high REAL NOT NULL,
+                low REAL NOT NULL,
+                close REAL NOT NULL,
+                volume REAL NOT NULL,
+                close_time INTEGER NOT NULL,
+                quote_volume REAL NOT NULL,
+                trades INTEGER NOT NULL,
+                taker_buy_base_volume REAL NOT NULL,
+                taker_buy_quote_volume REAL NOT NULL,
+                is_closed INTEGER NOT NULL,
+                fetched_at_utc TEXT NOT NULL,
+                PRIMARY KEY (source, symbol, interval, open_time)
+            )
+            """
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_kline_cache_symbol_interval_time "
+            "ON kline_cache (symbol, interval, open_time)"
+        )
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS backtest_runs (
+                run_id TEXT PRIMARY KEY,
+                created_at_utc TEXT NOT NULL,
+                symbols_json TEXT NOT NULL,
+                start_utc TEXT NOT NULL,
+                end_utc TEXT NOT NULL,
+                config_json TEXT NOT NULL,
+                commit_hash TEXT NOT NULL,
+                metrics_json TEXT NOT NULL,
+                report_path TEXT,
+                payload_json TEXT NOT NULL
+            )
+            """
+        )
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS backtest_trades (
+                run_id TEXT NOT NULL,
+                trade_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                status TEXT NOT NULL,
+                created_at_utc TEXT NOT NULL,
+                entered_at_utc TEXT,
+                closed_at_utc TEXT,
+                entry_price_raw REAL,
+                entry_price_filled REAL,
+                exit_price_raw REAL,
+                exit_price_filled REAL,
+                entry_fee REAL NOT NULL DEFAULT 0,
+                exit_fee REAL NOT NULL DEFAULT 0,
+                slippage_cost REAL NOT NULL DEFAULT 0,
+                gross_pnl REAL NOT NULL DEFAULT 0,
+                net_pnl REAL NOT NULL DEFAULT 0,
+                r_multiple_net REAL,
+                payload_json TEXT NOT NULL,
+                PRIMARY KEY (run_id, trade_id),
+                FOREIGN KEY (run_id) REFERENCES backtest_runs(run_id)
+            )
+            """
+        )
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS backtest_metrics (
+                run_id TEXT NOT NULL,
+                metric_name TEXT NOT NULL,
+                metric_value REAL,
+                metric_text TEXT,
+                PRIMARY KEY (run_id, metric_name),
+                FOREIGN KEY (run_id) REFERENCES backtest_runs(run_id)
+            )
+            """
+        )
 
 
 def save_scan_result(path: Path, result: ScanResult) -> None:

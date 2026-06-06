@@ -119,7 +119,7 @@ def _analyze_ticker(
     closes_4h = _quote_closes(k4h)
     closes_1d = _quote_closes(k1d)
     volumes_1h = _quote_volumes(k1h)
-    if len(closes_1h) < 100 or len(closes_4h) < 80 or len(closes_1d) < 60:
+    if len(closes_1h) < 168 or len(closes_4h) < 80 or len(closes_1d) < 60:
         return None
 
     price = closes_1h[-1]
@@ -134,7 +134,7 @@ def _analyze_ticker(
     if atr_4h is None or atr_4h <= 0:
         return None
 
-    pct_7d = percent_change(closes_1h[0], closes_1h[-1])
+    pct_7d = percent_change(closes_1h[-168], closes_1h[-1])
     pct_3d = percent_change(closes_1h[-72], closes_1h[-1])
     recent_low = _recent_low(k4h, 18)
     recent_high = _recent_high(k4h, 36)
@@ -207,6 +207,21 @@ def _analyze_ticker(
     if distance_to_support > 10 or (rsi_4h is not None and rsi_4h > 75):
         verdict = "只等回调"
 
+    trend_ok = trend_4h or trend_1d
+    score_ok = score >= 35
+    momentum_ok = ticker.pct_24h > 0 and (pct_7d is None or pct_7d > 0)
+    distance_buy_ok = distance_to_support <= 4
+    distance_wait_ok = distance_to_support <= 10
+    rsi_ok = rsi_4h is None or rsi_4h <= 75
+    if score_ok and trend_ok and momentum_ok and distance_buy_ok and rsi_ok:
+        action = "BUY_CANDIDATE"
+    elif trend_ok and momentum_ok and distance_wait_ok and rsi_ok:
+        action = "WAIT_PULLBACK"
+    elif score < 20:
+        action = "REJECT"
+    else:
+        action = "WATCH_ONLY"
+
     risks: list[str] = []
     if distance_to_support > 8:
         risks.append("距离支撑偏远，不能追市价")
@@ -266,6 +281,7 @@ def _analyze_ticker(
         invalidation=invalidation,
         recent_4h_klines=_recent_kline_evidence(k4h),
         risks=risks,
+        action=action,
     )
 
 

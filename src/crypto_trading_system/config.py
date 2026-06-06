@@ -36,6 +36,28 @@ class PaperSettings:
 
 
 @dataclass
+class BacktestSettings:
+    maker_fee_bps: float
+    taker_fee_bps: float
+    entry_slippage_bps: float
+    stop_slippage_bps: float
+    intrabar_policy: str
+    primary_interval: str
+    execution_interval: str
+    initial_equity: float
+    max_open_plans: int
+    max_active_positions: int
+    total_active_risk_pct: float
+    risk_per_trade_pct: float
+    max_position_notional_pct: float
+    allow_leverage: bool
+    watch_expiry_bars: int
+    warmup_1h_bars: int
+    warmup_4h_bars: int
+    warmup_1d_bars: int
+
+
+@dataclass
 class DataValidationSettings:
     enabled: bool
     coingecko_base_url: str
@@ -62,6 +84,7 @@ class Settings:
     market: MarketSettings
     analysis: AnalysisSettings
     paper: PaperSettings
+    backtest: BacktestSettings
     data_validation: DataValidationSettings
     output: OutputSettings
 
@@ -83,6 +106,7 @@ def load_settings(path: Path) -> Settings:
     market = data["market"]
     analysis = data["analysis"]
     paper = data.get("paper", {})
+    backtest = data.get("backtest", {})
     data_validation = data.get("data_validation", {})
     output = data["output"]
 
@@ -110,6 +134,26 @@ def load_settings(path: Path) -> Settings:
             account_name=str(paper.get("account_name", "demo")),
             account_equity=float(paper.get("account_equity", 10_000)),
             risk_per_trade_pct=float(paper.get("risk_per_trade_pct", analysis.get("risk_per_trade_pct", 0.01))),
+        ),
+        backtest=BacktestSettings(
+            maker_fee_bps=float(backtest.get("maker_fee_bps", 4)),
+            taker_fee_bps=float(backtest.get("taker_fee_bps", 10)),
+            entry_slippage_bps=float(backtest.get("entry_slippage_bps", 5)),
+            stop_slippage_bps=float(backtest.get("stop_slippage_bps", 10)),
+            intrabar_policy=str(backtest.get("intrabar_policy", "stop_first")),
+            primary_interval=str(backtest.get("primary_interval", "4h")),
+            execution_interval=str(backtest.get("execution_interval", "4h")),
+            initial_equity=float(backtest.get("initial_equity", 10_000)),
+            max_open_plans=int(backtest.get("max_open_plans", 10)),
+            max_active_positions=int(backtest.get("max_active_positions", 5)),
+            total_active_risk_pct=float(backtest.get("total_active_risk_pct", 0.05)),
+            risk_per_trade_pct=float(backtest.get("risk_per_trade_pct", analysis.get("risk_per_trade_pct", 0.01))),
+            max_position_notional_pct=float(backtest.get("max_position_notional_pct", 1.0)),
+            allow_leverage=bool(backtest.get("allow_leverage", False)),
+            watch_expiry_bars=int(backtest.get("watch_expiry_bars", 18)),
+            warmup_1h_bars=int(backtest.get("warmup_1h_bars", 200)),
+            warmup_4h_bars=int(backtest.get("warmup_4h_bars", 100)),
+            warmup_1d_bars=int(backtest.get("warmup_1d_bars", 80)),
         ),
         data_validation=DataValidationSettings(
             enabled=bool(data_validation.get("enabled", True)),

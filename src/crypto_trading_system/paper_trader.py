@@ -11,6 +11,7 @@ from .config import Settings
 from .market_data import BinanceClient
 from .models import PaperTrade, PaperTradeEvent
 from .report_versions import next_report_version, versioned_markdown_filename
+from .trade_state import step_trade
 
 
 OPEN_STATUSES = {"WATCHING", "ENTERED", "TP1_HIT"}
@@ -402,99 +403,27 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
     with sqlite3.connect(settings.output.database_path) as connection:
         trades = _load_open_trades(connection, account)
         for trade in trades:
-            old_status = trade.status
             current_price = ticker_map.get(trade.symbol)
             if current_price is None:
                 trade.notes = f"{trade.notes} | No ticker price found during update."
                 continue
 
-            trade.last_price = current_price
-            trade.updated_at_utc = now
-
-            if trade.status == "WATCHING":
-                if current_price <= trade.stop_loss:
-                    trade.status = "INVALIDATED"
-                    trade.closed_at_utc = now
-                    trade.exit_price = current_price
-                    trade.notes = "Plan invalidated before entry: current price is below stop loss."
-                    _record_event(
-                        connection,
-                        trade,
-                        "INVALIDATED",
-                        "Plan invalidated before entry: current price is below stop loss.",
-                        event_time_utc=now,
-                        price=current_price,
-                    )
-                elif trade.entry_low <= current_price <= trade.entry_high:
-                    trade.status = "ENTERED"
-                    trade.entry_price = current_price
-                    per_unit_risk = current_price - trade.stop_loss
-                    if per_unit_risk > 0:
-                        trade.quantity = trade.cash_risk / per_unit_risk
-                    trade.entered_at_utc = now
-                    trade.notes = "Paper entry triggered inside entry zone."
-                    _record_event(
-                        connection,
-                        trade,
-                        "ENTERED",
-                        (
-                            f"Paper entry triggered at {current_price:.8g}; "
-                            f"quantity {trade.quantity:.8g}."
-                        ),
-                        event_time_utc=now,
-                        price=current_price,
-                    )
-                elif current_price > trade.entry_high:
-                    trade.notes = "Watching: price is above entry zone; waiting for pullback."
-                else:
-                    trade.notes = "Watching: price is below entry zone but above stop; waiting for recovery."
-
-            if trade.status in {"ENTERED", "TP1_HIT"} and trade.entry_price is not None and trade.quantity:
-                trade.unrealized_pnl = (current_price - trade.entry_price) * trade.quantity
-                if current_price <= trade.stop_loss:
-                    trade.status = "STOPPED"
-                    trade.closed_at_utc = now
-                    trade.exit_price = trade.stop_loss
-                    trade.realized_pnl = (trade.stop_loss - trade.entry_price) * trade.quantity
-                    trade.unrealized_pnl = 0
-                    trade.notes = "Stop loss hit."
-                    if old_status != "STOPPED":
-                        _record_event(
-                            connection,
-                            trade,
-                            "STOPPED",
-                            f"Stop loss hit at {trade.stop_loss:.8g}.",
-                            event_time_utc=now,
-                            price=trade.stop_loss,
-                        )
-                elif current_price >= trade.take_profit_2:
-                    trade.status = "CLOSED"
-                    trade.closed_at_utc = now
-                    trade.exit_price = trade.take_profit_2
-                    trade.realized_pnl = (trade.take_profit_2 - trade.entry_price) * trade.quantity
-                    trade.unrealized_pnl = 0
-                    trade.notes = "TP2 hit; paper trade closed."
-                    if old_status != "CLOSED":
-                        _record_event(
-                            connection,
-                            trade,
-                            "CLOSED",
-                            f"TP2 hit at {trade.take_profit_2:.8g}; trade closed.",
-                            event_time_utc=now,
-                            price=trade.take_profit_2,
-                        )
-                elif current_price >= trade.take_profit_1 and trade.status == "ENTERED":
-                    trade.status = "TP1_HIT"
-                    trade.tp1_hit_at_utc = now
-                    trade.notes = "TP1 hit; trade remains open for TP2 tracking."
-                    _record_event(
-                        connection,
-                        trade,
-                        "TP1_HIT",
-                        f"TP1 hit at {trade.take_profit_1:.8g}; trade remains open.",
-                        event_time_utc=now,
-                        price=trade.take_profit_1,
-                    )
+            events = step_trade(
+                trade,
+                high=current_price,
+                low=current_price,
+                close=current_price,
+                event_time_utc=now,
+            )
+            for event in events:
+                _record_event(
+                    connection,
+                    trade,
+                    event.event_type,
+                    event.message,
+                    event_time_utc=event.event_time_utc,
+                    price=event.price,
+                )
 
             _save_trade_update(connection, trade)
             updated.append(trade)

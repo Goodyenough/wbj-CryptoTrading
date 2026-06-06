@@ -60,8 +60,17 @@ class BinanceClient:
     def ticker_24hr(self) -> list[dict[str, Any]]:
         return self._get_json("/api/v3/ticker/24hr")
 
-    def klines(self, symbol: str, interval: str, limit: int) -> list[list[Any]]:
-        return self._get_json(
-            "/api/v3/klines",
-            {"symbol": symbol, "interval": interval, "limit": limit},
-        )
+    def klines(
+        self,
+        symbol: str,
+        interval: str,
+        limit: int = 1000,
+        start_time_ms: int | None = None,
+        end_time_ms: int | None = None,
+    ) -> list[list[Any]]:
+        params: dict[str, Any] = {"symbol": symbol, "interval": interval, "limit": limit}
+        if start_time_ms is not None:
+            params["startTime"] = start_time_ms
+        if end_time_ms is not None:
+            params["endTime"] = end_time_ms
+        return self._get_json("/api/v3/klines", params)

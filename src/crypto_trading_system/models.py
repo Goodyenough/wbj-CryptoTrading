@@ -76,6 +76,7 @@ class TradeCandidate:
     data_quality_status: str = "DATA_NOT_CHECKED"
     data_quality_message: str = "Data cross-check has not run."
     data_checks: list[DataSourceCheck] = field(default_factory=list)
+    action: str = "WATCH_ONLY"
 
 
 @dataclass
@@ -138,3 +139,11 @@ class PaperTradeEvent:
     realized_pnl: float
     unrealized_pnl: float
     message: str
+
+
+@dataclass
+class StepEvent:
+    event_type: str
+    message: str
+    event_time_utc: str
+    price: float | None
