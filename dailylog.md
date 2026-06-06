@@ -15,6 +15,15 @@
 
 ## 2026-06-07
 
+### 00:16:58 +08:00 - 增加 commit 后自动 push 规则
+- 类型：文档 / 规则 / Git
+- 改动：在 `AGENTS.md` 中增加规则，要求每次创建 Git commit 后继续 push 当前分支到 `origin`，除非用户明确要求不 push，或遇到网络、权限、远端冲突等失败。
+- 改动：同步调整失败处理规则，若无法 commit 或 push，都需要写入 `dailylog.md` 并明确告知用户。
+- 原因：用户希望工程文件夹中的代码、说明文件和报告能及时同步到 GitHub，方便另一台电脑继续工作。
+- 影响：后续改动完成后会默认进入“记录 dailylog -> commit -> push”的闭环；重要信息更不容易只留在本机。
+- 验证：检查 `AGENTS.md` 已包含 commit 后 push 的规则；文档变更，未运行代码测试。
+- Git：`Push after each commit by default`（本条随该提交一起提交并 push）。
+
 ### 00:13:28 +08:00 - 将近期 dailylog 改为中文
 - 类型：文档 / 规则 / Git
 - 改动：将 `dailylog.md` 近期英文记录改为中文表达，并保留必要的命令名、配置键、状态值和 Git commit message。
