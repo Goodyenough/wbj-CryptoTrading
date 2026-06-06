@@ -23,7 +23,7 @@
 - 改动：`paper_trader.update_paper_trades` 改为调用共享 `step_trade`；修正扫描器 7 日涨幅为固定 168 根 1h K 线口径。
 - 影响：为回测引擎提供无前视 ticker 重建、历史数据缓存和可复用状态机，同时保持现有模拟盘更新路径行为一致。
 - 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`，均通过。
-- Git：待本次回测基础设施提交后回填。
+- Git：`e383554` - `Add backtest foundations`。
 
 ### 11:47:56 +08:00 - 增加回测引擎、指标、报告和 CLI
 - 类型：代码 / 报告 / 数据库
@@ -32,7 +32,14 @@
 - 改动：新增 `tests/test_replay.py`，验证历史 ticker 重建不读取未来数据、未收盘 K 线不会进入决策切片。
 - 影响：可以运行 `python main.py backtest --symbols BTCUSDT --start 2024-06-01 --end 2024-09-01 --interval 4h` 生成回测报告并写入 SQLite。
 - 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`、`python tests/test_replay.py`，并完成 BTCUSDT 2024-06-01 至 2024-09-01 回测烟测。
-- Git：待本次回测引擎提交后回填。
+- Git：`b05a89d` - `Add backtest engine`。
+
+### 11:48:50 +08:00 - 生成回测模块验收报告
+- 类型：报告 / Git
+- 改动：运行 BTCUSDT 2024-06-01 至 2024-09-01 的 4h 回测，生成 `reports/2026-06-06/backtest_2024-06-01_2024-09-01_v1.md`。
+- 影响：仓库内保留一份可人工复核的回测验收样例，报告包含回测假设、核心指标、benchmark、交易明细和代码 commit hash。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests/test_trade_state.py`、`python tests/test_replay.py`、`python main.py backtest --symbols BTCUSDT --start 2024-06-01 --end 2024-09-01 --interval 4h --no-obsidian`，全部通过。
+- Git：待本次验收报告提交后回填。
 
 ## 2026-06-03
 
