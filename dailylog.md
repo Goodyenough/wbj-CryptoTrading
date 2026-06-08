@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 00:58:53 +08:00 - Dynamic Universe history_365 样本过线复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `history_365` dynamic universe A/B，区间拉长到 `2025-01-01 -> 2025-09-01`，参数保持 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_history_365_2025-01-01_2025-09-01_v1.md` 及底层 dynamic universe backtest 报告，并更新仓库开发计划与 Obsidian 实验日志。
+- 原因：上一轮 `2025-01-01 -> 2025-06-01` 只有 14/13 笔闭合交易，仍未达到 `closed_trades >= 20`；需要拉长时间段验证 `history_365` 是否在充足样本下改善策略质量。
+- 影响：本轮 baseline closed_trades=33、variant closed_trades=29，样本首次充足；variant 胜率、Profit factor、净收益和最大回撤均改善，但策略整体仍为负收益，因此结论为 promising `retest`，不能直接 keep。
+- 验证：A/B 命令成功完成；baseline PF=0.431、净收益=-15.27%、最大回撤=19.84%；variant PF=0.654、净收益=-7.84%、最大回撤=15.99%；`sample_sufficient=true`。
+- Git：`Run sufficient dynamic universe history retest`（本条随该提交一起提交并 push）。
+
 ### 00:30:11 +08:00 - 负缓存后扩大 Dynamic Universe A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `history_365` dynamic universe A/B，区间为 `2025-01-01 -> 2025-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
