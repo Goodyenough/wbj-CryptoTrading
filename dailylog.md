@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 00:30:11 +08:00 - 负缓存后扩大 Dynamic Universe A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `history_365` dynamic universe A/B，区间为 `2025-01-01 -> 2025-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_history_365_2025-01-01_2025-06-01_v1.md` 及底层 dynamic universe backtest 报告，并更新仓库开发计划与 Obsidian 实验日志。
+- 原因：验证 K 线无数据负缓存后，扩大 dynamic universe 是否能让 A/B 样本达到 `closed_trades >= 20`。
+- 影响：样本从上一轮扩大版的 baseline 17 trades / 11 closed_trades 提升到 36 trades / 14 closed_trades，但仍未达到样本充足门槛；`history_365` 继续保留为 `retest`，不能 keep。
+- 验证：A/B 命令成功完成；baseline closed_trades=14、PF=0.198、净收益=-10.37%、最大回撤=12.67%；variant closed_trades=13、PF=0.214、净收益=-9.44%、最大回撤=11.66%；`sample_sufficient=false`。
+- Git：`Run larger dynamic universe history retest`（本条随该提交一起提交并 push）。
+
 ### 00:03:57 +08:00 - 增加 K 线无数据负缓存
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：新增 `kline_unavailable_ranges` SQLite 表，用于记录 Binance 对指定 `symbol`、`interval`、时间区间返回空 K 线批次的情况。
