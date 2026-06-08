@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 01:10:49 +08:00 - Dynamic Universe pump_chase_strict 充足样本复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `pump_chase_strict` dynamic universe A/B，区间为 `2025-01-01 -> 2025-09-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_pump_chase_strict_2025-01-01_2025-09-01_v1.md` 及底层 dynamic universe backtest 报告，并更新仓库开发计划与 Obsidian 实验日志。
+- 原因：在 `history_365` 样本过线后，用同一 dynamic universe 和日期窗口检验收紧追高扣分是否能改变交易集。
+- 影响：baseline 与 variant 完全一致，closed_trades 均为 33，PF 均为 0.431，净收益均为 -15.27%；说明当前 `pump_chase_strict` 参数在该 dynamic universe 样本中没有实际筛选效果。
+- 验证：A/B 命令成功完成；`sample_sufficient=true`，但所有核心指标无差异。
+- Git：`Run sufficient dynamic universe pump retest`（本条随该提交一起提交并 push）。
+
 ### 00:58:53 +08:00 - Dynamic Universe history_365 样本过线复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `history_365` dynamic universe A/B，区间拉长到 `2025-01-01 -> 2025-09-01`，参数保持 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
