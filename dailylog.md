@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 01:22:00 +08:00 - Dynamic Universe liquidity_50m 充足样本复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `liquidity_50m` dynamic universe A/B，区间为 `2025-01-01 -> 2025-09-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-09-01_v1.md` 及底层 dynamic universe backtest 报告，并更新仓库开发计划与 Obsidian 实验日志。
+- 原因：`history_365` 已在同一窗口显示 promising retest，`pump_chase_strict` 无差异；需要验证提高最小成交额门槛是否也能在充足样本下改善风险收益。
+- 影响：variant 将 trades 从 108 降到 60、closed_trades 从 33 降到 30，同时将 Profit factor 从 0.431 提升到 0.648，最大回撤从 19.84% 降到 14.69%，净收益从 -15.27% 改善到 -8.13%；结论为 promising `retest`，仍不能直接 keep。
+- 验证：A/B 命令成功完成；baseline closed_trades=33、PF=0.431、Sharpe=-1.345、净收益=-15.27%；variant closed_trades=30、PF=0.648、Sharpe=-0.630、净收益=-8.13%。
+- Git：`Run sufficient dynamic universe liquidity retest`（本条随该提交一起提交并 push）。
+
 ### 01:10:49 +08:00 - Dynamic Universe pump_chase_strict 充足样本复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `pump_chase_strict` dynamic universe A/B，区间为 `2025-01-01 -> 2025-09-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
