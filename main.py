@@ -9,6 +9,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from crypto_trading_system.abtest import run_abtest
+from crypto_trading_system.abtest_summary import (
+    build_abtest_summary,
+    load_abtest_records,
+    write_abtest_summary_report,
+)
 from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.doctor import run_doctor
@@ -161,6 +166,27 @@ def build_parser() -> argparse.ArgumentParser:
     abtest.add_argument("--intrabar", default=None, choices=["stop_first", "tp_first"], help="Intrabar fill policy.")
     abtest.add_argument("--allow-data-gaps", action="store_true", help="Continue when historical kline gaps are found.")
     abtest.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
+    abtest_summary = subparsers.add_parser("abtest-summary", help="Summarize existing A/B reports across periods.")
+    abtest_summary.add_argument("--experiment", required=True, help="Experiment id, e.g. liquidity_50m.")
+    abtest_summary.add_argument(
+        "--mode",
+        default="dynamic_universe",
+        choices=["dynamic_universe", "symbols"],
+        help="A/B report mode to summarize.",
+    )
+    abtest_summary.add_argument(
+        "--reports-date",
+        default=None,
+        help="Project reports date directory to read and write, e.g. 2026-06-09. Defaults to today in Beijing time.",
+    )
+    abtest_summary.add_argument("--start", default=None, help="Optional inclusive start-date filter.")
+    abtest_summary.add_argument("--end", default=None, help="Optional inclusive end-date filter.")
+    abtest_summary.add_argument(
         "--no-obsidian",
         action="store_true",
         help="Write only to the project reports directory.",
@@ -407,6 +433,34 @@ def main() -> None:
         print(f"variant_run_id={summary.variant_run_id}")
         print(f"sample_sufficient={str(summary.sample_sufficient).lower()}")
         print(f"possible_over_filtering={str(summary.possible_over_filtering).lower()}")
+        print(f"verdict={summary.verdict}")
+        print(f"reason={summary.reason}")
+        for path in summary.report_paths:
+            print(f"report={path}")
+
+    if args.command == "abtest-summary":
+        report_date = args.reports_date or datetime.now().strftime("%Y-%m-%d")
+        reports_dir = settings.output.reports_dir / report_date
+        _progress(f"loading A/B reports from {reports_dir}")
+        records = load_abtest_records(
+            reports_dir,
+            args.experiment,
+            args.mode,
+            start=args.start,
+            end=args.end,
+        )
+        summary = build_abtest_summary(records, args.experiment, args.mode)
+        summary = write_abtest_summary_report(
+            settings,
+            summary,
+            report_date=report_date,
+            include_obsidian=not args.no_obsidian,
+        )
+        print("abtest_summary=completed")
+        print(f"experiment_id={summary.experiment_id}")
+        print(f"mode={summary.mode}")
+        print(f"periods={len(summary.records)}")
+        print(f"sufficient_periods={summary.sufficient_periods}")
         print(f"verdict={summary.verdict}")
         print(f"reason={summary.reason}")
         for path in summary.report_paths:

@@ -15,6 +15,17 @@
 
 ## 2026-06-09
 
+### 02:27:20 +08:00 - 增加 A/B 多时段汇总报告
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：新增 `src/crypto_trading_system/abtest_summary.py`，支持从已生成的 A/B Markdown 报告中解析 Raw Metrics JSON，并按 experiment、mode、日期目录聚合多时段结果。
+- 改动：新增 CLI 命令 `python main.py abtest-summary --experiment ... --mode dynamic_universe --reports-date ...`，输出 `abtest_summary_*` Markdown 汇总报告。
+- 改动：新增 `tests/test_abtest_summary.py`，覆盖报告解析、跨时段汇总、variant 样本不足时保持 `retest` 的规则。
+- 改动：生成 `reports/2026-06-09/abtest_summary_dynamic_universe_liquidity_50m_2026-06-09_v1.md` 和 `reports/2026-06-09/abtest_summary_dynamic_universe_history_365_2026-06-09_v1.md`。
+- 原因：dynamic universe A/B 已经进入多时段验证阶段，继续手工翻单份报告容易遗漏样本不足、浮点微差和跨段不稳定问题；需要一个轻量汇总入口辅助 keep/retest/reject 判断。
+- 影响：`liquidity_50m` 汇总为 2 个时段、1 个充足样本时段，结论 `retest`；`history_365` 汇总为 3 个时段、2 个充足样本时段，因仍包含样本不足时段且近端段无实质改善，结论 `retest`。
+- 验证：运行 `python tests\test_abtest_summary.py`、`python tests\test_abtest.py`、`python tests\test_history.py`、`python tests\test_trade_state.py`、`python tests\test_replay.py`、`python tests\test_universe.py`、`python -m compileall main.py src tests`，均通过；真实运行两次 `abtest-summary` 成功生成汇总报告。
+- Git：`Add abtest multi-period summary`（本条随该提交一起提交并 push）。
+
 ### 02:19:05 +08:00 - Dynamic Universe liquidity_50m 近端跨段复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `liquidity_50m` dynamic universe A/B，区间为 `2025-09-01 -> 2026-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
