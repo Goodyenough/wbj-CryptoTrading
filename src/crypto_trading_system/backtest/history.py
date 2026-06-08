@@ -92,6 +92,50 @@ def _load_cached_klines(
     return [_normalise_kline(row) for row in rows]
 
 
+def _has_cached_unavailable_range(
+    connection: sqlite3.Connection,
+    symbol: str,
+    interval: str,
+    start_time_ms: int,
+    end_time_ms: int,
+    source: str = "Binance",
+) -> bool:
+    row = connection.execute(
+        """
+        SELECT 1
+        FROM kline_unavailable_ranges
+        WHERE source = ?
+          AND symbol = ?
+          AND interval = ?
+          AND start_time <= ?
+          AND end_time >= ?
+        LIMIT 1
+        """,
+        (source, symbol, interval, start_time_ms, end_time_ms),
+    ).fetchone()
+    return row is not None
+
+
+def _insert_unavailable_range(
+    connection: sqlite3.Connection,
+    symbol: str,
+    interval: str,
+    start_time_ms: int,
+    end_time_ms: int,
+    reason: str,
+    source: str = "Binance",
+) -> None:
+    connection.execute(
+        """
+        INSERT OR REPLACE INTO kline_unavailable_ranges (
+            source, symbol, interval, start_time, end_time, reason, fetched_at_utc
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (source, symbol, interval, start_time_ms, end_time_ms, reason, _utc_now()),
+    )
+
+
 def _insert_klines(
     connection: sqlite3.Connection,
     symbol: str,
@@ -191,33 +235,49 @@ def fetch_klines_cached(
         expected = max(0, (end_time_ms - start_time_ms + step - 1) // step)
         fetched_from_api = 0
         if len(cached) < expected:
-            if progress is not None:
-                progress(f"fetching {symbol} {interval} klines from Binance")
-            client = BinanceClient(
-                settings.market.base_url,
-                timeout_seconds=settings.market.request_timeout_seconds,
-                pause_seconds=settings.market.request_pause_seconds,
+            no_data_cached = not cached and _has_cached_unavailable_range(
+                connection, symbol, interval, start_time_ms, end_time_ms
             )
-            cursor = start_time_ms
-            while cursor < end_time_ms:
-                batch = client.klines(
-                    symbol,
-                    interval,
-                    limit=1000,
-                    start_time_ms=cursor,
-                    end_time_ms=end_time_ms - 1,
+            if no_data_cached:
+                if progress is not None:
+                    progress(f"using cached no-data marker for {symbol} {interval} klines")
+            elif progress is not None:
+                progress(f"fetching {symbol} {interval} klines from Binance")
+            if not no_data_cached:
+                client = BinanceClient(
+                    settings.market.base_url,
+                    timeout_seconds=settings.market.request_timeout_seconds,
+                    pause_seconds=settings.market.request_pause_seconds,
                 )
-                if not batch:
-                    break
-                fetched_from_api += _insert_klines(connection, symbol, interval, batch)
-                last_open = int(batch[-1][0])
-                next_cursor = last_open + step
-                if next_cursor <= cursor:
-                    break
-                cursor = next_cursor
-                if len(batch) < 1000:
-                    break
-            cached = _load_cached_klines(connection, symbol, interval, start_time_ms, end_time_ms)
+                cursor = start_time_ms
+                while cursor < end_time_ms:
+                    batch = client.klines(
+                        symbol,
+                        interval,
+                        limit=1000,
+                        start_time_ms=cursor,
+                        end_time_ms=end_time_ms - 1,
+                    )
+                    if not batch:
+                        if not cached:
+                            _insert_unavailable_range(
+                                connection,
+                                symbol,
+                                interval,
+                                cursor,
+                                end_time_ms,
+                                "binance_empty_response",
+                            )
+                        break
+                    fetched_from_api += _insert_klines(connection, symbol, interval, batch)
+                    last_open = int(batch[-1][0])
+                    next_cursor = last_open + step
+                    if next_cursor <= cursor:
+                        break
+                    cursor = next_cursor
+                    if len(batch) < 1000:
+                        break
+                cached = _load_cached_klines(connection, symbol, interval, start_time_ms, end_time_ms)
 
     issues = _quality_issues(symbol, interval, cached)
     severe = [issue for issue in issues if issue.severity == "ERROR"]

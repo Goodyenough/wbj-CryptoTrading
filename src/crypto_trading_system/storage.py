@@ -155,6 +155,24 @@ def init_db(path: Path) -> None:
         )
         connection.execute(
             """
+            CREATE TABLE IF NOT EXISTS kline_unavailable_ranges (
+                source TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                interval TEXT NOT NULL,
+                start_time INTEGER NOT NULL,
+                end_time INTEGER NOT NULL,
+                reason TEXT NOT NULL,
+                fetched_at_utc TEXT NOT NULL,
+                PRIMARY KEY (source, symbol, interval, start_time, end_time)
+            )
+            """
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_kline_unavailable_lookup "
+            "ON kline_unavailable_ranges (source, symbol, interval, start_time, end_time)"
+        )
+        connection.execute(
+            """
             CREATE TABLE IF NOT EXISTS backtest_runs (
                 run_id TEXT PRIMARY KEY,
                 created_at_utc TEXT NOT NULL,

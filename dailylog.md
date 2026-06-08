@@ -13,6 +13,19 @@
 - Git：
 ```
 
+## 2026-06-09
+
+### 00:03:57 +08:00 - 增加 K 线无数据负缓存
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：新增 `kline_unavailable_ranges` SQLite 表，用于记录 Binance 对指定 `symbol`、`interval`、时间区间返回空 K 线批次的情况。
+- 改动：`fetch_klines_cached` 在命中无数据区间时直接使用 no-data marker，不再重复请求 Binance；同时保留 `allow_data_gaps=false` 时抛出数据质量错误的原有行为。
+- 改动：新增 `tests/test_history.py`，覆盖空批次写入负缓存、二次请求不再访问 API、严格数据缺口模式仍然报错。
+- 改动：更新 `TODO.md`、仓库开发计划和 Obsidian 开发计划，将 K 线无数据负缓存标记为已完成。
+- 原因：dynamic universe A/B 扩大时，新上市或历史区间无数据的 symbol 会反复触发 Binance 请求，拖慢实验迭代。
+- 影响：后续同区间 dynamic universe smoke / A/B 对无历史 symbol 的重复请求会减少；已有正向 K 线缓存和正常有数据路径不变。
+- 验证：运行 `python tests\test_history.py`、`python tests\test_replay.py`、`python tests\test_universe.py`、`python tests\test_abtest.py`，均通过。
+- Git：`Add kline no-data negative cache`（本条随该提交一起提交并 push）。
+
 ## 2026-06-08
 
 ### 23:53:36 +08:00 - 跑 Dynamic Universe A/B 扩大复测
