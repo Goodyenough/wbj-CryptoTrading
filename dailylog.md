@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 02:19:05 +08:00 - Dynamic Universe liquidity_50m 近端跨段复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `liquidity_50m` dynamic universe A/B，区间为 `2025-09-01 -> 2026-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-09-01_2026-06-01_v1.md` 及底层 dynamic universe backtest 报告，并更新仓库开发计划与 Obsidian 实验日志。
+- 原因：`liquidity_50m` 在 `2025-01-01 -> 2025-09-01` 显示 promising retest，需要验证近端市场中方向是否延续。
+- 影响：variant 将 trades 从 37 降到 24、closed_trades 从 20 降到 19；PF 从 0.451 提升到 0.479，最大回撤从 18.06% 降到 15.99%，净收益从 -10.09% 改善到 -8.23%。方向延续但 variant 样本未达到 `closed_trades >= 20`，仍不能 keep。
+- 验证：A/B 命令成功完成；自动结论为 `sample_sufficient=false`、`verdict=retest`。
+- Git：`Run dynamic universe liquidity cross-period retest`（本条随该提交一起提交并 push）。
+
 ### 02:07:15 +08:00 - Dynamic Universe history_365 近端跨段复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `history_365` dynamic universe A/B，区间为 `2025-09-01 -> 2026-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
