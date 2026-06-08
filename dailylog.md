@@ -15,6 +15,16 @@
 
 ## 2026-06-09
 
+### 02:47:41 +08:00 - 增加 A/B walk-forward 编排命令
+- 类型：代码 / 测试 / 文档 / Git
+- 改动：新增 `src/crypto_trading_system/abtest_walk_forward.py`，支持解析 `START:END` 或 `START -> END` 多时段参数，并校验日期顺序。
+- 改动：新增 CLI 命令 `python main.py abtest-walk-forward --experiment ... --periods ...`，可按多个时段顺序运行同一 A/B 实验，并在本次运行结束后生成只包含本次 period reports 的多时段汇总报告。
+- 改动：新增 `tests/test_abtest_walk_forward.py`，覆盖 period 解析、空输入和非递增日期校验。
+- 原因：`liquidity_50m` 已进入跨时段验证阶段，手工逐段运行再单独汇总容易漏步骤；需要一个可复现的 walk-forward 编排入口。
+- 影响：后续可以用单条命令运行多个 dynamic universe A/B 时段，例如 `python main.py abtest-walk-forward --experiment liquidity_50m --dynamic-universe --periods 2025-01-01:2025-09-01,2025-06-01:2026-06-01 --source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 验证：运行 `python tests\test_abtest_walk_forward.py`、`python tests\test_abtest_summary.py`、`python tests\test_abtest.py`、`python -m compileall main.py src tests`，均通过；运行 `python main.py abtest-walk-forward --help` 成功显示 CLI 帮助。
+- Git：`Add abtest walk-forward command`（本条随该提交一起提交并 push）。
+
 ### 02:43:31 +08:00 - Dynamic Universe liquidity_50m 更长近端窗口复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `liquidity_50m` dynamic universe A/B，区间为 `2025-06-01 -> 2026-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。

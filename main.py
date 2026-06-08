@@ -12,8 +12,10 @@ from crypto_trading_system.abtest import run_abtest
 from crypto_trading_system.abtest_summary import (
     build_abtest_summary,
     load_abtest_records,
+    parse_abtest_report,
     write_abtest_summary_report,
 )
+from crypto_trading_system.abtest_walk_forward import parse_period_specs
 from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.doctor import run_doctor
@@ -187,6 +189,39 @@ def build_parser() -> argparse.ArgumentParser:
     abtest_summary.add_argument("--start", default=None, help="Optional inclusive start-date filter.")
     abtest_summary.add_argument("--end", default=None, help="Optional inclusive end-date filter.")
     abtest_summary.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
+    abtest_walk_forward = subparsers.add_parser(
+        "abtest-walk-forward",
+        help="Run one A/B experiment across multiple periods and write a summary report.",
+    )
+    abtest_walk_forward.add_argument("--experiment", required=True, help="Experiment id from config/experiments.toml.")
+    abtest_walk_forward.add_argument("--experiments", default="config/experiments.toml", help="Path to TOML experiment definitions.")
+    abtest_walk_forward.add_argument(
+        "--periods",
+        required=True,
+        help="Comma-separated START:END periods, e.g. 2025-01-01:2025-06-01,2025-06-01:2026-01-01.",
+    )
+    abtest_walk_forward.add_argument("--symbols", default=None, help="Comma-separated symbols unless --dynamic-universe is used.")
+    abtest_walk_forward.add_argument(
+        "--dynamic-universe",
+        action="store_true",
+        help="Run each period with daily dynamic universe reconstruction.",
+    )
+    abtest_walk_forward.add_argument("--max-symbols", type=int, default=None, help="Daily dynamic universe size.")
+    abtest_walk_forward.add_argument("--source-limit", type=int, default=None, help="Debug only: limit dynamic symbol master.")
+    abtest_walk_forward.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
+    abtest_walk_forward.add_argument("--intrabar", default=None, choices=["stop_first", "tp_first"], help="Intrabar fill policy.")
+    abtest_walk_forward.add_argument("--allow-data-gaps", action="store_true", help="Continue when historical kline gaps are found.")
+    abtest_walk_forward.add_argument(
+        "--reports-date",
+        default=None,
+        help="Summary report date directory, e.g. 2026-06-09. Defaults to today in Beijing time.",
+    )
+    abtest_walk_forward.add_argument(
         "--no-obsidian",
         action="store_true",
         help="Write only to the project reports directory.",
@@ -465,6 +500,64 @@ def main() -> None:
         print(f"reason={summary.reason}")
         for path in summary.report_paths:
             print(f"report={path}")
+
+    if args.command == "abtest-walk-forward":
+        periods = parse_period_specs(args.periods)
+        if args.dynamic_universe and args.symbols:
+            raise ValueError("--symbols and --dynamic-universe are mutually exclusive")
+        symbols = []
+        if args.symbols:
+            symbols = [symbol.strip().upper() for symbol in args.symbols.split(",") if symbol.strip()]
+        if not args.dynamic_universe and not symbols:
+            raise ValueError("--symbols must include at least one symbol unless --dynamic-universe is used")
+
+        mode = "dynamic_universe" if args.dynamic_universe else "symbols"
+        records = []
+        print("abtest_walk_forward=started")
+        print(f"experiment_id={args.experiment}")
+        print(f"periods={len(periods)}")
+        for index, (start, end) in enumerate(periods, start=1):
+            _progress(f"running walk-forward period {index}/{len(periods)} {start} -> {end}")
+            period_summary = run_abtest(
+                settings,
+                args.experiment,
+                symbols,
+                start,
+                end,
+                experiments_path=Path(args.experiments),
+                interval=args.interval,
+                intrabar=args.intrabar,
+                allow_data_gaps=args.allow_data_gaps,
+                dynamic_universe=args.dynamic_universe,
+                max_universe_symbols=args.max_symbols,
+                source_limit=args.source_limit,
+                include_obsidian=not args.no_obsidian,
+                progress=_progress,
+            )
+            print(
+                f"period={start}->{end} verdict={period_summary.verdict} "
+                f"sample_sufficient={str(period_summary.sample_sufficient).lower()}"
+            )
+            for path in period_summary.report_paths:
+                print(f"period_report={path}")
+            if period_summary.report_paths:
+                record = parse_abtest_report(period_summary.report_paths[0], args.experiment, mode)
+                if record is not None:
+                    records.append(record)
+
+        aggregate = build_abtest_summary(records, args.experiment, mode)
+        aggregate = write_abtest_summary_report(
+            settings,
+            aggregate,
+            report_date=args.reports_date,
+            include_obsidian=not args.no_obsidian,
+        )
+        print("abtest_walk_forward=completed")
+        print(f"sufficient_periods={aggregate.sufficient_periods}")
+        print(f"verdict={aggregate.verdict}")
+        print(f"reason={aggregate.reason}")
+        for path in aggregate.report_paths:
+            print(f"summary_report={path}")
 
     if args.command == "paper":
         init_db(settings.output.database_path)
