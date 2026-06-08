@@ -15,6 +15,16 @@
 
 ## 2026-06-09
 
+### 02:43:31 +08:00 - Dynamic Universe liquidity_50m 更长近端窗口复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `liquidity_50m` dynamic universe A/B，区间为 `2025-06-01 -> 2026-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-06-01_2026-06-01_v1.md` 及底层 dynamic universe backtest 报告。
+- 改动：重新运行 `abtest-summary`，生成 `reports/2026-06-09/abtest_summary_dynamic_universe_liquidity_50m_2026-06-09_v2.md`，纳入 3 个 `liquidity_50m` dynamic universe 时段。
+- 原因：上一段 `2025-09-01 -> 2026-06-01` 的 variant closed_trades=19，刚好低于样本线；需要用更长近端窗口确认方向改善是否能在充足样本下成立。
+- 影响：本轮 baseline closed_trades=36、variant closed_trades=38，样本充足；variant 将 PF 从 0.718 提升到 0.810，净收益从 -8.77% 改善到 -5.53%，最大回撤从 19.70% 降到 18.76%。多时段汇总显示 3 个时段中 2 个充足样本时段均改善，但仍因一个短切片 variant 样本不足保持 `retest`。
+- 验证：A/B 命令和 `abtest-summary` 命令均成功完成；自动结论为 `sample_sufficient=true`、`verdict=retest`。
+- Git：`Run longer liquidity dynamic universe retest`（本条随该提交一起提交并 push）。
+
 ### 02:27:20 +08:00 - 增加 A/B 多时段汇总报告
 - 类型：代码 / 报告 / 测试 / 文档 / Git
 - 改动：新增 `src/crypto_trading_system/abtest_summary.py`，支持从已生成的 A/B Markdown 报告中解析 Raw Metrics JSON，并按 experiment、mode、日期目录聚合多时段结果。
