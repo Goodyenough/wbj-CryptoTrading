@@ -13,6 +13,18 @@
 - Git：
 ```
 
+## 2026-06-08
+
+### 23:53:36 +08:00 - 跑 Dynamic Universe A/B 扩大复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `history_365`、`pump_chase_strict`、`liquidity_50m` 三组 dynamic universe A/B，区间为 `2025-01-01 -> 2025-04-01`，参数为 `--source-limit 60 --max-symbols 10 --allow-data-gaps --no-obsidian`。
+- 改动：追加运行扩大版 `history_365` dynamic universe A/B，区间为 `2025-01-01 -> 2025-06-01`，参数为 `--source-limit 60 --max-symbols 20 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-08/` 下的 dynamic universe A/B 报告，并更新仓库开发计划、Obsidian 开发计划和 Obsidian 实验日志。
+- 原因：固定 symbols A/B 对选币过滤参数没有区分度；需要用历史动态 universe 验证参数类实验是否真正改变交易集和风险收益。
+- 影响：确认 dynamic universe A/B 链路可运行；但当前 `source-limit` 和当前 `exchangeInfo` master 下的闭合交易仍不足 20，所有自动结论均为 `retest`，不能 keep 默认策略。
+- 验证：四份 A/B 报告均生成成功；`history_365` 扩大版 closed_trades 为 11，`sample_sufficient=false`；`liquidity_50m` 能减少交易数和回撤但样本仅 3 笔闭合交易。
+- Git：`Run dynamic universe A/B retests`（本条随该提交一起提交并 push）。
+
 ## 2026-06-07
 
 ### 00:16:58 +08:00 - 增加 commit 后自动 push 规则
