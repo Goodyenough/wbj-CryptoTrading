@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 03:01:00 +08:00 - risk_off_no_core_entry_reclaim full master A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：复用 baseline run `73cadcfc0a45`，运行 `risk_off_no_core_entry_reclaim` variant `400001fc7ad6`，区间 `2025-01-01 -> 2025-09-01`，使用 `dynamic_master_full.json` 与 `--max-symbols 40 --allow-data-gaps`。
+- 改动：生成组合实验 A/B 报告、variant dynamic-universe backtest 报告和 regime breakdown；同步更新 `TODO.md`、`开发计划.md` 和 Obsidian 实验日志。
+- 原因：`entry_reclaim_close` 近端能改善 `RISK_ON`，但 `RISK_OFF` 仍为负；需要验证弱市停开核心币与入场确认是否互补。
+- 影响：variant closed_trades=38，样本充足；PF 0.579 -> 1.025，净收益 -13.17% -> -0.03%，最大回撤 19.43% -> 15.11%。分层显示 `RISK_OFF` closed_trades 10 -> 0，`RISK_ON` 净 PnL -1123.23 -> -320.18。
+- 验证：A/B 报告显示 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_OFF` 亏损清零，但 `RISK_ON` 仍未转正。
+- Git：`Run regime entry reclaim combo retest`（本条随该提交一起提交并 push）。
+
 ### 02:42:00 +08:00 - 增加 risk_off_no_core_entry_reclaim 组合实验
 - 类型：代码 / 配置 / 测试 / 文档 / Git
 - 改动：新增 `risk_off_no_core_entry_reclaim` A/B 实验，同时覆盖 `analysis.risk_off_core_buy_enabled=false` 与 `analysis.entry_reclaim_close_enabled=true`。
