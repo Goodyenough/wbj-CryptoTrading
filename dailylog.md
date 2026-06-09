@@ -15,6 +15,16 @@
 
 ## 2026-06-09
 
+### 23:54:45 +08:00 - 增加非重叠 A/B 汇总过滤
+- 类型：代码 / 测试 / 报告 / 文档 / Git
+- 改动：为 `abtest-summary` 增加 `--drop-overlap-periods`，汇总前按结束日期优先保留最大数量的非重叠 A/B 窗口，避免 extended 诊断窗口和 walk-forward 子窗口混在一起。
+- 改动：新增 `select_non_overlapping_records` 并补充单元测试，验证 `2025-01-01 -> 2025-09-01` 这类重叠 extended 窗口会被排除，保留 `2025-01-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01`。
+- 改动：生成 `abtest_summary_dynamic_universe_risk_off_no_core_top_n_3_2026-06-09_v1.md` 全证据汇总和 `v2.md` 非重叠 walk-forward 汇总。
+- 原因：组合实验已有 extended 窗口和两个非重叠子窗口；若直接汇总全部报告，结论会被重叠窗口原因主导，不利于区分诊断证据和 walk-forward 证据。
+- 影响：`v2` 汇总显示 periods=2、unique_coverage_days=516、overlap_periods=0、sufficient_periods=1，结论仍为 `retest`，原因变为早期 variant 样本不足。
+- 验证：运行 `python tests\test_abtest_summary.py` 和 `python -m compileall main.py src tests`，均通过；运行 `python main.py abtest-summary --experiment risk_off_no_core_top_n_3 --mode dynamic_universe --reports-date 2026-06-09 --drop-overlap-periods --no-obsidian` 成功生成 v2 汇总。
+- Git：`Add non-overlap abtest summary filter`（本条随该提交一起提交并 push）。
+
 ### 23:48:55 +08:00 - risk_off_no_core_top_n_3 近端非重叠段复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `risk_off_no_core_top_n_3` 近端窗口 variant，区间 `2025-06-01 -> 2026-06-01`，并复用 baseline run `359a6c461f6c` 生成 A/B 报告。

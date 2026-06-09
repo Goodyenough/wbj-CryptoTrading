@@ -13,6 +13,7 @@ from crypto_trading_system.abtest_summary import (
     build_abtest_summary,
     load_abtest_records,
     parse_abtest_report,
+    select_non_overlapping_records,
     write_abtest_summary_report,
 )
 from crypto_trading_system.abtest_walk_forward import parse_period_specs
@@ -252,6 +253,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     abtest_summary.add_argument("--start", default=None, help="Optional inclusive start-date filter.")
     abtest_summary.add_argument("--end", default=None, help="Optional inclusive end-date filter.")
+    abtest_summary.add_argument(
+        "--drop-overlap-periods",
+        action="store_true",
+        help="Keep the largest earliest-ending set of non-overlapping reports before summarizing.",
+    )
     abtest_summary.add_argument(
         "--no-obsidian",
         action="store_true",
@@ -598,6 +604,10 @@ def main() -> None:
             start=args.start,
             end=args.end,
         )
+        if args.drop_overlap_periods:
+            before = len(records)
+            records = select_non_overlapping_records(records)
+            _progress(f"kept {len(records)}/{before} non-overlapping A/B reports")
         summary = build_abtest_summary(records, args.experiment, args.mode)
         summary = write_abtest_summary_report(
             settings,

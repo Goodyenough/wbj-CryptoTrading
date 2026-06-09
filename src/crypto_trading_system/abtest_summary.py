@@ -205,6 +205,19 @@ def load_abtest_records(
     return records
 
 
+def select_non_overlapping_records(records: list[AbtestReportRecord]) -> list[AbtestReportRecord]:
+    """Keep the largest set of non-overlapping periods, preferring earlier-ending windows."""
+    selected: list[AbtestReportRecord] = []
+    latest_end: date | None = None
+    for record in sorted(records, key=lambda item: (_period_dates(item)[1], _period_dates(item)[0], item.path.name)):
+        start, end = _period_dates(record)
+        if latest_end is not None and start < latest_end:
+            continue
+        selected.append(record)
+        latest_end = end
+    return selected
+
+
 def _summary_verdict(records: list[AbtestReportRecord]) -> tuple[str, str]:
     if not records:
         return "no_data", "No matching A/B reports were found."
