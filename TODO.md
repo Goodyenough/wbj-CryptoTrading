@@ -65,7 +65,8 @@
 - [x] A/B 汇总增加时段重叠分析：输出 `unique_coverage_days` 和 `overlap_periods`，重叠窗口保持 `retest`。
 - [x] A/B 汇总增加 dynamic universe 偏差提示：输出当前 `exchangeInfo` master 依赖和 `source_limit` 截断风险。
 - [x] 用非重叠 walk-forward 窗口验证 `liquidity_50m`：`2025-01-01 -> 2025-06-01` 样本不足，`2025-06-01 -> 2026-06-01` 样本充足且改善，整体仍为 `retest`。
-- [ ] 用更大 dynamic universe 或移除/提高 `--source-limit` 继续验证 `liquidity_50m`，避免只依赖 `source-limit=100` 的当前快照 master。
+- [x] 用更大 dynamic universe 复测 `liquidity_50m`：`source-limit 150 / max-symbols 40` 样本充足且方向继续改善，但仍为 `retest`。
+- [ ] 移除或继续提高 `--source-limit` 复测 `liquidity_50m`，避免只依赖当前快照 master 的截断样本。
 
 ## TODO 维护规则
 

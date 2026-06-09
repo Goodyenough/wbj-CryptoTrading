@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 14:07:33 +08:00 - Dynamic Universe liquidity_50m 扩大 universe 复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `liquidity_50m` dynamic universe A/B，区间为 `2025-06-01 -> 2026-06-01`，参数扩大到 `--source-limit 150 --max-symbols 40 --allow-data-gaps --no-obsidian`。
+- 改动：第一次运行在 30 分钟超时前生成 baseline 报告 `reports/2026-06-09/backtest_dynamic_universe_2025-06-01_2026-06-01_v5.md`；缓存变热后第二次完整生成 `backtest_dynamic_universe_2025-06-01_2026-06-01_v6.md`、`backtest_dynamic_universe_2025-06-01_2026-06-01_v7.md`、`abtest_dynamic_universe_liquidity_50m_2025-06-01_2026-06-01_v3.md` 和 `abtest_summary_dynamic_universe_liquidity_50m_2026-06-09_v6.md`。
+- 原因：上一轮 `source-limit 100 / max-symbols 30` 的 `liquidity_50m` 改善仍可能依赖当前快照 master 的前 100 个 symbols；需要用更大的 dynamic universe 检查方向是否延续。
+- 影响：扩大到 150/40 后，baseline closed_trades=55、variant closed_trades=56，样本充足；variant 将 PF 从 0.697 提升到 0.753，净收益从 -13.04% 改善到 -10.31%，最大回撤从 26.71% 降到 24.92%。方向仍改善，但总汇总 v6 因 period 重叠和 `source_limit` 风险继续保持 `retest`。
+- 验证：A/B 命令第二次成功完成；`abtest-summary` v6 成功生成，显示 periods=6、sufficient_periods=4、unique_coverage_days=516、overlap_periods=5、verdict=`retest`。
+- Git：`Run larger liquidity universe retest`（本条随该提交一起提交并 push）。
+
 ### 13:07:37 +08:00 - A/B 汇总增加 dynamic universe 偏差提示
 - 类型：代码 / 报告 / 测试 / 文档 / Git
 - 改动：扩展 `src/crypto_trading_system/abtest_summary.py`，从单段 A/B 报告的 Dynamic Universe Metadata 中提取 master count、`source_limit` 和 universe refreshes，并在汇总报告中输出 `Universe Bias Checks`。
