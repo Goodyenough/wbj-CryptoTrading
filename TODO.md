@@ -74,7 +74,8 @@
 - [x] 用 `dynamic_master_full.json` 跑 `liquidity_50m` 非重叠 walk-forward；早期窗口仍样本不足，近端窗口样本充足且改善，整体 `retest`。
 - [x] 延长 full master 早期窗口到 `2025-01-01 -> 2025-09-01`；样本充足且改善延续，但仍为负收益，结论 `retest`。
 - [x] 对 full master `liquidity_50m` 结果做市场环境分层：亏损主要来自 `RISK_ON` 和 `RISK_OFF`，variant 在两者中均减亏但仍为负。
-- [ ] 针对 `RISK_ON` 和 `RISK_OFF` 分别设计下一轮入场/退出规则 A/B，不能只继续提高流动性门槛。
+- [x] 设计 `RISK_OFF` 下一轮规则 A/B：新增 `risk_off_no_core_buy`，测试弱市是否连 BTC/ETH 也暂停新开仓。
+- [ ] 针对 `RISK_ON` 设计下一轮入场/退出规则 A/B，不能只继续提高流动性门槛。
 
 ## TODO 维护规则
 

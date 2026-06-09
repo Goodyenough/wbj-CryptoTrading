@@ -35,6 +35,7 @@ class AnalysisSettings:
     pump_chase_penalty: float
     high_volatility_range_pct: float
     high_volatility_penalty: float
+    risk_off_core_buy_enabled: bool
     validation_pool_multiplier: int
     validation_pool_max: int
 
@@ -150,6 +151,7 @@ def load_settings(path: Path) -> Settings:
             pump_chase_penalty=float(analysis.get("pump_chase_penalty", 8.0)),
             high_volatility_range_pct=float(analysis.get("high_volatility_range_pct", 35.0)),
             high_volatility_penalty=float(analysis.get("high_volatility_penalty", 6.0)),
+            risk_off_core_buy_enabled=bool(analysis.get("risk_off_core_buy_enabled", True)),
             validation_pool_multiplier=int(analysis.get("validation_pool_multiplier", 2)),
             validation_pool_max=int(analysis.get("validation_pool_max", 10)),
         ),

@@ -24,6 +24,7 @@ pump_chase_distance_pct = 8.0
 pump_chase_penalty = 8.0
 high_volatility_range_pct = 35.0
 high_volatility_penalty = 6.0
+risk_off_core_buy_enabled = true
 validation_pool_multiplier = 2
 validation_pool_max = 10
 

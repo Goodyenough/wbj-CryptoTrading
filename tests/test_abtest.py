@@ -45,6 +45,17 @@ def test_apply_overrides_does_not_mutate_baseline() -> None:
     ]
 
 
+def test_regime_override_can_disable_core_risk_off_buys() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    definition = load_experiment("risk_off_no_core_buy", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.analysis.risk_off_core_buy_enabled is True
+    assert variant.analysis.risk_off_core_buy_enabled is False
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.risk_off_core_buy_enabled", True, False)
+    ]
+
+
 def test_override_paths_are_dimension_scoped() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")
@@ -190,6 +201,7 @@ if __name__ == "__main__":
     test_load_unknown_experiment_reports_available_names()
     test_disabled_logic_experiment_is_not_runnable()
     test_apply_overrides_does_not_mutate_baseline()
+    test_regime_override_can_disable_core_risk_off_buys()
     test_override_paths_are_dimension_scoped()
     test_dynamic_abtest_reuses_one_symbol_master()
     test_dynamic_abtest_accepts_prebuilt_symbol_master()

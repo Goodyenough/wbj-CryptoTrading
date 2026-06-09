@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 19:07:43 +08:00 - 增加 RISK_OFF 核心币暂停买入实验
+- 类型：代码 / 配置 / 测试 / 计划 / Git
+- 改动：新增 `[analysis].risk_off_core_buy_enabled` 配置，默认 `true` 保持旧行为；新增 `risk_off_no_core_buy` A/B 实验，variant 将该开关设为 `false`。
+- 改动：扫描器和回测重放在传入 `market_regime_status="RISK_OFF"` 时，可按该开关取消 BTC/ETH 核心币买入豁免，将候选降级为 `WATCH_ONLY`。
+- 原因：regime breakdown 显示 `RISK_OFF` 亏损几乎全部来自 BTC/ETH，当前只降级山寨币不足以防守弱市。
+- 影响：下一步可以用 full master A/B 单独验证“弱市完全暂停新开仓”是否减少亏损；默认配置不改变现有行为。
+- 验证：运行 `python tests\test_scanner_regime.py`、`python tests\test_abtest.py`、`python tests\test_replay.py`、`python -m compileall main.py src tests`，均通过。
+- Git：`Add risk-off core buy experiment`（本条随该提交一起提交并 push）。
+
 ### 19:00:38 +08:00 - 增加回测市场环境分层报告
 - 类型：代码 / 报告 / 测试 / 文档 / Git
 - 改动：新增 `src/crypto_trading_system/backtest/regime_analysis.py` 和 `python main.py backtest-regime-breakdown --baseline-run-id ... --variant-run-id ...`，按交易创建日的 BTC/ETH 日线 regime 对真实入场且已闭合的回测交易分组。

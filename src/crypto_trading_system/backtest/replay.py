@@ -549,10 +549,13 @@ def run_backtest_replay(
         if progress is not None and bar_index % 20 == 0:
             progress(f"backtest replay {bar_index + 1}/{len(bars)} bars")
         market_regime_allows_buy = True
+        market_regime_status = None
         if settings.analysis.market_regime_filter_enabled:
             btc_1d = _closed_slice(regime_klines.get("BTCUSDT", []), "1d", bar_close_ms)
             eth_1d = _closed_slice(regime_klines.get("ETHUSDT", []), "1d", bar_close_ms)
-            market_regime_allows_buy = classify_market_regime(btc_1d, eth_1d).allows_alt_buy
+            market_regime = classify_market_regime(btc_1d, eth_1d)
+            market_regime_allows_buy = market_regime.allows_alt_buy
+            market_regime_status = market_regime.status
         unavailable = {item.paper.symbol for item in all_trades if item.paper.status in {"WATCHING", "ENTERED", "TP1_HIT"}}
         candidate_pool: list[TradeCandidate] = []
         analysis_symbols = symbols
@@ -595,6 +598,8 @@ def run_backtest_replay(
                 settings.analysis.risk_reward_min,
                 min_history_days=settings.analysis.min_history_days,
                 market_regime_allows_buy=market_regime_allows_buy,
+                market_regime_status=market_regime_status,
+                risk_off_core_buy_enabled=settings.analysis.risk_off_core_buy_enabled,
                 pump_chase_24h_pct=settings.analysis.pump_chase_24h_pct,
                 pump_chase_distance_pct=settings.analysis.pump_chase_distance_pct,
                 pump_chase_penalty=settings.analysis.pump_chase_penalty,

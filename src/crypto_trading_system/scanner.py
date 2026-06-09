@@ -144,6 +144,8 @@ def _analyze_ticker(
     risk_reward_min: float,
     min_history_days: int = 60,
     market_regime_allows_buy: bool = True,
+    market_regime_status: str | None = None,
+    risk_off_core_buy_enabled: bool = True,
     pump_chase_24h_pct: float = 20.0,
     pump_chase_distance_pct: float = 8.0,
     pump_chase_penalty: float = 8.0,
@@ -222,7 +224,11 @@ def _analyze_ticker(
         score -= 4
     if pct_7d is not None and pct_7d < 0:
         score -= 6
-    market_regime_risk = not market_regime_allows_buy and ticker.symbol not in {"BTCUSDT", "ETHUSDT"}
+    core_symbol = ticker.symbol in {"BTCUSDT", "ETHUSDT"}
+    core_allowed_in_regime = core_symbol and (
+        market_regime_status != "RISK_OFF" or risk_off_core_buy_enabled
+    )
+    market_regime_risk = not market_regime_allows_buy and not core_allowed_in_regime
     if market_regime_risk:
         score -= 10
 
@@ -429,6 +435,7 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
     ]
     market_regime = _detect_market_regime(client, settings, limitations, progress)
     market_regime_allows_buy = True if market_regime is None else market_regime.allows_alt_buy
+    market_regime_status = None if market_regime is None else market_regime.status
 
     total = len(raw_tickers)
     for index, ticker in enumerate(raw_tickers, start=1):
@@ -446,6 +453,8 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
                 settings.analysis.risk_reward_min,
                 min_history_days=settings.analysis.min_history_days,
                 market_regime_allows_buy=market_regime_allows_buy,
+                market_regime_status=market_regime_status,
+                risk_off_core_buy_enabled=settings.analysis.risk_off_core_buy_enabled,
                 pump_chase_24h_pct=settings.analysis.pump_chase_24h_pct,
                 pump_chase_distance_pct=settings.analysis.pump_chase_distance_pct,
                 pump_chase_penalty=settings.analysis.pump_chase_penalty,

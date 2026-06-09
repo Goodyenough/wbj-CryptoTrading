@@ -23,6 +23,7 @@ ALLOWED_OVERRIDE_PATHS: dict[str, set[str]] = {
         "analysis.pump_chase_penalty",
     },
     "liquidity": {"market.min_quote_volume", "market.min_trades"},
+    "regime": {"analysis.risk_off_core_buy_enabled"},
 }
 
 
