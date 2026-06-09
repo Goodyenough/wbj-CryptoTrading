@@ -69,7 +69,8 @@
 - [x] 支持保存/加载 dynamic universe `SymbolMaster` JSON，让 A/B 和 walk-forward 可以复用同一份固定 master。
 - [x] 增加 `dynamic-symbol-master` 导出命令，并生成 `reports/2026-06-09/dynamic_master_source150.json`。
 - [x] 用固定 `SymbolMaster` 文件复跑 `liquidity_50m` 的非重叠 walk-forward；近端段样本充足且方向继续改善，整体仍为 `retest`。
-- [ ] 移除或继续提高 `--source-limit` 复测 `liquidity_50m`，避免只依赖当前快照 master 的截断样本。
+- [x] 导出不截断的 full dynamic `SymbolMaster`：`reports/2026-06-09/dynamic_master_full.json`，当前 master_count=418。
+- [ ] 用 `dynamic_master_full.json` 复跑 `liquidity_50m`，避免只依赖当前快照 master 的截断样本。
 
 ## TODO 维护规则
 

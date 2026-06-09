@@ -15,6 +15,14 @@
 
 ## 2026-06-09
 
+### 15:09:31 +08:00 - 导出 full dynamic symbol master
+- 类型：报告 / 文档 / Git
+- 改动：运行 `python main.py dynamic-symbol-master --output reports\2026-06-09\dynamic_master_full.json`，导出不使用 `--source-limit` 的 full dynamic `SymbolMaster`。
+- 原因：为下一轮 `liquidity_50m` full master A/B 准备固定 universe，降低 source-limit 截断样本对实验判断的干扰。
+- 影响：生成 `reports/2026-06-09/dynamic_master_full.json`，当前包含 418 个 Binance 现货 USDT symbols；本节点只固化 universe，不产生 A/B keep/retest 结论。
+- 验证：命令成功输出 `symbols=418`、`source_limit=None`、`source_limit_applied=false`；抽查 JSON 文件头部确认 `created_at_utc=2026-06-09T07:07:56+00:00` 且 symbols 已写入。
+- Git：`Export full dynamic universe symbol master`（本条随该提交一起提交并 push）。
+
 ### 15:03:41 +08:00 - 固定 master 的 liquidity_50m 非重叠 walk-forward
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_source150.json` 作为固定 `SymbolMaster`，运行 `liquidity_50m` 非重叠 walk-forward：`2025-01-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
