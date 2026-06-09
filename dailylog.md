@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 21:06:32 +08:00 - risk_off_no_core_top_n_3 full master A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `risk_off_no_core_top_n_3` variant，并复用 baseline run `1d0037a773ff` 生成标准 A/B 报告。
+- 改动：生成 `backtest_dynamic_universe_2025-01-01_2025-09-01_v12.md`、`abtest_dynamic_universe_risk_off_no_core_top_n_3_2025-01-01_2025-09-01_v1.md` 和 `backtest_regime_breakdown_1d0037a773ff_8068142bf3c8_v1.md`。
+- 原因：`risk_off_no_core_buy` 主要改善 `RISK_OFF`，`top_n_3` 主要改善 `RISK_ON`，需要验证两条互补规则叠加后能否接近转正。
+- 影响：variant 将 PF 从 0.579 提升到 1.0005，净收益从 -13.17% 改善到 +1.04%，最大回撤从 19.43% 降到 15.96%；分层显示 `RISK_OFF` 亏损归零，`RISK_ON` 净 PnL 从 -1123.23 改善到 -387.41。结论为 promising `retest`，不能 keep，下一步必须做非重叠 walk-forward。
+- 验证：A/B 报告显示 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_OFF baseline_closed=10 variant_closed=0`、`RISK_ON baseline_closed=29 variant_closed=28`。
+- Git：`Run combined regime capacity full-master retest`（本条随该提交一起提交并 push）。
+
 ### 20:39:11 +08:00 - 增加 risk_off_no_core_top_n_3 组合实验
 - 类型：代码 / 配置 / 测试 / 计划 / Git
 - 改动：新增 `risk_off_no_core_top_n_3` A/B 实验，同时设置 `analysis.risk_off_core_buy_enabled=false` 与 `market.top_n=3`；扩展 `combined_regime_capacity` 覆盖白名单。

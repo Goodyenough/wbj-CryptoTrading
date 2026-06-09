@@ -79,7 +79,8 @@
 - [x] 设计 `RISK_ON` 下一轮规则 A/B：新增 `top_n_3`，测试降低每次扫描候选容量是否能减少同日相关拥挤开仓。
 - [x] 跑完 `top_n_3` full master A/B：`RISK_ON` 净 PnL 从 -1123.23 改善到 -212.97，但 `RISK_OFF` 不变，结论 `retest`。
 - [x] 设计 `risk_off_no_core_top_n_3` 组合实验：同时关闭 RISK_OFF 核心币买入并将 `top_n` 降到 3。
-- [ ] 运行 `risk_off_no_core_top_n_3` full master A/B，验证两条互补规则合并后能否接近转正。
+- [x] 运行 `risk_off_no_core_top_n_3` full master A/B：单窗口转正，PF 约 1.00，净收益 +1.04%，但仍需非重叠 walk-forward。
+- [ ] 对 `risk_off_no_core_top_n_3` 运行 full master 非重叠 walk-forward，优先 `2025-01-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01`。
 
 ## TODO 维护规则
 
