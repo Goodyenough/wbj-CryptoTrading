@@ -139,10 +139,58 @@ def test_dynamic_abtest_reuses_one_symbol_master() -> None:
     assert calls["masters"] == [shared_master, shared_master]
 
 
+def test_dynamic_abtest_accepts_prebuilt_symbol_master() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    calls = {"build": 0, "masters": []}
+    prebuilt_master = object()
+
+    def fake_build(settings, source_limit=None, progress=None):
+        calls["build"] += 1
+        return object()
+
+    def fake_run_backtest(settings, symbols, start, end, **kwargs):
+        calls["masters"].append(kwargs.get("dynamic_symbol_master"))
+        result = SimpleNamespace(
+            run_id=f"run{len(calls['masters'])}",
+            symbols=["AAAUSDT"],
+            trades=[],
+            created_at_utc="2026-01-01T00:00:00+00:00",
+            universe_type="dynamic",
+            dynamic_universe_summary={"master_count": 1, "source_limit": None, "universe_refresh_count": 1},
+        )
+        return result, _metrics(), []
+
+    original_build = abtest_module.build_current_symbol_master
+    original_run = abtest_module.run_backtest
+    original_write = abtest_module._write_abtest_report
+    abtest_module.build_current_symbol_master = fake_build
+    abtest_module.run_backtest = fake_run_backtest
+    abtest_module._write_abtest_report = lambda *args, **kwargs: []
+    try:
+        abtest_module.run_abtest(
+            settings,
+            "history_250",
+            [],
+            "2025-01-01",
+            "2025-02-01",
+            dynamic_universe=True,
+            dynamic_symbol_master=prebuilt_master,
+            include_obsidian=False,
+        )
+    finally:
+        abtest_module.build_current_symbol_master = original_build
+        abtest_module.run_backtest = original_run
+        abtest_module._write_abtest_report = original_write
+
+    assert calls["build"] == 0
+    assert calls["masters"] == [prebuilt_master, prebuilt_master]
+
+
 if __name__ == "__main__":
     test_load_unknown_experiment_reports_available_names()
     test_disabled_logic_experiment_is_not_runnable()
     test_apply_overrides_does_not_mutate_baseline()
     test_override_paths_are_dimension_scoped()
     test_dynamic_abtest_reuses_one_symbol_master()
+    test_dynamic_abtest_accepts_prebuilt_symbol_master()
     print("test_abtest=passed")

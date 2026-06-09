@@ -10,7 +10,10 @@ from crypto_trading_system.backtest import universe as universe_module
 from crypto_trading_system.backtest.universe import (
     build_current_symbol_master,
     dynamic_universe_refresh_key,
+    load_symbol_master,
+    save_symbol_master,
     select_dynamic_universe_for_day,
+    SymbolMaster,
     universe_preselection_score,
 )
 from crypto_trading_system.config import load_settings
@@ -123,6 +126,27 @@ def test_build_current_symbol_master_source_limit_is_alphabetical() -> None:
     assert master.source_limit_applied is True
 
 
+def test_symbol_master_json_round_trip(tmp_path: Path) -> None:
+    path = tmp_path / "master.json"
+    master = SymbolMaster(
+        source="test",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        symbols=["btcusdt", "ETH/USDT"],
+        source_limit=2,
+        source_limit_applied=True,
+        filters="unit-test",
+    )
+
+    save_symbol_master(master, path)
+    loaded = load_symbol_master(path)
+
+    assert loaded.source == "test"
+    assert loaded.symbols == ["BTCUSDT", "ETHUSDT"]
+    assert loaded.source_limit == 2
+    assert loaded.source_limit_applied is True
+    assert loaded.filters == "unit-test"
+
+
 def test_universe_preselection_score_is_not_technical_score() -> None:
     liquid = RawTicker("AAAUSDT", "AAA", 10, 0, 100_000_000, 100_000, 10)
     pumpy = RawTicker("BBBUSDT", "BBB", 10, 1, 10_000_000, 100_000, 10)
@@ -179,6 +203,9 @@ def test_dynamic_universe_refresh_key_is_daily() -> None:
 if __name__ == "__main__":
     test_fetch_universe_snapshot_filters_and_sorts()
     test_build_current_symbol_master_source_limit_is_alphabetical()
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        test_symbol_master_json_round_trip(Path(tmp))
     test_universe_preselection_score_is_not_technical_score()
     test_dynamic_universe_ignores_future_hourly_data()
     test_dynamic_universe_filters_insufficient_history_without_crashing()

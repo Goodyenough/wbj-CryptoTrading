@@ -388,21 +388,22 @@ def run_abtest(
     dynamic_universe: bool = False,
     max_universe_symbols: int | None = None,
     source_limit: int | None = None,
+    dynamic_symbol_master=None,
     include_obsidian: bool = True,
     progress: Callable[[str], None] | None = None,
 ) -> AbtestSummary:
     definition = load_experiment(experiment_id, experiments_path)
     baseline_settings = deepcopy(settings)
     variant_settings, changes = apply_experiment_overrides(settings, definition)
-    dynamic_symbol_master = None
     if dynamic_universe:
-        if progress is not None:
+        if dynamic_symbol_master is None and progress is not None:
             progress("building shared dynamic universe symbol master for A/B")
-        dynamic_symbol_master = build_current_symbol_master(
-            baseline_settings,
-            source_limit=source_limit,
-            progress=progress,
-        )
+        if dynamic_symbol_master is None:
+            dynamic_symbol_master = build_current_symbol_master(
+                baseline_settings,
+                source_limit=source_limit,
+                progress=progress,
+            )
 
     if progress is not None:
         progress(f"running baseline backtest for {experiment_id}")

@@ -15,6 +15,16 @@
 
 ## 2026-06-09
 
+### 14:16:17 +08:00 - Dynamic universe 支持固定 symbol master
+- 类型：代码 / 测试 / 文档 / Git
+- 改动：新增 `save_symbol_master` 和 `load_symbol_master`，支持把 dynamic universe 的 `SymbolMaster` 保存为 JSON，并在后续回测中复用。
+- 改动：`backtest-dynamic-universe`、`abtest` 和 `abtest-walk-forward` 新增 `--symbol-master-file` 与 `--write-symbol-master`；`--symbol-master-file` 与 `--source-limit` 互斥，避免同时声明两套 master 来源。
+- 改动：`run_abtest` 支持传入预构建 `dynamic_symbol_master`，A/B baseline 和 variant 继续共享同一份 master；walk-forward 也可在多个 period 间复用同一份 master。
+- 原因：参考开源量化回测项目的固定数据集/固定 pair universe 纪律，减少每次运行依赖当前 Binance `exchangeInfo` 快照带来的漂移，让后续 `liquidity_50m` 扩大 universe 复测更可复现。
+- 影响：后续可以先用 `--write-symbol-master reports/.../dynamic_master.json` 固化 master，再用 `--symbol-master-file` 对不同实验或不同时间段复跑，确保只改变实验参数或日期窗口。
+- 验证：运行 `python tests\test_universe.py`、`python tests\test_abtest.py`、`python -m compileall main.py src tests` 均通过；`python main.py abtest --help` 与 `python main.py backtest-dynamic-universe --help` 均显示新参数；非 dynamic A/B 误传 `--symbol-master-file` 会报错。
+- Git：`Add reusable dynamic universe symbol masters`（本条随该提交一起提交并 push）。
+
 ### 14:07:33 +08:00 - Dynamic Universe liquidity_50m 扩大 universe 复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `liquidity_50m` dynamic universe A/B，区间为 `2025-06-01 -> 2026-06-01`，参数扩大到 `--source-limit 150 --max-symbols 40 --allow-data-gaps --no-obsidian`。

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
+import json
 import math
+from pathlib import Path
 from typing import Callable
 
 from ..config import Settings
@@ -38,6 +40,30 @@ class SymbolMaster:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+def save_symbol_master(master: SymbolMaster, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(master.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def load_symbol_master(path: Path) -> SymbolMaster:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    required = {"source", "created_at_utc", "symbols", "source_limit", "source_limit_applied", "filters"}
+    missing = sorted(required - set(data))
+    if missing:
+        raise ValueError(f"Symbol master file is missing required keys: {', '.join(missing)}")
+    symbols = data["symbols"]
+    if not isinstance(symbols, list) or not all(isinstance(symbol, str) and symbol for symbol in symbols):
+        raise ValueError("Symbol master file must contain a non-empty string list in 'symbols'.")
+    return SymbolMaster(
+        source=str(data["source"]),
+        created_at_utc=str(data["created_at_utc"]),
+        symbols=[symbol.replace("/", "").upper() for symbol in symbols],
+        source_limit=data["source_limit"],
+        source_limit_applied=bool(data["source_limit_applied"]),
+        filters=str(data["filters"]),
+    )
 
 
 @dataclass

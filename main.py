@@ -16,6 +16,7 @@ from crypto_trading_system.abtest_summary import (
     write_abtest_summary_report,
 )
 from crypto_trading_system.abtest_walk_forward import parse_period_specs
+from crypto_trading_system.backtest.universe import build_current_symbol_master, load_symbol_master, save_symbol_master
 from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.doctor import run_doctor
@@ -24,6 +25,23 @@ from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.scanner import run_market_scan
 from crypto_trading_system.storage import init_db, save_scan_result
 from crypto_trading_system.verify import verify_symbol
+
+
+def _prepare_dynamic_symbol_master(settings, args):
+    master_file = getattr(args, "symbol_master_file", None)
+    write_master = getattr(args, "write_symbol_master", None)
+    source_limit = getattr(args, "source_limit", None)
+    if master_file and source_limit is not None:
+        raise ValueError("--symbol-master-file and --source-limit are mutually exclusive; the file already fixes the master.")
+    if master_file:
+        master = load_symbol_master(Path(master_file))
+        _progress(f"loaded dynamic symbol master from {master_file} ({len(master.symbols)} symbols)")
+    else:
+        master = build_current_symbol_master(settings, source_limit=source_limit, progress=_progress)
+    if write_master:
+        save_symbol_master(master, Path(write_master))
+        _progress(f"wrote dynamic symbol master to {write_master}")
+    return master
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -123,6 +141,16 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Debug only: sort master symbols alphabetically and keep the first N before loading history.",
     )
+    backtest_dynamic.add_argument(
+        "--symbol-master-file",
+        default=None,
+        help="Load a previously saved dynamic symbol master JSON instead of current exchangeInfo.",
+    )
+    backtest_dynamic.add_argument(
+        "--write-symbol-master",
+        default=None,
+        help="Write the dynamic symbol master JSON used by this run.",
+    )
     backtest_dynamic.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
     backtest_dynamic.add_argument(
         "--intrabar",
@@ -161,6 +189,16 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help="Debug only: limit the dynamic universe master list when --dynamic-universe is used.",
+    )
+    abtest.add_argument(
+        "--symbol-master-file",
+        default=None,
+        help="Load a previously saved dynamic symbol master JSON for --dynamic-universe.",
+    )
+    abtest.add_argument(
+        "--write-symbol-master",
+        default=None,
+        help="Write the dynamic symbol master JSON used by --dynamic-universe.",
     )
     abtest.add_argument("--start", required=True, help="UTC start date, e.g. 2024-01-01.")
     abtest.add_argument("--end", required=True, help="UTC end date, e.g. 2024-12-31.")
@@ -213,6 +251,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     abtest_walk_forward.add_argument("--max-symbols", type=int, default=None, help="Daily dynamic universe size.")
     abtest_walk_forward.add_argument("--source-limit", type=int, default=None, help="Debug only: limit dynamic symbol master.")
+    abtest_walk_forward.add_argument(
+        "--symbol-master-file",
+        default=None,
+        help="Load a previously saved dynamic symbol master JSON for all dynamic-universe periods.",
+    )
+    abtest_walk_forward.add_argument(
+        "--write-symbol-master",
+        default=None,
+        help="Write the dynamic symbol master JSON used for all dynamic-universe periods.",
+    )
     abtest_walk_forward.add_argument("--interval", default=None, help="Primary interval. MVP supports 4h.")
     abtest_walk_forward.add_argument("--intrabar", default=None, choices=["stop_first", "tp_first"], help="Intrabar fill policy.")
     abtest_walk_forward.add_argument("--allow-data-gaps", action="store_true", help="Continue when historical kline gaps are found.")
@@ -403,6 +451,7 @@ def main() -> None:
         _progress("starting dynamic universe backtest")
         if args.source_limit is not None:
             _progress("source-limit is enabled for smoke/debug; full universe results may differ")
+        dynamic_symbol_master = _prepare_dynamic_symbol_master(settings, args)
         result, metrics, report_paths = run_backtest(
             settings,
             [],
@@ -414,6 +463,7 @@ def main() -> None:
             dynamic_universe_mode=True,
             max_universe_symbols=args.max_symbols,
             source_limit=args.source_limit,
+            dynamic_symbol_master=dynamic_symbol_master,
             include_obsidian=not args.no_obsidian,
             progress=_progress,
         )
@@ -440,10 +490,14 @@ def main() -> None:
             symbols = [symbol.strip().upper() for symbol in args.symbols.split(",") if symbol.strip()]
         if not args.dynamic_universe and not symbols:
             raise ValueError("--symbols must include at least one symbol unless --dynamic-universe is used")
+        if not args.dynamic_universe and (args.symbol_master_file or args.write_symbol_master):
+            raise ValueError("--symbol-master-file and --write-symbol-master require --dynamic-universe")
+        dynamic_symbol_master = None
         if args.dynamic_universe:
             _progress(f"starting dynamic-universe A/B test {args.experiment}")
             if args.source_limit is not None:
                 _progress("source-limit is enabled for dynamic-universe A/B smoke/debug")
+            dynamic_symbol_master = _prepare_dynamic_symbol_master(settings, args)
         else:
             _progress(f"starting A/B test {args.experiment} for {', '.join(symbols)}")
         summary = run_abtest(
@@ -459,6 +513,7 @@ def main() -> None:
             dynamic_universe=args.dynamic_universe,
             max_universe_symbols=args.max_symbols,
             source_limit=args.source_limit,
+            dynamic_symbol_master=dynamic_symbol_master,
             include_obsidian=not args.no_obsidian,
             progress=_progress,
         )
@@ -510,6 +565,11 @@ def main() -> None:
             symbols = [symbol.strip().upper() for symbol in args.symbols.split(",") if symbol.strip()]
         if not args.dynamic_universe and not symbols:
             raise ValueError("--symbols must include at least one symbol unless --dynamic-universe is used")
+        if not args.dynamic_universe and (args.symbol_master_file or args.write_symbol_master):
+            raise ValueError("--symbol-master-file and --write-symbol-master require --dynamic-universe")
+        dynamic_symbol_master = None
+        if args.dynamic_universe:
+            dynamic_symbol_master = _prepare_dynamic_symbol_master(settings, args)
 
         mode = "dynamic_universe" if args.dynamic_universe else "symbols"
         records = []
@@ -531,6 +591,7 @@ def main() -> None:
                 dynamic_universe=args.dynamic_universe,
                 max_universe_symbols=args.max_symbols,
                 source_limit=args.source_limit,
+                dynamic_symbol_master=dynamic_symbol_master,
                 include_obsidian=not args.no_obsidian,
                 progress=_progress,
             )
