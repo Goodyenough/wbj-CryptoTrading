@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 13:00:10 +08:00 - Dynamic Universe liquidity_50m 非重叠 walk-forward 验证
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `liquidity_50m` dynamic universe 非重叠 walk-forward A/B，区间为 `2025-01-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-06-01_v1.md`、`reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-06-01_2026-06-01_v2.md` 和 `reports/2026-06-09/abtest_summary_dynamic_universe_liquidity_50m_2026-06-09_v4.md`，并同步更新 TODO、开发计划和 Obsidian 实验日志。
+- 原因：上一轮 `liquidity_50m` 的多窗口证据存在重叠，不能当作独立 walk-forward 证据；需要用非重叠窗口确认改善是否稳定。
+- 影响：非重叠覆盖为 `unique_coverage_days=516`、`overlap_periods=0`，但只有 1 个 period 样本充足；早期窗口 variant closed_trades=12，低于 `closed_trades >= 20` 样本线，因此自动结论仍为 `retest`。
+- 验证：A/B walk-forward 命令成功完成；抽取 Raw Metrics 确认 `2025-01-01 -> 2025-06-01` 为 baseline PF=0.198 / net=-10.37% / MDD=12.67%，variant PF=0.232 / net=-8.51% / MDD=10.33%，但样本不足；`2025-06-01 -> 2026-06-01` 为 baseline PF=0.718 / net=-8.77% / MDD=19.70%，variant PF=0.810 / net=-5.53% / MDD=18.76%，样本充足且方向改善。
+- Git：`Run non-overlap liquidity walk-forward retest`（本条随该提交一起提交并 push）。
+
 ### 12:31:40 +08:00 - A/B 汇总增加时段重叠分析
 - 类型：代码 / 报告 / 测试 / 文档 / Git
 - 改动：扩展 `src/crypto_trading_system/abtest_summary.py`，在多时段汇总中计算 `total_period_days`、`unique_coverage_days` 和 `overlap_periods`。
