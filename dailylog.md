@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 21:26:58 +08:00 - risk_off_no_core_top_n_3 早期非重叠段复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `risk_off_no_core_top_n_3` 早期窗口 variant，区间 `2025-01-01 -> 2025-06-01`，并复用 baseline run `e6133152fb7e` 生成 A/B 报告。
+- 改动：生成 `backtest_dynamic_universe_2025-01-01_2025-06-01_v9.md`、`abtest_dynamic_universe_risk_off_no_core_top_n_3_2025-01-01_2025-06-01_v1.md` 和 `backtest_regime_breakdown_e6133152fb7e_2ec5278f62cb_v1.md`。
+- 原因：组合实验在 extended 窗口首度转正后，需要用非重叠 walk-forward 检查是否稳定。
+- 影响：variant closed_trades=13，低于样本线；PF 0.327 -> 0.488，净收益 -11.80% -> -8.03%，最大回撤 14.49% -> 11.46%。`RISK_OFF` 闭合交易从 8 降到 0，但 `RISK_ON` 仍 7/7 全部止损。结论仍为 `retest`。
+- 验证：A/B 报告显示 `sample_sufficient=false`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_OFF baseline_closed=8 variant_closed=0`。
+- Git：`Run combined regime capacity early walk-forward`（本条随该提交一起提交并 push）。
+
 ### 21:06:32 +08:00 - risk_off_no_core_top_n_3 full master A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `risk_off_no_core_top_n_3` variant，并复用 baseline run `1d0037a773ff` 生成标准 A/B 报告。
