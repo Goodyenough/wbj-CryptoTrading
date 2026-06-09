@@ -95,7 +95,8 @@
 - [x] 汇总 `risk_off_no_core_entry_reclaim` full master 非重叠 walk-forward：2 段无重叠、仅近端样本充足，整体仍为 `retest`。
 - [ ] 为 `risk_off_no_core_entry_reclaim` 扩大早期样本：优先测试 `2025-01-01 -> 2025-09-01` 之外的更早历史或研究退市 symbol master，确认早期段不是样本不足假象。
 - [x] 设计下一轮 `RISK_ON` 退出 A/B：新增 `tp1_breakeven_stop`，测试 TP1 命中后将止损移动到入场价。
-- [ ] 运行 `tp1_breakeven_stop` full master A/B：先跑 `2025-01-01 -> 2025-09-01`，观察是否减少盈利后回吐。
+- [x] 运行 `tp1_breakeven_stop` full master A/B：PF、净收益、止损率均恶化，结论 `reject_candidate`，不进入 walk-forward。
+- [ ] 设计下一轮退出 A/B：不要简单 TP1 后保本，改测 TP1 后 4h EMA20/ATR 跟踪或延迟到 TP1 后收盘确认再抬止损。
 
 ## TODO 维护规则
 

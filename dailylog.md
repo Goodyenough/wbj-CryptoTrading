@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 04:06:00 +08:00 - tp1_breakeven_stop full master A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：复用 baseline run `73cadcfc0a45`，运行 `tp1_breakeven_stop` variant `1d313ac1b8eb`，区间 `2025-01-01 -> 2025-09-01`，使用 `dynamic_master_full.json` 与 `--max-symbols 40 --allow-data-gaps`。
+- 改动：生成 TP1 保本止损 A/B 报告、variant dynamic-universe backtest 报告和 regime breakdown；同步更新 `TODO.md`、`开发计划.md` 和 Obsidian 实验日志。
+- 原因：验证 TP1 后将止损移动到入场价，是否能减少盈利后回吐并改善退出质量。
+- 影响：variant closed_trades=48，样本充足；PF 0.579 -> 0.546，净收益 -13.17% -> -14.90%，最大回撤 19.43% -> 19.43%，stop_rate 80.95% -> 83.33%。分层显示 `RISK_ON` 净 PnL -1123.23 -> -1318.06。
+- 验证：A/B 报告给出 `verdict=reject_candidate`，原因是收益更差且最大回撤没有改善；regime breakdown 显示恶化主要来自 `RISK_ON`。
+- Git：`Reject TP1 breakeven stop retest`（本条随该提交一起提交并 push）。
+
 ### 04:02:00 +08:00 - 增加 TP1 后保本止损实验
 - 类型：代码 / 配置 / 测试 / 文档 / Git
 - 改动：新增 `analysis.tp1_move_stop_to_breakeven_enabled`，默认 `false` 保持现有行为；新增 `tp1_breakeven_stop` A/B 实验，variant 在 TP1 命中后将止损抬到入场价。
