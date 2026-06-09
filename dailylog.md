@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 14:20:26 +08:00 - 增加 dynamic symbol master 导出命令
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：新增 `python main.py dynamic-symbol-master --output ... [--source-limit N]`，可只导出 dynamic universe `SymbolMaster` JSON，不触发长回测或 A/B。
+- 改动：用新命令导出 `reports/2026-06-09/dynamic_master_source150.json`，固定当前 `source-limit=150` 的 150 个 symbols，供后续 `--symbol-master-file` 复跑使用。
+- 原因：上一节点已支持保存/加载 master，但只能绑在长回测/A/B 命令上；单独导出命令更符合固定数据集后再实验的回测纪律，也方便后续复现实验 universe。
+- 影响：后续可以先导出 master，再对 `liquidity_50m` 做非重叠 walk-forward 或更大 universe 复测，避免每次都重新依赖当前 `exchangeInfo`。
+- 验证：运行 `python main.py dynamic-symbol-master --help`、`python -m compileall main.py src tests`、`python tests\test_universe.py` 均通过；实际运行 `python main.py dynamic-symbol-master --source-limit 150 --output reports\2026-06-09\dynamic_master_source150.json` 成功输出 150 个 symbols。
+- Git：`Add dynamic symbol master export command`（本条随该提交一起提交并 push）。
+
 ### 14:16:17 +08:00 - Dynamic universe 支持固定 symbol master
 - 类型：代码 / 测试 / 文档 / Git
 - 改动：新增 `save_symbol_master` 和 `load_symbol_master`，支持把 dynamic universe 的 `SymbolMaster` 保存为 JSON，并在后续回测中复用。

@@ -169,6 +169,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write only to the project reports directory.",
     )
 
+    dynamic_master = subparsers.add_parser(
+        "dynamic-symbol-master",
+        help="Export the current dynamic universe symbol master JSON without running a backtest.",
+    )
+    dynamic_master.add_argument("--output", required=True, help="Output JSON path for the symbol master.")
+    dynamic_master.add_argument(
+        "--source-limit",
+        type=int,
+        default=None,
+        help="Optional debug cap: sort master symbols alphabetically and keep the first N.",
+    )
+
     abtest = subparsers.add_parser("abtest", help="Run baseline versus variant backtests for one experiment.")
     abtest.add_argument("--experiment", required=True, help="Experiment id from config/experiments.toml.")
     abtest.add_argument("--experiments", default="config/experiments.toml", help="Path to TOML experiment definitions.")
@@ -481,6 +493,17 @@ def main() -> None:
         print("runtime_note=first full dynamic-universe run can be slow; cached klines make later runs faster")
         for path in report_paths:
             print(f"report={path}")
+
+    if args.command == "dynamic-symbol-master":
+        if args.source_limit is not None:
+            _progress("source-limit is enabled for symbol master export")
+        master = build_current_symbol_master(settings, source_limit=args.source_limit, progress=_progress)
+        save_symbol_master(master, Path(args.output))
+        print("dynamic_symbol_master=completed")
+        print(f"symbols={len(master.symbols)}")
+        print(f"source_limit={master.source_limit}")
+        print(f"source_limit_applied={str(master.source_limit_applied).lower()}")
+        print(f"output={Path(args.output)}")
 
     if args.command == "abtest":
         if args.dynamic_universe and args.symbols:
