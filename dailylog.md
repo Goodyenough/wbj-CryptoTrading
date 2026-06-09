@@ -15,6 +15,17 @@
 
 ## 2026-06-09
 
+### 12:31:40 +08:00 - A/B 汇总增加时段重叠分析
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：扩展 `src/crypto_trading_system/abtest_summary.py`，在多时段汇总中计算 `total_period_days`、`unique_coverage_days` 和 `overlap_periods`。
+- 改动：当 A/B 汇总时段存在重叠时，自动结论保持 `retest`，避免把重叠窗口误判为完全独立证据。
+- 改动：更新 `tests/test_abtest_summary.py`，覆盖非重叠窗口的候选 keep 逻辑和重叠窗口保持 `retest` 的规则。
+- 改动：重新生成 `reports/2026-06-09/abtest_summary_dynamic_universe_liquidity_50m_2026-06-09_v3.md`，显示 `total_period_days=881`、`unique_coverage_days=516`、`overlap_periods=2`。
+- 原因：`liquidity_50m` 当前多个验证窗口存在明显重叠，直接按 periods 数量计数会高估证据独立性。
+- 影响：多时段汇总更接近专业 walk-forward 纪律；`liquidity_50m` 仍是优先验证对象，但在存在重叠窗口时不会被自动提升为 keep 候选。
+- 验证：运行 `python tests\test_abtest_summary.py`、`python tests\test_abtest_walk_forward.py`、`python -m compileall main.py src tests` 均通过；真实运行 `python main.py abtest-summary --experiment liquidity_50m --mode dynamic_universe --reports-date 2026-06-09 --no-obsidian` 成功生成 v3 汇总。
+- Git：`Add abtest overlap coverage summary`（本条随该提交一起提交并 push）。
+
 ### 02:47:41 +08:00 - 增加 A/B walk-forward 编排命令
 - 类型：代码 / 测试 / 文档 / Git
 - 改动：新增 `src/crypto_trading_system/abtest_walk_forward.py`，支持解析 `START:END` 或 `START -> END` 多时段参数，并校验日期顺序。

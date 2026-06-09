@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 import json
 from pathlib import Path
 import re
@@ -50,6 +50,9 @@ class AbtestAggregateSummary:
     profit_factor_improved_periods: int
     drawdown_improved_periods: int
     variant_under_sample_periods: int
+    total_period_days: int
+    unique_coverage_days: int
+    overlap_periods: int
     verdict: str
     reason: str
     report_paths: list[Path]
@@ -184,6 +187,9 @@ def load_abtest_records(
 def _summary_verdict(records: list[AbtestReportRecord]) -> tuple[str, str]:
     if not records:
         return "no_data", "No matching A/B reports were found."
+    overlap_periods = _overlap_period_count(records)
+    if overlap_periods:
+        return "retest", "Some periods overlap, so the evidence is not fully independent."
     if any(not bool(record.variant.get("sample_sufficient")) for record in records):
         return "retest", "At least one variant period is below the closed-trade sample threshold."
     sufficient = [record for record in records if record.sample_sufficient]
@@ -200,6 +206,41 @@ def _summary_verdict(records: list[AbtestReportRecord]) -> tuple[str, str]:
     return "retest", "Results are mixed or sample coverage is incomplete; continue cross-period testing."
 
 
+def _period_dates(record: AbtestReportRecord) -> tuple[date, date]:
+    return date.fromisoformat(record.start), date.fromisoformat(record.end)
+
+
+def _period_days(record: AbtestReportRecord) -> int:
+    start, end = _period_dates(record)
+    return (end - start).days
+
+
+def _unique_coverage_days(records: list[AbtestReportRecord]) -> int:
+    if not records:
+        return 0
+    intervals = sorted(_period_dates(record) for record in records)
+    merged: list[list[date]] = []
+    for start, end in intervals:
+        if not merged or start > merged[-1][1]:
+            merged.append([start, end])
+            continue
+        if end > merged[-1][1]:
+            merged[-1][1] = end
+    return sum((end - start).days for start, end in merged)
+
+
+def _overlap_period_count(records: list[AbtestReportRecord]) -> int:
+    intervals = sorted(_period_dates(record) for record in records)
+    overlaps = 0
+    latest_end: date | None = None
+    for start, end in intervals:
+        if latest_end is not None and start < latest_end:
+            overlaps += 1
+        if latest_end is None or end > latest_end:
+            latest_end = end
+    return overlaps
+
+
 def build_abtest_summary(
     records: list[AbtestReportRecord],
     experiment_id: str,
@@ -214,6 +255,9 @@ def build_abtest_summary(
         1 for record in records if record.sample_sufficient and _improved(record, "max_drawdown_pct", lower_is_better=True)
     )
     variant_under_sample_periods = sum(1 for record in records if not bool(record.variant.get("sample_sufficient")))
+    total_period_days = sum(_period_days(record) for record in records)
+    unique_coverage_days = _unique_coverage_days(records)
+    overlap_periods = _overlap_period_count(records)
     verdict, reason = _summary_verdict(records)
     return AbtestAggregateSummary(
         experiment_id=experiment_id,
@@ -224,6 +268,9 @@ def build_abtest_summary(
         profit_factor_improved_periods=profit_factor_improved_periods,
         drawdown_improved_periods=drawdown_improved_periods,
         variant_under_sample_periods=variant_under_sample_periods,
+        total_period_days=total_period_days,
+        unique_coverage_days=unique_coverage_days,
+        overlap_periods=overlap_periods,
         verdict=verdict,
         reason=reason,
         report_paths=[],
@@ -243,6 +290,8 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
         f"mode: {summary.mode}",
         f"periods: {len(summary.records)}",
         f"sufficient_periods: {summary.sufficient_periods}",
+        f"unique_coverage_days: {summary.unique_coverage_days}",
+        f"overlap_periods: {summary.overlap_periods}",
         f"verdict: {summary.verdict}",
         f"report_version: {report_version}",
         "---",
@@ -253,6 +302,9 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
         f"- mode: `{summary.mode}`",
         f"- periods: {len(summary.records)}",
         f"- sufficient_periods: {summary.sufficient_periods}",
+        f"- total_period_days: {summary.total_period_days}",
+        f"- unique_coverage_days: {summary.unique_coverage_days}",
+        f"- overlap_periods: {summary.overlap_periods}",
         f"- net_improved_periods: {summary.net_improved_periods}",
         f"- profit_factor_improved_periods: {summary.profit_factor_improved_periods}",
         f"- drawdown_improved_periods: {summary.drawdown_improved_periods}",
@@ -305,6 +357,7 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
             "",
             "- 汇总报告只给出 `candidate_keep_review`、`retest` 或 `reject_candidate`，不会自动修改默认配置。",
             "- 至少需要多个充足样本时段共同改善净收益、Profit factor 和最大回撤，才会标记 `candidate_keep_review`。",
+            "- 时段存在重叠时，证据不视为完全独立，结论保持 `retest`。",
             "- 任一 variant 样本不足时，结论应偏向 `retest`。",
             "",
             "## Raw Summary",
@@ -316,6 +369,9 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
                     "mode": summary.mode,
                     "periods": len(summary.records),
                     "sufficient_periods": summary.sufficient_periods,
+                    "total_period_days": summary.total_period_days,
+                    "unique_coverage_days": summary.unique_coverage_days,
+                    "overlap_periods": summary.overlap_periods,
                     "net_improved_periods": summary.net_improved_periods,
                     "profit_factor_improved_periods": summary.profit_factor_improved_periods,
                     "drawdown_improved_periods": summary.drawdown_improved_periods,
@@ -387,6 +443,9 @@ def write_abtest_summary_report(
         profit_factor_improved_periods=summary.profit_factor_improved_periods,
         drawdown_improved_periods=summary.drawdown_improved_periods,
         variant_under_sample_periods=summary.variant_under_sample_periods,
+        total_period_days=summary.total_period_days,
+        unique_coverage_days=summary.unique_coverage_days,
+        overlap_periods=summary.overlap_periods,
         verdict=summary.verdict,
         reason=summary.reason,
         report_paths=paths,

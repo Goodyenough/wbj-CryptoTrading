@@ -95,12 +95,15 @@ def test_load_abtest_records_parses_matching_reports(tmp_path: Path) -> None:
 
 def test_build_abtest_summary_marks_candidate_keep_review_for_consistent_improvement(tmp_path: Path) -> None:
     _write_report(tmp_path, "abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-09-01_v1.md")
-    _write_report(tmp_path, "abtest_dynamic_universe_liquidity_50m_2025-09-01_2026-06-01_v1.md")
+    _write_report(tmp_path, "abtest_dynamic_universe_liquidity_50m_2025-09-01_2026-01-01_v1.md")
     records = load_abtest_records(tmp_path, "liquidity_50m", "dynamic_universe")
 
     summary = build_abtest_summary(records, "liquidity_50m", "dynamic_universe")
 
     assert summary.sufficient_periods == 2
+    assert summary.total_period_days == 365
+    assert summary.unique_coverage_days == 365
+    assert summary.overlap_periods == 0
     assert summary.net_improved_periods == 2
     assert summary.profit_factor_improved_periods == 2
     assert summary.drawdown_improved_periods == 2
@@ -124,6 +127,21 @@ def test_build_abtest_summary_keeps_retest_when_variant_sample_is_short(tmp_path
     assert summary.verdict == "retest"
 
 
+def test_build_abtest_summary_keeps_retest_when_periods_overlap(tmp_path: Path) -> None:
+    _write_report(tmp_path, "abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-09-01_v1.md")
+    _write_report(tmp_path, "abtest_dynamic_universe_liquidity_50m_2025-06-01_2026-06-01_v1.md")
+    records = load_abtest_records(tmp_path, "liquidity_50m", "dynamic_universe")
+
+    summary = build_abtest_summary(records, "liquidity_50m", "dynamic_universe")
+
+    assert summary.sufficient_periods == 2
+    assert summary.total_period_days == 608
+    assert summary.unique_coverage_days == 516
+    assert summary.overlap_periods == 1
+    assert summary.verdict == "retest"
+    assert "overlap" in summary.reason
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -131,4 +149,5 @@ if __name__ == "__main__":
         test_load_abtest_records_parses_matching_reports(Path(tmp) / "parse")
         test_build_abtest_summary_marks_candidate_keep_review_for_consistent_improvement(Path(tmp) / "keep")
         test_build_abtest_summary_keeps_retest_when_variant_sample_is_short(Path(tmp) / "retest")
+        test_build_abtest_summary_keeps_retest_when_periods_overlap(Path(tmp) / "overlap")
     print("test_abtest_summary=passed")
