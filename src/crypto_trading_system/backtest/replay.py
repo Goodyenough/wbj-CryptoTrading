@@ -166,6 +166,10 @@ def _active_risk(trades: list[_SimTrade]) -> float:
     return risk
 
 
+def _entry_reclaim_close_satisfied(enabled: bool, close: float, entry_high: float) -> bool:
+    return not enabled or close >= entry_high
+
+
 def _candidate_to_sim_trade(
     result_id: str,
     candidate: TradeCandidate,
@@ -467,16 +471,27 @@ def run_backtest_replay(
                 continue
             high = float(bar[2])
             low = float(bar[3])
+            close = float(bar[4])
             if high < item.paper.entry_low or low > item.paper.entry_high:
                 step_trade(
                     item.paper,
                     high=high,
                     low=low,
-                    close=float(bar[4]),
+                    close=close,
                     open_price=float(bar[1]),
                     event_time_utc=bar_time,
                     intrabar=intrabar_policy,
                 )
+                _sync_record(item)
+                continue
+            if not _entry_reclaim_close_satisfied(
+                settings.analysis.entry_reclaim_close_enabled,
+                close,
+                item.paper.entry_high,
+            ):
+                item.paper.last_price = close
+                item.paper.updated_at_utc = bar_time
+                item.paper.notes = "Watching: entry zone touched, but 4h close has not reclaimed entry_high."
                 _sync_record(item)
                 continue
 
@@ -511,7 +526,7 @@ def run_backtest_replay(
                 item.paper,
                 high=high,
                 low=low,
-                close=float(bar[4]),
+                close=close,
                 open_price=float(bar[1]),
                 event_time_utc=bar_time,
                 intrabar=intrabar_policy,

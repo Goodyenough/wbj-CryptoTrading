@@ -60,6 +60,14 @@ risk_off_core_buy_enabled = false
 [risk_off_no_core_top_n_3.overrides.market]
 top_n = 3
 
+[entry_reclaim_close]
+enabled = true
+description = "Require a 4h close back above entry_high before entering after the entry zone is touched."
+dimension = "entry_timing"
+
+[entry_reclaim_close.overrides.analysis]
+entry_reclaim_close_enabled = true
+
 [daily_trend_required]
 enabled = false
 description = "Requires scanner logic support before this experiment can run."

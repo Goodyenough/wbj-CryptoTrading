@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from crypto_trading_system.backtest.history import interval_ms
 from crypto_trading_system.backtest.history import KlineFetchResult
 from crypto_trading_system.backtest import replay as replay_module
-from crypto_trading_system.backtest.replay import _closed_slice, _effective_warmup_ms
+from crypto_trading_system.backtest.replay import _closed_slice, _effective_warmup_ms, _entry_reclaim_close_satisfied
 from crypto_trading_system.backtest.universe import SymbolMaster
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.ticker_utils import reconstruct_ticker
@@ -64,6 +64,12 @@ def test_effective_warmup_covers_min_history_plus_margin() -> None:
     assert _effective_warmup_ms(settings) >= minimum
 
 
+def test_entry_reclaim_close_requires_close_above_entry_high() -> None:
+    assert _entry_reclaim_close_satisfied(False, close=99.0, entry_high=100.0) is True
+    assert _entry_reclaim_close_satisfied(True, close=99.0, entry_high=100.0) is False
+    assert _entry_reclaim_close_satisfied(True, close=100.0, entry_high=100.0) is True
+
+
 def test_dynamic_universe_requires_btc_timeline() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     master = SymbolMaster(
@@ -103,5 +109,6 @@ if __name__ == "__main__":
     test_closed_slice_excludes_unclosed_daily_bar()
     test_closed_slice_includes_signal_bar_only_after_close()
     test_effective_warmup_covers_min_history_plus_margin()
+    test_entry_reclaim_close_requires_close_above_entry_high()
     test_dynamic_universe_requires_btc_timeline()
     print("test_replay=passed")

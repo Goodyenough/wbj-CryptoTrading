@@ -79,6 +79,17 @@ def test_combined_override_can_change_regime_and_capacity() -> None:
     ]
 
 
+def test_entry_timing_override_can_require_reclaim_close() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    definition = load_experiment("entry_reclaim_close", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.analysis.entry_reclaim_close_enabled is False
+    assert variant.analysis.entry_reclaim_close_enabled is True
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.entry_reclaim_close_enabled", False, True)
+    ]
+
+
 def test_override_paths_are_dimension_scoped() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")

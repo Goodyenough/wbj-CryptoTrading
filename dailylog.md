@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 23:59:08 +08:00 - 增加 entry_reclaim_close 入场确认实验
+- 类型：代码 / 配置 / 测试 / 计划 / Git
+- 改动：新增 `analysis.entry_reclaim_close_enabled`，默认 `false` 保持现有行为；当开启时，回测中的 WATCHING 计划只有在入场区触碰后 4h 收盘重新站上 `entry_high` 才允许入场。
+- 改动：新增 `entry_reclaim_close` A/B 实验，dimension 为 `entry_timing`，variant 将 `analysis.entry_reclaim_close_enabled` 设为 `true`；扩展 A/B override 白名单。
+- 原因：`risk_off_no_core_top_n_3` 已能减少 `RISK_OFF` 亏损，但近端和早期 `RISK_ON` 仍容易止损；下一步需要验证延迟入场/重新确认是否能减少接飞刀。
+- 影响：默认扫描、模拟盘和回测行为不变；后续可运行 `python main.py abtest --experiment entry_reclaim_close --dynamic-universe ...` 做 full master A/B。
+- 验证：运行 `python tests\test_abtest.py`、`python tests\test_replay.py` 和 `python -m compileall main.py src tests`，均通过。
+- Git：`Add entry reclaim close experiment`（本条随该提交一起提交并 push）。
+
 ### 23:54:45 +08:00 - 增加非重叠 A/B 汇总过滤
 - 类型：代码 / 测试 / 报告 / 文档 / Git
 - 改动：为 `abtest-summary` 增加 `--drop-overlap-periods`，汇总前按结束日期优先保留最大数量的非重叠 A/B 窗口，避免 extended 诊断窗口和 walk-forward 子窗口混在一起。
