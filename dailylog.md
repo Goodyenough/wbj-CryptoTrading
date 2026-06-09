@@ -15,6 +15,16 @@
 
 ## 2026-06-09
 
+### 13:07:37 +08:00 - A/B 汇总增加 dynamic universe 偏差提示
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：扩展 `src/crypto_trading_system/abtest_summary.py`，从单段 A/B 报告的 Dynamic Universe Metadata 中提取 master count、`source_limit` 和 universe refreshes，并在汇总报告中输出 `Universe Bias Checks`。
+- 改动：更新 `tests/test_abtest_summary.py`，覆盖 dynamic metadata 解析、`universe_warnings` 汇总和 Markdown / Raw Summary 输出。
+- 改动：重新生成 `reports/2026-06-09/abtest_summary_dynamic_universe_liquidity_50m_2026-06-09_v5.md`，报告显示 `universe_warnings=2`，包括当前 Binance `exchangeInfo` master 依赖和 5/5 periods 使用 `source_limit`。
+- 原因：参考 Freqtrade、VectorBT、Backtrader 等开源项目的回测纪律后，当前最需要补强的是让 dynamic universe 回测报告显式暴露幸存者偏差、当前快照 master 和调试截断风险，而不是只看 PF/净收益。
+- 影响：以后 A/B 汇总不会只给指标结论，还会提醒在进入 keep review 前先扩大或取消 `source_limit`，并研究历史/退市 symbol master。
+- 验证：运行 `python tests\test_abtest_summary.py`、`python tests\test_abtest_walk_forward.py`、`python -m compileall main.py src tests` 均通过；运行 `python main.py abtest-summary --experiment liquidity_50m --mode dynamic_universe --reports-date 2026-06-09 --no-obsidian` 成功生成 v5。
+- Git：`Add dynamic universe bias warnings to abtest summary`（本条随该提交一起提交并 push）。
+
 ### 13:00:10 +08:00 - Dynamic Universe liquidity_50m 非重叠 walk-forward 验证
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `liquidity_50m` dynamic universe 非重叠 walk-forward A/B，区间为 `2025-01-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01`，参数为 `--source-limit 100 --max-symbols 30 --allow-data-gaps --no-obsidian`。

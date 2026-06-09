@@ -6,7 +6,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from crypto_trading_system.abtest_summary import build_abtest_summary, load_abtest_records
+from crypto_trading_system.abtest_summary import build_abtest_summary, load_abtest_records, render_abtest_summary_report
 
 
 def _write_report(
@@ -35,6 +35,15 @@ def _write_report(
                 f"sample_sufficient: {str(sample_sufficient).lower()}",
                 "verdict: retest",
                 "---",
+                "",
+                "## Dynamic Universe Metadata",
+                "",
+                "- baseline_master_count: 100",
+                "- variant_master_count: 100",
+                "- baseline_source_limit: 100",
+                "- variant_source_limit: 100",
+                "- baseline_universe_refreshes: 10",
+                "- variant_universe_refreshes: 10",
                 "",
                 "## Raw Metrics",
                 "",
@@ -91,6 +100,7 @@ def test_load_abtest_records_parses_matching_reports(tmp_path: Path) -> None:
     assert records[0].end == "2025-09-01"
     assert records[0].baseline["closed_trades"] == 20
     assert records[0].variant["profit_factor"] == 0.6
+    assert records[0].dynamic_metadata["baseline_source_limit"] == "100"
 
 
 def test_build_abtest_summary_marks_candidate_keep_review_for_consistent_improvement(tmp_path: Path) -> None:
@@ -107,6 +117,7 @@ def test_build_abtest_summary_marks_candidate_keep_review_for_consistent_improve
     assert summary.net_improved_periods == 2
     assert summary.profit_factor_improved_periods == 2
     assert summary.drawdown_improved_periods == 2
+    assert len(summary.universe_warnings) == 2
     assert summary.verdict == "candidate_keep_review"
 
 
@@ -142,6 +153,19 @@ def test_build_abtest_summary_keeps_retest_when_periods_overlap(tmp_path: Path) 
     assert "overlap" in summary.reason
 
 
+def test_render_abtest_summary_includes_universe_bias_checks(tmp_path: Path) -> None:
+    _write_report(tmp_path, "abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-09-01_v1.md")
+    records = load_abtest_records(tmp_path, "liquidity_50m", "dynamic_universe")
+    summary = build_abtest_summary(records, "liquidity_50m", "dynamic_universe")
+
+    report = render_abtest_summary_report(summary, "v1")
+
+    assert "## Universe Bias Checks" in report
+    assert "current Binance exchangeInfo" in report
+    assert "source_limit" in report
+    assert '"universe_warnings"' in report
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -150,4 +174,5 @@ if __name__ == "__main__":
         test_build_abtest_summary_marks_candidate_keep_review_for_consistent_improvement(Path(tmp) / "keep")
         test_build_abtest_summary_keeps_retest_when_variant_sample_is_short(Path(tmp) / "retest")
         test_build_abtest_summary_keeps_retest_when_periods_overlap(Path(tmp) / "overlap")
+        test_render_abtest_summary_includes_universe_bias_checks(Path(tmp) / "warnings")
     print("test_abtest_summary=passed")

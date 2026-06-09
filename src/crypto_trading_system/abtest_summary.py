@@ -38,6 +38,7 @@ class AbtestReportRecord:
     sample_sufficient: bool
     baseline: dict[str, Any]
     variant: dict[str, Any]
+    dynamic_metadata: dict[str, str]
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,7 @@ class AbtestAggregateSummary:
     total_period_days: int
     unique_coverage_days: int
     overlap_periods: int
+    universe_warnings: list[str]
     verdict: str
     reason: str
     report_paths: list[Path]
@@ -121,6 +123,23 @@ def _extract_raw_metrics(text: str) -> dict[str, Any]:
     return data
 
 
+def _extract_dynamic_metadata(text: str) -> dict[str, str]:
+    keys = {
+        "baseline_master_count",
+        "variant_master_count",
+        "baseline_source_limit",
+        "variant_source_limit",
+        "baseline_universe_refreshes",
+        "variant_universe_refreshes",
+    }
+    metadata: dict[str, str] = {}
+    for line in text.splitlines():
+        match = re.match(r"-\s+([a-z_]+):\s*(.*)$", line)
+        if match and match.group(1) in keys:
+            metadata[match.group(1)] = match.group(2).strip()
+    return metadata
+
+
 def _parse_report_name(path: Path, experiment_id: str, mode: str) -> tuple[str, str, str] | None:
     prefix = f"abtest_{mode}_{experiment_id}_"
     if not path.name.startswith(prefix) or not path.name.endswith(".md"):
@@ -140,6 +159,7 @@ def parse_abtest_report(path: Path, experiment_id: str, mode: str) -> AbtestRepo
     text = path.read_text(encoding="utf-8")
     frontmatter = _extract_frontmatter(text)
     raw_metrics = _extract_raw_metrics(text)
+    dynamic_metadata = _extract_dynamic_metadata(text)
     baseline = raw_metrics["baseline"]
     variant = raw_metrics["variant"]
     sample_sufficient = bool(
@@ -158,6 +178,7 @@ def parse_abtest_report(path: Path, experiment_id: str, mode: str) -> AbtestRepo
         sample_sufficient=sample_sufficient,
         baseline=baseline,
         variant=variant,
+        dynamic_metadata=dynamic_metadata,
     )
 
 
@@ -241,6 +262,29 @@ def _overlap_period_count(records: list[AbtestReportRecord]) -> int:
     return overlaps
 
 
+def _source_limit_present(value: str | None) -> bool:
+    return value is not None and value.lower() not in {"", "none", "n/a", "null"}
+
+
+def _universe_warnings(records: list[AbtestReportRecord], mode: str) -> list[str]:
+    warnings: list[str] = []
+    if mode == "dynamic_universe" or any(record.mode == "dynamic" for record in records):
+        warnings.append(
+            "Dynamic universe uses current Binance exchangeInfo as the symbol master; historic delisted symbols may be missing."
+        )
+    source_limited = [
+        record
+        for record in records
+        if _source_limit_present(record.dynamic_metadata.get("baseline_source_limit"))
+        or _source_limit_present(record.dynamic_metadata.get("variant_source_limit"))
+    ]
+    if source_limited:
+        warnings.append(
+            f"{len(source_limited)}/{len(records)} periods used source_limit; rerun with a larger or uncapped master before keep review."
+        )
+    return warnings
+
+
 def build_abtest_summary(
     records: list[AbtestReportRecord],
     experiment_id: str,
@@ -258,6 +302,7 @@ def build_abtest_summary(
     total_period_days = sum(_period_days(record) for record in records)
     unique_coverage_days = _unique_coverage_days(records)
     overlap_periods = _overlap_period_count(records)
+    universe_warnings = _universe_warnings(records, mode)
     verdict, reason = _summary_verdict(records)
     return AbtestAggregateSummary(
         experiment_id=experiment_id,
@@ -271,6 +316,7 @@ def build_abtest_summary(
         total_period_days=total_period_days,
         unique_coverage_days=unique_coverage_days,
         overlap_periods=overlap_periods,
+        universe_warnings=universe_warnings,
         verdict=verdict,
         reason=reason,
         report_paths=[],
@@ -292,6 +338,7 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
         f"sufficient_periods: {summary.sufficient_periods}",
         f"unique_coverage_days: {summary.unique_coverage_days}",
         f"overlap_periods: {summary.overlap_periods}",
+        f"universe_warnings: {len(summary.universe_warnings)}",
         f"verdict: {summary.verdict}",
         f"report_version: {report_version}",
         "---",
@@ -305,6 +352,7 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
         f"- total_period_days: {summary.total_period_days}",
         f"- unique_coverage_days: {summary.unique_coverage_days}",
         f"- overlap_periods: {summary.overlap_periods}",
+        f"- universe_warnings: {len(summary.universe_warnings)}",
         f"- net_improved_periods: {summary.net_improved_periods}",
         f"- profit_factor_improved_periods: {summary.profit_factor_improved_periods}",
         f"- drawdown_improved_periods: {summary.drawdown_improved_periods}",
@@ -340,6 +388,12 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
             + " |"
         )
 
+    lines.extend(["", "## Universe Bias Checks", ""])
+    if summary.universe_warnings:
+        lines.extend(f"- {warning}" for warning in summary.universe_warnings)
+    else:
+        lines.append("- No dynamic-universe bias warnings were detected from the source reports.")
+
     lines.extend(
         [
             "",
@@ -372,6 +426,7 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
                     "total_period_days": summary.total_period_days,
                     "unique_coverage_days": summary.unique_coverage_days,
                     "overlap_periods": summary.overlap_periods,
+                    "universe_warnings": summary.universe_warnings,
                     "net_improved_periods": summary.net_improved_periods,
                     "profit_factor_improved_periods": summary.profit_factor_improved_periods,
                     "drawdown_improved_periods": summary.drawdown_improved_periods,
@@ -384,6 +439,7 @@ def render_abtest_summary_report(summary: AbtestAggregateSummary, report_version
                             "start": record.start,
                             "end": record.end,
                             "sample_sufficient": record.sample_sufficient,
+                            "dynamic_metadata": record.dynamic_metadata,
                             "baseline": record.baseline,
                             "variant": record.variant,
                         }
@@ -446,6 +502,7 @@ def write_abtest_summary_report(
         total_period_days=summary.total_period_days,
         unique_coverage_days=summary.unique_coverage_days,
         overlap_periods=summary.overlap_periods,
+        universe_warnings=summary.universe_warnings,
         verdict=summary.verdict,
         reason=summary.reason,
         report_paths=paths,
