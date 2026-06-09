@@ -84,7 +84,8 @@
 - [x] 跑完 `risk_off_no_core_top_n_3` full master 非重叠 walk-forward 第二段 `2025-06-01 -> 2026-06-01`：样本充足且继续改善，但仍为负收益，结论 `retest`。
 - [x] 汇总 `risk_off_no_core_top_n_3` 两段 full master 非重叠 walk-forward：2 段无重叠、仅 1 段样本充足，结论 `retest`。
 - [x] 设计下一轮 `RISK_ON` 入场 A/B：新增 `entry_reclaim_close`，要求 4h 收盘重新站上 `entry_high` 后才允许入场。
-- [ ] 运行 `entry_reclaim_close` full master A/B，并用 regime breakdown 验证是否改善 `RISK_ON` 止损簇。
+- [x] 运行 `entry_reclaim_close` full master A/B：`RISK_ON` 大幅减亏但整体仍为负收益，结论 `retest`。
+- [ ] 对 `entry_reclaim_close` 做 full master 非重叠 walk-forward，优先跑 `2025-06-01 -> 2026-06-01` 近端段。
 - [ ] 设计下一轮 `RISK_ON` 退出 A/B：优先验证 TP1 后保护性退出或更快止损移动，避免继续单纯叠加防守过滤。
 
 ## TODO 维护规则

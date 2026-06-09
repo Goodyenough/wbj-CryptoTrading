@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-06-10
+
+### 00:49:00 +08:00 - entry_reclaim_close full master A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：运行 `entry_reclaim_close` full master dynamic-universe A/B，区间 `2025-01-01 -> 2025-09-01`，使用 `reports/2026-06-09/dynamic_master_full.json` 与 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-10/abtest_dynamic_universe_entry_reclaim_close_2025-01-01_2025-09-01_v1.md`、`backtest_dynamic_universe_2025-01-01_2025-09-01_v1.md`、`backtest_dynamic_universe_2025-01-01_2025-09-01_v2.md` 和 `backtest_regime_breakdown_73cadcfc0a45_d088ff687ea1_v1.md`。
+- 原因：`risk_off_no_core_top_n_3` 汇总显示下一步应优先优化 `RISK_ON` 入场/退出质量；本轮先测试 4h 收盘重新站上 `entry_high` 的入场确认。
+- 影响：variant 样本充足，PF 0.579 -> 0.905，净收益 -13.17% -> -3.50%，最大回撤 19.43% -> 17.63%；`RISK_ON` 净 PnL 从 -1123.23 改善到 -121.79，但整体仍为负收益，结论 `retest`。
+- 验证：A/B 报告显示 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_ON` PF 0.51 -> 0.94、stop_rate 82.76% -> 72.41%。
+- Git：`Run entry reclaim close full-master retest`（本条随该提交一起提交并 push）。
+
 ## 2026-06-09
 
 ### 23:59:08 +08:00 - 增加 entry_reclaim_close 入场确认实验
