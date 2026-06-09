@@ -440,6 +440,7 @@ def run_backtest_replay(
                 intrabar=intrabar_policy,
                 stop_exit_price_override=stop_fill.filled_price,
                 tp2_exit_price_override=tp2_fill.filled_price,
+                move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
             )
             for event in events:
                 item.record.events.append(asdict(event))
@@ -532,6 +533,7 @@ def run_backtest_replay(
                 intrabar=intrabar_policy,
                 entry_price_override=final_entry.filled_price,
                 stop_exit_price_override=stop_fill.filled_price,
+                move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
             )
             for event in events:
                 item.record.events.append(asdict(event))

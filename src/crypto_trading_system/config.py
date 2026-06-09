@@ -37,6 +37,7 @@ class AnalysisSettings:
     high_volatility_penalty: float
     risk_off_core_buy_enabled: bool
     entry_reclaim_close_enabled: bool
+    tp1_move_stop_to_breakeven_enabled: bool
     validation_pool_multiplier: int
     validation_pool_max: int
 
@@ -154,6 +155,7 @@ def load_settings(path: Path) -> Settings:
             high_volatility_penalty=float(analysis.get("high_volatility_penalty", 6.0)),
             risk_off_core_buy_enabled=bool(analysis.get("risk_off_core_buy_enabled", True)),
             entry_reclaim_close_enabled=bool(analysis.get("entry_reclaim_close_enabled", False)),
+            tp1_move_stop_to_breakeven_enabled=bool(analysis.get("tp1_move_stop_to_breakeven_enabled", False)),
             validation_pool_multiplier=int(analysis.get("validation_pool_multiplier", 2)),
             validation_pool_max=int(analysis.get("validation_pool_max", 10)),
         ),

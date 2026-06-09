@@ -27,6 +27,7 @@ def step_trade(
     entry_price_override: float | None = None,
     stop_exit_price_override: float | None = None,
     tp2_exit_price_override: float | None = None,
+    move_stop_to_breakeven_on_tp1: bool = False,
 ) -> list[StepEvent]:
     if intrabar not in {"stop_first", "tp_first"}:
         raise ValueError("intrabar must be stop_first or tp_first")
@@ -129,7 +130,11 @@ def step_trade(
             if trigger == "tp1" and tp1_hit:
                 trade.status = "TP1_HIT"
                 trade.tp1_hit_at_utc = event_time
-                trade.notes = "TP1 hit; trade remains open for TP2 tracking."
+                if move_stop_to_breakeven_on_tp1:
+                    trade.stop_loss = max(trade.stop_loss, trade.entry_price)
+                    trade.notes = "TP1 hit; stop moved to breakeven for TP2 tracking."
+                else:
+                    trade.notes = "TP1 hit; trade remains open for TP2 tracking."
                 events.append(
                     StepEvent(
                         event_type="TP1_HIT",

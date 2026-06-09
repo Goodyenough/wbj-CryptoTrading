@@ -77,6 +77,14 @@ dimension = "combined_regime_entry"
 risk_off_core_buy_enabled = false
 entry_reclaim_close_enabled = true
 
+[tp1_breakeven_stop]
+enabled = true
+description = "Move stop loss to breakeven after TP1 is hit."
+dimension = "exit_timing"
+
+[tp1_breakeven_stop.overrides.analysis]
+tp1_move_stop_to_breakeven_enabled = true
+
 [daily_trend_required]
 enabled = false
 description = "Requires scanner logic support before this experiment can run."

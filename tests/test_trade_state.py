@@ -75,6 +75,24 @@ def test_entered_to_closed() -> None:
     assert [event.event_type for event in events] == ["CLOSED"]
 
 
+def test_tp1_can_move_stop_to_breakeven() -> None:
+    trade = make_trade("ENTERED")
+    trade.entry_price = 103.0
+    trade.quantity = 100 / 13
+    events = step_trade(
+        trade,
+        high=121.0,
+        low=100.0,
+        close=119.0,
+        event_time_utc="2026-01-01T08:00:00+00:00",
+        move_stop_to_breakeven_on_tp1=True,
+    )
+    assert trade.status == "TP1_HIT"
+    assert trade.stop_loss == 103.0
+    assert "breakeven" in trade.notes
+    assert [event.event_type for event in events] == ["TP1_HIT"]
+
+
 def test_watching_same_bar_entry_then_stop() -> None:
     trade = make_trade()
     events = step_trade(
@@ -96,5 +114,6 @@ if __name__ == "__main__":
     test_watching_invalidated_before_entry()
     test_entered_to_stopped()
     test_entered_to_closed()
+    test_tp1_can_move_stop_to_breakeven()
     test_watching_same_bar_entry_then_stop()
     print("test_trade_state=passed")

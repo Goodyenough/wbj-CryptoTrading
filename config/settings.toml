@@ -26,6 +26,7 @@ high_volatility_range_pct = 35.0
 high_volatility_penalty = 6.0
 risk_off_core_buy_enabled = true
 entry_reclaim_close_enabled = false
+tp1_move_stop_to_breakeven_enabled = false
 validation_pool_multiplier = 2
 validation_pool_max = 10
 

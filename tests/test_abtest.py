@@ -104,6 +104,17 @@ def test_combined_regime_entry_override_can_pause_and_reclaim() -> None:
     ]
 
 
+def test_exit_timing_override_can_move_stop_to_breakeven() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    definition = load_experiment("tp1_breakeven_stop", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.analysis.tp1_move_stop_to_breakeven_enabled is False
+    assert variant.analysis.tp1_move_stop_to_breakeven_enabled is True
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.tp1_move_stop_to_breakeven_enabled", False, True),
+    ]
+
+
 def test_override_paths_are_dimension_scoped() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")
@@ -254,6 +265,7 @@ if __name__ == "__main__":
     test_combined_override_can_change_regime_and_capacity()
     test_entry_timing_override_can_require_reclaim_close()
     test_combined_regime_entry_override_can_pause_and_reclaim()
+    test_exit_timing_override_can_move_stop_to_breakeven()
     test_override_paths_are_dimension_scoped()
     test_dynamic_abtest_reuses_one_symbol_master()
     test_dynamic_abtest_accepts_prebuilt_symbol_master()

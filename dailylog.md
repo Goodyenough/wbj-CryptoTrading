@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 04:02:00 +08:00 - 增加 TP1 后保本止损实验
+- 类型：代码 / 配置 / 测试 / 文档 / Git
+- 改动：新增 `analysis.tp1_move_stop_to_breakeven_enabled`，默认 `false` 保持现有行为；新增 `tp1_breakeven_stop` A/B 实验，variant 在 TP1 命中后将止损抬到入场价。
+- 改动：扩展 `step_trade` 与回测 replay，把 TP1 后保本止损作为显式开关传入；新增状态机和 A/B override 测试。
+- 原因：组合实验显示近端可转正，但早期 `RISK_ON` 仍全止损；下一步需要测试 TP1 后保护性退出，减少盈利后回吐到原始结构止损。
+- 影响：默认扫描、模拟盘和回测行为不变；后续可运行 `python main.py abtest --experiment tp1_breakeven_stop ...` 做退出质量 A/B。
+- 验证：运行 `python tests\test_trade_state.py`、`python tests\test_abtest.py`、`python tests\test_replay.py` 和 `python -m compileall main.py src tests`，均通过。
+- Git：`Add TP1 breakeven stop experiment`（本条随该提交一起提交并 push）。
+
 ### 03:45:00 +08:00 - risk_off_no_core_entry_reclaim 近端 walk-forward 与汇总
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：复用近端 baseline run `93b978d7a8c5`，运行 `risk_off_no_core_entry_reclaim` variant `d32443a95501`，区间 `2025-06-01 -> 2026-06-01`。
