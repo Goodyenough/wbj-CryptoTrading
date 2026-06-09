@@ -15,6 +15,16 @@
 
 ## 2026-06-09
 
+### 20:05:30 +08:00 - risk_off_no_core_buy full master A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 跑 `risk_off_no_core_buy` full master A/B，区间为 `2025-01-01 -> 2025-09-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
+- 改动：完整 A/B 命令首次在 30 分钟超时前写出 baseline 报告 `backtest_dynamic_universe_2025-01-01_2025-09-01_v9.md`；随后复用 SQLite 中的 baseline run `1d0037a773ff`，单独运行 variant `b4ef9a870efb` 并生成 `abtest_dynamic_universe_risk_off_no_core_buy_2025-01-01_2025-09-01_v1.md`。
+- 改动：生成 `backtest_regime_breakdown_1d0037a773ff_b4ef9a870efb_v1.md`，确认 variant 的 `RISK_OFF` 闭合交易从 10 降到 0。
+- 原因：上一轮分层显示 `RISK_OFF` 亏损几乎全部来自 BTC/ETH 核心币豁免，需要验证弱市是否应完全暂停新开仓。
+- 影响：variant 将 PF 从 0.579 提升到 0.707，净收益从 -13.17% 改善到 -7.96%，最大回撤从 19.43% 降到 15.03%；但 `RISK_ON` 净 PnL 从 -1123.23 恶化到 -1243.74，因此结论仍为 `retest`，不能 keep。
+- 验证：A/B 报告显示 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_OFF baseline_closed=10 variant_closed=0`。
+- Git：`Run risk-off core buy full-master retest`（本条随该提交一起提交并 push）。
+
 ### 19:07:43 +08:00 - 增加 RISK_OFF 核心币暂停买入实验
 - 类型：代码 / 配置 / 测试 / 计划 / Git
 - 改动：新增 `[analysis].risk_off_core_buy_enabled` 配置，默认 `true` 保持旧行为；新增 `risk_off_no_core_buy` A/B 实验，variant 将该开关设为 `false`。
