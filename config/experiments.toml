@@ -41,6 +41,14 @@ dimension = "regime"
 [risk_off_no_core_buy.overrides.analysis]
 risk_off_core_buy_enabled = false
 
+[top_n_3]
+enabled = true
+description = "Test lower per-scan candidate capacity to reduce clustered correlated entries."
+dimension = "capacity"
+
+[top_n_3.overrides.market]
+top_n = 3
+
 [daily_trend_required]
 enabled = false
 description = "Requires scanner logic support before this experiment can run."

@@ -15,6 +15,14 @@
 
 ## 2026-06-09
 
+### 20:09:21 +08:00 - 增加 top_n_3 容量实验
+- 类型：代码 / 配置 / 测试 / 计划 / Git
+- 改动：新增 `top_n_3` A/B 实验，variant 将 `market.top_n` 从 5 降到 3；扩展 `capacity` 维度的配置覆盖白名单。
+- 原因：`RISK_ON` 亏损按日期聚集明显，例如 2025-05-11、2025-01-04、2025-07-22 等同日多笔相关交易同时止损，score 阈值本身无法区分赢家和输家。
+- 影响：下一步可以单独验证降低每次扫描候选容量是否能减少拥挤开仓和 `RISK_ON` 止损簇；默认配置不改变。
+- 验证：运行 `python tests\test_abtest.py`、`python -m compileall main.py src tests`，均通过。
+- Git：`Add top-n capacity experiment`（本条随该提交一起提交并 push）。
+
 ### 20:05:30 +08:00 - risk_off_no_core_buy full master A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 跑 `risk_off_no_core_buy` full master A/B，区间为 `2025-01-01 -> 2025-09-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。

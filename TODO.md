@@ -76,7 +76,8 @@
 - [x] 对 full master `liquidity_50m` 结果做市场环境分层：亏损主要来自 `RISK_ON` 和 `RISK_OFF`，variant 在两者中均减亏但仍为负。
 - [x] 设计 `RISK_OFF` 下一轮规则 A/B：新增 `risk_off_no_core_buy`，测试弱市是否连 BTC/ETH 也暂停新开仓。
 - [x] 跑完 `risk_off_no_core_buy` full master A/B：`RISK_OFF` 闭合交易降到 0，整体减亏但 `RISK_ON` 略恶化，结论 `retest`。
-- [ ] 针对 `RISK_ON` 设计下一轮入场/退出规则 A/B，不能只继续提高流动性门槛。
+- [x] 设计 `RISK_ON` 下一轮规则 A/B：新增 `top_n_3`，测试降低每次扫描候选容量是否能减少同日相关拥挤开仓。
+- [ ] 跑完 `top_n_3` full master A/B，重点观察 `RISK_ON` stop_rate、净 PnL 和 max_drawdown 是否改善。
 
 ## TODO 维护规则
 

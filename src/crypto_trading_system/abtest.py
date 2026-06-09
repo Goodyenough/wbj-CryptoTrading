@@ -24,6 +24,7 @@ ALLOWED_OVERRIDE_PATHS: dict[str, set[str]] = {
     },
     "liquidity": {"market.min_quote_volume", "market.min_trades"},
     "regime": {"analysis.risk_off_core_buy_enabled"},
+    "capacity": {"market.top_n"},
 }
 
 
