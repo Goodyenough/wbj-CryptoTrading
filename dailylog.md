@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 23:48:55 +08:00 - risk_off_no_core_top_n_3 近端非重叠段复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `risk_off_no_core_top_n_3` 近端窗口 variant，区间 `2025-06-01 -> 2026-06-01`，并复用 baseline run `359a6c461f6c` 生成 A/B 报告。
+- 改动：生成 `backtest_dynamic_universe_2025-06-01_2026-06-01_v12.md`、`abtest_dynamic_universe_risk_off_no_core_top_n_3_2025-06-01_2026-06-01_v1.md` 和 `backtest_regime_breakdown_359a6c461f6c_1f9a0a132e6f_v1.md`。
+- 原因：组合实验在 full master extended 窗口转正，早期非重叠段方向改善但样本不足；需要补完近端非重叠段，判断改善是否跨窗口延续。
+- 影响：近端段 variant 样本充足，PF 0.734 -> 0.876，净收益 -10.62% -> -5.36%，最大回撤 24.24% -> 21.38%，暴露 88.45% -> 63.01%；但策略仍为负收益，结论继续 `retest`，不能 keep。
+- 验证：A/B 报告显示 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_OFF` closed_trades 9 -> 1、净 PnL -541.46 -> -106.97，`RISK_ON` PF 0.84 -> 0.86。
+- Git：`Run combined regime capacity near walk-forward`（本条随该提交一起提交并 push）。
+
 ### 21:26:58 +08:00 - risk_off_no_core_top_n_3 早期非重叠段复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `risk_off_no_core_top_n_3` 早期窗口 variant，区间 `2025-01-01 -> 2025-06-01`，并复用 baseline run `e6133152fb7e` 生成 A/B 报告。

@@ -81,7 +81,8 @@
 - [x] 设计 `risk_off_no_core_top_n_3` 组合实验：同时关闭 RISK_OFF 核心币买入并将 `top_n` 降到 3。
 - [x] 运行 `risk_off_no_core_top_n_3` full master A/B：单窗口转正，PF 约 1.00，净收益 +1.04%，但仍需非重叠 walk-forward。
 - [x] 跑完 `risk_off_no_core_top_n_3` full master 非重叠 walk-forward 第一段 `2025-01-01 -> 2025-06-01`：方向改善但样本不足，结论 `retest`。
-- [ ] 跑完 `risk_off_no_core_top_n_3` full master 非重叠 walk-forward 第二段 `2025-06-01 -> 2026-06-01`。
+- [x] 跑完 `risk_off_no_core_top_n_3` full master 非重叠 walk-forward 第二段 `2025-06-01 -> 2026-06-01`：样本充足且继续改善，但仍为负收益，结论 `retest`。
+- [ ] 汇总 `risk_off_no_core_top_n_3` 两段 full master 非重叠 walk-forward，并决定下一轮是继续优化 `RISK_ON` 入场/退出，还是新增更细 regime/capacity 组合。
 
 ## TODO 维护规则
 
