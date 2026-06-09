@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 19:00:38 +08:00 - 增加回测市场环境分层报告
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：新增 `src/crypto_trading_system/backtest/regime_analysis.py` 和 `python main.py backtest-regime-breakdown --baseline-run-id ... --variant-run-id ...`，按交易创建日的 BTC/ETH 日线 regime 对真实入场且已闭合的回测交易分组。
+- 改动：生成 `reports/2026-06-09/backtest_regime_breakdown_1c1bd1b7b9ad_4dae110c062c_v1.md`，对 full master extended 的 baseline/variant 做 `RISK_ON`、`RISK_OFF`、`NEUTRAL` 分层。
+- 原因：`liquidity_50m` 在 full master 下持续减亏但不能转正，需要定位亏损主要来自哪类市场环境，避免继续盲目提高流动性门槛。
+- 影响：`RISK_ON` 与 `RISK_OFF` 是主要亏损来源；variant 在两者中均减亏，但仍为负，说明下一步应做 regime-aware 入场/退出规则，而不是直接 keep `liquidity_50m`。
+- 验证：运行 `python tests\test_regime_analysis.py`、`python tests\test_abtest_summary.py`、`python -m compileall main.py src tests`，并用 `backtest-regime-breakdown` 生成报告；修正过一次口径，确保只统计 `entered_at_utc IS NOT NULL` 且 `closed_at_utc IS NOT NULL` 的真实闭合交易。
+- Git：`Add backtest regime breakdown report`（本条随该提交一起提交并 push）。
+
 ### 18:52:14 +08:00 - Full master liquidity_50m 延长早期窗口 A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 运行 `liquidity_50m` 延长早期窗口 dynamic-universe A/B，区间为 `2025-01-01 -> 2025-09-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。

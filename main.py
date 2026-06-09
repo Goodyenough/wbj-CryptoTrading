@@ -16,6 +16,7 @@ from crypto_trading_system.abtest_summary import (
     write_abtest_summary_report,
 )
 from crypto_trading_system.abtest_walk_forward import parse_period_specs
+from crypto_trading_system.backtest.regime_analysis import build_regime_comparison, write_regime_comparison_report
 from crypto_trading_system.backtest.universe import build_current_symbol_master, load_symbol_master, save_symbol_master
 from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
@@ -179,6 +180,19 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help="Optional debug cap: sort master symbols alphabetically and keep the first N.",
+    )
+
+    regime_breakdown = subparsers.add_parser(
+        "backtest-regime-breakdown",
+        help="Group saved backtest trades by BTC/ETH market regime and write a comparison report.",
+    )
+    regime_breakdown.add_argument("--baseline-run-id", required=True, help="Baseline backtest run_id from an A/B report.")
+    regime_breakdown.add_argument("--variant-run-id", required=True, help="Variant backtest run_id from an A/B report.")
+    regime_breakdown.add_argument("--reports-date", default=None, help="Reports date directory, default today.")
+    regime_breakdown.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
     )
 
     abtest = subparsers.add_parser("abtest", help="Run baseline versus variant backtests for one experiment.")
@@ -504,6 +518,28 @@ def main() -> None:
         print(f"source_limit={master.source_limit}")
         print(f"source_limit_applied={str(master.source_limit_applied).lower()}")
         print(f"output={Path(args.output)}")
+
+    if args.command == "backtest-regime-breakdown":
+        _progress("building backtest market regime breakdown")
+        comparison = build_regime_comparison(settings, args.baseline_run_id, args.variant_run_id)
+        original_obsidian = settings.output.obsidian_dir
+        if args.no_obsidian:
+            settings.output.obsidian_dir = None
+        comparison = write_regime_comparison_report(settings, comparison, report_date=args.reports_date)
+        settings.output.obsidian_dir = original_obsidian
+        print("backtest_regime_breakdown=completed")
+        print(f"baseline_run_id={comparison.baseline.run_id}")
+        print(f"variant_run_id={comparison.variant.run_id}")
+        for status in sorted(set(comparison.baseline.buckets) | set(comparison.variant.buckets)):
+            base = comparison.baseline.buckets.get(status)
+            variant = comparison.variant.buckets.get(status)
+            print(
+                f"regime={status} "
+                f"baseline_closed={base.closed_trades if base else 0} "
+                f"variant_closed={variant.closed_trades if variant else 0}"
+            )
+        for path in comparison.report_paths:
+            print(f"report={path}")
 
     if args.command == "abtest":
         if args.dynamic_universe and args.symbols:
