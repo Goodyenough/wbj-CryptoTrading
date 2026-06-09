@@ -72,7 +72,8 @@
 - [x] 导出不截断的 full dynamic `SymbolMaster`：`reports/2026-06-09/dynamic_master_full.json`，当前 master_count=418。
 - [x] 用 `dynamic_master_full.json` 复跑 `liquidity_50m` 近端窗口：样本充足且方向继续改善，但策略仍为负收益，结论 `retest`。
 - [x] 用 `dynamic_master_full.json` 跑 `liquidity_50m` 非重叠 walk-forward；早期窗口仍样本不足，近端窗口样本充足且改善，整体 `retest`。
-- [ ] 延长 full master 早期窗口或做市场环境分层，解决 `liquidity_50m` 早期样本不足问题。
+- [x] 延长 full master 早期窗口到 `2025-01-01 -> 2025-09-01`；样本充足且改善延续，但仍为负收益，结论 `retest`。
+- [ ] 对 full master `liquidity_50m` 结果做市场环境分层，区分上涨、下跌、震荡和暴跌阶段。
 
 ## TODO 维护规则
 

@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 18:52:14 +08:00 - Full master liquidity_50m 延长早期窗口 A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 运行 `liquidity_50m` 延长早期窗口 dynamic-universe A/B，区间为 `2025-01-01 -> 2025-09-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-09-01_v2.md` 及底层 `backtest_dynamic_universe_2025-01-01_2025-09-01_v7.md`、`v8.md`。
+- 原因：早期短窗口 `2025-01-01 -> 2025-06-01` 在 full master 下仍只有 17/17 笔闭合交易，需要延长窗口确认样本不足是否只是时间长度问题。
+- 影响：baseline/variant trades=271/242，closed_trades=42/41，PF=0.579/0.693，净收益=-13.17%/-9.60%，最大回撤=19.43%/18.81%，样本充足且改善延续，但策略仍为负收益，结论继续 `retest`。
+- 验证：A/B 命令完成并输出 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；抽取报告 Raw Metrics 确认指标。
+- Git：`Run full-master extended liquidity retest`（本条随该提交一起提交并 push）。
+
 ### 18:10:11 +08:00 - Full master liquidity_50m 早期窗口 A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 运行 `liquidity_50m` 早期窗口 dynamic-universe A/B，区间为 `2025-01-01 -> 2025-06-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
