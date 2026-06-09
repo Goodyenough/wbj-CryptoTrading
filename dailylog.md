@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 02:23:23 +08:00 - entry_reclaim_close 近端非重叠段复测
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：复用近端 baseline run `93b978d7a8c5`，单独运行 `entry_reclaim_close` variant `9770a33e7f77`，区间 `2025-06-01 -> 2026-06-01`，并生成标准 A/B 报告与 regime breakdown。
+- 改动：生成 `abtest_dynamic_universe_entry_reclaim_close_2025-06-01_2026-06-01_v1.md`、`backtest_dynamic_universe_2025-06-01_2026-06-01_v1.md`、`backtest_dynamic_universe_2025-06-01_2026-06-01_v2.md` 和 `backtest_regime_breakdown_93b978d7a8c5_9770a33e7f77_v1.md`。
+- 原因：full master extended 窗口显示 `entry_reclaim_close` 对 `RISK_ON` 有明显改善，需要用近端非重叠窗口确认效果是否延续。
+- 影响：近端 variant 样本充足且转正，PF 0.734 -> 1.142，净收益 -10.62% -> +5.34%，最大回撤 24.24% -> 15.90%；分层显示 `RISK_ON` 净 PnL -458.33 -> +627.20，`RISK_OFF` 仍为负且略恶化。
+- 验证：A/B 报告显示 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_ON` PF 0.84 -> 1.23、stop_rate 75.00% -> 66.67%。
+- Git：`Run entry reclaim close near walk-forward`（本条随该提交一起提交并 push）。
+
 ### 00:49:00 +08:00 - entry_reclaim_close full master A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：运行 `entry_reclaim_close` full master dynamic-universe A/B，区间 `2025-01-01 -> 2025-09-01`，使用 `reports/2026-06-09/dynamic_master_full.json` 与 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
