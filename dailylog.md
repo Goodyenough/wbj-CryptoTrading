@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 03:13:00 +08:00 - risk_off_no_core_entry_reclaim 早期 walk-forward
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：复用早期 baseline run `e6133152fb7e`，运行 `risk_off_no_core_entry_reclaim` variant `c7be05461e78`，区间 `2025-01-01 -> 2025-06-01`。
+- 改动：生成早期段 A/B 报告、variant dynamic-universe backtest 报告和 regime breakdown；同步更新 `TODO.md`、`开发计划.md` 和 Obsidian 实验日志。
+- 原因：组合 full master 接近打平，但需要非重叠 walk-forward 验证，先补早期段。
+- 影响：variant closed_trades=15，仍低于样本线；PF 0.327 -> 0.413，净收益 -11.80% -> -8.17%，最大回撤 14.49% -> 10.85%。分层显示 `RISK_OFF` closed_trades 8 -> 0，但 `RISK_ON` closed_trades 7 -> 9 且仍全部止损。
+- 验证：A/B 报告显示 `sample_sufficient=false`、`verdict=retest`；regime breakdown 证实早期改善主要来自去掉 `RISK_OFF` 交易，而不是 `RISK_ON` 转强。
+- Git：`Run combo entry reclaim early walk-forward`（本条随该提交一起提交并 push）。
+
 ### 03:01:00 +08:00 - risk_off_no_core_entry_reclaim full master A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：复用 baseline run `73cadcfc0a45`，运行 `risk_off_no_core_entry_reclaim` variant `400001fc7ad6`，区间 `2025-01-01 -> 2025-09-01`，使用 `dynamic_master_full.json` 与 `--max-symbols 40 --allow-data-gaps`。
