@@ -68,7 +68,7 @@
 - [x] 用更大 dynamic universe 复测 `liquidity_50m`：`source-limit 150 / max-symbols 40` 样本充足且方向继续改善，但仍为 `retest`。
 - [x] 支持保存/加载 dynamic universe `SymbolMaster` JSON，让 A/B 和 walk-forward 可以复用同一份固定 master。
 - [x] 增加 `dynamic-symbol-master` 导出命令，并生成 `reports/2026-06-09/dynamic_master_source150.json`。
-- [ ] 用固定 `SymbolMaster` 文件复跑 `liquidity_50m` 的非重叠 walk-forward，确认结果不是当前 `exchangeInfo` 快照漂移造成。
+- [x] 用固定 `SymbolMaster` 文件复跑 `liquidity_50m` 的非重叠 walk-forward；近端段样本充足且方向继续改善，整体仍为 `retest`。
 - [ ] 移除或继续提高 `--source-limit` 复测 `liquidity_50m`，避免只依赖当前快照 master 的截断样本。
 
 ## TODO 维护规则

@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 15:03:41 +08:00 - 固定 master 的 liquidity_50m 非重叠 walk-forward
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_source150.json` 作为固定 `SymbolMaster`，运行 `liquidity_50m` 非重叠 walk-forward：`2025-01-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-06-01_v2.md`、`abtest_dynamic_universe_liquidity_50m_2025-06-01_2026-06-01_v4.md`、`abtest_summary_dynamic_universe_liquidity_50m_2026-06-09_v7.md` 及对应底层 backtest 报告。
+- 原因：验证 `liquidity_50m` 在固定 master 文件下是否仍延续改善，降低当前 `exchangeInfo` 快照漂移对实验结论的影响。
+- 影响：早期段 baseline/variant closed_trades=19/16，样本仍不足但 variant 改善 PF、净收益和回撤；近端段 baseline/variant closed_trades=55/56，样本充足且 PF 0.697 -> 0.753、净收益 -13.04% -> -10.31%、最大回撤 26.71% -> 24.92%。汇总 v7 显示 `unique_coverage_days=516`、`overlap_periods=0`，但因一个 variant period 样本不足和 `source_limit` 风险继续 `retest`。
+- 验证：`abtest-walk-forward` 命令成功完成；抽取 Raw Metrics 确认两段指标和 v7 汇总结论。
+- Git：`Run fixed-master liquidity walk-forward retest`（本条随该提交一起提交并 push）。
+
 ### 14:20:26 +08:00 - 增加 dynamic symbol master 导出命令
 - 类型：代码 / 报告 / 测试 / 文档 / Git
 - 改动：新增 `python main.py dynamic-symbol-master --output ... [--source-limit N]`，可只导出 dynamic universe `SymbolMaster` JSON，不触发长回测或 A/B。
