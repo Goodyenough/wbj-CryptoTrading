@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 17:12:29 +08:00 - Full master liquidity_50m 近端 A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用不截断的 `reports/2026-06-09/dynamic_master_full.json` 运行 `liquidity_50m` dynamic-universe A/B，窗口为 `2025-06-01 -> 2026-06-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-06-01_2026-06-01_v5.md` 及底层 `backtest_dynamic_universe_2025-06-01_2026-06-01_v10.md`、`v11.md`。
+- 原因：验证 `liquidity_50m` 的近端改善是否仍能在无 `source_limit` 截断、418 个 symbol 的 full master 下延续。
+- 影响：baseline/variant trades=302/240，closed_trades=49/51，PF=0.734/0.852，净收益=-10.62%/-6.11%，最大回撤=24.24%/21.32%，样本充足但整体仍为负收益，结论继续 `retest`，不能 keep。
+- 验证：A/B 命令完成并输出 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；抽取报告 Raw Metrics 确认指标。
+- Git：`Run full-master liquidity retest`（本条随该提交一起提交并 push）。
+
 ### 15:09:31 +08:00 - 导出 full dynamic symbol master
 - 类型：报告 / 文档 / Git
 - 改动：运行 `python main.py dynamic-symbol-master --output reports\2026-06-09\dynamic_master_full.json`，导出不使用 `--source-limit` 的 full dynamic `SymbolMaster`。
