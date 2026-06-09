@@ -71,7 +71,8 @@
 - [x] 用固定 `SymbolMaster` 文件复跑 `liquidity_50m` 的非重叠 walk-forward；近端段样本充足且方向继续改善，整体仍为 `retest`。
 - [x] 导出不截断的 full dynamic `SymbolMaster`：`reports/2026-06-09/dynamic_master_full.json`，当前 master_count=418。
 - [x] 用 `dynamic_master_full.json` 复跑 `liquidity_50m` 近端窗口：样本充足且方向继续改善，但策略仍为负收益，结论 `retest`。
-- [ ] 用 `dynamic_master_full.json` 跑 `liquidity_50m` 非重叠 walk-forward，确认早期窗口是否仍样本不足。
+- [x] 用 `dynamic_master_full.json` 跑 `liquidity_50m` 非重叠 walk-forward；早期窗口仍样本不足，近端窗口样本充足且改善，整体 `retest`。
+- [ ] 延长 full master 早期窗口或做市场环境分层，解决 `liquidity_50m` 早期样本不足问题。
 
 ## TODO 维护规则
 

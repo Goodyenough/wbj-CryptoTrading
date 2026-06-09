@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 18:10:11 +08:00 - Full master liquidity_50m 早期窗口 A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 运行 `liquidity_50m` 早期窗口 dynamic-universe A/B，区间为 `2025-01-01 -> 2025-06-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
+- 改动：生成 `reports/2026-06-09/abtest_dynamic_universe_liquidity_50m_2025-01-01_2025-06-01_v3.md` 及底层 `backtest_dynamic_universe_2025-01-01_2025-06-01_v7.md`、`v8.md`。
+- 原因：补齐 full master 非重叠验证的早期窗口，确认 `liquidity_50m` 在 `source_limit=None` 时早期样本是否过线。
+- 影响：baseline/variant trades=91/88，closed_trades=17/17，PF=0.327/0.327，净收益=-11.80%/-10.31%，最大回撤=14.49%/13.47%；variant 仍低于 20 笔闭合交易，full master 非重叠整体继续 `retest`。
+- 验证：A/B 命令完成并输出 `sample_sufficient=false`、`verdict=retest`；抽取报告 Raw Metrics 确认早期窗口指标。
+- Git：`Run full-master early liquidity retest`（本条随该提交一起提交并 push）。
+
 ### 17:12:29 +08:00 - Full master liquidity_50m 近端 A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用不截断的 `reports/2026-06-09/dynamic_master_full.json` 运行 `liquidity_50m` dynamic-universe A/B，窗口为 `2025-06-01 -> 2026-06-01`，参数为 `--max-symbols 40 --allow-data-gaps --no-obsidian`。
