@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 02:38:00 +08:00 - entry_reclaim_close 早期段与 walk-forward 汇总
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：补齐 `entry_reclaim_close` full master 非重叠 walk-forward 早期段，复用 baseline run `e6133152fb7e` 并对比 variant run `a049fb3cf4d3`，区间 `2025-01-01 -> 2025-06-01`。
+- 改动：生成早期段 A/B 报告、regime breakdown、含重叠窗口汇总和非重叠 walk-forward 汇总；同步更新 `TODO.md`、`开发计划.md` 和 Obsidian 实验日志。
+- 原因：近端段已经转正，但要判断 `entry_reclaim_close` 是否能进入组合验证，必须补齐早期非重叠段并做汇总。
+- 影响：早期 variant closed_trades=18，仍低于样本线；PF 0.327 -> 0.305，净收益 -11.80% -> -11.36%，最大回撤 14.49% -> 13.50%。非重叠汇总保留 2 段、`overlap_periods=0`、`sufficient_periods=1`，结论仍为 `retest`。
+- 验证：`abtest_dynamic_universe_entry_reclaim_close_2025-01-01_2025-06-01_v1.md`、`backtest_regime_breakdown_e6133152fb7e_a049fb3cf4d3_v1.md`、`abtest_summary_dynamic_universe_entry_reclaim_close_2026-06-10_v2.md` 和 `abtest_summary_dynamic_universe_entry_reclaim_close_2026-06-10_v3.md` 均已生成；非重叠汇总原因是 variant 有一个时段低于闭合交易样本线。
+- Git：`Summarize entry reclaim walk-forward`（本条随该提交一起提交并 push）。
+
 ### 02:23:23 +08:00 - entry_reclaim_close 近端非重叠段复测
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：复用近端 baseline run `93b978d7a8c5`，单独运行 `entry_reclaim_close` variant `9770a33e7f77`，区间 `2025-06-01 -> 2026-06-01`，并生成标准 A/B 报告与 regime breakdown。

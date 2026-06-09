@@ -28,7 +28,7 @@
 - [x] 提高流动性门槛，并测试对交易次数、胜率和回撤的影响；`liquidity_50m` 方向较好但样本仍需继续 retest。
 - [ ] A/B 测试更强的日线趋势过滤：只允许 `price > EMA20 > EMA50` 的币成为买入候选。
 - [ ] A/B 测试趋势相关高波动惩罚：只有在趋势未确认时才对高波动加重扣分。
-- [ ] 每次 A/B 实验后补一条简短结论：`keep`、`revert` 或 `retest`。
+- [x] 每次 A/B 实验后补一条简短结论：`keep`、`revert` 或 `retest`；当前 dynamic-universe A/B 均通过报告、开发计划和实验日志保留结论。
 
 ## Priority 2：优化入场规则
 
@@ -86,7 +86,9 @@
 - [x] 设计下一轮 `RISK_ON` 入场 A/B：新增 `entry_reclaim_close`，要求 4h 收盘重新站上 `entry_high` 后才允许入场。
 - [x] 运行 `entry_reclaim_close` full master A/B：`RISK_ON` 大幅减亏但整体仍为负收益，结论 `retest`。
 - [x] 对 `entry_reclaim_close` 做 full master 非重叠 walk-forward 近端段 `2025-06-01 -> 2026-06-01`：variant 转正，`RISK_ON` 明显转正。
-- [ ] 对 `entry_reclaim_close` 做 full master 非重叠 walk-forward 早期段 `2025-01-01 -> 2025-06-01`。
+- [x] 对 `entry_reclaim_close` 做 full master 非重叠 walk-forward 早期段 `2025-01-01 -> 2025-06-01`：样本不足，PF 略降但净收益和回撤小幅改善，整体仍为 `retest`。
+- [x] 汇总 `entry_reclaim_close` full master 非重叠 walk-forward：近端转正但早期样本不足，整体仍为 `retest`。
+- [ ] 设计 `entry_reclaim_close + risk_off_no_core_buy` 组合 A/B：验证近端 `RISK_ON` 转正能否与弱市停开核心币互补，先跑 full master extended，再决定是否 walk-forward。
 - [ ] 设计下一轮 `RISK_ON` 退出 A/B：优先验证 TP1 后保护性退出或更快止损移动，避免继续单纯叠加防守过滤。
 
 ## TODO 维护规则
