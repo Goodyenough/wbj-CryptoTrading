@@ -77,7 +77,8 @@
 - [x] 设计 `RISK_OFF` 下一轮规则 A/B：新增 `risk_off_no_core_buy`，测试弱市是否连 BTC/ETH 也暂停新开仓。
 - [x] 跑完 `risk_off_no_core_buy` full master A/B：`RISK_OFF` 闭合交易降到 0，整体减亏但 `RISK_ON` 略恶化，结论 `retest`。
 - [x] 设计 `RISK_ON` 下一轮规则 A/B：新增 `top_n_3`，测试降低每次扫描候选容量是否能减少同日相关拥挤开仓。
-- [ ] 跑完 `top_n_3` full master A/B，重点观察 `RISK_ON` stop_rate、净 PnL 和 max_drawdown 是否改善。
+- [x] 跑完 `top_n_3` full master A/B：`RISK_ON` 净 PnL 从 -1123.23 改善到 -212.97，但 `RISK_OFF` 不变，结论 `retest`。
+- [ ] 设计并运行 `risk_off_no_core_buy + top_n_3` 组合实验，验证两条互补规则合并后能否接近转正。
 
 ## TODO 维护规则
 

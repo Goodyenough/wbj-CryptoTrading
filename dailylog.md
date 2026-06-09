@@ -15,6 +15,15 @@
 
 ## 2026-06-09
 
+### 20:36:39 +08:00 - top_n_3 full master A/B
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `top_n_3` variant，并复用 baseline run `1d0037a773ff` 生成标准 A/B 报告。
+- 改动：生成 `backtest_dynamic_universe_2025-01-01_2025-09-01_v11.md`、`abtest_dynamic_universe_top_n_3_2025-01-01_2025-09-01_v1.md` 和 `backtest_regime_breakdown_1d0037a773ff_c9f68192026d_v1.md`。
+- 原因：`RISK_ON` 亏损按日期聚集，怀疑每次扫描候选容量过高导致同日相关拥挤开仓。
+- 影响：variant 将 PF 从 0.579 提升到 0.837，净收益从 -13.17% 改善到 -3.63%；分层显示 `RISK_ON` 净 PnL 从 -1123.23 改善到 -212.97，但 `RISK_OFF` 完全不变，最大回撤也未改善。因此结论仍为 `retest`，下一步应测试 `risk_off_no_core_buy + top_n_3` 组合。
+- 验证：A/B 报告显示 `sample_sufficient=true`、`possible_over_filtering=false`、`verdict=retest`；regime breakdown 显示 `RISK_ON baseline_closed=29 variant_closed=26`。
+- Git：`Run top-n capacity full-master retest`（本条随该提交一起提交并 push）。
+
 ### 20:09:21 +08:00 - 增加 top_n_3 容量实验
 - 类型：代码 / 配置 / 测试 / 计划 / Git
 - 改动：新增 `top_n_3` A/B 实验，variant 将 `market.top_n` 从 5 降到 3；扩展 `capacity` 维度的配置覆盖白名单。
