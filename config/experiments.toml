@@ -49,6 +49,17 @@ dimension = "capacity"
 [top_n_3.overrides.market]
 top_n = 3
 
+[risk_off_no_core_top_n_3]
+enabled = true
+description = "Combine RISK_OFF core-buy pause with lower candidate capacity."
+dimension = "combined_regime_capacity"
+
+[risk_off_no_core_top_n_3.overrides.analysis]
+risk_off_core_buy_enabled = false
+
+[risk_off_no_core_top_n_3.overrides.market]
+top_n = 3
+
 [daily_trend_required]
 enabled = false
 description = "Requires scanner logic support before this experiment can run."

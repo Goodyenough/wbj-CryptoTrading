@@ -67,6 +67,18 @@ def test_capacity_override_can_reduce_top_n() -> None:
     ]
 
 
+def test_combined_override_can_change_regime_and_capacity() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    definition = load_experiment("risk_off_no_core_top_n_3", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert variant.analysis.risk_off_core_buy_enabled is False
+    assert variant.market.top_n == 3
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.risk_off_core_buy_enabled", True, False),
+        ("market.top_n", 5, 3),
+    ]
+
+
 def test_override_paths_are_dimension_scoped() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")
@@ -214,6 +226,7 @@ if __name__ == "__main__":
     test_apply_overrides_does_not_mutate_baseline()
     test_regime_override_can_disable_core_risk_off_buys()
     test_capacity_override_can_reduce_top_n()
+    test_combined_override_can_change_regime_and_capacity()
     test_override_paths_are_dimension_scoped()
     test_dynamic_abtest_reuses_one_symbol_master()
     test_dynamic_abtest_accepts_prebuilt_symbol_master()

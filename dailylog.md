@@ -15,6 +15,14 @@
 
 ## 2026-06-09
 
+### 20:39:11 +08:00 - 增加 risk_off_no_core_top_n_3 组合实验
+- 类型：代码 / 配置 / 测试 / 计划 / Git
+- 改动：新增 `risk_off_no_core_top_n_3` A/B 实验，同时设置 `analysis.risk_off_core_buy_enabled=false` 与 `market.top_n=3`；扩展 `combined_regime_capacity` 覆盖白名单。
+- 原因：`risk_off_no_core_buy` 主要改善 `RISK_OFF`，`top_n_3` 主要改善 `RISK_ON`，两者在分层结果中互补，需要验证组合后是否能接近转正。
+- 影响：下一步可复用 full master baseline `1d0037a773ff` 单独运行组合 variant，并生成 A/B 与 regime breakdown 报告；默认配置不改变。
+- 验证：运行 `python tests\test_abtest.py`、`python -m compileall main.py src tests`，均通过。
+- Git：`Add combined regime capacity experiment`（本条随该提交一起提交并 push）。
+
 ### 20:36:39 +08:00 - top_n_3 full master A/B
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：使用 `reports/2026-06-09/dynamic_master_full.json` 单独运行 `top_n_3` variant，并复用 baseline run `1d0037a773ff` 生成标准 A/B 报告。
