@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 02:42:00 +08:00 - 增加 risk_off_no_core_entry_reclaim 组合实验
+- 类型：代码 / 配置 / 测试 / 文档 / Git
+- 改动：新增 `risk_off_no_core_entry_reclaim` A/B 实验，同时覆盖 `analysis.risk_off_core_buy_enabled=false` 与 `analysis.entry_reclaim_close_enabled=true`。
+- 改动：为 A/B override 白名单增加 `combined_regime_entry` dimension，并补充测试验证组合 override 不会污染 baseline。
+- 原因：`entry_reclaim_close` 近端能让 `RISK_ON` 转正，但早期样本不足且 `RISK_OFF` 仍有亏损；需要验证它和弱市停开核心币是否互补。
+- 影响：默认配置不变；后续可运行 `python main.py abtest --experiment risk_off_no_core_entry_reclaim --dynamic-universe ...` 做 full master A/B。
+- 验证：运行 `python tests\test_abtest.py` 和 `python -m compileall main.py src tests`，均通过。
+- Git：`Add regime entry reclaim combo experiment`（本条随该提交一起提交并 push）。
+
 ### 02:38:00 +08:00 - entry_reclaim_close 早期段与 walk-forward 汇总
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：补齐 `entry_reclaim_close` full master 非重叠 walk-forward 早期段，复用 baseline run `e6133152fb7e` 并对比 variant run `a049fb3cf4d3`，区间 `2025-01-01 -> 2025-06-01`。

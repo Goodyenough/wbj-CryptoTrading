@@ -88,7 +88,8 @@
 - [x] 对 `entry_reclaim_close` 做 full master 非重叠 walk-forward 近端段 `2025-06-01 -> 2026-06-01`：variant 转正，`RISK_ON` 明显转正。
 - [x] 对 `entry_reclaim_close` 做 full master 非重叠 walk-forward 早期段 `2025-01-01 -> 2025-06-01`：样本不足，PF 略降但净收益和回撤小幅改善，整体仍为 `retest`。
 - [x] 汇总 `entry_reclaim_close` full master 非重叠 walk-forward：近端转正但早期样本不足，整体仍为 `retest`。
-- [ ] 设计 `entry_reclaim_close + risk_off_no_core_buy` 组合 A/B：验证近端 `RISK_ON` 转正能否与弱市停开核心币互补，先跑 full master extended，再决定是否 walk-forward。
+- [x] 设计 `entry_reclaim_close + risk_off_no_core_buy` 组合 A/B：新增 `risk_off_no_core_entry_reclaim`，验证近端 `RISK_ON` 转正能否与弱市停开核心币互补。
+- [ ] 运行 `risk_off_no_core_entry_reclaim` full master A/B：先跑 `2025-01-01 -> 2025-09-01`，再决定是否做非重叠 walk-forward。
 - [ ] 设计下一轮 `RISK_ON` 退出 A/B：优先验证 TP1 后保护性退出或更快止损移动，避免继续单纯叠加防守过滤。
 
 ## TODO 维护规则
