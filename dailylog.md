@@ -15,6 +15,15 @@
 
 ## 2026-06-10
 
+### 03:45:00 +08:00 - risk_off_no_core_entry_reclaim 近端 walk-forward 与汇总
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：复用近端 baseline run `93b978d7a8c5`，运行 `risk_off_no_core_entry_reclaim` variant `d32443a95501`，区间 `2025-06-01 -> 2026-06-01`。
+- 改动：生成近端段 A/B 报告、variant dynamic-universe backtest 报告、regime breakdown、含重叠窗口汇总和非重叠 walk-forward 汇总；同步更新项目记忆和 Obsidian 实验日志。
+- 原因：组合 full master 与早期段均显示减亏，需要近端段与非重叠汇总判断是否具备 keep 候选资格。
+- 影响：近端 variant closed_trades=46，样本充足；PF 0.734 -> 1.204，净收益 -10.62% -> +5.96%，最大回撤 24.24% -> 14.46%。分层显示 `RISK_ON` 净 PnL -458.33 -> +289.35，`RISK_OFF` closed_trades 9 -> 1。
+- 验证：非重叠汇总保留 2 段、`overlap_periods=0`、`sufficient_periods=1`，因早期段样本不足仍为 `retest`；不能 keep。
+- Git：`Summarize combo entry reclaim walk-forward`（本条随该提交一起提交并 push）。
+
 ### 03:13:00 +08:00 - risk_off_no_core_entry_reclaim 早期 walk-forward
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：复用早期 baseline run `e6133152fb7e`，运行 `risk_off_no_core_entry_reclaim` variant `c7be05461e78`，区间 `2025-01-01 -> 2025-06-01`。
