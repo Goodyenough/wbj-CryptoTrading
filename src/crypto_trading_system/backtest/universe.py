@@ -37,6 +37,7 @@ class SymbolMaster:
     source_limit: int | None
     source_limit_applied: bool
     filters: str
+    listing_dates: dict[str, str] | None = None  # symbol -> "YYYY-MM-DD" of first 1d candle
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -56,6 +57,10 @@ def load_symbol_master(path: Path) -> SymbolMaster:
     symbols = data["symbols"]
     if not isinstance(symbols, list) or not all(isinstance(symbol, str) and symbol for symbol in symbols):
         raise ValueError("Symbol master file must contain a non-empty string list in 'symbols'.")
+    raw_listing = data.get("listing_dates")
+    listing_dates: dict[str, str] | None = None
+    if isinstance(raw_listing, dict):
+        listing_dates = {str(k): str(v) for k, v in raw_listing.items()}
     return SymbolMaster(
         source=str(data["source"]),
         created_at_utc=str(data["created_at_utc"]),
@@ -63,6 +68,7 @@ def load_symbol_master(path: Path) -> SymbolMaster:
         source_limit=data["source_limit"],
         source_limit_applied=bool(data["source_limit_applied"]),
         filters=str(data["filters"]),
+        listing_dates=listing_dates,
     )
 
 
@@ -118,10 +124,57 @@ def _quote_filter_description(settings: Settings, limit: int | None = None) -> s
     )
 
 
+# Earliest possible Binance listing: 2017-07-14 (BNB)
+_LISTING_EPOCH_MS = 1_500_000_000_000
+
+
+def fetch_symbol_listing_dates(
+    settings: Settings,
+    symbols: list[str],
+    *,
+    progress: Callable[[str], None] | None = None,
+) -> dict[str, str]:
+    """Return a mapping of symbol -> YYYY-MM-DD of its first 1d candle on Binance."""
+    client = BinanceClient(
+        settings.market.base_url,
+        timeout_seconds=settings.market.request_timeout_seconds,
+        pause_seconds=settings.market.request_pause_seconds,
+    )
+    listing_dates: dict[str, str] = {}
+    for i, symbol in enumerate(symbols):
+        if progress is not None and i % 50 == 0:
+            progress(f"fetching listing date {i + 1}/{len(symbols)}")
+        try:
+            klines = client.klines(symbol, "1d", limit=1, start_time_ms=_LISTING_EPOCH_MS)
+            if klines:
+                open_time_ms = int(klines[0][0])
+                listing_dates[symbol] = datetime.fromtimestamp(open_time_ms / 1000, tz=timezone.utc).date().isoformat()
+        except Exception:
+            pass  # symbol with no history simply omitted
+    return listing_dates
+
+
+def listing_date_allows_analysis(
+    listing_dates: dict[str, str] | None,
+    symbol: str,
+    bar_close_ms: int,
+    min_history_days: int,
+) -> bool:
+    """Return False if listing_dates shows this symbol hasn't had enough history by bar_close_ms."""
+    if not listing_dates:
+        return True
+    listing_str = listing_dates.get(symbol)
+    if not listing_str:
+        return True
+    listing_ms = int(datetime.fromisoformat(listing_str + "T00:00:00+00:00").timestamp() * 1000)
+    return bar_close_ms >= listing_ms + min_history_days * 86_400_000
+
+
 def build_current_symbol_master(
     settings: Settings,
     *,
     source_limit: int | None = None,
+    fetch_listing_dates: bool = False,
     progress: Callable[[str], None] | None = None,
 ) -> SymbolMaster:
     client = BinanceClient(
@@ -157,10 +210,15 @@ def build_current_symbol_master(
             "exclude leveraged token suffixes=UPUSDT,DOWNUSDT,BULLUSDT,BEARUSDT"
         ),
     )
+    if fetch_listing_dates:
+        if progress is not None:
+            progress(f"fetching listing dates for {len(master.symbols)} symbols (this may take a moment)")
+        master.listing_dates = fetch_symbol_listing_dates(settings, master.symbols, progress=progress)
     if progress is not None:
         progress(
             f"dynamic universe symbol master contains {len(master.symbols)} symbols"
             + (" after source-limit" if source_limit_applied else "")
+            + (" with listing dates" if master.listing_dates else "")
         )
     return master
 

@@ -10,6 +10,7 @@ from crypto_trading_system.backtest import universe as universe_module
 from crypto_trading_system.backtest.universe import (
     build_current_symbol_master,
     dynamic_universe_refresh_key,
+    listing_date_allows_analysis,
     load_symbol_master,
     save_symbol_master,
     select_dynamic_universe_for_day,
@@ -200,14 +201,89 @@ def test_dynamic_universe_refresh_key_is_daily() -> None:
     assert dynamic_universe_refresh_key(4 * hour) != dynamic_universe_refresh_key(28 * hour)
 
 
+def test_symbol_master_listing_dates_round_trip(tmp_path: Path) -> None:
+    path = tmp_path / "master_with_listing.json"
+    master = SymbolMaster(
+        source="test",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        symbols=["BTCUSDT", "ETHUSDT"],
+        source_limit=None,
+        source_limit_applied=False,
+        filters="unit-test",
+        listing_dates={"BTCUSDT": "2017-08-17", "ETHUSDT": "2017-08-17"},
+    )
+    save_symbol_master(master, path)
+    loaded = load_symbol_master(path)
+    assert loaded.listing_dates == {"BTCUSDT": "2017-08-17", "ETHUSDT": "2017-08-17"}
+
+
+def test_symbol_master_listing_dates_none_for_old_file(tmp_path: Path) -> None:
+    # Old master files don't have listing_dates; load_symbol_master should return None
+    path = tmp_path / "old_master.json"
+    master = SymbolMaster(
+        source="test",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        symbols=["BTCUSDT"],
+        source_limit=None,
+        source_limit_applied=False,
+        filters="unit-test",
+        listing_dates=None,
+    )
+    save_symbol_master(master, path)
+    # Patch out listing_dates from JSON to simulate old file format
+    import json as _json
+    data = _json.loads(path.read_text(encoding="utf-8"))
+    data.pop("listing_dates", None)
+    path.write_text(_json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    loaded = load_symbol_master(path)
+    assert loaded.listing_dates is None
+
+
+def test_listing_date_allows_analysis_no_dates() -> None:
+    # Without listing_dates, always allow
+    assert listing_date_allows_analysis(None, "ANYUSDT", 10**13, 180) is True
+    assert listing_date_allows_analysis({}, "ANYUSDT", 10**13, 180) is True
+
+
+def test_listing_date_allows_analysis_rejects_too_soon() -> None:
+    # Symbol listed 2025-03-01; min_history_days=180; bar at 2025-05-01 (~61 days) -> reject
+    from datetime import datetime, timezone
+    listing = {"NEWUSDT": "2025-03-01"}
+    day_ms = 86_400_000
+    listing_ms = int(datetime.fromisoformat("2025-03-01T00:00:00+00:00").timestamp() * 1000)
+    bar_too_soon = listing_ms + 61 * day_ms
+    assert listing_date_allows_analysis(listing, "NEWUSDT", bar_too_soon, 180) is False
+
+
+def test_listing_date_allows_analysis_accepts_after_history() -> None:
+    # Symbol listed 2025-03-01; bar at 2025-10-01 (~214 days) -> allow
+    from datetime import datetime, timezone
+    listing = {"NEWUSDT": "2025-03-01"}
+    day_ms = 86_400_000
+    listing_ms = int(datetime.fromisoformat("2025-03-01T00:00:00+00:00").timestamp() * 1000)
+    bar_ok = listing_ms + 214 * day_ms
+    assert listing_date_allows_analysis(listing, "NEWUSDT", bar_ok, 180) is True
+
+
+def test_listing_date_allows_analysis_unknown_symbol_passes() -> None:
+    # Symbol not in listing_dates dict -> always allow
+    assert listing_date_allows_analysis({"BTCUSDT": "2017-08-17"}, "NEWUSDT", 10**13, 180) is True
+
+
 if __name__ == "__main__":
     test_fetch_universe_snapshot_filters_and_sorts()
     test_build_current_symbol_master_source_limit_is_alphabetical()
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
         test_symbol_master_json_round_trip(Path(tmp))
+        test_symbol_master_listing_dates_round_trip(Path(tmp))
+        test_symbol_master_listing_dates_none_for_old_file(Path(tmp))
     test_universe_preselection_score_is_not_technical_score()
     test_dynamic_universe_ignores_future_hourly_data()
     test_dynamic_universe_filters_insufficient_history_without_crashing()
     test_dynamic_universe_refresh_key_is_daily()
+    test_listing_date_allows_analysis_no_dates()
+    test_listing_date_allows_analysis_rejects_too_soon()
+    test_listing_date_allows_analysis_accepts_after_history()
+    test_listing_date_allows_analysis_unknown_symbol_passes()
     print("test_universe=passed")

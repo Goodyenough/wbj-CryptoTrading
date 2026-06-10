@@ -182,6 +182,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional debug cap: sort master symbols alphabetically and keep the first N.",
     )
+    dynamic_master.add_argument(
+        "--fetch-listing-dates",
+        action="store_true",
+        help="Query Binance for each symbol's first 1d candle date and store in the master JSON.",
+    )
 
     regime_breakdown = subparsers.add_parser(
         "backtest-regime-breakdown",
@@ -517,12 +522,18 @@ def main() -> None:
     if args.command == "dynamic-symbol-master":
         if args.source_limit is not None:
             _progress("source-limit is enabled for symbol master export")
-        master = build_current_symbol_master(settings, source_limit=args.source_limit, progress=_progress)
+        master = build_current_symbol_master(
+            settings,
+            source_limit=args.source_limit,
+            fetch_listing_dates=getattr(args, "fetch_listing_dates", False),
+            progress=_progress,
+        )
         save_symbol_master(master, Path(args.output))
         print("dynamic_symbol_master=completed")
         print(f"symbols={len(master.symbols)}")
         print(f"source_limit={master.source_limit}")
         print(f"source_limit_applied={str(master.source_limit_applied).lower()}")
+        print(f"listing_dates_fetched={str(master.listing_dates is not None).lower()}")
         print(f"output={Path(args.output)}")
 
     if args.command == "backtest-regime-breakdown":

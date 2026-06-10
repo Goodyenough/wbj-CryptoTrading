@@ -21,8 +21,20 @@ from .universe import (
     build_dynamic_universe_summary,
     dynamic_universe_refresh_key,
     fetch_universe_snapshot,
+    listing_date_allows_analysis,
     select_dynamic_universe_for_day,
 )
+
+
+def _listing_date_allows(
+    master: SymbolMaster | None,
+    symbol: str,
+    bar_close_ms: int,
+    min_history_days: int,
+) -> bool:
+    if master is None:
+        return True
+    return listing_date_allows_analysis(master.listing_dates, symbol, bar_close_ms, min_history_days)
 
 
 @dataclass
@@ -611,6 +623,8 @@ def run_backtest_replay(
             analysis_symbols = daily_universe_cache[day_key]
         for symbol in analysis_symbols:
             if symbol in unavailable:
+                continue
+            if not _listing_date_allows(dynamic_symbol_master, symbol, bar_close_ms, settings.analysis.min_history_days):
                 continue
             k1h = _closed_slice(klines_by_symbol[symbol]["1h"], "1h", bar_close_ms)
             k4h = _closed_slice(klines_by_symbol[symbol]["4h"], "4h", bar_close_ms)
