@@ -52,17 +52,17 @@ def _utc_now() -> str:
 def _normalise_kline(row: sqlite3.Row) -> list:
     return [
         int(row["open_time"]),
-        str(row["open"]),
-        str(row["high"]),
-        str(row["low"]),
-        str(row["close"]),
-        str(row["volume"]),
+        float(row["open"]),
+        float(row["high"]),
+        float(row["low"]),
+        float(row["close"]),
+        float(row["volume"]),
         int(row["close_time"]),
-        str(row["quote_volume"]),
+        float(row["quote_volume"]),
         int(row["trades"]),
-        str(row["taker_buy_base_volume"]),
-        str(row["taker_buy_quote_volume"]),
-        "0",
+        float(row["taker_buy_base_volume"]),
+        float(row["taker_buy_quote_volume"]),
+        0,
     ]
 
 
@@ -299,18 +299,18 @@ def _normalise_kline_row(row: tuple) -> list:
     #               volume, close_time, quote_volume, trades,
     #               taker_buy_base_volume, taker_buy_quote_volume, is_closed, fetched_at_utc
     return [
-        int(row[3]),   # open_time
-        str(row[4]),   # open
-        str(row[5]),   # high
-        str(row[6]),   # low
-        str(row[7]),   # close
-        str(row[8]),   # volume
-        int(row[9]),   # close_time
-        str(row[10]),  # quote_volume
-        int(row[11]),  # trades
-        str(row[12]),  # taker_buy_base_volume
-        str(row[13]),  # taker_buy_quote_volume
-        "0",
+        int(row[3]),    # open_time
+        float(row[4]),  # open
+        float(row[5]),  # high
+        float(row[6]),  # low
+        float(row[7]),  # close
+        float(row[8]),  # volume
+        int(row[9]),    # close_time
+        float(row[10]), # quote_volume
+        int(row[11]),   # trades
+        float(row[12]), # taker_buy_base_volume
+        float(row[13]), # taker_buy_quote_volume
+        0,
     ]
 
 
