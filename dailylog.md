@@ -13,6 +13,35 @@
 - Git：
 ```
 
+## 2026-06-11
+
+### 00:43:00 +08:00 - risk_off_no_core_entry_reclaim 扩大早期窗口 walk-forward 与 candidate_keep_review
+- 类型：回测 / A/B / 报告 / 文档 / Git
+- 改动：将早期段从 `2025-01-01 -> 2025-06-01` 扩展到 `2024-07-01 -> 2025-06-01`，复用近端 baseline `93b978d7a8c5` 及新生成的近端 variant `d32443a95501`，与 `2026-06-10` 早期段报告一起汇总。
+- 改动：生成 `reports/2026-06-11/abtest_dynamic_universe_risk_off_no_core_entry_reclaim_2025-06-01_2026-06-01_v1.md`（近端段复跑）和 `abtest_summary_dynamic_universe_risk_off_no_core_entry_reclaim_2026-06-11_v1.md`。
+- 影响：早期段（2024-07-01 → 2025-06-01）：baseline/variant closed_trades=52/41，PF=0.91→1.40，净收益=-5.59%→+11.74%，MDD=18.72%→14.31%，样本充足。近端段（2025-06-01 → 2026-06-01）：baseline/variant closed_trades=49/46，PF=0.73→1.20，净收益=-10.62%→+5.96%，MDD=24.24%→14.46%，样本充足。
+- 验证：汇总 `unique_coverage_days=700`，`overlap_periods=0`，`sufficient_periods=2`，verdict=**`candidate_keep_review`**；两段均转正且 PF>1，为首次达到 keep review 门槛。
+- Git：`Run entry reclaim combo extended walk-forward`（本条随该提交一起提交并 push）。
+
+### 21:00:00 +08:00 - 增加 TP1 后 EMA20 跟踪止损实验
+- 类型：代码 / 配置 / 测试 / 文档 / Git
+- 改动：新增 `analysis.tp1_ema_trailing_stop_enabled`，默认 `false`；新增 `tp1_trailing_ema_stop_active` 字段于 `PaperTrade`；`step_trade` 增加 `tp1_trailing_ema_stop: float | None` 参数，TP1 命中后每根 bar 用 4h EMA20 跟踪抬止损（只升不降，不低于入场价）。
+- 改动：`replay.py` 两处 `step_trade` 调用处均计算当前 bar 4h EMA20 并传入；`abtest.py` exit_timing 维度扩展；`experiments.toml` 新增 `tp1_ema20_trailing_stop` 实验。
+- 改动：新增 4 个 `test_trade_state.py` 测试，1 个 `test_abtest.py` 测试。
+- 影响：默认行为不变；后续可运行 `python main.py abtest --experiment tp1_ema20_trailing_stop ...` 做退出质量 A/B。
+- 验证：`python -m compileall main.py src tests`、`test_trade_state`、`test_abtest`、`test_replay` 均通过。
+- Git：`Add TP1 EMA20 trailing stop experiment`（commit hash `2de9c5f`，已 push）。
+
+### 21:30:00 +08:00 - 增加 SymbolMaster 上市日期过滤
+- 类型：代码 / 测试 / 文档 / Git
+- 改动：`SymbolMaster` 新增可选字段 `listing_dates: dict[str, str] | None`；`load_symbol_master` 向后兼容旧文件（无 `listing_dates` 字段时为 None）。
+- 改动：新增 `fetch_symbol_listing_dates` 函数，批量查询 Binance 各 symbol 最早 1d K 线日期；新增 `listing_date_allows_analysis` 函数，在 dynamic universe 每日过滤中排除历史数据不足的近期上市 symbol。
+- 改动：`build_current_symbol_master` 增加 `fetch_listing_dates: bool = False` 开关；`dynamic-symbol-master` CLI 增加 `--fetch-listing-dates` 标志；`replay.py` 在 `for symbol in analysis_symbols:` 循环中增加上市日期过滤层。
+- 改动：`test_universe.py` 新增 7 个测试覆盖 round-trip、向后兼容和 `listing_date_allows_analysis` 逻辑。
+- 影响：现有 `dynamic_master_full.json`（无 `listing_dates`）加载后过滤层不生效，行为不变；使用 `--fetch-listing-dates` 导出新 master 后可精确排除在早期回测窗口没有足够历史的近期上市 symbol。
+- 验证：`python -m compileall main.py src tests`、`test_universe`、`test_replay` 均通过。
+- Git：`Add listing_dates to SymbolMaster for early-sample filtering`（commit hash `03700df`，已 push）。
+
 ## 2026-06-10
 
 ### 04:06:00 +08:00 - tp1_breakeven_stop full master A/B
