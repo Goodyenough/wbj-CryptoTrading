@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 import json
@@ -224,8 +225,9 @@ def build_current_symbol_master(
 
 
 def _closed_slice(klines: list[list], interval: str, decision_ms: int) -> list[list]:
-    step = interval_ms(interval)
-    return [kline for kline in klines if int(kline[0]) + step <= decision_ms]
+    cutoff = decision_ms - interval_ms(interval)
+    idx = bisect.bisect_right(klines, cutoff, key=lambda k: int(k[0]))
+    return klines[:idx]
 
 
 def dynamic_universe_refresh_key(decision_ms: int) -> str:

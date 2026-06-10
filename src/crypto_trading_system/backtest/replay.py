@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 import uuid
@@ -130,8 +131,12 @@ def _symbol_base(symbol: str, quote_asset: str) -> str:
 
 
 def _closed_slice(klines: list[list], interval: str, decision_ms: int) -> list[list]:
-    step = interval_ms(interval)
-    return [kline for kline in klines if int(kline[0]) + step <= decision_ms]
+    # klines are sorted by open_time ascending; a bar is "closed" when its close_time
+    # (open_time + step) <= decision_ms, i.e. open_time <= decision_ms - step.
+    # Use bisect to locate the cutoff in O(log n) instead of a full linear scan.
+    cutoff = decision_ms - interval_ms(interval)
+    idx = bisect.bisect_right(klines, cutoff, key=lambda k: int(k[0]))
+    return klines[:idx]
 
 
 def _effective_warmup_ms(settings: Settings) -> int:
