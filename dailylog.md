@@ -15,7 +15,15 @@
 
 ## 2026-06-11
 
-### 00:43:00 +08:00 - risk_off_no_core_entry_reclaim 扩大早期窗口 walk-forward 与 candidate_keep_review
+### 01:30:00 +08:00 - 优化 _closed_slice：linear scan 改为 bisect 二分查找
+- 类型：代码 / 性能 / 测试 / Git
+- 改动：`replay.py` 和 `universe.py` 中的 `_closed_slice` 函数从全量线性扫描改为 `bisect.bisect_right` 二分查找。klines 列表按 open_time 升序排列，用 `bisect` 直接定位截止下标，取前缀切片，无需逐元素过滤。
+- 原因：性能分析发现 `_closed_slice` 是回测最大瓶颈——每根 4h bar 被调用约 150 次，每次对最多 9000 条 1h klines 做 O(n) 线性扫描并分配新 list。1 年回测约 33 万次调用，累积约 30 亿次元素比较。bisect 将单次调用从 O(n) 降到 O(log n)，benchmark 测得加速比约 96x，行为完全一致。
+- 影响：不改变任何策略逻辑和输出结果；所有现有测试通过；实际回测端到端时间预期大幅缩短。
+- 验证：`python -m compileall`、`test_replay`、`test_universe`、`test_trade_state` 均通过；benchmark 10000 次调用：旧实现 1.38ms/call → 新实现 0.014ms/call，加速 96x，结果一致。
+- Git：`Optimize _closed_slice with bisect binary search`（本条随该提交一起提交并 push）。
+
+
 - 类型：回测 / A/B / 报告 / 文档 / Git
 - 改动：将早期段从 `2025-01-01 -> 2025-06-01` 扩展到 `2024-07-01 -> 2025-06-01`，复用近端 baseline `93b978d7a8c5` 及新生成的近端 variant `d32443a95501`，与 `2026-06-10` 早期段报告一起汇总。
 - 改动：生成 `reports/2026-06-11/abtest_dynamic_universe_risk_off_no_core_entry_reclaim_2025-06-01_2026-06-01_v1.md`（近端段复跑）和 `abtest_summary_dynamic_universe_risk_off_no_core_entry_reclaim_2026-06-11_v1.md`。
