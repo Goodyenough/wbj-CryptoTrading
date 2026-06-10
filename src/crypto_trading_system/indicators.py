@@ -21,6 +21,12 @@ def ema_series(values: Sequence[float], period: int) -> list[float]:
     return output
 
 
+def ema_step(prev_ema: float, new_value: float, period: int) -> float:
+    """Incrementally update an EMA by one new data point."""
+    k = 2 / (period + 1)
+    return new_value * k + prev_ema * (1 - k)
+
+
 def ema(values: Sequence[float], period: int) -> float | None:
     series = ema_series(values, period)
     return series[-1] if series else None

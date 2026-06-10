@@ -14,6 +14,7 @@ from ..scanner import _analyze_ticker
 from ..ticker_utils import reconstruct_ticker
 from ..trade_state import step_trade
 from ..indicators import ema as _ema
+from ..indicators import ema_series as _ema_series, ema_step as _ema_step
 from .costs import entry_fill, stop_exit_fill, target_exit_fill
 from .history import KlineQualityIssue, batch_load_klines_cached, fetch_klines_cached, interval_ms
 from .universe import (
@@ -414,6 +415,12 @@ def run_backtest_replay(
         symbol: {int(kline[0]): kline for kline in per_interval["4h"]}
         for symbol, per_interval in klines_by_symbol.items()
     }
+
+    # Per-symbol EMA running state: seeded on first bar that has enough history,
+    # then updated incrementally with ema_step instead of full ema_series.
+    # Keys: "ema20_4h", "ema50_4h", "ema20_1d", "ema50_1d"
+    # Also tracks the last 4h/1d kline count seen to detect when a new bar is added.
+    _ema_cache: dict[str, dict] = {}  # symbol -> {ema20_4h, ..., n4h, n1d}
     limitations = [
         "MVP spot backtest: WATCHING is a condition plan, not an exchange-submitted limit order.",
         "24h ticker fields are reconstructed from 1h klines and differ from live rolling /ticker/24hr precision.",
@@ -646,6 +653,44 @@ def run_backtest_replay(
             k1d = _closed_slice(klines_by_symbol[symbol]["1d"], "1d", bar_close_ms)
             if len(k1h) < 168 or len(k4h) < 80 or len(k1d) < max(60, settings.analysis.min_history_days):
                 continue
+
+            # Update per-symbol EMA cache incrementally.
+            n4h, n1d = len(k4h), len(k1d)
+            cached = _ema_cache.get(symbol)
+            if cached is None or n4h < 50 or n1d < 50:
+                # Seed from scratch (first time or not enough history yet).
+                closes_4h_seed = [float(k[4]) for k in k4h]
+                closes_1d_seed = [float(k[4]) for k in k1d]
+                _ema_cache[symbol] = {
+                    "ema20_4h": _ema(closes_4h_seed, 20),
+                    "ema50_4h": _ema(closes_4h_seed, 50),
+                    "ema20_1d": _ema(closes_1d_seed, 20),
+                    "ema50_1d": _ema(closes_1d_seed, 50),
+                    "n4h": n4h,
+                    "n1d": n1d,
+                }
+                cached = _ema_cache[symbol]
+            else:
+                # Incremental update: apply ema_step for each new 4h/1d bar since last call.
+                new4h = n4h - cached["n4h"]
+                new1d = n1d - cached["n1d"]
+                if new4h > 0:
+                    for k in k4h[-new4h:]:
+                        c = float(k[4])
+                        if cached["ema20_4h"] is not None:
+                            cached["ema20_4h"] = _ema_step(cached["ema20_4h"], c, 20)
+                        if cached["ema50_4h"] is not None:
+                            cached["ema50_4h"] = _ema_step(cached["ema50_4h"], c, 50)
+                    cached["n4h"] = n4h
+                if new1d > 0:
+                    for k in k1d[-new1d:]:
+                        c = float(k[4])
+                        if cached["ema20_1d"] is not None:
+                            cached["ema20_1d"] = _ema_step(cached["ema20_1d"], c, 20)
+                        if cached["ema50_1d"] is not None:
+                            cached["ema50_1d"] = _ema_step(cached["ema50_1d"], c, 50)
+                    cached["n1d"] = n1d
+
             ticker = reconstruct_ticker(
                 symbol,
                 _symbol_base(symbol, settings.market.quote_asset),
@@ -666,6 +711,7 @@ def run_backtest_replay(
                 pump_chase_penalty=settings.analysis.pump_chase_penalty,
                 high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
                 high_volatility_penalty=settings.analysis.high_volatility_penalty,
+                precomputed_indicators=cached,
             )
             if candidate is not None and candidate.action == "BUY_CANDIDATE":
                 candidate_pool.append(candidate)

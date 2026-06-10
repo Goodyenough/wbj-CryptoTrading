@@ -151,6 +151,7 @@ def _analyze_ticker(
     pump_chase_penalty: float = 8.0,
     high_volatility_range_pct: float = 35.0,
     high_volatility_penalty: float = 6.0,
+    precomputed_indicators: dict | None = None,
 ) -> TradeCandidate | None:
     closes_1h = _quote_closes(k1h)
     closes_4h = _quote_closes(k4h)
@@ -160,10 +161,16 @@ def _analyze_ticker(
         return None
 
     price = closes_1h[-1]
-    ema20_4h = ema(closes_4h, 20)
-    ema50_4h = ema(closes_4h, 50)
-    ema20_1d = ema(closes_1d, 20)
-    ema50_1d = ema(closes_1d, 50)
+    if precomputed_indicators is not None:
+        ema20_4h = precomputed_indicators.get("ema20_4h")
+        ema50_4h = precomputed_indicators.get("ema50_4h")
+        ema20_1d = precomputed_indicators.get("ema20_1d")
+        ema50_1d = precomputed_indicators.get("ema50_1d")
+    else:
+        ema20_4h = ema(closes_4h, 20)
+        ema50_4h = ema(closes_4h, 50)
+        ema20_1d = ema(closes_1d, 20)
+        ema50_1d = ema(closes_1d, 50)
     rsi_1h = rsi(closes_1h)
     rsi_4h = rsi(closes_4h)
     atr_4h = atr(k4h)
