@@ -291,3 +291,69 @@ def fetch_klines_cached(
         issues=issues,
         fetched_from_api=fetched_from_api,
     )
+
+
+def _normalise_kline_row(row: tuple) -> list:
+    """Normalise a raw sqlite3 tuple row (column order matches kline_cache schema)."""
+    # Column order: source, symbol, interval, open_time, open, high, low, close,
+    #               volume, close_time, quote_volume, trades,
+    #               taker_buy_base_volume, taker_buy_quote_volume, is_closed, fetched_at_utc
+    return [
+        int(row[3]),   # open_time
+        str(row[4]),   # open
+        str(row[5]),   # high
+        str(row[6]),   # low
+        str(row[7]),   # close
+        str(row[8]),   # volume
+        int(row[9]),   # close_time
+        str(row[10]),  # quote_volume
+        int(row[11]),  # trades
+        str(row[12]),  # taker_buy_base_volume
+        str(row[13]),  # taker_buy_quote_volume
+        "0",
+    ]
+
+
+def batch_load_klines_cached(
+    settings: Settings,
+    symbols: list[str],
+    intervals: list[str],
+    start_time_ms: int,
+    end_time_ms: int,
+    source: str = "Binance",
+) -> dict[str, dict[str, list[list]]]:
+    """Load klines for multiple symbols and intervals in a single SQLite query.
+
+    Returns klines_by_symbol[symbol][interval] = list of kline rows.
+    Only returns data already in the cache; callers should have ensured all
+    symbols are cached via fetch_klines_cached before calling this.
+    """
+    init_db(settings.output.database_path)
+    if not symbols or not intervals:
+        return {}
+
+    placeholders_sym = ",".join("?" * len(symbols))
+    placeholders_ivl = ",".join("?" * len(intervals))
+    sql = f"""
+        SELECT source, symbol, interval, open_time, open, high, low, close,
+               volume, close_time, quote_volume, trades,
+               taker_buy_base_volume, taker_buy_quote_volume, is_closed, fetched_at_utc
+        FROM kline_cache
+        WHERE source = ?
+          AND symbol IN ({placeholders_sym})
+          AND interval IN ({placeholders_ivl})
+          AND open_time >= ?
+          AND open_time < ?
+          AND is_closed = 1
+        ORDER BY symbol, interval, open_time
+    """
+    params = [source, *symbols, *intervals, start_time_ms, end_time_ms]
+
+    result: dict[str, dict[str, list[list]]] = {sym: {iv: [] for iv in intervals} for sym in symbols}
+    with sqlite3.connect(settings.output.database_path) as conn:
+        for row in conn.execute(sql, params):
+            sym = row[1]
+            iv = row[2]
+            if sym in result and iv in result[sym]:
+                result[sym][iv].append(_normalise_kline_row(row))
+    return result

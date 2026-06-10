@@ -15,7 +15,7 @@ from ..ticker_utils import reconstruct_ticker
 from ..trade_state import step_trade
 from ..indicators import ema as _ema
 from .costs import entry_fill, stop_exit_fill, target_exit_fill
-from .history import KlineQualityIssue, fetch_klines_cached, interval_ms
+from .history import KlineQualityIssue, batch_load_klines_cached, fetch_klines_cached, interval_ms
 from .universe import (
     SymbolMaster,
     build_current_symbol_master,
@@ -325,13 +325,14 @@ def run_backtest_replay(
     data_issues: list[KlineQualityIssue] = []
     symbols_to_fetch = list(dict.fromkeys(symbols + (["BTCUSDT", "ETHUSDT"] if dynamic_universe_mode else [])))
     total_symbols_to_fetch = len(symbols_to_fetch)
+
+    # Phase 1: ensure all klines are in the local cache (downloads from Binance if needed).
     for symbol_index, symbol in enumerate(symbols_to_fetch, start=1):
         if progress is not None:
             if dynamic_universe_mode:
                 progress(f"loading historical klines for dynamic universe symbol {symbol_index}/{total_symbols_to_fetch} {symbol}")
             else:
                 progress(f"loading historical klines for {symbol}")
-        per_interval: dict[str, list[list]] = {}
         for item_interval in ("1h", "4h", "1d"):
             if progress is not None and dynamic_universe_mode:
                 progress(f"loading {symbol_index}/{total_symbols_to_fetch} {symbol} {item_interval} klines")
@@ -344,22 +345,31 @@ def run_backtest_replay(
                 allow_data_gaps=True if dynamic_universe_mode else allow_data_gaps,
                 progress=progress,
             )
-            per_interval[item_interval] = fetched.klines
             data_issues.extend(fetched.issues)
-        klines_by_symbol[symbol] = per_interval
+
+    # Phase 2: bulk-load all klines for all symbols in a single SQLite query.
+    if progress is not None:
+        progress(f"bulk loading klines for {len(symbols_to_fetch)} symbols from cache")
+    klines_by_symbol = batch_load_klines_cached(
+        settings, symbols_to_fetch, ["1h", "4h", "1d"], fetch_start_ms, fetch_end_ms
+    )
+
     if settings.analysis.market_regime_filter_enabled:
         for regime_symbol in ("BTCUSDT", "ETHUSDT"):
-            fetched = fetch_klines_cached(
-                settings,
-                regime_symbol,
-                "1d",
-                fetch_start_ms,
-                fetch_end_ms,
-                allow_data_gaps=allow_data_gaps,
-                progress=progress,
-            )
-            regime_klines[regime_symbol] = fetched.klines
-            data_issues.extend(fetched.issues)
+            if regime_symbol in klines_by_symbol:
+                regime_klines[regime_symbol] = klines_by_symbol[regime_symbol]["1d"]
+            else:
+                fetched = fetch_klines_cached(
+                    settings,
+                    regime_symbol,
+                    "1d",
+                    fetch_start_ms,
+                    fetch_end_ms,
+                    allow_data_gaps=allow_data_gaps,
+                    progress=progress,
+                )
+                regime_klines[regime_symbol] = fetched.klines
+                data_issues.extend(fetched.issues)
 
     usable_symbols: list[str] = []
     for symbol in symbols:

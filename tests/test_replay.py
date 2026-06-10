@@ -84,8 +84,13 @@ def test_dynamic_universe_requires_btc_timeline() -> None:
     def fake_fetch(settings, symbol, interval, start_time_ms, end_time_ms, **kwargs):
         return KlineFetchResult(symbol=symbol, interval=interval, klines=[], issues=[], fetched_from_api=0)
 
+    def fake_batch(settings, symbols, intervals, start_time_ms, end_time_ms, **kwargs):
+        return {sym: {iv: [] for iv in intervals} for sym in symbols}
+
     original_fetch = replay_module.fetch_klines_cached
+    original_batch = replay_module.batch_load_klines_cached
     replay_module.fetch_klines_cached = fake_fetch
+    replay_module.batch_load_klines_cached = fake_batch
     try:
         try:
             replay_module.run_backtest_replay(
@@ -102,6 +107,7 @@ def test_dynamic_universe_requires_btc_timeline() -> None:
             raise AssertionError("Expected missing BTCUSDT timeline to raise ValueError")
     finally:
         replay_module.fetch_klines_cached = original_fetch
+        replay_module.batch_load_klines_cached = original_batch
 
 
 if __name__ == "__main__":
