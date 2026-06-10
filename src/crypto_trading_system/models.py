@@ -124,6 +124,7 @@ class PaperTrade:
     unrealized_pnl: float = 0.0
     last_price: float | None = None
     notes: str = ""
+    tp1_trailing_ema_stop_active: bool = False
 
 
 @dataclass

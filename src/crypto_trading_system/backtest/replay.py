@@ -12,6 +12,7 @@ from ..risk import position_size
 from ..scanner import _analyze_ticker
 from ..ticker_utils import reconstruct_ticker
 from ..trade_state import step_trade
+from ..indicators import ema as _ema
 from .costs import entry_fill, stop_exit_fill, target_exit_fill
 from .history import KlineQualityIssue, fetch_klines_cached, interval_ms
 from .universe import (
@@ -430,6 +431,12 @@ def run_backtest_replay(
             qty = item.paper.quantity or 0
             stop_fill = stop_exit_fill(item.paper.stop_loss, qty, settings.backtest)
             tp2_fill = target_exit_fill(item.paper.take_profit_2, qty, settings.backtest)
+            ema20_4h_current: float | None = None
+            if settings.analysis.tp1_ema_trailing_stop_enabled:
+                k4h_closed = _closed_slice(klines_by_symbol[item.paper.symbol]["4h"], "4h", bar_close_ms)
+                closes_4h = [float(k[4]) for k in k4h_closed]
+                if len(closes_4h) >= 20:
+                    ema20_4h_current = _ema(closes_4h, 20)
             events = step_trade(
                 item.paper,
                 high=float(bar[2]),
@@ -441,6 +448,7 @@ def run_backtest_replay(
                 stop_exit_price_override=stop_fill.filled_price,
                 tp2_exit_price_override=tp2_fill.filled_price,
                 move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
+                tp1_trailing_ema_stop=ema20_4h_current,
             )
             for event in events:
                 item.record.events.append(asdict(event))
@@ -523,6 +531,12 @@ def run_backtest_replay(
                 continue
             final_entry = entry_fill(raw_entry, qty, settings.backtest)
             stop_fill = stop_exit_fill(item.paper.stop_loss, qty, settings.backtest)
+            ema20_4h_entry: float | None = None
+            if settings.analysis.tp1_ema_trailing_stop_enabled:
+                k4h_closed_entry = _closed_slice(klines_by_symbol[item.paper.symbol]["4h"], "4h", bar_close_ms)
+                closes_4h_entry = [float(k[4]) for k in k4h_closed_entry]
+                if len(closes_4h_entry) >= 20:
+                    ema20_4h_entry = _ema(closes_4h_entry, 20)
             events = step_trade(
                 item.paper,
                 high=high,
@@ -534,6 +548,7 @@ def run_backtest_replay(
                 entry_price_override=final_entry.filled_price,
                 stop_exit_price_override=stop_fill.filled_price,
                 move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
+                tp1_trailing_ema_stop=ema20_4h_entry,
             )
             for event in events:
                 item.record.events.append(asdict(event))

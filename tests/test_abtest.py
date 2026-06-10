@@ -115,6 +115,18 @@ def test_exit_timing_override_can_move_stop_to_breakeven() -> None:
     ]
 
 
+def test_exit_timing_override_can_enable_ema_trailing_stop() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    definition = load_experiment("tp1_ema20_trailing_stop", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.analysis.tp1_ema_trailing_stop_enabled is False
+    assert variant.analysis.tp1_ema_trailing_stop_enabled is True
+    assert settings.analysis.tp1_move_stop_to_breakeven_enabled is False
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.tp1_ema_trailing_stop_enabled", False, True),
+    ]
+
+
 def test_override_paths_are_dimension_scoped() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")

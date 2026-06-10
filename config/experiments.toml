@@ -85,6 +85,14 @@ dimension = "exit_timing"
 [tp1_breakeven_stop.overrides.analysis]
 tp1_move_stop_to_breakeven_enabled = true
 
+[tp1_ema20_trailing_stop]
+enabled = true
+description = "After TP1 hit, trail stop with 4h EMA20 instead of immediate breakeven."
+dimension = "exit_timing"
+
+[tp1_ema20_trailing_stop.overrides.analysis]
+tp1_ema_trailing_stop_enabled = true
+
 [daily_trend_required]
 enabled = false
 description = "Requires scanner logic support before this experiment can run."

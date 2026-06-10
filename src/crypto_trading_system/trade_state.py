@@ -28,6 +28,7 @@ def step_trade(
     stop_exit_price_override: float | None = None,
     tp2_exit_price_override: float | None = None,
     move_stop_to_breakeven_on_tp1: bool = False,
+    tp1_trailing_ema_stop: float | None = None,
 ) -> list[StepEvent]:
     if intrabar not in {"stop_first", "tp_first"}:
         raise ValueError("intrabar must be stop_first or tp_first")
@@ -82,6 +83,14 @@ def step_trade(
 
     if trade.status in {"ENTERED", "TP1_HIT"} and trade.entry_price is not None and trade.quantity:
         trade.unrealized_pnl = (close - trade.entry_price) * trade.quantity
+        if (
+            trade.status == "TP1_HIT"
+            and trade.tp1_trailing_ema_stop_active
+            and tp1_trailing_ema_stop is not None
+        ):
+            trailing = max(tp1_trailing_ema_stop, trade.entry_price)
+            if trailing > trade.stop_loss:
+                trade.stop_loss = trailing
         stop_hit = low <= trade.stop_loss
         tp2_hit = high >= trade.take_profit_2
         tp1_hit = high >= trade.take_profit_1 and trade.status == "ENTERED"
@@ -133,6 +142,11 @@ def step_trade(
                 if move_stop_to_breakeven_on_tp1:
                     trade.stop_loss = max(trade.stop_loss, trade.entry_price)
                     trade.notes = "TP1 hit; stop moved to breakeven for TP2 tracking."
+                elif tp1_trailing_ema_stop is not None:
+                    trade.tp1_trailing_ema_stop_active = True
+                    trailing = max(tp1_trailing_ema_stop, trade.entry_price)
+                    trade.stop_loss = max(trade.stop_loss, trailing)
+                    trade.notes = "TP1 hit; EMA20 trailing stop activated."
                 else:
                     trade.notes = "TP1 hit; trade remains open for TP2 tracking."
                 events.append(

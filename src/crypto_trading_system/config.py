@@ -38,6 +38,7 @@ class AnalysisSettings:
     risk_off_core_buy_enabled: bool
     entry_reclaim_close_enabled: bool
     tp1_move_stop_to_breakeven_enabled: bool
+    tp1_ema_trailing_stop_enabled: bool
     validation_pool_multiplier: int
     validation_pool_max: int
 
@@ -156,6 +157,7 @@ def load_settings(path: Path) -> Settings:
             risk_off_core_buy_enabled=bool(analysis.get("risk_off_core_buy_enabled", True)),
             entry_reclaim_close_enabled=bool(analysis.get("entry_reclaim_close_enabled", False)),
             tp1_move_stop_to_breakeven_enabled=bool(analysis.get("tp1_move_stop_to_breakeven_enabled", False)),
+            tp1_ema_trailing_stop_enabled=bool(analysis.get("tp1_ema_trailing_stop_enabled", False)),
             validation_pool_multiplier=int(analysis.get("validation_pool_multiplier", 2)),
             validation_pool_max=int(analysis.get("validation_pool_max", 10)),
         ),

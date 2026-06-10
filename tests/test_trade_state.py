@@ -109,6 +109,80 @@ def test_watching_same_bar_entry_then_stop() -> None:
     assert [event.event_type for event in events] == ["ENTERED", "STOPPED"]
 
 
+def test_tp1_activates_ema_trailing_stop() -> None:
+    trade = make_trade("ENTERED")
+    trade.entry_price = 103.0
+    trade.quantity = 100 / 13
+    events = step_trade(
+        trade,
+        high=121.0,
+        low=100.0,
+        close=119.0,
+        event_time_utc="2026-01-01T08:00:00+00:00",
+        tp1_trailing_ema_stop=108.0,
+    )
+    assert trade.status == "TP1_HIT"
+    assert trade.stop_loss == 108.0
+    assert trade.tp1_trailing_ema_stop_active is True
+    assert "EMA20" in trade.notes
+    assert [event.event_type for event in events] == ["TP1_HIT"]
+
+
+def test_tp1_ema_trailing_stop_raises_on_next_bar() -> None:
+    trade = make_trade("TP1_HIT")
+    trade.entry_price = 103.0
+    trade.quantity = 100 / 13
+    trade.stop_loss = 108.0
+    trade.tp1_trailing_ema_stop_active = True
+    events = step_trade(
+        trade,
+        high=125.0,
+        low=115.0,
+        close=123.0,
+        event_time_utc="2026-01-01T12:00:00+00:00",
+        tp1_trailing_ema_stop=112.0,
+    )
+    assert trade.stop_loss == 112.0
+    assert trade.status == "TP1_HIT"
+    assert events == []
+
+
+def test_tp1_ema_trailing_stop_never_below_entry() -> None:
+    trade = make_trade("TP1_HIT")
+    trade.entry_price = 103.0
+    trade.quantity = 100 / 13
+    trade.stop_loss = 103.0
+    trade.tp1_trailing_ema_stop_active = True
+    step_trade(
+        trade,
+        high=125.0,
+        low=115.0,
+        close=123.0,
+        event_time_utc="2026-01-01T12:00:00+00:00",
+        tp1_trailing_ema_stop=95.0,
+    )
+    assert trade.stop_loss == 103.0
+
+
+def test_tp1_ema_trailing_stop_stop_hit() -> None:
+    trade = make_trade("TP1_HIT")
+    trade.entry_price = 103.0
+    trade.quantity = 100 / 13
+    trade.stop_loss = 112.0
+    trade.tp1_trailing_ema_stop_active = True
+    events = step_trade(
+        trade,
+        high=115.0,
+        low=110.0,
+        close=111.0,
+        event_time_utc="2026-01-01T16:00:00+00:00",
+        tp1_trailing_ema_stop=112.0,
+    )
+    assert trade.status == "STOPPED"
+    assert trade.exit_price == 112.0
+    assert [event.event_type for event in events] == ["STOPPED"]
+
+
 if __name__ == "__main__":
     test_watching_to_entered()
     test_watching_invalidated_before_entry()
@@ -116,4 +190,8 @@ if __name__ == "__main__":
     test_entered_to_closed()
     test_tp1_can_move_stop_to_breakeven()
     test_watching_same_bar_entry_then_stop()
+    test_tp1_activates_ema_trailing_stop()
+    test_tp1_ema_trailing_stop_raises_on_next_bar()
+    test_tp1_ema_trailing_stop_never_below_entry()
+    test_tp1_ema_trailing_stop_stop_hit()
     print("test_trade_state=passed")
