@@ -24,10 +24,13 @@ pump_chase_distance_pct = 8.0
 pump_chase_penalty = 8.0
 high_volatility_range_pct = 35.0
 high_volatility_penalty = 6.0
-risk_off_core_buy_enabled = true
-entry_reclaim_close_enabled = false
+risk_off_core_buy_enabled = false
+entry_reclaim_close_enabled = true
 tp1_move_stop_to_breakeven_enabled = false
-tp1_ema_trailing_stop_enabled = false
+tp1_ema_trailing_stop_enabled = true
+regime_btc_7d_drop_pct = -3.0
+regime_eth_7d_drop_pct = -5.0
+regime_require_both_trend = true
 validation_pool_multiplier = 2
 validation_pool_max = 10
 
