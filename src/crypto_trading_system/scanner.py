@@ -151,6 +151,7 @@ def _analyze_ticker(
     pump_chase_penalty: float = 8.0,
     high_volatility_range_pct: float = 35.0,
     high_volatility_penalty: float = 6.0,
+    daily_trend_required: bool = False,
     precomputed_indicators: dict | None = None,
 ) -> TradeCandidate | None:
     closes_1h = _quote_closes(k1h)
@@ -259,6 +260,8 @@ def _analyze_ticker(
         verdict = "只等回调"
 
     trend_ok = trend_4h or trend_1d
+    if daily_trend_required:
+        trend_ok = trend_ok and trend_1d
     score_ok = score >= 35
     momentum_ok = ticker.pct_24h > 0 and (pct_7d is None or pct_7d > 0)
     distance_buy_ok = distance_to_support <= 4
@@ -467,6 +470,7 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
                 pump_chase_penalty=settings.analysis.pump_chase_penalty,
                 high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
                 high_volatility_penalty=settings.analysis.high_volatility_penalty,
+                daily_trend_required=settings.analysis.daily_trend_required,
             )
             if candidate is not None:
                 candidates.append(candidate)

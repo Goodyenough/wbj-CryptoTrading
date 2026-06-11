@@ -104,10 +104,12 @@ entry_reclaim_close_enabled = true
 tp1_ema_trailing_stop_enabled = true
 
 [daily_trend_required]
-enabled = false
-description = "Requires scanner logic support before this experiment can run."
+enabled = true
+description = "Require daily trend confirmation (price > EMA20_1d >= EMA50_1d) before allowing BUY_CANDIDATE."
 dimension = "daily_trend"
-requires_logic = true
+
+[daily_trend_required.overrides.analysis]
+daily_trend_required = true
 
 [volatility_without_trend_penalty]
 enabled = false

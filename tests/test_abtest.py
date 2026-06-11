@@ -24,14 +24,15 @@ def test_load_unknown_experiment_reports_available_names() -> None:
         raise AssertionError("Expected unknown experiment to raise ValueError")
 
 
-def test_disabled_logic_experiment_is_not_runnable() -> None:
-    try:
-        load_experiment("daily_trend_required", ROOT / "config" / "experiments.toml")
-    except ValueError as exc:
-        assert "disabled" in str(exc)
-        assert "requires logic support" in str(exc)
-    else:
-        raise AssertionError("Expected disabled experiment to raise ValueError")
+def test_daily_trend_experiment_is_runnable() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    definition = load_experiment("daily_trend_required", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.analysis.daily_trend_required is False
+    assert variant.analysis.daily_trend_required is True
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.daily_trend_required", False, True)
+    ]
 
 
 def test_apply_overrides_does_not_mutate_baseline() -> None:
@@ -270,7 +271,7 @@ def test_dynamic_abtest_accepts_prebuilt_symbol_master() -> None:
 
 if __name__ == "__main__":
     test_load_unknown_experiment_reports_available_names()
-    test_disabled_logic_experiment_is_not_runnable()
+    test_daily_trend_experiment_is_runnable()
     test_apply_overrides_does_not_mutate_baseline()
     test_regime_override_can_disable_core_risk_off_buys()
     test_capacity_override_can_reduce_top_n()
