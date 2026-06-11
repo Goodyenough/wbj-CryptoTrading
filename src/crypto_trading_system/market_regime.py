@@ -28,7 +28,13 @@ def _trend_ok(closes: list[float]) -> bool:
     return closes[-1] > ema20 > ema50
 
 
-def classify_market_regime(btc_1d: list[list], eth_1d: list[list]) -> MarketRegime:
+def classify_market_regime(
+    btc_1d: list[list],
+    eth_1d: list[list],
+    btc_7d_drop_pct: float = -5.0,
+    eth_7d_drop_pct: float = -8.0,
+    require_both_trend: bool = False,
+) -> MarketRegime:
     if len(btc_1d) < 60 or len(eth_1d) < 60:
         return MarketRegime(
             status="UNKNOWN",
@@ -46,10 +52,14 @@ def classify_market_regime(btc_1d: list[list], eth_1d: list[list]) -> MarketRegi
     eth_pct_7d = percent_change(eth_closes[-8], eth_closes[-1])
     btc_trend_ok = _trend_ok(btc_closes)
     eth_trend_ok = _trend_ok(eth_closes)
-    btc_not_breaking = btc_pct_7d is None or btc_pct_7d >= -5
-    eth_not_breaking = eth_pct_7d is None or eth_pct_7d >= -8
+    btc_not_breaking = btc_pct_7d is None or btc_pct_7d >= btc_7d_drop_pct
+    eth_not_breaking = eth_pct_7d is None or eth_pct_7d >= eth_7d_drop_pct
 
-    if btc_trend_ok and eth_trend_ok and btc_not_breaking and eth_not_breaking:
+    both_trend_ok = btc_trend_ok and eth_trend_ok
+    either_trend_ok = btc_trend_ok or eth_trend_ok
+    trend_ok = both_trend_ok if require_both_trend else either_trend_ok
+
+    if trend_ok and btc_not_breaking and eth_not_breaking:
         return MarketRegime(
             status="RISK_ON",
             allows_alt_buy=True,
@@ -60,7 +70,7 @@ def classify_market_regime(btc_1d: list[list], eth_1d: list[list]) -> MarketRegi
             summary="BTC/ETH 日线趋势均较强，允许山寨币买入候选。",
         )
 
-    if not btc_not_breaking or not eth_not_breaking or (not btc_trend_ok and not eth_trend_ok):
+    if not btc_not_breaking or not eth_not_breaking or not either_trend_ok:
         status = "RISK_OFF"
         summary = "BTC/ETH 大盘偏弱，山寨币买入候选降级为观察。"
     else:

@@ -127,3 +127,26 @@ enabled = false
 description = "Requires scanner logic support before this experiment can run."
 dimension = "volatility_trend"
 requires_logic = true
+
+[regime_sensitive]
+enabled = true
+description = "Test tighter RISK_OFF thresholds: BTC 7d drop -3% (vs -5%), ETH -5% (vs -8%), require both BTC+ETH trend ok."
+dimension = "regime_sensitivity"
+
+[regime_sensitive.overrides.analysis]
+regime_btc_7d_drop_pct = -3.0
+regime_eth_7d_drop_pct = -5.0
+regime_require_both_trend = true
+
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive]
+enabled = true
+description = "Three-way combo (RISK_OFF core-buy pause + entry reclaim + TP1 EMA trailing stop) with tighter regime thresholds."
+dimension = "combined_regime_entry_exit_sensitivity"
+
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive.overrides.analysis]
+risk_off_core_buy_enabled = false
+entry_reclaim_close_enabled = true
+tp1_ema_trailing_stop_enabled = true
+regime_btc_7d_drop_pct = -3.0
+regime_eth_7d_drop_pct = -5.0
+regime_require_both_trend = true

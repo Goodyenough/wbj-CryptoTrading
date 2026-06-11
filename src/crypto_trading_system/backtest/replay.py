@@ -619,7 +619,13 @@ def run_backtest_replay(
         if settings.analysis.market_regime_filter_enabled:
             btc_1d = _closed_slice(regime_klines.get("BTCUSDT", []), "1d", bar_close_ms)
             eth_1d = _closed_slice(regime_klines.get("ETHUSDT", []), "1d", bar_close_ms)
-            market_regime = classify_market_regime(btc_1d, eth_1d)
+            market_regime = classify_market_regime(
+                btc_1d,
+                eth_1d,
+                btc_7d_drop_pct=settings.analysis.regime_btc_7d_drop_pct,
+                eth_7d_drop_pct=settings.analysis.regime_eth_7d_drop_pct,
+                require_both_trend=settings.analysis.regime_require_both_trend,
+            )
             market_regime_allows_buy = market_regime.allows_alt_buy
             market_regime_status = market_regime.status
         unavailable = {item.paper.symbol for item in all_trades if item.paper.status in {"WATCHING", "ENTERED", "TP1_HIT"}}

@@ -36,6 +36,9 @@ class AnalysisSettings:
     high_volatility_range_pct: float
     high_volatility_penalty: float
     risk_off_core_buy_enabled: bool
+    regime_btc_7d_drop_pct: float
+    regime_eth_7d_drop_pct: float
+    regime_require_both_trend: bool
     entry_reclaim_close_enabled: bool
     tp1_move_stop_to_breakeven_enabled: bool
     tp1_ema_trailing_stop_enabled: bool
@@ -156,6 +159,9 @@ def load_settings(path: Path) -> Settings:
             high_volatility_range_pct=float(analysis.get("high_volatility_range_pct", 35.0)),
             high_volatility_penalty=float(analysis.get("high_volatility_penalty", 6.0)),
             risk_off_core_buy_enabled=bool(analysis.get("risk_off_core_buy_enabled", True)),
+            regime_btc_7d_drop_pct=float(analysis.get("regime_btc_7d_drop_pct", -5.0)),
+            regime_eth_7d_drop_pct=float(analysis.get("regime_eth_7d_drop_pct", -8.0)),
+            regime_require_both_trend=bool(analysis.get("regime_require_both_trend", False)),
             entry_reclaim_close_enabled=bool(analysis.get("entry_reclaim_close_enabled", False)),
             tp1_move_stop_to_breakeven_enabled=bool(analysis.get("tp1_move_stop_to_breakeven_enabled", False)),
             tp1_ema_trailing_stop_enabled=bool(analysis.get("tp1_ema_trailing_stop_enabled", False)),

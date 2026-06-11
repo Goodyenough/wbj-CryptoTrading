@@ -353,7 +353,13 @@ def _detect_market_regime(client: BinanceClient, settings: Settings, limitations
             progress("checking BTC/ETH market regime")
         btc_1d = client.klines("BTCUSDT", "1d", max(80, settings.analysis.min_history_days))
         eth_1d = client.klines("ETHUSDT", "1d", max(80, settings.analysis.min_history_days))
-        regime = classify_market_regime(btc_1d, eth_1d)
+        regime = classify_market_regime(
+            btc_1d,
+            eth_1d,
+            btc_7d_drop_pct=settings.analysis.regime_btc_7d_drop_pct,
+            eth_7d_drop_pct=settings.analysis.regime_eth_7d_drop_pct,
+            require_both_trend=settings.analysis.regime_require_both_trend,
+        )
         limitations.append(
             "大盘环境过滤："
             f"{regime.status}; {regime.summary} "
