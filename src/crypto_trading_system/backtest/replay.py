@@ -711,6 +711,7 @@ def run_backtest_replay(
                 pump_chase_penalty=settings.analysis.pump_chase_penalty,
                 high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
                 high_volatility_penalty=settings.analysis.high_volatility_penalty,
+                daily_trend_required=settings.analysis.daily_trend_required,
                 precomputed_indicators=cached,
             )
             if candidate is not None and candidate.action == "BUY_CANDIDATE":
