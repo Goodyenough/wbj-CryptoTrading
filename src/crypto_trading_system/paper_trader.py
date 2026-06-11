@@ -12,6 +12,7 @@ from .market_data import BinanceClient
 from .models import PaperTrade, PaperTradeEvent
 from .report_versions import next_report_version, versioned_markdown_filename
 from .trade_state import step_trade
+from .indicators import ema as _ema
 
 
 OPEN_STATUSES = {"WATCHING", "ENTERED", "TP1_HIT"}
@@ -409,6 +410,20 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
     updated: list[PaperTrade] = []
     now = _utc_now()
 
+    entry_reclaim_enabled = settings.analysis.entry_reclaim_close_enabled
+    ema_trailing_enabled = settings.analysis.tp1_ema_trailing_stop_enabled
+
+    # 按需批量拉 4h K线：entry_reclaim 需要当前收盘价（用 lastPrice 代替），
+    # ema_trailing 需要最近 20 根 4h K线。两者共用同一次 API 请求。
+    klines_4h_cache: dict[str, list[list]] = {}
+
+    def _get_4h_closes(symbol: str) -> list[float]:
+        if symbol not in klines_4h_cache:
+            klines_4h_cache[symbol] = client.klines(symbol, "4h", limit=25)
+        # 只取已完全收盘的 K线（排除最后一根未收盘的）
+        closed = klines_4h_cache[symbol][:-1]
+        return [float(k[4]) for k in closed]
+
     with sqlite3.connect(settings.output.database_path) as connection:
         trades = _load_open_trades(connection, account)
         for trade in trades:
@@ -417,12 +432,38 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
                 trade.notes = f"{trade.notes} | No ticker price found during update."
                 continue
 
+            # entry_reclaim_close：WATCHING 状态下，entry zone 已触碰但 4h 收盘未重新站上 entry_high
+            # 用当前价格作为"最新 4h 收盘"的近似值（模拟盘每次更新间隔远大于 1 tick）
+            if (
+                entry_reclaim_enabled
+                and trade.status == "WATCHING"
+                and current_price <= trade.entry_high
+            ):
+                closes_4h = _get_4h_closes(trade.symbol)
+                last_close = closes_4h[-1] if closes_4h else current_price
+                if last_close < trade.entry_high:
+                    trade.last_price = current_price
+                    trade.updated_at_utc = now
+                    trade.notes = "Watching: entry zone touched, but 4h close has not reclaimed entry_high."
+                    _save_trade_update(connection, trade)
+                    updated.append(trade)
+                    continue
+
+            # tp1_ema_trailing_stop：ENTERED/TP1_HIT 状态下计算 4h EMA20
+            ema20_4h: float | None = None
+            if ema_trailing_enabled and trade.status in {"ENTERED", "TP1_HIT"}:
+                closes_4h = _get_4h_closes(trade.symbol)
+                if len(closes_4h) >= 20:
+                    ema20_4h = _ema(closes_4h, 20)
+
             events = step_trade(
                 trade,
                 high=current_price,
                 low=current_price,
                 close=current_price,
                 event_time_utc=now,
+                move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
+                tp1_trailing_ema_stop=ema20_4h,
             )
             for event in events:
                 _record_event(
