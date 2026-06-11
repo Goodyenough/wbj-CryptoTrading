@@ -15,7 +15,14 @@
 
 ## 2026-06-11
 
-### 10:06:25 +08:00 - tp1_ema20_trailing_stop full master A/B（2025-01-01→2025-09-01）
+### 10:15:51 +08:00 - tp1_ema20_trailing_stop 非重叠 walk-forward 汇总
+- 类型：回测 / A/B / 报告
+- 改动：运行早期段（`2024-07-01 -> 2025-01-01`，baseline `ec6edacdae47`，variant `7b1855f719a3`），与已有近端段汇总为两段非重叠 walk-forward。
+- 影响：早期段：closed_trades 35→49，PF 1.30→1.41，净收益 +7.14%→+11.82%，Sharpe 0.78→1.20，MDD 10.67%→10.54%，方向全面改善。近端段：PF 0.58→0.75，净收益 -13.17%→-10.31%，MDD 小幅上升（19.43%→19.78%），两段均样本充足且净收益/PF 改善，但近端绝对值仍负；TP2 rate 在两段均下降（副作用：EMA 跟踪止损提前锁定部分本可到 TP2 的仓位）。
+- 验证：汇总 `unique_coverage_days=427`，`overlap_periods=0`，`sufficient_periods=2`，`net_improved_periods=2`，`drawdown_improved_periods=1`，verdict=**`retest`**；近端 MDD 未改善是无法升级到 `candidate_keep_review` 的主因。
+- 结论：`tp1_ema20_trailing_stop` 在牛市段（早期）效果显著，在震荡/弱市段（近端）方向正确但不足以扭转负收益；下一步设计与 `risk_off_no_core_entry_reclaim` 的组合实验。
+
+
 - 类型：回测 / A/B / 报告
 - 改动：运行 `tp1_ema20_trailing_stop` A/B，baseline `8a881bbd789e`，variant `c5afb1a8dbdc`，区间 `2025-01-01 -> 2025-09-01`，使用 `dynamic_master_full.json`，`--max-symbols 40 --allow-data-gaps`。
 - 影响：variant closed_trades=53（baseline=42），样本充足；PF 0.58→0.75，avg_R -0.32→-0.14，净收益 -13.17%→-10.31%，MDD 19.43%→19.78%（小幅上升），stop_rate 80.95%→86.79%（略上升），Sharpe -1.03→-0.77。fee_drag 51→72（换手率上升带来更多手续费）。TP2 rate 下降（19.05%→13.21%），说明跟踪止损提前锁定了一些本可到 TP2 的仓位。
