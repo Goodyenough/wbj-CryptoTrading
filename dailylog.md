@@ -15,7 +15,17 @@
 
 ## 2026-06-11
 
-### 10:51:52 +08:00 - risk_off_no_core_entry_reclaim_ema_stop 组合实验 walk-forward 汇总
+### 11:00:00 +08:00 - paper_trader 口径对齐：entry_reclaim_close + tp1 EMA20 trailing stop
+- 类型：代码 / 测试 / Git
+- 改动：`paper_trader.py` `update_paper_trades` 补全两项与回测不一致的逻辑：
+  1. `entry_reclaim_close_enabled`：WATCHING 状态下，当前价格已触碰 entry zone 但最新已收盘 4h K线收盘价低于 `entry_high` 时，跳过本次入场判断，写入 notes 并继续等待；
+  2. `tp1_ema_trailing_stop_enabled`：ENTERED/TP1_HIT 状态下，从 Binance 拉取最近 25 根 4h K线（去掉未收盘的最后一根），计算 EMA20 后传入 `step_trade`；两者共用同一次 API 请求（`klines_4h_cache`）。
+  3. 同步传入 `move_stop_to_breakeven_on_tp1`（此前也未传，现在一并对齐）。
+- 影响：`risk_off_core_buy_enabled` 原本口径一致；修复后三项规则在模拟盘中全部生效，回测与模拟盘行为对齐。
+- 验证：`test_trade_state`、`test_abtest`、`test_replay` 全部通过。
+- Git：commit `417681d`，已 push。
+
+
 - 类型：代码 / 回测 / A/B / 报告 / Git
 - 改动：新增 `combined_regime_entry_exit` dimension 至 `abtest.py` ALLOWED_OVERRIDE_PATHS；新增 `risk_off_no_core_entry_reclaim_ema_stop` 实验至 `config/experiments.toml`（三项叠加：RISK_OFF 停开核心币 + 入场收盘确认 + TP1 EMA20 跟踪止损）。
 - 改动：串行运行早期段（`2024-07-01 -> 2025-06-01`，baseline `de633d08ae00`，variant `1159c2ab9b5e`）和近端段（`2025-06-01 -> 2026-06-01`，baseline `9d9664bd1085`，variant `4eb256b0c879`）。
