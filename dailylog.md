@@ -15,7 +15,14 @@
 
 ## 2026-06-11
 
-### 11:00:00 +08:00 - paper_trader 口径对齐：entry_reclaim_close + tp1 EMA20 trailing stop
+### 14:55:00 +08:00 - daily_trend_required A/B 实验：reject_candidate
+- 类型：代码 / 回测 / A/B / 报告 / Git
+- 改动：新增 `analysis.daily_trend_required` 参数（默认 false）；scanner `_analyze_ticker` 和 replay `_analyze_ticker` 调用均传入此参数；`trend_ok` 逻辑改为：启用时必须同时满足 `trend_1d`（`price > EMA20_1d >= EMA50_1d * 0.98`），否则仅需 `trend_4h OR trend_1d`。修复：replay.py 初版漏传参数导致 baseline=variant，修复后 v2 重跑。
+- 影响：早期段（2024-07→2025-06）：PF 0.91→0.97，净收益 -5.59%→-3.54%，MDD 小幅上升（18.72%→19.52%）。近端段（2025-06→2026-06）：PF 0.73→0.32，净收益 -10.62%→-22.71%，MDD 24.24%→28.30%，止损率 77%→89%，大幅恶化。
+- 验证：近端段 verdict=`reject_candidate`；根因：弱市中日线趋势恢复滞后，过滤后实际在更高位置入场，质量反而更差；不适合作为单独规则使用。
+- Git：commit `18663db`（实验代码）、`1642731`（修复 replay 漏传参数），已 push。
+
+
 - 类型：代码 / 测试 / Git
 - 改动：`paper_trader.py` `update_paper_trades` 补全两项与回测不一致的逻辑：
   1. `entry_reclaim_close_enabled`：WATCHING 状态下，当前价格已触碰 entry zone 但最新已收盘 4h K线收盘价低于 `entry_high` 时，跳过本次入场判断，写入 notes 并继续等待；
