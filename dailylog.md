@@ -15,6 +15,19 @@
 
 ## 2026-06-11
 
+### 10:06:25 +08:00 - tp1_ema20_trailing_stop full master A/B（2025-01-01→2025-09-01）
+- 类型：回测 / A/B / 报告
+- 改动：运行 `tp1_ema20_trailing_stop` A/B，baseline `8a881bbd789e`，variant `c5afb1a8dbdc`，区间 `2025-01-01 -> 2025-09-01`，使用 `dynamic_master_full.json`，`--max-symbols 40 --allow-data-gaps`。
+- 影响：variant closed_trades=53（baseline=42），样本充足；PF 0.58→0.75，avg_R -0.32→-0.14，净收益 -13.17%→-10.31%，MDD 19.43%→19.78%（小幅上升），stop_rate 80.95%→86.79%（略上升），Sharpe -1.03→-0.77。fee_drag 51→72（换手率上升带来更多手续费）。TP2 rate 下降（19.05%→13.21%），说明跟踪止损提前锁定了一些本可到 TP2 的仓位。
+- 验证：verdict=`retest`；绝对值仍为负收益，需跨时段 walk-forward 或与 `risk_off_no_core_entry_reclaim` 组合后验证。
+- Git：（报告自动生成，无代码改动）
+
+### 10:05:00 +08:00 - 创建性能优化文档并提交
+- 类型：文档 / Git
+- 改动：创建 `reports/2026-06-11/perf_optimization_2026-06-11.md`，记录 5 轮 profiling 驱动优化全貌（`_closed_slice` bisect、批量 SQL、kline float 存储、EMA 增量缓存、kline_fetch_ranges）。
+- 影响：优化前 ~400s/540bar → 优化后（第二次起）~114s，约 3.5x 提速；文档覆盖根因、commit、实测数据和剩余瓶颈。
+- Git：commit `e4b0102`，已 push。
+
 ### 02:00:00 +08:00 - 性能优化系列：profiling 驱动的三轮优化
 - 类型：代码 / 性能 / 测试 / Git
 

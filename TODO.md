@@ -97,7 +97,7 @@
 - [x] 设计下一轮 `RISK_ON` 退出 A/B：新增 `tp1_breakeven_stop`，测试 TP1 命中后将止损移动到入场价。
 - [x] 运行 `tp1_breakeven_stop` full master A/B：PF、净收益、止损率均恶化，结论 `reject_candidate`，不进入 walk-forward。
 - [x] 设计下一轮退出 A/B：新增 `tp1_ema20_trailing_stop`，测试 TP1 命中后改用 4h EMA20 跟踪止损替代立刻保本。
-- [ ] 运行 `tp1_ema20_trailing_stop` full master A/B，验证 TP1 后 EMA20 跟踪是否改善净收益和 Profit factor。
+- [x] 运行 `tp1_ema20_trailing_stop` full master A/B：PF 0.58→0.75，avg_R -0.32→-0.14，净收益 -13.17%→-10.31%，方向改善但绝对值仍为负，结论 `retest`；需跨时段 walk-forward 或与 `risk_off_no_core_entry_reclaim` 组合验证。
 - [ ] 对 `risk_off_no_core_entry_reclaim` 做 keep review：在模拟盘中手动验证入场重新确认逻辑，并检查是否有实现层面的 corner case；通过后合并为默认策略。
 
 ## TODO 维护规则
