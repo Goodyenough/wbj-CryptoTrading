@@ -21,7 +21,7 @@
 - 改动：更新 `TODO.md` 运维待办，将修正计划任务的下一步明确为运行 `powershell -ExecutionPolicy Bypass -File scripts\install_daily_task.ps1` 后检查 `LastRunTime`、`LastTaskResult` 和 `logs/daily_paper_update.log`。
 - 影响：当前非管理员会话仍无法直接修改系统计划任务；后续只需在管理员 PowerShell 中运行脚本即可避免手工配置遗漏，并把任务从 09:00 调整到 20:05。
 - 验证：本会话中 `Set-ScheduledTask`、`schtasks /Change /ST 20:05`、`schtasks /Create /F /IT` 均因 `Access is denied` 被系统拒绝；计划任务当前仍显示 `Next Run Time=2026-06-12 9:00:00`，需要提升权限执行安装脚本完成最终修改。
-- Git：本次提交 `e727fa2 Add daily task installer`。
+- Git：本次提交 `79c14b4 Add daily task installer`。
 
 ### 21:30:39 +08:00 - 完成三周等待期五项补强
 - 类型：代码 / 配置 / 回测 / A/B / 报告 / 测试 / 文档 / Git
