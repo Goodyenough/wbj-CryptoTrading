@@ -15,7 +15,15 @@
 
 ## 2026-06-11
 
-### 10:15:51 +08:00 - tp1_ema20_trailing_stop 非重叠 walk-forward 汇总
+### 10:51:52 +08:00 - risk_off_no_core_entry_reclaim_ema_stop 组合实验 walk-forward 汇总
+- 类型：代码 / 回测 / A/B / 报告 / Git
+- 改动：新增 `combined_regime_entry_exit` dimension 至 `abtest.py` ALLOWED_OVERRIDE_PATHS；新增 `risk_off_no_core_entry_reclaim_ema_stop` 实验至 `config/experiments.toml`（三项叠加：RISK_OFF 停开核心币 + 入场收盘确认 + TP1 EMA20 跟踪止损）。
+- 改动：串行运行早期段（`2024-07-01 -> 2025-06-01`，baseline `de633d08ae00`，variant `1159c2ab9b5e`）和近端段（`2025-06-01 -> 2026-06-01`，baseline `9d9664bd1085`，variant `4eb256b0c879`）。
+- 影响：早期段：closed_trades 52→50，PF 0.91→1.53，avg_R -0.03→+0.37，净收益 -5.59%→+16.74%，MDD 18.72%→14.99%，Sharpe -0.25→1.07。近端段：closed_trades 49→64，PF 0.73→1.05，avg_R -0.20→+0.03，净收益 -10.62%→+1.21%，MDD 24.24%→18.68%，Sharpe -0.54→0.16。两段 net/PF/MDD 全面改善，stop_rate 小幅上升（副作用）。
+- 验证：汇总 `unique_coverage_days=700`，`overlap_periods=0`，`sufficient_periods=2`，verdict=**`candidate_keep_review`**；为继 `risk_off_no_core_entry_reclaim` 后第二个达到此门槛的实验，且近端 MDD 改善更显著（-5.56pp vs 组合基线的 -9.76pp）。
+- 注意：两段不能并行运行（SQLite 数据库锁），需串行执行。
+
+
 - 类型：回测 / A/B / 报告
 - 改动：运行早期段（`2024-07-01 -> 2025-01-01`，baseline `ec6edacdae47`，variant `7b1855f719a3`），与已有近端段汇总为两段非重叠 walk-forward。
 - 影响：早期段：closed_trades 35→49，PF 1.30→1.41，净收益 +7.14%→+11.82%，Sharpe 0.78→1.20，MDD 10.67%→10.54%，方向全面改善。近端段：PF 0.58→0.75，净收益 -13.17%→-10.31%，MDD 小幅上升（19.43%→19.78%），两段均样本充足且净收益/PF 改善，但近端绝对值仍负；TP2 rate 在两段均下降（副作用：EMA 跟踪止损提前锁定部分本可到 TP2 的仓位）。
