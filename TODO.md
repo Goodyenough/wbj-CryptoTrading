@@ -105,6 +105,10 @@
 
 - [ ] 修复 `tp1_ema_trailing_stop` corner case：TP1 命中时 4h K线不足 20 根，`tp1_trailing_ema_stop_active` 标志已设为 True 但 EMA 为 None，后续 K 线累积到 20 根后会突然激活抬止损；实际概率低（历史长度过滤已排除绝大多数新上市币），但逻辑上存在，需在 `step_trade` 中明确处理（例如：仅在首次 EMA 有值时才设 active 标志，或在 active 但 EMA 为 None 时保持止损不动并记录 notes）。
 
+## 运维待办
+
+- [ ] 用管理员权限修正 Windows 任务计划 `CryptoTrading_DailyPaperUpdate`：将触发时间从当前 09:00 改为每天 20:05，并确认 `LastRunTime`、`LastTaskResult` 和 `logs/daily_paper_update.log` 正常更新。
+
 ## TODO 维护规则
 
 - 默认使用中文记录 TODO。

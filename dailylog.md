@@ -15,6 +15,13 @@
 
 ## 2026-06-11
 
+### 20:49:20 +08:00 - 手动运行 daily 扫盘并发现定时任务配置问题
+- 类型：扫描 / 模拟盘 / 报告 / 脚本 / 运维 / Git
+- 改动：手动运行 `python main.py daily` 完成日常流程，生成 `reports/2026-06-11/market_scan_2026-06-11_v2.md`、`paper_report_2026-06-11_demo_v3.md` 和对应图表；修正 `scripts/daily_paper_update.bat`，将硬编码中文项目路径改为 `%~dp0..` 自动定位项目根目录，降低 `cmd.exe` 编码解析风险。
+- 影响：本次 scan_id=`d81f9cdeba05`，候选 5 个；`paper_added=0`、`paper_skipped_action=5`，未新增模拟盘计划；模拟盘更新 4 笔开放观察/持仓，未实现 PnL 从 -128.53 USDT 改为 -61.72 USDT；新增 1 次 `RECLAIM_PENDING`，ONDOUSDT 触碰 entry zone 但 4h 收盘未重新站上 `entry_high`，继续等待。
+- 验证：`python main.py daily` 成功输出 `daily=completed`；检查 Windows 任务计划发现 `CryptoTrading_DailyPaperUpdate` 当前触发时间为每天 09:00，非预期 20:05，且 `LastRunTime=1999-11-30` 表示尚未成功自动运行。尝试 `Set-ScheduledTask` 与 `schtasks /Change /ST 20:05` 均因 `Access is denied` 失败，需要管理员权限或任务计划程序中输入当前用户任务密码后调整。
+- Git：本次提交 `Run daily scan and fix daily batch path`。
+
 ### 20:39:46 +08:00 - 调整 handoff.md 更新规则为顶部插入
 - 类型：文档 / 规则 / Git
 - 改动：更新 `AGENTS.md` 的 `Context Handoff` 规则，明确新增 handoff 条目不得覆盖、删除或重写历史内容；最新条目应插入到 `handoff.md` 顶部、位于文件级标题或说明之后，旧条目作为历史记录完整保留并下移。
