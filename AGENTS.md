@@ -59,13 +59,15 @@ Use this event-to-file decision table:
 
 ## Context Handoff
 
-When context usage reaches 90% or above, append a new section to `handoff.md` in the project root before the session ends. Do not overwrite existing content — always append with a timestamp header.
+When context usage reaches 90% or above, add a new section to `handoff.md` in the project root before the session ends. Do not overwrite, delete, or rewrite existing content.
 
 - Path: `handoff.md` (project root, single persistent file)
 - Each entry starts with: `## YYYY-MM-DD HH:mm +08:00`
+- Insert the newest entry at the top of the file, above all older handoff entries and below any file-level title or introductory note.
+- Preserve all older handoff entries exactly as historical records, moving them lower in the file only as needed.
 - Purpose: allow a new session to pick up exactly where this one left off, with no repeated explanation needed
 
-Each appended section must cover:
+Each new section must cover:
 
 1. **项目目录** — absolute path of the working directory
 2. **任务背景** — what was being worked on and why
@@ -76,7 +78,7 @@ Each appended section must cover:
 
 Write in Chinese. Keep English for command names, config keys, file paths, and commit hashes.
 
-After appending, create a Git commit for `handoff.md` before the session ends.
+After updating `handoff.md`, create a Git commit for `handoff.md` before the session ends.
 
 Use this template for experiment-log entries:
 

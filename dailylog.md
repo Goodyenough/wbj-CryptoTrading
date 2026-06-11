@@ -15,6 +15,13 @@
 
 ## 2026-06-11
 
+### 20:39:46 +08:00 - 调整 handoff.md 更新规则为顶部插入
+- 类型：文档 / 规则 / Git
+- 改动：更新 `AGENTS.md` 的 `Context Handoff` 规则，明确新增 handoff 条目不得覆盖、删除或重写历史内容；最新条目应插入到 `handoff.md` 顶部、位于文件级标题或说明之后，旧条目作为历史记录完整保留并下移。
+- 影响：后续上下文交接会按时间倒序保留，最近交接信息更容易读取，同时避免此前更新 handoff 时覆盖旧内容。
+- 验证：已检查 `AGENTS.md` 目标段落内容；未运行代码测试（仅文档规则变更）。
+- Git：本次提交 `Update handoff insertion rule in AGENTS`。
+
 ### 14:55:00 +08:00 - daily_trend_required A/B 实验：reject_candidate
 - 类型：代码 / 回测 / A/B / 报告 / Git
 - 改动：新增 `analysis.daily_trend_required` 参数（默认 false）；scanner `_analyze_ticker` 和 replay `_analyze_ticker` 调用均传入此参数；`trend_ok` 逻辑改为：启用时必须同时满足 `trend_1d`（`price > EMA20_1d >= EMA50_1d * 0.98`），否则仅需 `trend_4h OR trend_1d`。修复：replay.py 初版漏传参数导致 baseline=variant，修复后 v2 重跑。
