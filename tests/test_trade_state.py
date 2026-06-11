@@ -125,7 +125,7 @@ def test_tp1_activates_ema_trailing_stop() -> None:
     assert trade.stop_loss == 108.0
     assert trade.tp1_trailing_ema_stop_active is True
     assert "EMA20" in trade.notes
-    assert [event.event_type for event in events] == ["TP1_HIT"]
+    assert [event.event_type for event in events] == ["TP1_EMA_TRAILING_ACTIVATED", "TP1_HIT"]
 
 
 def test_tp1_ema_trailing_stop_raises_on_next_bar() -> None:
@@ -144,7 +144,7 @@ def test_tp1_ema_trailing_stop_raises_on_next_bar() -> None:
     )
     assert trade.stop_loss == 112.0
     assert trade.status == "TP1_HIT"
-    assert events == []
+    assert [event.event_type for event in events] == ["TP1_EMA_TRAILING_RAISED"]
 
 
 def test_tp1_ema_trailing_stop_never_below_entry() -> None:
@@ -180,7 +180,9 @@ def test_tp1_ema_trailing_stop_stop_hit() -> None:
     )
     assert trade.status == "STOPPED"
     assert trade.exit_price == 112.0
+    assert trade.notes == "EMA20 trailing stop hit."
     assert [event.event_type for event in events] == ["STOPPED"]
+    assert "EMA20 trailing stop" in events[0].message
 
 
 if __name__ == "__main__":

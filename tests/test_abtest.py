@@ -26,6 +26,7 @@ def test_load_unknown_experiment_reports_available_names() -> None:
 
 def test_daily_trend_experiment_is_runnable() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.daily_trend_required = False
     definition = load_experiment("daily_trend_required", ROOT / "config" / "experiments.toml")
     variant, changes = apply_experiment_overrides(settings, definition)
     assert settings.analysis.daily_trend_required is False
@@ -48,6 +49,7 @@ def test_apply_overrides_does_not_mutate_baseline() -> None:
 
 def test_regime_override_can_disable_core_risk_off_buys() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.risk_off_core_buy_enabled = True
     definition = load_experiment("risk_off_no_core_buy", ROOT / "config" / "experiments.toml")
     variant, changes = apply_experiment_overrides(settings, definition)
     assert settings.analysis.risk_off_core_buy_enabled is True
@@ -70,6 +72,7 @@ def test_capacity_override_can_reduce_top_n() -> None:
 
 def test_combined_override_can_change_regime_and_capacity() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.risk_off_core_buy_enabled = True
     definition = load_experiment("risk_off_no_core_top_n_3", ROOT / "config" / "experiments.toml")
     variant, changes = apply_experiment_overrides(settings, definition)
     assert variant.analysis.risk_off_core_buy_enabled is False
@@ -82,6 +85,7 @@ def test_combined_override_can_change_regime_and_capacity() -> None:
 
 def test_entry_timing_override_can_require_reclaim_close() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.entry_reclaim_close_enabled = False
     definition = load_experiment("entry_reclaim_close", ROOT / "config" / "experiments.toml")
     variant, changes = apply_experiment_overrides(settings, definition)
     assert settings.analysis.entry_reclaim_close_enabled is False
@@ -93,6 +97,8 @@ def test_entry_timing_override_can_require_reclaim_close() -> None:
 
 def test_combined_regime_entry_override_can_pause_and_reclaim() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.risk_off_core_buy_enabled = True
+    settings.analysis.entry_reclaim_close_enabled = False
     definition = load_experiment("risk_off_no_core_entry_reclaim", ROOT / "config" / "experiments.toml")
     variant, changes = apply_experiment_overrides(settings, definition)
     assert settings.analysis.risk_off_core_buy_enabled is True
@@ -107,6 +113,7 @@ def test_combined_regime_entry_override_can_pause_and_reclaim() -> None:
 
 def test_exit_timing_override_can_move_stop_to_breakeven() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.tp1_move_stop_to_breakeven_enabled = False
     definition = load_experiment("tp1_breakeven_stop", ROOT / "config" / "experiments.toml")
     variant, changes = apply_experiment_overrides(settings, definition)
     assert settings.analysis.tp1_move_stop_to_breakeven_enabled is False
@@ -118,6 +125,7 @@ def test_exit_timing_override_can_move_stop_to_breakeven() -> None:
 
 def test_exit_timing_override_can_enable_ema_trailing_stop() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.tp1_ema_trailing_stop_enabled = False
     definition = load_experiment("tp1_ema20_trailing_stop", ROOT / "config" / "experiments.toml")
     variant, changes = apply_experiment_overrides(settings, definition)
     assert settings.analysis.tp1_ema_trailing_stop_enabled is False

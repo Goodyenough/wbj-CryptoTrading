@@ -15,6 +15,14 @@
 
 ## 2026-06-11
 
+### 21:01:16 +08:00 - 增强 paper report 三周验证追踪字段
+- 类型：代码 / 报告 / 测试 / Git
+- 改动：在 `trade_state.step_trade` 中新增 `TP1_EMA_TRAILING_ACTIVATED` 与 `TP1_EMA_TRAILING_RAISED` 事件，并在 EMA20 trailing stop 触发止损时写入明确事件说明；在 `paper_trader.generate_paper_report` 中新增 TP1 EMA trailing stop 激活次数、抬止损次数、EMA stop 出场次数、当前激活持仓统计，以及 `RECLAIM_PENDING` 后续追踪表。
+- 改动：更新 `tests/test_trade_state.py` 覆盖 TP1 EMA trailing 激活、抬止损和 EMA stop 出场事件；更新 `tests/test_abtest.py`，让相关 A/B 单测显式设置 baseline 默认值，避免被当前生产配置默认开关影响。
+- 影响：三周后复盘模拟盘时，可以直接从 paper report 判断 TP1 EMA trailing 是否真正介入、是否抬过止损、是否导致出场，也可以看到 `RECLAIM_PENDING` 后续是重新入场、跌破/失效还是仍在等待。新报告 `reports/2026-06-11/paper_report_2026-06-11_demo_v4.md` 当前显示 ONDOUSDT 的 reclaim outcome 为 `still_waiting`，TP1 EMA trailing 统计均为 0。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`、`python tests\test_abtest.py` 均通过；运行 `python main.py paper report` 成功生成 v4 paper report。
+- Git：本次提交 `Add paper report validation tracking`。
+
 ### 20:49:20 +08:00 - 手动运行 daily 扫盘并发现定时任务配置问题
 - 类型：扫描 / 模拟盘 / 报告 / 脚本 / 运维 / Git
 - 改动：手动运行 `python main.py daily` 完成日常流程，生成 `reports/2026-06-11/market_scan_2026-06-11_v2.md`、`paper_report_2026-06-11_demo_v3.md` 和对应图表；修正 `scripts/daily_paper_update.bat`，将硬编码中文项目路径改为 `%~dp0..` 自动定位项目根目录，降低 `cmd.exe` 编码解析风险。

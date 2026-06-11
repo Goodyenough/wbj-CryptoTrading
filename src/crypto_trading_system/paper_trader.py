@@ -582,6 +582,54 @@ def load_all_paper_trades(settings: Settings, account_name: str | None = None) -
     return [_paper_trade_from_row(row) for row in rows]
 
 
+def _event_time(event: PaperTradeEvent) -> datetime | None:
+    try:
+        return datetime.fromisoformat(event.event_time_utc)
+    except ValueError:
+        return None
+
+
+def _events_after(events: list[PaperTradeEvent], anchor: PaperTradeEvent) -> list[PaperTradeEvent]:
+    anchor_time = _event_time(anchor)
+    if anchor_time is None:
+        return []
+    later: list[PaperTradeEvent] = []
+    for event in events:
+        event_time = _event_time(event)
+        if event_time is not None and event_time > anchor_time:
+            later.append(event)
+    return later
+
+
+def _reclaim_outcome(trade: PaperTrade, events: list[PaperTradeEvent]) -> tuple[str, str]:
+    pending = [event for event in events if event.event_type == "RECLAIM_PENDING"]
+    if not pending:
+        return "n/a", ""
+
+    first_pending = pending[0]
+    later = _events_after(events, first_pending)
+    entered = next((event for event in later if event.event_type == "ENTERED"), None)
+    if entered is not None:
+        after_entry = _events_after(events, entered)
+        terminal = next(
+            (event for event in after_entry if event.event_type in {"STOPPED", "CLOSED", "INVALIDATED", "ARCHIVED"}),
+            None,
+        )
+        if terminal is not None:
+            return f"reclaimed_then_{terminal.event_type.lower()}", terminal.message
+        return "reclaimed_entered", entered.message
+
+    terminal = next(
+        (event for event in later if event.event_type in {"INVALIDATED", "ARCHIVED", "STOPPED", "CLOSED"}),
+        None,
+    )
+    if terminal is not None:
+        return terminal.event_type.lower(), terminal.message
+    if trade.status == "WATCHING":
+        return "still_waiting", trade.notes
+    return trade.status.lower(), trade.notes
+
+
 def generate_paper_report(settings: Settings, account_name: str | None = None) -> tuple[str, list[Path]]:
     account = account_name or settings.paper.account_name
     backfill_missing_events(settings, account)
@@ -610,6 +658,23 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
     # 统计 entry_reclaim 拦截次数（所有 RECLAIM_PENDING 事件数）
     all_events = [e for evs in events_by_trade.values() for e in evs]
     reclaim_pending_count = sum(1 for e in all_events if e.event_type == "RECLAIM_PENDING")
+    ema_trailing_activated_count = sum(1 for e in all_events if e.event_type == "TP1_EMA_TRAILING_ACTIVATED")
+    ema_trailing_raised_count = sum(1 for e in all_events if e.event_type == "TP1_EMA_TRAILING_RAISED")
+    ema_trailing_stop_count = sum(
+        1
+        for e in all_events
+        if e.event_type == "STOPPED" and "EMA20 trailing stop" in e.message
+    )
+    ema_trailing_active_trades = [
+        trade
+        for trade in open_trades
+        if any(e.event_type == "TP1_EMA_TRAILING_ACTIVATED" for e in events_by_trade.get(trade.paper_trade_id, []))
+    ]
+    reclaim_trades = [
+        trade
+        for trade in trades
+        if any(e.event_type == "RECLAIM_PENDING" for e in events_by_trade.get(trade.paper_trade_id, []))
+    ]
 
     # 计算已结束入场交易的平均持仓时长（小时）
     holding_durations: list[float] = []
@@ -713,6 +778,45 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
         f"| Unrealized PnL | {unrealized:,.2f} USDT |",
         f"| Entry reclaim blocks | {reclaim_pending_count} |",
         f"| Avg holding time | {'n/a' if avg_holding_hours is None else f'{avg_holding_hours:.1f}h'} |",
+        f"| TP1 EMA trailing activated | {ema_trailing_activated_count} |",
+        f"| TP1 EMA trailing raises | {ema_trailing_raised_count} |",
+        f"| TP1 EMA trailing stops | {ema_trailing_stop_count} |",
+        f"| TP1 EMA trailing active trades | {len(ema_trailing_active_trades)} |",
+        "",
+        "## Entry Reclaim 后续追踪",
+        "",
+        "| Symbol | Status | Pending Events | First Pending | Last Pending | Outcome | Detail |",
+        "|---|---|---:|---|---|---|---|",
+    ])
+
+    if reclaim_trades:
+        for trade in reclaim_trades:
+            trade_events = events_by_trade.get(trade.paper_trade_id, [])
+            pending_events = [event for event in trade_events if event.event_type == "RECLAIM_PENDING"]
+            outcome, detail = _reclaim_outcome(trade, trade_events)
+            lines.append(
+                "| "
+                f"`{trade.symbol}` | "
+                f"{trade.status} | "
+                f"{len(pending_events)} | "
+                f"{_local_timestamp(pending_events[0].event_time_utc)} | "
+                f"{_local_timestamp(pending_events[-1].event_time_utc)} | "
+                f"{outcome} | "
+                f"{detail} |"
+            )
+    else:
+        lines.append("| n/a | n/a | 0 | n/a | n/a | no_reclaim_pending | No RECLAIM_PENDING events recorded yet. |")
+
+    lines.extend([
+        "",
+        "## TP1 EMA Trailing Stop 追踪",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| Activated events | {ema_trailing_activated_count} |",
+        f"| Stop raise events | {ema_trailing_raised_count} |",
+        f"| Stop exits from EMA trailing | {ema_trailing_stop_count} |",
+        f"| Currently active trades | {len(ema_trailing_active_trades)} |",
         "",
         "## 当前观察与持仓",
         "",

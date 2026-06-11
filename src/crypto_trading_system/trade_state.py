@@ -83,14 +83,29 @@ def step_trade(
 
     if trade.status in {"ENTERED", "TP1_HIT"} and trade.entry_price is not None and trade.quantity:
         trade.unrealized_pnl = (close - trade.entry_price) * trade.quantity
-        if (
+        ema_trailing_stop_was_active = (
             trade.status == "TP1_HIT"
             and trade.tp1_trailing_ema_stop_active
             and tp1_trailing_ema_stop is not None
+        )
+        if (
+            ema_trailing_stop_was_active
         ):
             trailing = max(tp1_trailing_ema_stop, trade.entry_price)
             if trailing > trade.stop_loss:
+                old_stop = trade.stop_loss
                 trade.stop_loss = trailing
+                events.append(
+                    StepEvent(
+                        event_type="TP1_EMA_TRAILING_RAISED",
+                        message=(
+                            f"EMA20 trailing stop raised from {old_stop:.8g} "
+                            f"to {trade.stop_loss:.8g}."
+                        ),
+                        event_time_utc=event_time,
+                        price=trade.stop_loss,
+                    )
+                )
         stop_hit = low <= trade.stop_loss
         tp2_hit = high >= trade.take_profit_2
         tp1_hit = high >= trade.take_profit_1 and trade.status == "ENTERED"
@@ -102,17 +117,23 @@ def step_trade(
         for trigger in order:
             if trigger == "stop" and stop_hit:
                 exit_price = stop_exit_price_override if stop_exit_price_override is not None else trade.stop_loss
+                stopped_by_ema_trailing = ema_trailing_stop_was_active
                 trade.status = "STOPPED"
                 trade.closed_at_utc = event_time
                 trade.exit_price = exit_price
                 trade.realized_pnl = (exit_price - trade.entry_price) * trade.quantity
                 trade.unrealized_pnl = 0
-                trade.notes = "Stop loss hit."
+                trade.notes = "EMA20 trailing stop hit." if stopped_by_ema_trailing else "Stop loss hit."
                 if old_status != "STOPPED":
+                    message = (
+                        f"EMA20 trailing stop hit at {exit_price:.8g}."
+                        if stopped_by_ema_trailing
+                        else f"Stop loss hit at {exit_price:.8g}."
+                    )
                     events.append(
                         StepEvent(
                             event_type="STOPPED",
-                            message=f"Stop loss hit at {exit_price:.8g}.",
+                            message=message,
                             event_time_utc=event_time,
                             price=exit_price,
                         )
@@ -147,6 +168,14 @@ def step_trade(
                     trailing = max(tp1_trailing_ema_stop, trade.entry_price)
                     trade.stop_loss = max(trade.stop_loss, trailing)
                     trade.notes = "TP1 hit; EMA20 trailing stop activated."
+                    events.append(
+                        StepEvent(
+                            event_type="TP1_EMA_TRAILING_ACTIVATED",
+                            message=f"EMA20 trailing stop activated at {trade.stop_loss:.8g}.",
+                            event_time_utc=event_time,
+                            price=trade.stop_loss,
+                        )
+                    )
                 else:
                     trade.notes = "TP1 hit; trade remains open for TP2 tracking."
                 events.append(
