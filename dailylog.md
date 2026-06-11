@@ -15,7 +15,42 @@
 
 ## 2026-06-11
 
-### 01:30:00 +08:00 - 优化 _closed_slice：linear scan 改为 bisect 二分查找
+### 02:00:00 +08:00 - 性能优化系列：profiling 驱动的三轮优化
+- 类型：代码 / 性能 / 测试 / Git
+
+#### 背景
+dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。profiling 发现真正的瓶颈分布：
+- 网络 I/O（SSL read + TLS + sleep）：~261s（数据未完全缓存时）
+- `_closed_slice` 线性扫描：每根 4h bar ~150 次调用 × O(n) 全量扫描
+- `_normalise_kline/row`：str→float 逐字段转换，每次 4506k 次调用
+- `ema_series`/`atr`：110k 次调用，每次从头算 ~2290 点历史
+- `_quote_closes`/`_quote_volumes`：每次 `float()` 转换全量 closes 列表
+
+#### 优化 1：`_closed_slice` bisect（commit `477c2ab`）
+- `replay.py` 和 `universe.py` 的 `_closed_slice` 从 O(n) 线性扫描改为 `bisect.bisect_right` 二分查找
+- benchmark：10000 次调用 1.38ms/call → 0.014ms/call，加速 **96x**，结果完全一致
+
+#### 优化 2：批量 klines 加载（commit `81965db`）
+- 新增 `batch_load_klines_cached`，418 symbols × 3 intervals 用单次 SQL IN 查询而非 1254 次独立连接
+- 实测：全缓存时加载阶段节省有限（SQLite IN 查询本身仍需时间）
+
+#### 优化 3：kline 字段存 float/int（commit `2a0be7d`）
+- `_normalise_kline` 和 `_normalise_kline_row` 直接存 float/int 而非 str
+- 消除 `_quote_closes`、`_quote_volumes`、replay 热路径中的无效 str→float 转换
+- 实测节省：~44s（profiling 前后对比：_normalise -14s，_normalise_row -11s，_quote_closes -10s，_quote_volumes -9s）
+- 端到端：644s → 543s（混合有网络下载的窗口）
+
+#### 优化 4：EMA 增量缓存（commit `c0b1f60`）
+- `indicators.py` 新增 `ema_step(prev, value, period)` 单步递推函数
+- `_analyze_ticker` 增加 `precomputed_indicators` 可选参数，传入时跳过 `ema_series` 全量计算
+- `replay.py` 主循环维护 `_ema_cache[symbol]`，每根 bar 只用 `ema_step` 做增量更新
+- 理论节省：~26s（ema_series 110k 次调用 × 2290 点）；实测被网络时间掩盖，需纯缓存窗口验证
+
+#### 验证
+- 所有优化：`test_replay`、`test_universe`、`test_trade_state`、`test_abtest` 全部通过
+- 数值一致性：net_return_pct=-10.78，max_drawdown_pct=20.70，closed_trades=35 在各轮均相同
+
+
 - 类型：代码 / 性能 / 测试 / Git
 - 改动：`replay.py` 和 `universe.py` 中的 `_closed_slice` 函数从全量线性扫描改为 `bisect.bisect_right` 二分查找。klines 列表按 open_time 升序排列，用 `bisect` 直接定位截止下标，取前缀切片，无需逐元素过滤。
 - 原因：性能分析发现 `_closed_slice` 是回测最大瓶颈——每根 4h bar 被调用约 150 次，每次对最多 9000 条 1h klines 做 O(n) 线性扫描并分配新 list。1 年回测约 33 万次调用，累积约 30 亿次元素比较。bisect 将单次调用从 O(n) 降到 O(log n)，benchmark 测得加速比约 96x，行为完全一致。
