@@ -268,9 +268,49 @@ def _sync_record(item: _SimTrade) -> None:
         trade.exit_price - trade.entry_price
     ) * trade.quantity
     record.net_pnl = trade.realized_pnl
-    if trade.cash_risk > 0 and trade.status in {"STOPPED", "CLOSED"}:
+    if trade.cash_risk > 0 and trade.status in {"STOPPED", "CLOSED", "TIME_EXIT"}:
         record.r_multiple_net = trade.realized_pnl / trade.cash_risk
     record.notes = trade.notes
+
+
+def _holding_bars_since_entry(trade: PaperTrade, bar_close_ms: int, primary_interval: str) -> int | None:
+    if trade.entered_at_utc is None:
+        return None
+    entered_ms = _date_to_ms(trade.entered_at_utc)
+    return max(0, (bar_close_ms - entered_ms) // interval_ms(primary_interval))
+
+
+def _force_time_exit(
+    item: _SimTrade,
+    *,
+    fill_price: float,
+    fill_fee: float,
+    slippage_cost: float,
+    raw_price: float,
+    bar_time: str,
+) -> None:
+    trade = item.paper
+    if trade.entry_price is None or trade.quantity is None:
+        return
+    trade.status = "TIME_EXIT"
+    trade.closed_at_utc = bar_time
+    trade.updated_at_utc = bar_time
+    trade.exit_price = fill_price
+    trade.realized_pnl = (fill_price - trade.entry_price) * trade.quantity
+    trade.unrealized_pnl = 0
+    trade.notes = "Time exit: TP1 not touched within max_holding_bars_without_tp1."
+    item.record.exit_price_raw = raw_price
+    item.record.exit_fee = fill_fee
+    item.record.slippage_cost += slippage_cost
+    trade.realized_pnl -= fill_fee + item.record.entry_fee
+    item.record.events.append(
+        {
+            "event_type": "TIME_EXIT",
+            "message": trade.notes,
+            "event_time_utc": bar_time,
+            "price": fill_price,
+        }
+    )
 
 
 def run_backtest_replay(
@@ -466,11 +506,13 @@ def run_backtest_replay(
             stop_fill = stop_exit_fill(item.paper.stop_loss, qty, settings.backtest)
             tp2_fill = target_exit_fill(item.paper.take_profit_2, qty, settings.backtest)
             ema20_4h_current: float | None = None
+            ema20_4h_current_ready = False
             if settings.analysis.tp1_ema_trailing_stop_enabled:
                 k4h_closed = _closed_slice(klines_by_symbol[item.paper.symbol]["4h"], "4h", bar_close_ms)
                 closes_4h = [float(k[4]) for k in k4h_closed]
                 if len(closes_4h) >= 20:
                     ema20_4h_current = _ema(closes_4h, 20)
+                    ema20_4h_current_ready = True
             events = step_trade(
                 item.paper,
                 high=float(bar[2]),
@@ -483,6 +525,7 @@ def run_backtest_replay(
                 tp2_exit_price_override=tp2_fill.filled_price,
                 move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
                 tp1_trailing_ema_stop=ema20_4h_current,
+                tp1_trailing_ema_stop_ready=ema20_4h_current_ready,
             )
             for event in events:
                 item.record.events.append(asdict(event))
@@ -493,6 +536,26 @@ def run_backtest_replay(
                     item.record.slippage_cost += fill.slippage_cost
                     item.paper.realized_pnl -= fill.fee + item.record.entry_fee
                     cash += item.paper.quantity * fill.filled_price - fill.fee
+            max_holding_bars = settings.backtest.max_holding_bars_without_tp1
+            holding_bars = _holding_bars_since_entry(item.paper, bar_close_ms, primary_interval)
+            if (
+                max_holding_bars > 0
+                and item.paper.status == "ENTERED"
+                and item.paper.tp1_hit_at_utc is None
+                and holding_bars is not None
+                and holding_bars >= max_holding_bars
+                and item.paper.quantity
+            ):
+                time_fill = stop_exit_fill(float(bar[4]), item.paper.quantity, settings.backtest)
+                _force_time_exit(
+                    item,
+                    fill_price=time_fill.filled_price,
+                    fill_fee=time_fill.fee,
+                    slippage_cost=time_fill.slippage_cost,
+                    raw_price=time_fill.raw_price,
+                    bar_time=bar_time,
+                )
+                cash += item.paper.quantity * time_fill.filled_price - time_fill.fee
             _sync_record(item)
 
         watching = [
@@ -566,11 +629,13 @@ def run_backtest_replay(
             final_entry = entry_fill(raw_entry, qty, settings.backtest)
             stop_fill = stop_exit_fill(item.paper.stop_loss, qty, settings.backtest)
             ema20_4h_entry: float | None = None
+            ema20_4h_entry_ready = False
             if settings.analysis.tp1_ema_trailing_stop_enabled:
                 k4h_closed_entry = _closed_slice(klines_by_symbol[item.paper.symbol]["4h"], "4h", bar_close_ms)
                 closes_4h_entry = [float(k[4]) for k in k4h_closed_entry]
                 if len(closes_4h_entry) >= 20:
                     ema20_4h_entry = _ema(closes_4h_entry, 20)
+                    ema20_4h_entry_ready = True
             events = step_trade(
                 item.paper,
                 high=high,
@@ -583,6 +648,7 @@ def run_backtest_replay(
                 stop_exit_price_override=stop_fill.filled_price,
                 move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
                 tp1_trailing_ema_stop=ema20_4h_entry,
+                tp1_trailing_ema_stop_ready=ema20_4h_entry_ready,
             )
             for event in events:
                 item.record.events.append(asdict(event))

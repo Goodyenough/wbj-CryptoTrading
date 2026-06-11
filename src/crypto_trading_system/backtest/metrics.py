@@ -34,7 +34,7 @@ class BacktestMetrics:
 
 
 def _closed(trades: list[BacktestTrade]) -> list[BacktestTrade]:
-    return [trade for trade in trades if trade.status in {"STOPPED", "CLOSED"}]
+    return [trade for trade in trades if trade.status in {"STOPPED", "CLOSED", "TIME_EXIT"}]
 
 
 def _max_drawdown(values: list[float]) -> tuple[float, float]:

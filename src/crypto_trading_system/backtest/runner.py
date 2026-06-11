@@ -82,6 +82,7 @@ STATUS_LABELS = {
     "TP1_HIT": "TP1_HIT（第一止盈已触达）",
     "STOPPED": "STOPPED（已止损）",
     "CLOSED": "CLOSED（已按TP2平仓）",
+    "TIME_EXIT": "TIME_EXIT（未触TP1超时退出）",
     "INVALIDATED": "INVALIDATED（未入场前失效）",
     "EXPIRED": "EXPIRED（观察计划过期）",
     "EXPIRED_END": "EXPIRED_END（回测结束仍未入场）",
@@ -208,9 +209,9 @@ def _render_report(
     benchmarks: dict[str, float | None],
     report_version: str,
 ) -> str:
-    closed = [trade for trade in result.trades if trade.status in {"STOPPED", "CLOSED"}]
+    closed = [trade for trade in result.trades if trade.status in {"STOPPED", "CLOSED", "TIME_EXIT"}]
     open_trades = [trade for trade in result.trades if trade.status in {"ENTERED", "TP1_HIT"}]
-    inactive = [trade for trade in result.trades if trade.status not in {"STOPPED", "CLOSED", "ENTERED", "TP1_HIT"}]
+    inactive = [trade for trade in result.trades if trade.status not in {"STOPPED", "CLOSED", "TIME_EXIT", "ENTERED", "TP1_HIT"}]
     commit_hash = _commit_hash()
     lines = [
         "---",

@@ -24,6 +24,11 @@ from crypto_trading_system.config import load_settings
 from crypto_trading_system.doctor import run_doctor
 from crypto_trading_system.paper_trader import add_from_scan, generate_paper_report, update_paper_trades
 from crypto_trading_system.reports import write_scan_reports
+from crypto_trading_system.research_tools import (
+    build_experiment_index,
+    generate_observation_dashboard,
+    split_symbol_master_by_cap,
+)
 from crypto_trading_system.scanner import run_market_scan
 from crypto_trading_system.storage import init_db, save_scan_result
 from crypto_trading_system.verify import verify_symbol
@@ -188,6 +193,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Query Binance for each symbol's first 1d candle date and store in the master JSON.",
     )
 
+    split_master = subparsers.add_parser(
+        "split-symbol-master",
+        help="Split a dynamic symbol master into large-cap and altcoin JSON files.",
+    )
+    split_master.add_argument("--input", required=True, help="Input dynamic symbol master JSON.")
+    split_master.add_argument("--output-dir", default=None, help="Output directory. Defaults to input file directory.")
+
     regime_breakdown = subparsers.add_parser(
         "backtest-regime-breakdown",
         help="Group saved backtest trades by BTC/ETH market regime and write a comparison report.",
@@ -312,6 +324,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write only to the project reports directory.",
     )
 
+    experiment_index = subparsers.add_parser("experiment-index", help="Build a Markdown index of A/B conclusions.")
+    experiment_index.add_argument(
+        "--reports-dir",
+        default=None,
+        help="Reports root or date directory to scan. Defaults to settings.output.reports_dir.",
+    )
+    experiment_index.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
+    observation_dashboard = subparsers.add_parser(
+        "observation-dashboard",
+        help="Write the three-week paper-trading observation dashboard.",
+    )
+    observation_dashboard.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    observation_dashboard.add_argument(
+        "--no-obsidian",
+        action="store_true",
+        help="Write only to the project reports directory.",
+    )
+
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
 
@@ -382,6 +417,12 @@ def main() -> None:
         updated = update_paper_trades(settings, account_name=args.account)
         _progress("writing paper trading report")
         _, paper_report_paths = generate_paper_report(settings, account_name=args.account)
+        _progress("writing three-week observation dashboard")
+        original_obsidian = settings.output.obsidian_dir
+        if args.no_obsidian:
+            settings.output.obsidian_dir = None
+        _, observation_paths = generate_observation_dashboard(settings, account_name=args.account)
+        settings.output.obsidian_dir = original_obsidian
 
         print("daily=completed")
         print(f"scan_id={result.scan_id}")
@@ -408,6 +449,8 @@ def main() -> None:
             print(f"scan_report={path}")
         for path in paper_report_paths:
             print(f"paper_report={path}")
+        for path in observation_paths:
+            print(f"observation_dashboard={path}")
 
     if args.command == "verify":
         result = verify_symbol(settings, args.symbol, progress=_progress)
@@ -535,6 +578,15 @@ def main() -> None:
         print(f"source_limit_applied={str(master.source_limit_applied).lower()}")
         print(f"listing_dates_fetched={str(master.listing_dates is not None).lower()}")
         print(f"output={Path(args.output)}")
+
+    if args.command == "split-symbol-master":
+        large_path, alt_path = split_symbol_master_by_cap(
+            Path(args.input),
+            None if args.output_dir is None else Path(args.output_dir),
+        )
+        print("split_symbol_master=completed")
+        print(f"large_cap={large_path}")
+        print(f"altcoin={alt_path}")
 
     if args.command == "backtest-regime-breakdown":
         _progress("building backtest market regime breakdown")
@@ -699,6 +751,30 @@ def main() -> None:
         print(f"reason={aggregate.reason}")
         for path in aggregate.report_paths:
             print(f"summary_report={path}")
+
+    if args.command == "experiment-index":
+        original_obsidian = settings.output.obsidian_dir
+        if args.no_obsidian:
+            settings.output.obsidian_dir = None
+        _, paths = build_experiment_index(
+            settings,
+            reports_dir=None if args.reports_dir is None else Path(args.reports_dir),
+        )
+        settings.output.obsidian_dir = original_obsidian
+        print("experiment_index=completed")
+        for path in paths:
+            print(f"report={path}")
+
+    if args.command == "observation-dashboard":
+        original_obsidian = settings.output.obsidian_dir
+        if args.no_obsidian:
+            settings.output.obsidian_dir = None
+        init_db(settings.output.database_path)
+        _, paths = generate_observation_dashboard(settings, account_name=args.account)
+        settings.output.obsidian_dir = original_obsidian
+        print("observation_dashboard=completed")
+        for path in paths:
+            print(f"report={path}")
 
     if args.command == "paper":
         init_db(settings.output.database_path)

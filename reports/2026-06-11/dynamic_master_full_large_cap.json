@@ -1,0 +1,14 @@
+{
+  "source": "Binance current exchangeInfo tradable USDT spot symbols; cap_split=large_cap",
+  "created_at_utc": "2026-06-11T13:14:02+00:00",
+  "symbols": [
+    "BNBUSDT",
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "source_limit": null,
+  "source_limit_applied": false,
+  "filters": "USDT spot; exclude bases=USDT,USDC,FDUSD,TUSD,DAI,USDP,USDE,EUR,EURI,AEUR,PAXG,USTC; exclude leveraged token suffixes=UPUSDT,DOWNUSDT,BULLUSDT,BEARUSDT; cap_split=large_cap; large_cap_symbols=BTCUSDT,ETHUSDT,BNBUSDT,SOLUSDT",
+  "listing_dates": null
+}

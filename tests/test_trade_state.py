@@ -120,12 +120,32 @@ def test_tp1_activates_ema_trailing_stop() -> None:
         close=119.0,
         event_time_utc="2026-01-01T08:00:00+00:00",
         tp1_trailing_ema_stop=108.0,
+        tp1_trailing_ema_stop_ready=True,
     )
     assert trade.status == "TP1_HIT"
     assert trade.stop_loss == 108.0
     assert trade.tp1_trailing_ema_stop_active is True
     assert "EMA20" in trade.notes
     assert [event.event_type for event in events] == ["TP1_EMA_TRAILING_ACTIVATED", "TP1_HIT"]
+
+
+def test_tp1_does_not_activate_ema_trailing_stop_before_ema_ready() -> None:
+    trade = make_trade("ENTERED")
+    trade.entry_price = 103.0
+    trade.quantity = 100 / 13
+    events = step_trade(
+        trade,
+        high=121.0,
+        low=100.0,
+        close=119.0,
+        event_time_utc="2026-01-01T08:00:00+00:00",
+        tp1_trailing_ema_stop=108.0,
+        tp1_trailing_ema_stop_ready=False,
+    )
+    assert trade.status == "TP1_HIT"
+    assert trade.stop_loss == 90.0
+    assert trade.tp1_trailing_ema_stop_active is False
+    assert [event.event_type for event in events] == ["TP1_HIT"]
 
 
 def test_tp1_ema_trailing_stop_raises_on_next_bar() -> None:
@@ -141,6 +161,7 @@ def test_tp1_ema_trailing_stop_raises_on_next_bar() -> None:
         close=123.0,
         event_time_utc="2026-01-01T12:00:00+00:00",
         tp1_trailing_ema_stop=112.0,
+        tp1_trailing_ema_stop_ready=True,
     )
     assert trade.stop_loss == 112.0
     assert trade.status == "TP1_HIT"
@@ -160,6 +181,7 @@ def test_tp1_ema_trailing_stop_never_below_entry() -> None:
         close=123.0,
         event_time_utc="2026-01-01T12:00:00+00:00",
         tp1_trailing_ema_stop=95.0,
+        tp1_trailing_ema_stop_ready=True,
     )
     assert trade.stop_loss == 103.0
 
@@ -177,6 +199,7 @@ def test_tp1_ema_trailing_stop_stop_hit() -> None:
         close=111.0,
         event_time_utc="2026-01-01T16:00:00+00:00",
         tp1_trailing_ema_stop=112.0,
+        tp1_trailing_ema_stop_ready=True,
     )
     assert trade.status == "STOPPED"
     assert trade.exit_price == 112.0
@@ -193,6 +216,7 @@ if __name__ == "__main__":
     test_tp1_can_move_stop_to_breakeven()
     test_watching_same_bar_entry_then_stop()
     test_tp1_activates_ema_trailing_stop()
+    test_tp1_does_not_activate_ema_trailing_stop_before_ema_ready()
     test_tp1_ema_trailing_stop_raises_on_next_bar()
     test_tp1_ema_trailing_stop_never_below_entry()
     test_tp1_ema_trailing_stop_stop_hit()

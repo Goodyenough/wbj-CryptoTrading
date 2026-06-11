@@ -103,7 +103,13 @@
 - [x] 对 `risk_off_no_core_entry_reclaim_ema_stop` 做 keep review：发现模拟盘口径缺失两项——`entry_reclaim_close` 检查（WATCHING 状态下 4h 收盘未站回 entry_high 时阻止入场）和 `tp1_ema_trailing_stop`（TP1 后 EMA20 跟踪止损）；已在 `paper_trader.py` 补全并对齐，`risk_off_core_buy_enabled` 口径原本一致，三项规则现已全部在模拟盘中生效，commit `417681d`。
 - [ ] 正式 keep `risk_off_no_core_entry_reclaim_ema_stop`：将三项 override（`risk_off_core_buy_enabled=false`、`entry_reclaim_close_enabled=true`、`tp1_ema_trailing_stop_enabled=true`）写入默认 `settings.toml`；当前模拟盘有存量 WATCHING 持仓，写入后会立即对其生效，决定等模拟盘跑一段时间、观察到足够真实案例后再执行。
 
-- [ ] 修复 `tp1_ema_trailing_stop` corner case：TP1 命中时 4h K线不足 20 根，`tp1_trailing_ema_stop_active` 标志已设为 True 但 EMA 为 None，后续 K 线累积到 20 根后会突然激活抬止损；实际概率低（历史长度过滤已排除绝大多数新上市币），但逻辑上存在，需在 `step_trade` 中明确处理（例如：仅在首次 EMA 有值时才设 active 标志，或在 active 但 EMA 为 None 时保持止损不动并记录 notes）。
+- [x] 修复 `tp1_ema_trailing_stop` 两个技术债：EMA 不足 20 根时不激活 trailing stop；`tp1_trailing_ema_stop_active` 持久化到 `paper_trades`，避免模拟盘重启/重载后丢失 TP1 EMA trailing 状态。
+- [x] 做市值分层回测：将 `dynamic_master_full.json` 拆成 large-cap（BTC/ETH/BNB/SOL）和 altcoin，两组分别跑当前 sensitive 组合；近端窗口 large-cap 净收益 +3.46%、MDD 11.36%，altcoin 净收益 -10.26%、MDD 23.44%，结论为弱市中 altcoin 风险暴露更像主要拖累，large-cap 值得单独观察。
+- [ ] 跨区间复测市值分层：至少补 `2024-07-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01` 非重叠窗口，确认 large-cap 优势不是单窗口偶然。
+- [x] 做持仓时间过滤实验：新增 `max_holding_30x4h_no_tp1`，入场后 30 根 4h 未触 TP1 则 `TIME_EXIT`；近端 full master A/B 显示净收益 3.32% -> 27.28%、MDD 20.85% -> 11.84%、PF 1.11 -> 1.56，结论 `retest / candidate_keep_review`。
+- [ ] 跨区间复测 `max_holding_30x4h_no_tp1`，并尝试 18/42 根 4h 两个相邻阈值，确认不是过拟合 30 根。
+- [x] 建实验结论索引页：新增 `python main.py experiment-index`，生成 `reports/2026-06-11/experiment_index_2026-06-11_v2.md`。
+- [x] 准备 3 周观察仪表：新增 `python main.py observation-dashboard`，并接入 `python main.py daily`，每天输出 `RECLAIM_PENDING` 后续、TP1 EMA trailing、开放持仓时长和 RISK_OFF 今日候选摘要。
 
 ## 运维待办
 

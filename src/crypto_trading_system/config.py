@@ -72,6 +72,7 @@ class BacktestSettings:
     max_position_notional_pct: float
     allow_leverage: bool
     watch_expiry_bars: int
+    max_holding_bars_without_tp1: int
     warmup_1h_bars: int
     warmup_4h_bars: int
     warmup_1d_bars: int
@@ -191,6 +192,7 @@ def load_settings(path: Path) -> Settings:
             max_position_notional_pct=float(backtest.get("max_position_notional_pct", 1.0)),
             allow_leverage=bool(backtest.get("allow_leverage", False)),
             watch_expiry_bars=int(backtest.get("watch_expiry_bars", 18)),
+            max_holding_bars_without_tp1=int(backtest.get("max_holding_bars_without_tp1", 0)),
             warmup_1h_bars=int(backtest.get("warmup_1h_bars", 200)),
             warmup_4h_bars=int(backtest.get("warmup_4h_bars", 100)),
             warmup_1d_bars=int(backtest.get("warmup_1d_bars", 80)),

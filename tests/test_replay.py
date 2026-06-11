@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 import sys
 
@@ -9,9 +10,18 @@ sys.path.insert(0, str(ROOT / "src"))
 from crypto_trading_system.backtest.history import interval_ms
 from crypto_trading_system.backtest.history import KlineFetchResult
 from crypto_trading_system.backtest import replay as replay_module
-from crypto_trading_system.backtest.replay import _closed_slice, _effective_warmup_ms, _entry_reclaim_close_satisfied
+from crypto_trading_system.backtest.replay import (
+    BacktestTrade,
+    _SimTrade,
+    _closed_slice,
+    _effective_warmup_ms,
+    _entry_reclaim_close_satisfied,
+    _force_time_exit,
+    _holding_bars_since_entry,
+)
 from crypto_trading_system.backtest.universe import SymbolMaster
 from crypto_trading_system.config import load_settings
+from crypto_trading_system.models import PaperTrade
 from crypto_trading_system.ticker_utils import reconstruct_ticker
 
 
@@ -30,6 +40,10 @@ def make_kline(open_time: int, close: float, interval_ms: int = 60 * 60_000) -> 
         "500",
         "0",
     ]
+
+
+def ms(value: str) -> int:
+    return int(datetime.fromisoformat(value).replace(tzinfo=timezone.utc).timestamp() * 1000)
 
 
 def test_reconstruct_ticker_ignores_future_data() -> None:
@@ -68,6 +82,94 @@ def test_entry_reclaim_close_requires_close_above_entry_high() -> None:
     assert _entry_reclaim_close_satisfied(False, close=99.0, entry_high=100.0) is True
     assert _entry_reclaim_close_satisfied(True, close=99.0, entry_high=100.0) is False
     assert _entry_reclaim_close_satisfied(True, close=100.0, entry_high=100.0) is True
+
+
+def test_holding_bars_since_entry_counts_closed_4h_bars() -> None:
+    trade = PaperTrade(
+        paper_trade_id="test",
+        account_name="backtest",
+        source_scan_id="scan",
+        source_rank=1,
+        symbol="TESTUSDT",
+        base_asset="TEST",
+        status="ENTERED",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        updated_at_utc="2026-01-01T04:00:00+00:00",
+        setup="test",
+        verdict="test",
+        entry_low=100,
+        entry_high=105,
+        planned_entry_mid=102.5,
+        stop_loss=90,
+        take_profit_1=120,
+        take_profit_2=135,
+        risk_reward_1=2,
+        risk_reward_2=3,
+        account_equity=10_000,
+        risk_per_trade_pct=0.01,
+        cash_risk=100,
+        entered_at_utc="2026-01-01T04:00:00+00:00",
+    )
+    assert _holding_bars_since_entry(trade, ms("2026-01-01T12:00:00"), "4h") == 2
+
+
+def test_force_time_exit_marks_closed_trade() -> None:
+    paper = PaperTrade(
+        paper_trade_id="test",
+        account_name="backtest",
+        source_scan_id="scan",
+        source_rank=1,
+        symbol="TESTUSDT",
+        base_asset="TEST",
+        status="ENTERED",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        updated_at_utc="2026-01-01T04:00:00+00:00",
+        setup="test",
+        verdict="test",
+        entry_low=100,
+        entry_high=105,
+        planned_entry_mid=102.5,
+        stop_loss=90,
+        take_profit_1=120,
+        take_profit_2=135,
+        risk_reward_1=2,
+        risk_reward_2=3,
+        account_equity=10_000,
+        risk_per_trade_pct=0.01,
+        cash_risk=100,
+        quantity=10,
+        entry_price=105,
+    )
+    record = BacktestTrade(
+        trade_id="test",
+        symbol="TESTUSDT",
+        status="ENTERED",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        updated_at_utc="2026-01-01T04:00:00+00:00",
+        score=80,
+        action="BUY_CANDIDATE",
+        setup="test",
+        verdict="test",
+        entry_low=100,
+        entry_high=105,
+        stop_loss=90,
+        take_profit_1=120,
+        take_profit_2=135,
+        entry_fee=1,
+    )
+    item = _SimTrade(paper=paper, record=record, active_from_ms=0, created_index=0, score=80, initial_cash_risk=100)
+    _force_time_exit(
+        item,
+        fill_price=101,
+        fill_fee=1,
+        slippage_cost=0.5,
+        raw_price=101.1,
+        bar_time="2026-01-02T00:00:00+00:00",
+    )
+    assert paper.status == "TIME_EXIT"
+    assert paper.closed_at_utc == "2026-01-02T00:00:00+00:00"
+    assert paper.realized_pnl == -42
+    assert record.events[-1]["event_type"] == "TIME_EXIT"
 
 
 def test_dynamic_universe_requires_btc_timeline() -> None:
@@ -116,5 +218,7 @@ if __name__ == "__main__":
     test_closed_slice_includes_signal_bar_only_after_close()
     test_effective_warmup_covers_min_history_plus_margin()
     test_entry_reclaim_close_requires_close_above_entry_high()
+    test_holding_bars_since_entry_counts_closed_4h_bars()
+    test_force_time_exit_marks_closed_trade()
     test_dynamic_universe_requires_btc_timeline()
     print("test_replay=passed")

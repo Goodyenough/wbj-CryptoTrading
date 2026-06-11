@@ -15,6 +15,18 @@
 
 ## 2026-06-11
 
+### 21:30:39 +08:00 - 完成三周等待期五项补强
+- 类型：代码 / 配置 / 回测 / A/B / 报告 / 测试 / 文档 / Git
+- 改动：修复 `tp1_ema_trailing_stop` 两个一致性问题：`step_trade` 只有在调用方明确传入 `tp1_trailing_ema_stop_ready=true` 时才允许 TP1 EMA trailing 激活；`paper_trades` 新增 `tp1_trailing_ema_stop_active` 持久化列，并在旧库上自动 `ALTER TABLE` 补列。
+- 改动：新增 `backtest.max_holding_bars_without_tp1` 与实验 `max_holding_30x4h_no_tp1`；回测中持仓进入 `ENTERED` 后若 30 根 4h 未触 TP1，则按 `TIME_EXIT` 防守性退出，并纳入 closed trade 指标。
+- 改动：新增 `research_tools.py` 和 CLI：`split-symbol-master` 拆分 large-cap/altcoin master，`experiment-index` 生成实验结论索引，`observation-dashboard` 生成三周观察仪表；`daily` 流程在 paper report 后自动输出观察仪表。
+- 改动：将 `dynamic_master_full.json` 拆成 `dynamic_master_full_large_cap.json` 与 `dynamic_master_full_altcoin.json`；分别运行当前 sensitive 组合回测，并生成 `market_cap_split_sensitive_2026-06-11_v1.md`。
+- 影响：三周观察期每天会额外沉淀 `RECLAIM_PENDING` 后续、TP1 EMA trailing 激活/抬止损/出场、开放持仓时长、今日扫描 action 与 RISK_OFF 摘要；后续实验可以从 `experiment_index_2026-06-11_v2.md` 快速检索结论。
+- 结果：市值分层近端窗口 `2025-06-01 -> 2026-06-01` 显示 large-cap（BTC/ETH/BNB/SOL）closed_trades=30、PF=1.19、净收益 +3.46%、MDD 11.36%；altcoin closed_trades=57、PF=0.76、净收益 -10.26%、MDD 23.44%，结论为 `retest / candidate_keep_review`。
+- 结果：`max_holding_30x4h_no_tp1` full master A/B 显示 closed_trades 63 -> 111、stop_rate 84.13% -> 31.53%、PF 1.11 -> 1.56、净收益 3.32% -> 27.28%、MDD 20.85% -> 11.84%，结论为 `retest / candidate_keep_review`，需跨区间复测。
+- 验证：运行 `python -m compileall main.py src tests`、`python tests\test_trade_state.py`、`python tests\test_replay.py`、`python tests\test_abtest.py` 均通过；运行 `python main.py paper report --account demo` 成功生成 `paper_report_2026-06-11_demo_v5.md`，验证 SQLite 新列迁移和读取正常。
+- Git：本次提交 `Add three-week validation workflows`。
+
 ### 21:01:16 +08:00 - 增强 paper report 三周验证追踪字段
 - 类型：代码 / 报告 / 测试 / Git
 - 改动：在 `trade_state.step_trade` 中新增 `TP1_EMA_TRAILING_ACTIVATED` 与 `TP1_EMA_TRAILING_RAISED` 事件，并在 EMA20 trailing stop 触发止损时写入明确事件说明；在 `paper_trader.generate_paper_report` 中新增 TP1 EMA trailing stop 激活次数、抬止损次数、EMA stop 出场次数、当前激活持仓统计，以及 `RECLAIM_PENDING` 后续追踪表。

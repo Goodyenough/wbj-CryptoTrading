@@ -113,6 +113,7 @@ def _paper_trade_from_row(row: sqlite3.Row) -> PaperTrade:
         unrealized_pnl=float(row["unrealized_pnl"]),
         last_price=None if row["last_price"] is None else float(row["last_price"]),
         notes=row["notes"],
+        tp1_trailing_ema_stop_active=bool(row["tp1_trailing_ema_stop_active"]) if "tp1_trailing_ema_stop_active" in row.keys() else False,
     )
 
 
@@ -176,11 +177,12 @@ def _insert_paper_trade(connection: sqlite3.Connection, trade: PaperTrade, paylo
                 stop_loss, take_profit_1, take_profit_2, risk_reward_1, risk_reward_2,
                 account_equity, risk_per_trade_pct, cash_risk, quantity, entry_price,
                 entered_at_utc, tp1_hit_at_utc, closed_at_utc, exit_price,
-                realized_pnl, unrealized_pnl, last_price, notes, payload_json
+                realized_pnl, unrealized_pnl, last_price, notes,
+                tp1_trailing_ema_stop_active, payload_json
             )
             VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
             """,
             (
@@ -216,6 +218,7 @@ def _insert_paper_trade(connection: sqlite3.Connection, trade: PaperTrade, paylo
                 trade.unrealized_pnl,
                 trade.last_price,
                 trade.notes,
+                1 if trade.tp1_trailing_ema_stop_active else 0,
                 json.dumps(payload, ensure_ascii=False),
             ),
         )
@@ -379,7 +382,8 @@ def _save_trade_update(connection: sqlite3.Connection, trade: PaperTrade) -> Non
         UPDATE paper_trades
         SET status = ?, updated_at_utc = ?, quantity = ?, entry_price = ?,
             entered_at_utc = ?, tp1_hit_at_utc = ?, closed_at_utc = ?, exit_price = ?,
-            realized_pnl = ?, unrealized_pnl = ?, last_price = ?, notes = ?
+            realized_pnl = ?, unrealized_pnl = ?, last_price = ?, notes = ?,
+            tp1_trailing_ema_stop_active = ?
         WHERE paper_trade_id = ?
         """,
         (
@@ -395,6 +399,7 @@ def _save_trade_update(connection: sqlite3.Connection, trade: PaperTrade) -> Non
             trade.unrealized_pnl,
             trade.last_price,
             trade.notes,
+            1 if trade.tp1_trailing_ema_stop_active else 0,
             trade.paper_trade_id,
         ),
     )
@@ -459,10 +464,12 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
 
             # tp1_ema_trailing_stop：ENTERED/TP1_HIT 状态下计算 4h EMA20
             ema20_4h: float | None = None
+            ema20_4h_ready = False
             if ema_trailing_enabled and trade.status in {"ENTERED", "TP1_HIT"}:
                 closes_4h = _get_4h_closes(trade.symbol)
                 if len(closes_4h) >= 20:
                     ema20_4h = _ema(closes_4h, 20)
+                    ema20_4h_ready = True
 
             events = step_trade(
                 trade,
@@ -472,6 +479,7 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
                 event_time_utc=now,
                 move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
                 tp1_trailing_ema_stop=ema20_4h,
+                tp1_trailing_ema_stop_ready=ema20_4h_ready,
             )
             for event in events:
                 _record_event(

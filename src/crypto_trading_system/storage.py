@@ -72,11 +72,21 @@ def init_db(path: Path) -> None:
                 unrealized_pnl REAL NOT NULL DEFAULT 0,
                 last_price REAL,
                 notes TEXT NOT NULL DEFAULT '',
+                tp1_trailing_ema_stop_active INTEGER NOT NULL DEFAULT 0,
                 payload_json TEXT NOT NULL,
                 UNIQUE (account_name, source_scan_id, source_rank)
             )
             """
         )
+        columns = {
+            str(row[1])
+            for row in connection.execute("PRAGMA table_info(paper_trades)").fetchall()
+        }
+        if "tp1_trailing_ema_stop_active" not in columns:
+            connection.execute(
+                "ALTER TABLE paper_trades "
+                "ADD COLUMN tp1_trailing_ema_stop_active INTEGER NOT NULL DEFAULT 0"
+            )
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS paper_trade_events (

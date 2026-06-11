@@ -150,3 +150,11 @@ tp1_ema_trailing_stop_enabled = true
 regime_btc_7d_drop_pct = -3.0
 regime_eth_7d_drop_pct = -5.0
 regime_require_both_trend = true
+
+[max_holding_30x4h_no_tp1]
+enabled = true
+description = "Force-close an entered position if TP1 has not been touched after 30 closed 4h bars."
+dimension = "holding_time"
+
+[max_holding_30x4h_no_tp1.overrides.backtest]
+max_holding_bars_without_tp1 = 30

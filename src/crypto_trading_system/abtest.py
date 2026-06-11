@@ -54,6 +54,7 @@ ALLOWED_OVERRIDE_PATHS: dict[str, set[str]] = {
         "analysis.regime_eth_7d_drop_pct",
         "analysis.regime_require_both_trend",
     },
+    "holding_time": {"backtest.max_holding_bars_without_tp1"},
 }
 
 
