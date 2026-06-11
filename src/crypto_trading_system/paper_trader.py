@@ -9,6 +9,7 @@ import uuid
 
 from .config import Settings
 from .market_data import BinanceClient
+from .market_regime import classify_market_regime
 from .models import PaperTrade, PaperTradeEvent
 from .report_versions import next_report_version, versioned_markdown_filename
 from .trade_state import step_trade
@@ -445,6 +446,13 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
                     trade.last_price = current_price
                     trade.updated_at_utc = now
                     trade.notes = "Watching: entry zone touched, but 4h close has not reclaimed entry_high."
+                    _record_event(
+                        connection,
+                        trade,
+                        "RECLAIM_PENDING",
+                        f"Entry zone touched (price={_fmt_price(current_price)}) but 4h close {_fmt_price(last_close)} < entry_high {_fmt_price(trade.entry_high)}; waiting for reclaim.",
+                        price=current_price,
+                    )
                     _save_trade_update(connection, trade)
                     updated.append(trade)
                     continue
@@ -599,6 +607,42 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
     tp1_hits = [trade for trade in trades if trade.tp1_hit_at_utc is not None or trade.status == "TP1_HIT"]
     tp1_rate = (len(tp1_hits) / len(entered_trades) * 100) if entered_trades else None
 
+    # 统计 entry_reclaim 拦截次数（所有 RECLAIM_PENDING 事件数）
+    all_events = [e for evs in events_by_trade.values() for e in evs]
+    reclaim_pending_count = sum(1 for e in all_events if e.event_type == "RECLAIM_PENDING")
+
+    # 计算已结束入场交易的平均持仓时长（小时）
+    holding_durations: list[float] = []
+    for trade in closed_trades:
+        if trade.entered_at_utc and trade.closed_at_utc:
+            try:
+                entered = datetime.fromisoformat(trade.entered_at_utc)
+                closed = datetime.fromisoformat(trade.closed_at_utc)
+                holding_durations.append((closed - entered).total_seconds() / 3600)
+            except ValueError:
+                pass
+    avg_holding_hours = (sum(holding_durations) / len(holding_durations)) if holding_durations else None
+
+    # 拉取当日 regime 快照
+    regime = None
+    try:
+        client = BinanceClient(
+            settings.market.base_url,
+            timeout_seconds=settings.market.request_timeout_seconds,
+            pause_seconds=settings.market.request_pause_seconds,
+        )
+        btc_1d = client.klines("BTCUSDT", "1d", limit=80)
+        eth_1d = client.klines("ETHUSDT", "1d", limit=80)
+        regime = classify_market_regime(
+            btc_1d,
+            eth_1d,
+            btc_7d_drop_pct=settings.analysis.regime_btc_7d_drop_pct,
+            eth_7d_drop_pct=settings.analysis.regime_eth_7d_drop_pct,
+            require_both_trend=settings.analysis.regime_require_both_trend,
+        )
+    except Exception:
+        pass
+
     lines = [
         "---",
         f"created: {_local_timestamp(now)}",
@@ -624,6 +668,35 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
         f"- 胜率：{'n/a' if win_rate is None else f'{win_rate:.2f}%'}",
         f"- TP1 命中率：{'n/a' if tp1_rate is None else f'{tp1_rate:.2f}%'}",
         "",
+        "## 今日大盘环境",
+        "",
+    ]
+
+    if regime is None:
+        lines.append("_大盘环境数据获取失败。_")
+    else:
+        def _trend_str(ok: bool) -> str:
+            return "✓ 趋势确认 (price > EMA20 > EMA50)" if ok else "✗ 趋势未确认"
+
+        def _pct_str(val: float | None) -> str:
+            return "n/a" if val is None else f"{val:+.2f}%"
+
+        btc_threshold = settings.analysis.regime_btc_7d_drop_pct
+        eth_threshold = settings.analysis.regime_eth_7d_drop_pct
+        btc_pct_flag = "" if regime.btc_pct_7d is None or regime.btc_pct_7d >= btc_threshold else f" ⚠ 低于阈值 {btc_threshold:+.1f}%"
+        eth_pct_flag = "" if regime.eth_pct_7d is None or regime.eth_pct_7d >= eth_threshold else f" ⚠ 低于阈值 {eth_threshold:+.1f}%"
+
+        lines.extend([
+            f"- **状态：{regime.status}** — {regime.summary}",
+            f"- BTC 7d 涨跌：{_pct_str(regime.btc_pct_7d)}{btc_pct_flag}（阈值 {btc_threshold:+.1f}%）",
+            f"- ETH 7d 涨跌：{_pct_str(regime.eth_pct_7d)}{eth_pct_flag}（阈值 {eth_threshold:+.1f}%）",
+            f"- BTC 日线趋势：{_trend_str(regime.btc_trend_ok)}",
+            f"- ETH 日线趋势：{_trend_str(regime.eth_trend_ok)}",
+            f"- require_both_trend：{'是' if settings.analysis.regime_require_both_trend else '否'}",
+        ])
+
+    lines.extend([
+        "",
         "## 复盘统计",
         "",
         "| Metric | Value |",
@@ -638,12 +711,14 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
         f"| TP1 hit rate | {'n/a' if tp1_rate is None else f'{tp1_rate:.2f}%'} |",
         f"| Realized PnL | {realized:,.2f} USDT |",
         f"| Unrealized PnL | {unrealized:,.2f} USDT |",
+        f"| Entry reclaim blocks | {reclaim_pending_count} |",
+        f"| Avg holding time | {'n/a' if avg_holding_hours is None else f'{avg_holding_hours:.1f}h'} |",
         "",
         "## 当前观察与持仓",
         "",
         "| Status | Symbol | Last | Entry Zone | Entry | Stop | TP1 | TP2 | Qty | Unrealized | Notes |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
-    ]
+    ])
 
     for trade in open_trades:
         lines.append(
