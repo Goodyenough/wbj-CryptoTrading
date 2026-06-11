@@ -35,6 +35,12 @@ ALLOWED_OVERRIDE_PATHS: dict[str, set[str]] = {
         "analysis.entry_reclaim_close_enabled",
         "analysis.tp1_ema_trailing_stop_enabled",
     },
+    "combined_regime_entry_exit_daily_trend": {
+        "analysis.risk_off_core_buy_enabled",
+        "analysis.entry_reclaim_close_enabled",
+        "analysis.tp1_ema_trailing_stop_enabled",
+        "analysis.daily_trend_required",
+    },
 }
 
 
