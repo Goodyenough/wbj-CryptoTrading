@@ -57,6 +57,27 @@ Use this event-to-file decision table:
 | Concept learned | No | No | No | Learning note, not these four files |
 | Project direction changed | Optional | Required | Required | Required if experiment-driven |
 
+## Context Handoff
+
+When context usage reaches 90% or above, append a new section to `handoff.md` in the project root before the session ends. Do not overwrite existing content — always append with a timestamp header.
+
+- Path: `handoff.md` (project root, single persistent file)
+- Each entry starts with: `## YYYY-MM-DD HH:mm +08:00`
+- Purpose: allow a new session to pick up exactly where this one left off, with no repeated explanation needed
+
+Each appended section must cover:
+
+1. **项目目录** — absolute path of the working directory
+2. **任务背景** — what was being worked on and why
+3. **已完成的工作** — a concise list of everything done this session, with commit hashes where relevant
+4. **尚未完成的事项** — what is unfinished, blocked, or deferred, and why
+5. **下一步直接执行指令** — exact commands or steps the next session should run first, copy-paste ready
+6. **重要声明** — any gotchas, known issues, or decisions made that the next session must be aware of
+
+Write in Chinese. Keep English for command names, config keys, file paths, and commit hashes.
+
+After appending, create a Git commit for `handoff.md` before the session ends.
+
 Use this template for experiment-log entries:
 
 ```markdown
