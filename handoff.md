@@ -1,159 +1,228 @@
-# Handoff Log
+# Handoff — 2026-06-11 18:00 +08:00
+
+## 项目基本信息
+
+- **项目目录**：`D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects`
+- **Git 远端**：`https://github.com/Goodyenough/wbj-CryptoTrading.git`
+- **当前分支**：`main`
+- **最新 commit**：`0ac8f74` (已 push 到 origin/main)
+- **运行环境**：Windows 11 Pro，PowerShell，Python，SQLite
+- **数据库**：`data/crypto_trading.db`（SQLite，单文件，**不支持并发写入，两段回测必须串行**）
 
 ---
 
-## 2026-06-11 17:00 +08:00
+## 系统架构概览
 
-### 项目目录
-
-`D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects`
-
----
-
-### 任务背景
-
-加密货币量化交易回测系统。本次会话在上次基础上继续推进实验，完成了两轮 A/B 实验（walk-forward 补充段 + RISK_OFF 灵敏度优化），并将最优策略写入 settings.toml 激活模拟盘。
-
----
-
-### 已完成的工作
-
-1. **daily_trend + 三项组合 A/B 实验**：
-   - 早期段 PF 0.91→1.50，近端段 PF 0.73→0.81，但近端段止损率 77%→92%
-   - 结论：daily_trend 在四项组合中 reject，三项组合仍是更优选择
-   - commit `849136a`
-
-2. **三项组合 walk-forward 补充段**：
-   - 牛市段（2024-07→2025-01）：PF 1.30→2.37，净收益 +7.1%→+24.1%
-   - 震荡转熊段（2025-01→2025-06）：sample_insufficient（15笔），MDD 14.5%→10.0%，净收益 -11.8%→-6.5%
-   - 四段均成立，candidate_keep_review 信心提升
-
-3. **RISK_OFF 灵敏度参数化**（实验 4）：
-   - 将 `regime_btc_7d_drop_pct`、`regime_eth_7d_drop_pct`、`regime_require_both_trend` 三个参数加入 `AnalysisSettings`
-   - 更新 `market_regime.py` 接收参数，`replay.py` 和 `scanner.py` 透传
-   - commit `4657e82`
-
-4. **sensitive 组合四段 walk-forward**（三项规则 + 收紧阈值 BTC -3%/ETH -5%/both_trend）：
-   - 2024-07→2025-01（牛市）：PF 1.07→**2.52**，净收益 +2.4%→**+25.4%**，MDD -5.5%
-   - 2024-07→2025-06（牛+震荡）：PF 0.74→**1.58**，净收益 -14.3%→**+18.0%**，MDD -11.2%
-   - 2025-01→2025-06（震荡转熊⚠）：sample_insufficient+over_filtering（15笔），PF 0.11→0.53，净收益 -19.7%→-6.5%
-   - 2025-06→2026-06（熊市）：PF 0.66→**1.17**，净收益 -14.2%→**+5.5%**，MDD -4.8%
-   - 四段均优于或持平原三项组合，升级为主候选
-   - commits `cffe60a`
-
-5. **settings.toml 写入 sensitive 组合**：
-   - `risk_off_core_buy_enabled = false`
-   - `entry_reclaim_close_enabled = true`
-   - `tp1_ema_trailing_stop_enabled = true`
-   - `regime_btc_7d_drop_pct = -3.0`
-   - `regime_eth_7d_drop_pct = -5.0`
-   - `regime_require_both_trend = true`
-   - 模拟盘定时任务（每天 20:05）下次运行即生效
-   - commit `3598790`
-
----
-
-### 尚未完成的事项
-
-1. **模拟盘验证 sensitive 组合**：写入 settings.toml 时间为 2026-06-11，建议等约 3 周（至 2026-07-02）后观察实盘表现，再决定是否继续保留
-2. **Windows 任务计划时间确认**：用户在管理员 PowerShell 里已将时间改为 20:05，本会话未验证是否成功
-3. **tp1_ema_trailing_stop corner case**：TP1 命中时 4h K 线不足 20 根，`tp1_trailing_ema_stop_active` 标志设为 True 但 EMA 为 None，后续可能突然激活；已记录，暂不修
-4. **幸存者偏差**：Binance 历史退市币未纳入 symbol master，所有回测结果偏乐观，未处理
-5. **震荡转熊段（2025-01→06）样本不足**：sensitive 组合在此段 over_filtering（15笔），如需更细粒度验证可拉长此段或降低筛选阈值观察
-
----
-
-### 下一步直接执行指令
-
-确认定时任务时间是否已改为 20:05：
-```powershell
-Get-ScheduledTask -TaskName "CryptoTrading_DailyPaperUpdate" | Get-ScheduledTaskInfo | Select-Object NextRunTime
+```
+main.py                          # 入口，子命令：scan / daily / backtest / abtest / paper 等
+config/
+  settings.toml                  # 生产配置（当前已激活 sensitive 组合）
+  experiments.toml               # A/B 实验定义，所有 variant 参数在此声明
+src/crypto_trading_system/
+  config.py                      # Settings dataclass，load_settings()
+  scanner.py                     # 市场扫描，输出 BUY_CANDIDATE
+  market_regime.py               # classify_market_regime()，判断 RISK_ON/NEUTRAL/RISK_OFF
+  paper_trader.py                # 模拟盘：add_from_scan / update_paper_trades / generate_paper_report
+  trade_state.py                 # 单笔交易状态机：step_trade()
+  abtest.py                      # A/B 实验框架，ALLOWED_OVERRIDE_PATHS 白名单
+  backtest/replay.py             # 回测主循环
+  backtest/runner.py             # 回测入口
+  indicators.py                  # ema(), percent_change() 等
+  models.py                      # PaperTrade, PaperTradeEvent dataclass
+  storage.py                     # DB schema，建表语句
+reports/                         # 每日报告输出目录（按日期子目录）
+scripts/
+  daily_paper_update.bat         # 每天 20:05 定时执行：scan→add-from-scan→update→report
+logs/
+  daily_paper_update.log         # 定时任务日志
 ```
 
-如需继续实验，下一个有价值的方向：
-- **持仓时间过滤**：入场后 N 根 4h K 线内未触 TP1 则提前平仓，减少长期套牢
-- **市值分层分析**：按 large-cap / altcoin 分组回测，确认亏损来源
-
 ---
 
-### 重要声明
+## 当前生产配置（settings.toml [analysis] 关键字段）
 
-- **sensitive 组合已写入 settings.toml**（commit `3598790`），模拟盘即日起使用新参数
-- **两段回测不能并行运行**：SQLite 数据库会锁，必须串行执行
-- **`daily_trend_required` 实验代码已合并主分支**，默认值为 false，不影响现有行为
-- 最新 commit：`3598790`，已在本地 main 分支
-
-
-### 项目目录
-
-`D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects`
-
----
-
-### 任务背景
-
-加密货币量化交易回测系统。本次会话主要完成了：性能优化文档补全、多轮 A/B 实验、模拟盘口径对齐、定时任务配置、日线趋势过滤实验。
-
----
-
-### 已完成的工作
-
-1. **性能优化文档**：创建 `reports/2026-06-11/perf_optimization_2026-06-11.md`，记录 5 轮优化（bisect、批量 SQL、float 存储、EMA 增量、kline_fetch_ranges），commit `e4b0102`
-
-2. **tp1_ema20_trailing_stop A/B**：
-   - 单段（2025-01→2025-09）：PF 0.58→0.75，净收益 -13.17%→-10.31%，verdict=`retest`
-   - walk-forward 两段（2024-07→2025-01 / 2025-01→2025-09）：方向改善但近端 MDD 上升，verdict=`retest`
-   - commit `080e1ba`
-
-3. **risk_off_no_core_entry_reclaim_ema_stop 组合实验**（三项叠加：RISK_OFF 停开核心币 + 入场收盘确认 + TP1 EMA20 跟踪止损）：
-   - 早期段（2024-07→2025-06）：PF 0.91→1.53，净收益 -5.59%→+16.74%，MDD 18.72%→14.99%
-   - 近端段（2025-06→2026-06）：PF 0.73→1.05，净收益 -10.62%→+1.21%，MDD 24.24%→18.68%
-   - verdict=`candidate_keep_review`，commit `00f596e`
-
-4. **paper_trader.py 口径对齐**：补全 `entry_reclaim_close` 和 `tp1_ema_trailing_stop` 逻辑，同步传入 `move_stop_to_breakeven_on_tp1`，commit `417681d`
-
-5. **模拟盘定时任务**：创建 `scripts/daily_paper_update.bat`，通过 Windows 任务计划程序每天 20:05 自动运行 scan → add-from-scan → paper update → paper report，日志写入 `logs/daily_paper_update.log`（需用户在管理员 PowerShell 完成注册，时间已由用户改为 20:05）
-
-6. **daily_trend_required 实验**：
-   - 实现：`config.py` 新增参数、`scanner.py` + `replay.py` 接入开关、`abtest.py` 白名单新增 `daily_trend` dimension
-   - 修复：replay.py 初版漏传参数（delta 全为 0），修复后 v2 重跑
-   - 结果：近端段 PF 0.73→0.32，净收益 -10.62%→-22.71%，止损率 77%→89%，verdict=`reject_candidate`
-   - commit `14d24d7`
-
-7. **AGENTS.md 更新**：新增 Context Handoff 规则，commit `5ba7ace`
-
----
-
-### 尚未完成的事项
-
-1. **正式 keep `risk_off_no_core_entry_reclaim_ema_stop`**：等模拟盘跑约 3 周（至 2026-07-02）后再将三项 override 写入 `settings.toml`；已设 CronCreate 提醒（session-only，可能已失效），TODO 里有记录
-2. **Windows 任务计划时间确认**：用户在管理员 PowerShell 里已将时间改为 20:05，但未在本会话里验证是否成功
-3. **tp1_ema_trailing_stop corner case**：TP1 命中时 4h K 线不足 20 根，`tp1_trailing_ema_stop_active` 标志设为 True 但 EMA 为 None，后续可能突然激活；已记录在 TODO，暂不修
-4. **daily_trend_required 组合方向**：单独 reject，但在 RISK_ON 环境下组合使用（弱市已由 risk_off 过滤）可能有价值，未实验
-5. **幸存者偏差**：Binance 历史退市币未纳入 symbol master，所有回测结果偏乐观，未处理
-
----
-
-### 下一步直接执行指令
-
-确认定时任务时间是否已改为 20:05：
-```powershell
-Get-ScheduledTask -TaskName "CryptoTrading_DailyPaperUpdate" | Get-ScheduledTaskInfo | Select-Object NextRunTime
+```toml
+risk_off_core_buy_enabled = false       # RISK_OFF 时不开新 BTC/ETH 多单
+entry_reclaim_close_enabled = true      # 进入 entry zone 后须 4h 收盘确认才入场
+tp1_ema_trailing_stop_enabled = true    # TP1 命中后用 4h EMA20 跟踪止损
+regime_btc_7d_drop_pct = -3.0          # BTC 7日跌幅阈值（旧值 -5.0）
+regime_eth_7d_drop_pct = -5.0          # ETH 7日跌幅阈值（旧值 -8.0）
+regime_require_both_trend = true        # BTC+ETH 必须同时 price>EMA20>EMA50 才算趋势确认
 ```
 
-如需继续实验，下一个有价值的方向是 `daily_trend_required` + `risk_off_no_core_entry_reclaim_ema_stop` 组合（只在 RISK_ON 下要求日线趋势确认）：
+这六个参数合称 **sensitive 组合**（`risk_off_no_core_entry_reclaim_ema_stop_sensitive`），于 2026-06-11 写入 settings.toml，模拟盘当日起生效。
+
+---
+
+## 实验历史与结论（按时间顺序）
+
+### 1. tp1_ema20_trailing_stop（单项）
+- 结论：retest，单独使用效果有限，近端 MDD 上升
+
+### 2. risk_off_no_core_entry_reclaim_ema_stop（三项组合）
+- 三项：`risk_off_core_buy=false` + `entry_reclaim_close=true` + `tp1_ema_trailing_stop=true`
+- 早期段 2024-07→2025-06：PF 0.91→1.53，净收益 -5.6%→+16.7%，MDD 18.7%→15.0%
+- 近端段 2025-06→2026-06：PF 0.73→1.05，净收益 -10.6%→+1.2%，MDD 24.2%→18.7%
+- **verdict：candidate_keep_review**
+
+### 3. daily_trend_required（单项 + 四项组合）
+- 单项 reject：近端段止损率 77%→89%，净收益 -10%→-23%
+- 四项组合 reject：近端段止损率 77%→92%，净收益 -14%→-7.8%（不如三项组合）
+
+### 4. regime_sensitive（仅收紧阈值）
+- BTC -5%→-3%，ETH -8%→-5%，require_both_trend=true
+- 单独使用方向改善但仍亏损，需配合出入场规则
+
+### 5. risk_off_no_core_entry_reclaim_ema_stop_sensitive（三项 + 收紧阈值，当前主候选）
+
+四段 walk-forward 完整结果：
+
+| 段 | 市场环境 | baseline 净收益 | variant 净收益 | PF | MDD |
+|---|---|---:|---:|---:|---:|
+| 2024-07→2025-01 | 牛市 | +2.4% | **+25.4%** | 2.52 | 9.0% |
+| 2024-07→2025-06 | 牛+震荡 | -14.3% | **+18.0%** | 1.58 | 15.0% |
+| 2025-01→2025-06 | 震荡转熊⚠ | -19.7% | **-6.5%** | 0.53 | 10.0% |
+| 2025-06→2026-06 | 熊市 | -14.2% | **+5.5%** | 1.17 | 17.8% |
+
+⚠ 2025-01→2025-06 段：sample_insufficient（15笔）+ possible_over_filtering，数据供参考。四段均优于或持平三项组合。
+
+---
+
+## 模拟盘状态
+
+- **账户**：demo，初始权益 10,000 USDT，单笔风险 1%
+- **定时任务**：Windows 任务计划 `CryptoTrading_DailyPaperUpdate`，每天 20:05 自动执行
+- **执行脚本**：`scripts/daily_paper_update.bat`，依次跑 scan → add-from-scan → paper update → paper report
+- **日志**：`logs/daily_paper_update.log`
+- **sensitive 组合生效日期**：2026-06-11
+- **建议观察截止**：2026-07-02（约 3 周），届时根据模拟盘结果决定是否继续保留
+
+### paper report 现包含的信息（2026-06-11 新增）
+
+每日报告新增三项，专门用于 3 周后的判断：
+
+1. **今日大盘环境节**：regime 状态（RISK_ON/NEUTRAL/RISK_OFF）、BTC/ETH 7d 涨跌与阈值对比、趋势确认情况
+2. **RECLAIM_PENDING 事件**：每次价格进入 entry zone 但 4h 收盘未确认时记录事件，可追溯 entry_reclaim 拦截了哪些单
+3. **统计补充**：Entry reclaim blocks 累计次数、平均持仓时长
+
+---
+
+## 关键代码位置
+
+### market_regime.py — RISK_OFF 判断逻辑
+
+```python
+def classify_market_regime(
+    btc_1d, eth_1d,
+    btc_7d_drop_pct=-5.0,    # settings.analysis.regime_btc_7d_drop_pct
+    eth_7d_drop_pct=-8.0,    # settings.analysis.regime_eth_7d_drop_pct
+    require_both_trend=False  # settings.analysis.regime_require_both_trend
+) -> MarketRegime
+# RISK_ON 条件：trend_ok AND btc_not_breaking AND eth_not_breaking
+# require_both_trend=True 时，BTC+ETH 必须同时满足 price>EMA20>EMA50
+# 调用方：replay.py:622, scanner.py:356（均透传 settings 参数）
+# regime_analysis.py:148 用默认值（仅用于事后分析，不影响回测/扫盘）
 ```
-python main.py abtest --experiment <新实验名> --dynamic-universe \
-  --symbol-master-file reports\2026-06-09\dynamic_master_full.json \
+
+### paper_trader.py — entry_reclaim 逻辑
+
+```python
+# update_paper_trades() 约 437 行
+# 条件：entry_reclaim_enabled AND status==WATCHING AND price<=entry_high
+# 若 4h 最新已收盘 close < entry_high → 记录 RECLAIM_PENDING 事件，跳过入场
+# 每天定时任务运行一次，不会重复记录
+```
+
+### abtest.py — dimension 白名单
+
+新增的两个 dimension（可直接在 experiments.toml 引用）：
+
+```python
+"regime_sensitivity": {
+    "analysis.regime_btc_7d_drop_pct",
+    "analysis.regime_eth_7d_drop_pct",
+    "analysis.regime_require_both_trend",
+},
+"combined_regime_entry_exit_sensitivity": {
+    "analysis.risk_off_core_buy_enabled",
+    "analysis.entry_reclaim_close_enabled",
+    "analysis.tp1_ema_trailing_stop_enabled",
+    "analysis.regime_btc_7d_drop_pct",
+    "analysis.regime_eth_7d_drop_pct",
+    "analysis.regime_require_both_trend",
+},
+```
+
+---
+
+## 已知问题 / 技术债
+
+### 1. tp1_ema_trailing_stop corner case（未修，低风险）
+- **现象**：TP1 命中时若 4h K 线不足 20 根，`tp1_trailing_ema_stop_active` 在内存中被置为 True，但 EMA 计算返回 None；下次 update 时可能突然激活跟踪止损
+- **位置**：`trade_state.py`（step_trade 内部），`paper_trader.py:454-457`
+- **影响**：模拟盘偶发，不影响回测（回测有足够历史 K 线）
+- **修法**：仅当 EMA 有效时才设 active=True
+
+### 2. tp1_trailing_ema_stop_active 不持久化（未修）
+- **现象**：`PaperTrade.tp1_trailing_ema_stop_active` 是 dataclass 字段，DB 里没有对应列；每次 update 重新加载 trade 时该字段重置为 False
+- **影响**：TP1_HIT 状态的跟踪止损每次 update 都重新从零判断，行为与回测不完全一致
+- **修法**：在 paper_trades 表加列 `tp1_trailing_ema_stop_active INTEGER NOT NULL DEFAULT 0`，或改为从事件日志推断
+
+### 3. 幸存者偏差（未修，结构性问题）
+- Binance 历史退市币未纳入 symbol master（`reports/2026-06-09/dynamic_master_full.json`）
+- 所有回测结果偏乐观，无法量化偏差幅度
+
+---
+
+## 接下来可以做的实验（按优先级）
+
+### A. 持仓时间过滤（需改代码）
+- **假设**：部分止损单是入场后长期横盘最终慢慢跌破止损，而非快速止损
+- **实验**：入场后 N 根 4h K 线内未触 TP1 则强制平仓（N 约 18～36）
+- **需改**：`trade_state.py`（step_trade 加 bar_count 计数）+ `config.py` 加参数 + `abtest.py` 白名单 + `experiments.toml` 加实验定义
+
+### B. 市值分层分析（无需改代码，直接跑）
+- **目标**：确认亏损主要来自 altcoin 还是 large-cap，熊市是否应只做 large-cap
+- **做法**：用 `--symbol-master-file` 分别传只含 large-cap 和只含 altcoin 的 master JSON，跑两段对比回测
+- **large-cap 参考**：BTC/ETH/BNB/SOL/XRP/DOGE/ADA/AVAX/TRX/TON 等前 20
+
+### C. 修 tp1_trailing_ema_stop_active 持久化（改代码）
+- 加 DB 迁移，在 paper_trades 表加列，保证模拟盘行为与回测一致
+
+---
+
+## 常用命令
+
+```bash
+# A/B 实验（两段必须串行，不能同时跑）
+python main.py abtest --experiment <实验名> \
+  --dynamic-universe \
+  --symbol-master-file reports/2026-06-09/dynamic_master_full.json \
   --start 2024-07-01 --end 2025-06-01 \
   --max-symbols 40 --allow-data-gaps --no-obsidian
+
+# 回测
+python main.py backtest-dynamic-universe \
+  --symbol-master-file reports/2026-06-09/dynamic_master_full.json \
+  --start 2024-07-01 --end 2025-06-01 \
+  --max-symbols 40 --allow-data-gaps --no-obsidian
+
+# 模拟盘手动触发（定时任务每天 20:05 自动跑）
+python main.py daily --no-obsidian
+
+# 只生成模拟盘报告（不跑扫盘）
+python main.py paper report
+
+# 确认定时任务是否正常
+Get-ScheduledTask -TaskName "CryptoTrading_DailyPaperUpdate" | Get-ScheduledTaskInfo | Select-Object NextRunTime
 ```
 
 ---
 
-### 重要声明
+## 重要约束
 
-- **两段回测不能并行运行**：SQLite 数据库会锁，必须串行执行
-- **模拟盘三项规则已在代码层生效**（`paper_trader.py`），但 `settings.toml` 默认值未改，模拟盘实际运行仍用旧逻辑；等 3 周后再写入 settings.toml
-- **`daily_trend_required` 实验代码已合并主分支**，默认值为 false，不影响现有行为
-- 最新 commit：`5ba7ace`，已 push 到 `origin/main`
+1. **SQLite 单写**：两段回测/实验不能并行，必须串行
+2. **symbol master**：所有回测使用 `reports/2026-06-09/dynamic_master_full.json`（418 个币），不要用其他文件
+3. **实验新增 dimension**：必须先在 `abtest.py` 的 `ALLOWED_OVERRIDE_PATHS` 里注册，否则运行时报错
+4. **不要直接改 settings.toml 的 analysis 参数来做实验**：应通过 experiments.toml + abtest 命令，保持生产配置稳定
+5. **daily_trend_required 已 reject**：不要在新实验里复用，浪费算力
