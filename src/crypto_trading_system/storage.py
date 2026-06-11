@@ -168,6 +168,23 @@ def init_db(path: Path) -> None:
             """
         )
         connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS kline_fetch_ranges (
+                source TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                interval TEXT NOT NULL,
+                start_time INTEGER NOT NULL,
+                end_time INTEGER NOT NULL,
+                fetched_at_utc TEXT NOT NULL,
+                PRIMARY KEY (source, symbol, interval, start_time, end_time)
+            )
+            """
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_kline_fetch_ranges_lookup "
+            "ON kline_fetch_ranges (source, symbol, interval, start_time, end_time)"
+        )
+        connection.execute(
             "CREATE INDEX IF NOT EXISTS idx_kline_unavailable_lookup "
             "ON kline_unavailable_ranges (source, symbol, interval, start_time, end_time)"
         )

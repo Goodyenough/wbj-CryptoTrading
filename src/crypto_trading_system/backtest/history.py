@@ -92,6 +92,50 @@ def _load_cached_klines(
     return [_normalise_kline(row) for row in rows]
 
 
+def _has_fetch_range_cached(
+    connection: sqlite3.Connection,
+    symbol: str,
+    interval: str,
+    start_time_ms: int,
+    end_time_ms: int,
+    source: str = "Binance",
+) -> bool:
+    """Return True if a previous fetch already covered [start_time_ms, end_time_ms)."""
+    row = connection.execute(
+        """
+        SELECT 1
+        FROM kline_fetch_ranges
+        WHERE source = ?
+          AND symbol = ?
+          AND interval = ?
+          AND start_time <= ?
+          AND end_time >= ?
+        LIMIT 1
+        """,
+        (source, symbol, interval, start_time_ms, end_time_ms),
+    ).fetchone()
+    return row is not None
+
+
+def _insert_fetch_range(
+    connection: sqlite3.Connection,
+    symbol: str,
+    interval: str,
+    start_time_ms: int,
+    end_time_ms: int,
+    source: str = "Binance",
+) -> None:
+    connection.execute(
+        """
+        INSERT OR REPLACE INTO kline_fetch_ranges (
+            source, symbol, interval, start_time, end_time, fetched_at_utc
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (source, symbol, interval, start_time_ms, end_time_ms, _utc_now()),
+    )
+
+
 def _has_cached_unavailable_range(
     connection: sqlite3.Connection,
     symbol: str,
@@ -235,15 +279,18 @@ def fetch_klines_cached(
         expected = max(0, (end_time_ms - start_time_ms + step - 1) // step)
         fetched_from_api = 0
         if len(cached) < expected:
+            already_fetched = _has_fetch_range_cached(
+                connection, symbol, interval, start_time_ms, end_time_ms
+            )
             no_data_cached = not cached and _has_cached_unavailable_range(
                 connection, symbol, interval, start_time_ms, end_time_ms
             )
-            if no_data_cached:
-                if progress is not None:
+            if already_fetched or no_data_cached:
+                if no_data_cached and progress is not None:
                     progress(f"using cached no-data marker for {symbol} {interval} klines")
-            elif progress is not None:
-                progress(f"fetching {symbol} {interval} klines from Binance")
-            if not no_data_cached:
+            else:
+                if progress is not None:
+                    progress(f"fetching {symbol} {interval} klines from Binance")
                 client = BinanceClient(
                     settings.market.base_url,
                     timeout_seconds=settings.market.request_timeout_seconds,
@@ -277,6 +324,7 @@ def fetch_klines_cached(
                     cursor = next_cursor
                     if len(batch) < 1000:
                         break
+                _insert_fetch_range(connection, symbol, interval, start_time_ms, end_time_ms)
                 cached = _load_cached_klines(connection, symbol, interval, start_time_ms, end_time_ms)
 
     issues = _quality_issues(symbol, interval, cached)
