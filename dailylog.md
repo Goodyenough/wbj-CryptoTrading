@@ -40,7 +40,26 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 实测节省：~44s（profiling 前后对比：_normalise -14s，_normalise_row -11s，_quote_closes -10s，_quote_volumes -9s）
 - 端到端：644s → 543s（混合有网络下载的窗口）
 
-#### 优化 4：EMA 增量缓存（commit `c0b1f60`）
+#### 优化 5：kline_fetch_ranges——消除重复 API 请求（commit `84b8c55`）
+- 根因：`fetch_klines_cached` 用 `len(cached) < expected` 判断缓存完整性，但 expected 是时间跨度理论值，实际上许多 symbol 有数据空洞（暂停交易等），导致每次跑都触发 200-400 次 Binance API 请求来"补充"数据——即使数据已经抓过了。
+- 修复：新增 `kline_fetch_ranges` 表，成功 fetch 后写入 `(symbol, interval, start, end)` 记录；下次检查时如果范围已覆盖，直接跳过 API 调用。
+- 实测：同一 6 个月历史窗口（2024-07→2025-01，~540 bars）：Run 1=327s（210 次 fetching） → Run 2=116s（0 次 fetching） → Run 3=114s，加速 **2.9x**，结果完全一致（closed_trades=35，net_return=7.14%）。
+- 影响：首次运行仍需下载数据（不变）；重复运行同一时间段大幅加速，walk-forward 多轮重复段直接受益。
+
+#### 全量优化效果总结（纯 CPU 基准，历史稳定窗口）
+| 阶段 | 说明 | 时间 |
+|---|---|---|
+| 优化前（估计） | 含重复 API + 线性扫描 + str→float | ~400s/540bar |
+| 优化后（Run 2+） | bisect + float klines + EMA 增量 + fetch_ranges | **114s/540bar** |
+| 加速比 | | **~3.5x** |
+
+剩余 114 秒的主要开销（profiling 估算）：
+- batch SQL 查询 + fetchall：~30s（SQLite 读 960 万行表）
+- ATR 每 bar 从头算：~15s（未优化）
+- `list.append`（ema_series 内部）：~12s（部分由 EMA 增量减少）
+- `_quote_closes`/`_quote_volumes`：~8s（float 优化后剩余）
+
+
 - `indicators.py` 新增 `ema_step(prev, value, period)` 单步递推函数
 - `_analyze_ticker` 增加 `precomputed_indicators` 可选参数，传入时跳过 `ema_series` 全量计算
 - `replay.py` 主循环维护 `_ema_cache[symbol]`，每根 bar 只用 `ema_step` 做增量更新
