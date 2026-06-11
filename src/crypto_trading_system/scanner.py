@@ -146,6 +146,7 @@ def _analyze_ticker(
     market_regime_allows_buy: bool = True,
     market_regime_status: str | None = None,
     risk_off_core_buy_enabled: bool = True,
+    risk_off_large_cap_buy_enabled: bool = False,
     pump_chase_24h_pct: float = 20.0,
     pump_chase_distance_pct: float = 8.0,
     pump_chase_penalty: float = 8.0,
@@ -233,10 +234,14 @@ def _analyze_ticker(
     if pct_7d is not None and pct_7d < 0:
         score -= 6
     core_symbol = ticker.symbol in {"BTCUSDT", "ETHUSDT"}
-    core_allowed_in_regime = core_symbol and (
-        market_regime_status != "RISK_OFF" or risk_off_core_buy_enabled
+    large_cap_symbol = ticker.symbol in {"BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT"}
+    exempt_in_risk_off = (
+        (core_symbol and risk_off_core_buy_enabled)
+        or (large_cap_symbol and risk_off_large_cap_buy_enabled)
     )
-    market_regime_risk = not market_regime_allows_buy and not core_allowed_in_regime
+    market_regime_risk = not market_regime_allows_buy and not (
+        market_regime_status != "RISK_OFF" or exempt_in_risk_off
+    )
     if market_regime_risk:
         score -= 10
 
@@ -471,6 +476,7 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
                 market_regime_allows_buy=market_regime_allows_buy,
                 market_regime_status=market_regime_status,
                 risk_off_core_buy_enabled=settings.analysis.risk_off_core_buy_enabled,
+                risk_off_large_cap_buy_enabled=settings.analysis.risk_off_large_cap_buy_enabled,
                 pump_chase_24h_pct=settings.analysis.pump_chase_24h_pct,
                 pump_chase_distance_pct=settings.analysis.pump_chase_distance_pct,
                 pump_chase_penalty=settings.analysis.pump_chase_penalty,

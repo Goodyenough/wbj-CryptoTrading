@@ -778,6 +778,7 @@ def run_backtest_replay(
                 market_regime_allows_buy=market_regime_allows_buy,
                 market_regime_status=market_regime_status,
                 risk_off_core_buy_enabled=settings.analysis.risk_off_core_buy_enabled,
+                risk_off_large_cap_buy_enabled=settings.analysis.risk_off_large_cap_buy_enabled,
                 pump_chase_24h_pct=settings.analysis.pump_chase_24h_pct,
                 pump_chase_distance_pct=settings.analysis.pump_chase_distance_pct,
                 pump_chase_penalty=settings.analysis.pump_chase_penalty,

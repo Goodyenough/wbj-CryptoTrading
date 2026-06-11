@@ -55,6 +55,10 @@ ALLOWED_OVERRIDE_PATHS: dict[str, set[str]] = {
         "analysis.regime_require_both_trend",
     },
     "holding_time": {"backtest.max_holding_bars_without_tp1"},
+    "large_cap_regime": {
+        "analysis.risk_off_core_buy_enabled",
+        "analysis.risk_off_large_cap_buy_enabled",
+    },
 }
 
 

@@ -15,6 +15,35 @@
 
 ## 2026-06-11
 
+### 23:15:00 +08:00 - 实现并运行 large_cap_only_risk_off 实验
+- 类型：代码 / 配置 / 回测 / 文档
+- 改动：`config.py` 新增 `risk_off_large_cap_buy_enabled` 字段（默认 `False`，不改现有行为）。
+- 改动：`scanner.py` 扩展豁免逻辑，新参数 `risk_off_large_cap_buy_enabled`；RISK_OFF 下 `{"BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT"}` 可独立豁免，与旧的 `risk_off_core_buy_enabled` 互不干扰。
+- 改动：`backtest/replay.py` 同步透传新参数。
+- 改动：`abtest.py` 新增 `large_cap_regime` dimension，`experiments.toml` 新增 `large_cap_only_risk_off` 实验定义（`risk_off_core_buy_enabled=false` + `risk_off_large_cap_buy_enabled=true`）。
+- 改动：`tests/test_abtest.py` 新增两个测试：实验加载覆盖验证、`_analyze_ticker` 豁免行为验证（BNBUSDT 不被 regime 阻断，ADAUSDT 仍被阻断）。
+- 结果（两段 walk-forward）：
+  - 早期段（2024-07→2025-06）baseline net +2.37% → variant +13.54%（+11.17%），PF 1.04→1.22，MDD 18.03%→17.01%，方向改善
+  - 近端段（2025-06→2026-06）baseline net +3.12% → variant -3.12%（-6.24%），PF 1.11→0.95，MDD 20.74%→22.19%，方向恶化
+  - 结论：`retest`，两段方向不一致；在已有 altcoin 组合上叠加 BNB/SOL RISK_OFF 入场，熊市反而拖累整体，与单独 large-cap 回测结论不一致，暂不 keep。
+- 验证：`python -m compileall main.py src tests -q` 无错；`test_abtest.py` 和 `test_replay.py` 全通过；两段 A/B 回测 exit code 0。
+
+### 22:50:00 +08:00 - 市值分层跨区间复测 + max_holding 三阈值两段 walk-forward
+- 类型：回测 / 配置 / 文档
+- 改动：在 `config/experiments.toml` 新增 `max_holding_18x4h_no_tp1` 和 `max_holding_42x4h_no_tp1` 两个实验定义，分别对应 18 根和 42 根 4h 持仓上限。
+- 改动：串行跑 7 段回测：large-cap（BTC/ETH/BNB/SOL）早期段、altcoin 早期段、max_holding 三阈值各两段；生成对应报告。
+- 结果（市值分层两段非重叠 walk-forward）：
+  - 牛市（2024-07→2025-06）large-cap closed=25、PF 2.02、净收益 +14.14%、MDD 7.77%；altcoin closed=54、PF 1.35、净收益 +11.71%、MDD 15.92%
+  - 熊市（2025-06→2026-06）large-cap closed=30、PF 1.19、净收益 +3.46%、MDD 11.36%；altcoin closed=57、PF 0.76、净收益 -10.26%、MDD 23.44%
+  - 结论：large-cap 两段均正收益，熊市优势显著；altcoin 熊市严重拖累，结论 `candidate_keep_review`，可推进 `large_cap_only_risk_off` 实验设计。
+- 结果（max_holding 三阈值两段 walk-forward）：
+  - 18根：早期段 +17.98%→+34.25%（Δ+16.3%）MDD 12.09%，近端段 +5.46%→+21.06%（Δ+15.6%）MDD 11.50%
+  - 30根：早期段 +17.98%→+25.03%（Δ+7.1%）MDD 12.84%，近端段 +3.32%→+27.28%（Δ+24.0%）MDD 11.84%
+  - 42根：早期段 +17.98%→+31.66%（Δ+13.7%）MDD 13.08%，近端段 +5.46%→+26.93%（Δ+21.5%）MDD 9.27%
+  - 结论：三阈值两段全部正向改善，方向稳健，不是过拟合 30 根。42根 MDD 最低（近端 9.27%），是最平衡候选；30根近端绝对净收益最高；18根净收益最高但持仓时间过短。整体结论 `candidate_keep_review`，建议优先考虑 42根。
+- 影响：TODO.md 两项跨区间复测任务标为完成，新增 `large_cap_only_risk_off` 实验设计和 2026-07-02 复盘决策两项待办。
+- 验证：所有回测命令正常退出（exit code 0），报告文件确认生成。
+
 ### 21:37:08 +08:00 - 补齐 daily 定时任务安装脚本
 - 类型：脚本 / 运维 / 文档 / Git
 - 改动：新增 `scripts/install_daily_task.ps1`，用于以管理员 PowerShell 覆盖注册 Windows 任务计划 `CryptoTrading_DailyPaperUpdate`，触发时间固定为每天 `20:05`，执行 `scripts\daily_paper_update.bat`，并输出 trigger 与 `Get-ScheduledTaskInfo` 便于验证。

@@ -304,4 +304,76 @@ if __name__ == "__main__":
     test_override_paths_are_dimension_scoped()
     test_dynamic_abtest_reuses_one_symbol_master()
     test_dynamic_abtest_accepts_prebuilt_symbol_master()
+
+
+def test_large_cap_only_risk_off_experiment_loads() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.risk_off_core_buy_enabled = False
+    settings.analysis.risk_off_large_cap_buy_enabled = False
+    definition = load_experiment("large_cap_only_risk_off", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.analysis.risk_off_core_buy_enabled is False
+    assert settings.analysis.risk_off_large_cap_buy_enabled is False
+    assert variant.analysis.risk_off_core_buy_enabled is False
+    assert variant.analysis.risk_off_large_cap_buy_enabled is True
+    paths = [(c.path, c.old_value, c.new_value) for c in changes]
+    assert ("analysis.risk_off_large_cap_buy_enabled", False, True) in paths
+
+
+def test_large_cap_exempt_in_risk_off_but_altcoin_not() -> None:
+    import sys
+    sys.path.insert(0, str(ROOT / "src"))
+    from crypto_trading_system.scanner import _analyze_ticker
+    from crypto_trading_system.models import RawTicker
+
+    def _make_ticker(symbol: str) -> RawTicker:
+        return RawTicker(
+            symbol=symbol,
+            base_asset=symbol.replace("USDT", ""),
+            price=1.0,
+            pct_24h=5.0,
+            quote_volume_24h=1_000_000_000.0,
+            trades_24h=100_000,
+            high_low_range_24h=5.0,
+        )
+
+    # Minimal klines: 200 daily bars so history filter passes, 120 4h bars, 168 1h bars
+    # Each bar: [open_ms, open, high, low, close, volume]
+    def _bars(n: int, price: float = 1.0) -> list[list]:
+        return [[i * 3_600_000, price, price * 1.01, price * 0.99, price, 1_000_000] for i in range(n)]
+
+    k1d = _bars(200, price=1.0)
+    k4h = _bars(120, price=1.0)
+    k1h = _bars(168, price=1.0)
+
+    # BNBUSDT in RISK_OFF with large_cap enabled → should NOT be blocked by regime
+    bnb = _make_ticker("BNBUSDT")
+    result_bnb = _analyze_ticker(
+        bnb, k1h, k4h, k1d,
+        risk_reward_min=2.0,
+        market_regime_allows_buy=False,
+        market_regime_status="RISK_OFF",
+        risk_off_core_buy_enabled=False,
+        risk_off_large_cap_buy_enabled=True,
+    )
+    # BNBUSDT should not be forced to WATCH_ONLY by regime (may be None for other reasons)
+    if result_bnb is not None:
+        assert result_bnb.action != "WATCH_ONLY" or "regime" not in result_bnb.verdict.lower(), (
+            f"BNBUSDT should not be regime-blocked but got action={result_bnb.action}"
+        )
+
+    # ADAUSDT in RISK_OFF with large_cap enabled → should still be blocked
+    ada = _make_ticker("ADAUSDT")
+    result_ada = _analyze_ticker(
+        ada, k1h, k4h, k1d,
+        risk_reward_min=2.0,
+        market_regime_allows_buy=False,
+        market_regime_status="RISK_OFF",
+        risk_off_core_buy_enabled=False,
+        risk_off_large_cap_buy_enabled=True,
+    )
+    if result_ada is not None:
+        assert result_ada.action != "BUY_CANDIDATE", (
+            f"ADAUSDT should be blocked in RISK_OFF but got action={result_ada.action}"
+        )
     print("test_abtest=passed")

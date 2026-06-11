@@ -105,9 +105,11 @@
 
 - [x] 修复 `tp1_ema_trailing_stop` 两个技术债：EMA 不足 20 根时不激活 trailing stop；`tp1_trailing_ema_stop_active` 持久化到 `paper_trades`，避免模拟盘重启/重载后丢失 TP1 EMA trailing 状态。
 - [x] 做市值分层回测：将 `dynamic_master_full.json` 拆成 large-cap（BTC/ETH/BNB/SOL）和 altcoin，两组分别跑当前 sensitive 组合；近端窗口 large-cap 净收益 +3.46%、MDD 11.36%，altcoin 净收益 -10.26%、MDD 23.44%，结论为弱市中 altcoin 风险暴露更像主要拖累，large-cap 值得单独观察。
-- [ ] 跨区间复测市值分层：至少补 `2024-07-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01` 非重叠窗口，确认 large-cap 优势不是单窗口偶然。
+- [x] 跨区间复测市值分层：两段非重叠 walk-forward 完成。牛市（2024-07→2025-06）large-cap +14.14%/MDD 7.77%，altcoin +11.71%/MDD 15.92%；熊市（2025-06→2026-06）large-cap +3.46%/MDD 11.36%，altcoin -10.26%/MDD 23.44%。large-cap 熊市优势显著，两段均有样本，结论 `candidate_keep_review`，可推进 `large_cap_only_risk_off` 实验。
 - [x] 做持仓时间过滤实验：新增 `max_holding_30x4h_no_tp1`，入场后 30 根 4h 未触 TP1 则 `TIME_EXIT`；近端 full master A/B 显示净收益 3.32% -> 27.28%、MDD 20.85% -> 11.84%、PF 1.11 -> 1.56，结论 `retest / candidate_keep_review`。
-- [ ] 跨区间复测 `max_holding_30x4h_no_tp1`，并尝试 18/42 根 4h 两个相邻阈值，确认不是过拟合 30 根。
+- [x] 跨区间复测 `max_holding_30x4h_no_tp1`，并尝试 18/42 根 4h 两个相邻阈值：三阈值两段全部正向改善，方向稳健，不是过拟合。42根 MDD 最低（近端 9.27%），两段净收益分别 +31.66%/+26.93%，是最平衡候选；18根净收益最高但持仓时间过短；30根近端绝对净收益最高（+27.28%）但 MDD 略高于 42根。结论 `candidate_keep_review`，建议优先考虑 42根。
+- [x] 设计 large-cap 单独入场规则实验：若市值分层复测确认 large-cap 在弱市仍正收益，新增 `large_cap_only_risk_off` dimension，RISK_OFF 时只允许 BTC/ETH/BNB/SOL 入场，altcoin 全部暂停；需在 `abtest.py` 注册 dimension、`experiments.toml` 加实验定义。实验已完成两段 walk-forward：早期段（2024-07→2025-06）variant net +2.37%→+13.54%（+11.17%），近端段（2025-06→2026-06）variant net +3.12%→-3.12%（-6.24%）。两段方向相反，结论 `retest`；在已有 altcoin 组合上叠加 BNB/SOL RISK_OFF 入场反而在熊市拖累整体，与单独 large-cap 回测结论不一致，暂不 keep。
+- [ ] 2026-07-02 模拟盘复盘决策：根据 3 周观察结果（entry_reclaim 拦截次数、RISK_OFF 频率、现有持仓 WLDUSDT/ONDOUSDT 结果）决定 sensitive 组合是 keep、调参还是继续观察。
 - [x] 建实验结论索引页：新增 `python main.py experiment-index`，生成 `reports/2026-06-11/experiment_index_2026-06-11_v2.md`。
 - [x] 准备 3 周观察仪表：新增 `python main.py observation-dashboard`，并接入 `python main.py daily`，每天输出 `RECLAIM_PENDING` 后续、TP1 EMA trailing、开放持仓时长和 RISK_OFF 今日候选摘要。
 

@@ -158,3 +158,28 @@ dimension = "holding_time"
 
 [max_holding_30x4h_no_tp1.overrides.backtest]
 max_holding_bars_without_tp1 = 30
+
+[max_holding_18x4h_no_tp1]
+enabled = true
+description = "Force-close an entered position if TP1 has not been touched after 18 closed 4h bars."
+dimension = "holding_time"
+
+[max_holding_18x4h_no_tp1.overrides.backtest]
+max_holding_bars_without_tp1 = 18
+
+[max_holding_42x4h_no_tp1]
+enabled = true
+description = "Force-close an entered position if TP1 has not been touched after 42 closed 4h bars."
+dimension = "holding_time"
+
+[max_holding_42x4h_no_tp1.overrides.backtest]
+max_holding_bars_without_tp1 = 42
+
+[large_cap_only_risk_off]
+enabled = true
+description = "RISK_OFF: pause altcoin only; allow BTC/ETH/BNB/SOL entry via risk_off_large_cap_buy_enabled. Baseline keeps both flags false (all paused)."
+dimension = "large_cap_regime"
+
+[large_cap_only_risk_off.overrides.analysis]
+risk_off_core_buy_enabled = false
+risk_off_large_cap_buy_enabled = true

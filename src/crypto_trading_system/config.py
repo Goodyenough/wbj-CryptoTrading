@@ -36,6 +36,7 @@ class AnalysisSettings:
     high_volatility_range_pct: float
     high_volatility_penalty: float
     risk_off_core_buy_enabled: bool
+    risk_off_large_cap_buy_enabled: bool
     regime_btc_7d_drop_pct: float
     regime_eth_7d_drop_pct: float
     regime_require_both_trend: bool
@@ -160,6 +161,7 @@ def load_settings(path: Path) -> Settings:
             high_volatility_range_pct=float(analysis.get("high_volatility_range_pct", 35.0)),
             high_volatility_penalty=float(analysis.get("high_volatility_penalty", 6.0)),
             risk_off_core_buy_enabled=bool(analysis.get("risk_off_core_buy_enabled", True)),
+            risk_off_large_cap_buy_enabled=bool(analysis.get("risk_off_large_cap_buy_enabled", False)),
             regime_btc_7d_drop_pct=float(analysis.get("regime_btc_7d_drop_pct", -5.0)),
             regime_eth_7d_drop_pct=float(analysis.get("regime_eth_7d_drop_pct", -8.0)),
             regime_require_both_trend=bool(analysis.get("regime_require_both_trend", False)),
