@@ -113,7 +113,7 @@
 
 ## 运维待办
 
-- [ ] 用管理员权限修正 Windows 任务计划 `CryptoTrading_DailyPaperUpdate`：将触发时间从当前 09:00 改为每天 20:05，并确认 `LastRunTime`、`LastTaskResult` 和 `logs/daily_paper_update.log` 正常更新。
+- [ ] 用管理员权限运行 `powershell -ExecutionPolicy Bypass -File scripts\install_daily_task.ps1` 修正 Windows 任务计划 `CryptoTrading_DailyPaperUpdate`：将触发时间从当前 09:00 改为每天 20:05，并确认 `LastRunTime`、`LastTaskResult` 和 `logs/daily_paper_update.log` 正常更新。
 
 ## TODO 维护规则
 
