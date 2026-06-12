@@ -15,6 +15,14 @@
 
 ## 2026-06-12
 
+### 22:24:29 +08:00 - 保存数据库开发前基线
+- 类型：脚本 / 文档 / Git
+- 改动：提交用户新增的 `数据库开发计划.md`，作为三周模拟盘 SQLite 主数据源、状态事件、快照、复盘查询和后续 4h update 的开发依据。
+- 改动：一并保存当前 `scripts/install_daily_task.ps1` 调整，包括 `RunLevel Limited`、允许电池供电运行及 `StartWhenAvailable` 设置。
+- 影响：建立数据库开发开始前的可追溯 Git 基线；本提交不包含数据库功能实现。
+- 验证：使用 PowerShell parser 检查 `scripts/install_daily_task.ps1`，语法通过；人工读取并确认数据库开发计划文件可正常按 UTF-8 加载。
+- Git：本次提交 `Save database development baseline`。
+
 ### 21:25:26 +08:00 - 补充三周内每日运行 daily 的必要性说明
 - 类型：文档 / Git
 - 改动：新增 `为什么未来三周每天运行daily.md`，详细说明 daily 的扫描快照、计划导入、模拟盘状态推进、事件记录和 dashboard 沉淀职责，并解释为何三周后单次运行或事后历史回放不能替代连续前向观察。

@@ -22,11 +22,12 @@ if (-not $isAdmin) {
 
 $trigger = New-ScheduledTaskTrigger -Daily -At $At
 $action = New-ScheduledTaskAction -Execute $batchPath -WorkingDirectory $projectRoot
-$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel LeastPrivilege
+$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
+
 $settings = New-ScheduledTaskSettingsSet `
-    -ExecutionTimeLimit (New-TimeSpan -Minutes 30) `
-    -AllowStartIfOnBatteries:$false `
-    -DisallowStartIfOnBatteries
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -StartWhenAvailable
 
 $description = "Run CryptoTrading daily scan, paper update, and paper report every day at $At."
 
@@ -41,8 +42,8 @@ Register-ScheduledTask `
 
 Write-Host "Scheduled task updated: $TaskName"
 Get-ScheduledTask -TaskName $TaskName |
-    Select-Object -ExpandProperty Triggers |
-    Select-Object Enabled, StartBoundary, DaysInterval
+Select-Object -ExpandProperty Triggers |
+Select-Object Enabled, StartBoundary, DaysInterval
 
 Get-ScheduledTaskInfo -TaskName $TaskName |
-    Select-Object LastRunTime, LastTaskResult, NextRunTime, NumberOfMissedRuns
+Select-Object LastRunTime, LastTaskResult, NextRunTime, NumberOfMissedRuns
