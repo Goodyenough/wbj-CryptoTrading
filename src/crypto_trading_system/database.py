@@ -1,0 +1,427 @@
+from __future__ import annotations
+
+from contextlib import contextmanager
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import sqlite3
+import subprocess
+import uuid
+
+
+SCHEMA_VERSION = 1
+BUSY_TIMEOUT_MS = 30_000
+TERMINAL_PLAN_STATUSES = {"CLOSED", "STOPPED", "EXPIRED", "INVALIDATED", "ARCHIVED"}
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def connect_db(path: Path) -> sqlite3.Connection:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(path, timeout=BUSY_TIMEOUT_MS / 1000)
+    connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA foreign_keys=ON")
+    connection.execute(f"PRAGMA busy_timeout={BUSY_TIMEOUT_MS}")
+    connection.execute("PRAGMA synchronous=NORMAL")
+    return connection
+
+
+def _table_columns(connection: sqlite3.Connection, table: str) -> set[str]:
+    return {str(row[1]) for row in connection.execute(f"PRAGMA table_info({table})")}
+
+
+def _add_column(connection: sqlite3.Connection, table: str, definition: str) -> None:
+    column = definition.split()[0]
+    if column not in _table_columns(connection, table):
+        connection.execute(f"ALTER TABLE {table} ADD COLUMN {definition}")
+
+
+def _config_hash(settings_path: Path | None) -> str | None:
+    if settings_path is None or not settings_path.exists():
+        return None
+    return hashlib.sha256(settings_path.read_bytes()).hexdigest()[:16]
+
+
+def _git_commit(project_root: Path | None) -> str | None:
+    if project_root is None:
+        return None
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return result.stdout.strip() or None
+
+
+def init_observation_db(path: Path) -> None:
+    with connect_db(path) as connection:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA synchronous=NORMAL")
+        connection.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS schema_metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS runs (
+                run_id TEXT PRIMARY KEY,
+                run_type TEXT NOT NULL CHECK(run_type IN ('daily_full', 'paper_4h_update', 'manual', 'backfill')),
+                started_at TEXT NOT NULL,
+                finished_at TEXT,
+                status TEXT NOT NULL CHECK(status IN ('running', 'success', 'failed')),
+                config_hash TEXT,
+                git_commit TEXT,
+                log_path TEXT,
+                error_message TEXT,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS market_scans (
+                scan_id TEXT PRIMARY KEY,
+                run_id TEXT NOT NULL,
+                scan_time TEXT NOT NULL,
+                market_regime TEXT,
+                universe_size INTEGER,
+                candidate_count INTEGER,
+                buy_candidate_count INTEGER,
+                watch_only_count INTEGER,
+                risk_off_count INTEGER,
+                config_hash TEXT,
+                report_path TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(run_id) REFERENCES runs(run_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS paper_plans (
+                plan_id TEXT PRIMARY KEY,
+                account_name TEXT NOT NULL,
+                source_scan_id TEXT,
+                source_symbol TEXT NOT NULL,
+                created_run_id TEXT,
+                created_at TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                entry_low REAL,
+                entry_high REAL,
+                stop_initial REAL,
+                stop_current REAL,
+                tp1 REAL,
+                tp2 REAL,
+                status TEXT NOT NULL,
+                created_reason TEXT,
+                market_regime TEXT,
+                raw_json TEXT,
+                updated_at TEXT NOT NULL,
+                closed_at TEXT,
+                FOREIGN KEY(source_scan_id) REFERENCES market_scans(scan_id),
+                FOREIGN KEY(created_run_id) REFERENCES runs(run_id),
+                UNIQUE(account_name, source_scan_id, source_symbol)
+            );
+
+            CREATE TABLE IF NOT EXISTS paper_events (
+                event_id TEXT PRIMARY KEY,
+                plan_id TEXT NOT NULL,
+                run_id TEXT NOT NULL,
+                event_time TEXT NOT NULL,
+                event_type TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                price REAL,
+                old_status TEXT,
+                new_status TEXT,
+                old_stop REAL,
+                new_stop REAL,
+                kline_time TEXT,
+                reason TEXT,
+                raw_json TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(plan_id) REFERENCES paper_plans(plan_id),
+                FOREIGN KEY(run_id) REFERENCES runs(run_id),
+                UNIQUE(plan_id, event_type, event_time)
+            );
+
+            CREATE TABLE IF NOT EXISTS paper_snapshots (
+                snapshot_id TEXT PRIMARY KEY,
+                run_id TEXT NOT NULL,
+                snapshot_time TEXT NOT NULL,
+                plan_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                status TEXT NOT NULL,
+                current_price REAL,
+                entry_price REAL,
+                stop_current REAL,
+                tp1 REAL,
+                tp2 REAL,
+                tp1_hit INTEGER,
+                ema_trailing_active INTEGER,
+                ema_stop REAL,
+                unrealized_pnl REAL,
+                realized_pnl REAL,
+                holding_hours REAL,
+                raw_json TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(run_id) REFERENCES runs(run_id),
+                FOREIGN KEY(plan_id) REFERENCES paper_plans(plan_id),
+                UNIQUE(run_id, plan_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_runs_type_started ON runs(run_type, started_at);
+            CREATE INDEX IF NOT EXISTS idx_runs_status_started ON runs(status, started_at);
+            CREATE INDEX IF NOT EXISTS idx_plans_symbol_status ON paper_plans(symbol, status);
+            CREATE INDEX IF NOT EXISTS idx_plans_status_updated ON paper_plans(status, updated_at);
+            CREATE INDEX IF NOT EXISTS idx_event_plan_type ON paper_events(plan_id, event_type);
+            CREATE INDEX IF NOT EXISTS idx_event_type_time ON paper_events(event_type, event_time);
+            CREATE INDEX IF NOT EXISTS idx_event_run ON paper_events(run_id);
+            CREATE INDEX IF NOT EXISTS idx_snapshot_run_plan ON paper_snapshots(run_id, plan_id);
+            CREATE INDEX IF NOT EXISTS idx_snapshot_plan_time ON paper_snapshots(plan_id, snapshot_time);
+            """
+        )
+        scan_columns = [
+            "action TEXT",
+            "price REAL",
+            "volume REAL",
+            "market_regime TEXT",
+            "entry_low REAL",
+            "entry_high REAL",
+            "stop REAL",
+            "tp1 REAL",
+            "tp2 REAL",
+            "reason TEXT",
+            "raw_json TEXT",
+            "created_at TEXT",
+        ]
+        for definition in scan_columns:
+            _add_column(connection, "scan_candidates", definition)
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_scan_candidates_symbol ON scan_candidates(symbol)"
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_scan_candidates_scan_action ON scan_candidates(scan_id, action)"
+        )
+        connection.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_scan_candidates_scan_symbol ON scan_candidates(scan_id, symbol)"
+        )
+        now = utc_now()
+        connection.execute(
+            """
+            INSERT INTO schema_metadata(key, value, updated_at)
+            VALUES ('schema_version', ?, ?)
+            ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at
+            """,
+            (str(SCHEMA_VERSION), now),
+        )
+        _backfill_legacy_data(connection)
+
+
+def _backfill_legacy_data(connection: sqlite3.Connection) -> None:
+    now = utc_now()
+    legacy_run_id = "backfill_legacy_v1"
+    connection.execute(
+        """
+        INSERT OR IGNORE INTO runs(
+            run_id, run_type, started_at, finished_at, status, created_at
+        ) VALUES (?, 'backfill', ?, ?, 'success', ?)
+        """,
+        (legacy_run_id, now, now, now),
+    )
+    scan_rows = connection.execute("SELECT * FROM scan_runs").fetchall()
+    for scan in scan_rows:
+        candidates = connection.execute(
+            "SELECT payload_json FROM scan_candidates WHERE scan_id = ? ORDER BY rank",
+            (scan["scan_id"],),
+        ).fetchall()
+        payloads = [json.loads(row["payload_json"]) for row in candidates]
+        actions = [str(payload.get("action", "")) for payload in payloads]
+        risk_off_count = sum(
+            1
+            for payload in payloads
+            if "大盘环境未确认强势" in " ".join(str(item) for item in payload.get("risks", []))
+        )
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO market_scans(
+                scan_id, run_id, scan_time, candidate_count, buy_candidate_count,
+                watch_only_count, risk_off_count, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                scan["scan_id"],
+                legacy_run_id,
+                scan["timestamp_utc"],
+                len(payloads),
+                actions.count("BUY_CANDIDATE"),
+                actions.count("WATCH_ONLY"),
+                risk_off_count,
+                scan["timestamp_utc"],
+            ),
+        )
+        for payload in payloads:
+            connection.execute(
+                """
+                UPDATE scan_candidates SET
+                    action = COALESCE(action, ?), price = COALESCE(price, ?),
+                    volume = COALESCE(volume, ?), entry_low = COALESCE(entry_low, ?),
+                    entry_high = COALESCE(entry_high, ?), stop = COALESCE(stop, ?),
+                    tp1 = COALESCE(tp1, ?), tp2 = COALESCE(tp2, ?),
+                    reason = COALESCE(reason, ?), raw_json = COALESCE(raw_json, payload_json),
+                    created_at = COALESCE(created_at, ?)
+                WHERE scan_id = ? AND symbol = ?
+                """,
+                (
+                    payload.get("action"), payload.get("price"), payload.get("quote_volume_24h"),
+                    payload.get("entry_low"), payload.get("entry_high"), payload.get("stop_loss"),
+                    payload.get("take_profit_1"), payload.get("take_profit_2"), payload.get("setup"),
+                    scan["timestamp_utc"], scan["scan_id"], payload.get("symbol"),
+                ),
+            )
+    trade_rows = connection.execute("SELECT * FROM paper_trades").fetchall()
+    for trade in trade_rows:
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO paper_plans(
+                plan_id, account_name, source_scan_id, source_symbol, created_run_id,
+                created_at, symbol, entry_low, entry_high, stop_initial, stop_current,
+                tp1, tp2, status, created_reason, raw_json, updated_at, closed_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                trade["paper_trade_id"], trade["account_name"], trade["source_scan_id"],
+                trade["symbol"], legacy_run_id, trade["created_at_utc"], trade["symbol"],
+                trade["entry_low"], trade["entry_high"],
+                json.loads(trade["payload_json"]).get("stop_loss", trade["stop_loss"]),
+                trade["stop_loss"], trade["take_profit_1"], trade["take_profit_2"],
+                trade["status"], trade["notes"], trade["payload_json"],
+                trade["updated_at_utc"], trade["closed_at_utc"],
+            ),
+        )
+    event_rows = connection.execute("SELECT * FROM paper_trade_events").fetchall()
+    for event in event_rows:
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO paper_events(
+                event_id, plan_id, run_id, event_time, event_type, symbol, price,
+                reason, raw_json, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                event["event_id"], event["paper_trade_id"], legacy_run_id,
+                event["event_time_utc"], event["event_type"], event["symbol"],
+                event["price"], event["message"], json.dumps(dict(event), ensure_ascii=False),
+                event["event_time_utc"],
+            ),
+        )
+
+
+def start_run(
+    path: Path,
+    run_type: str,
+    *,
+    settings_path: Path | None = None,
+    project_root: Path | None = None,
+    log_path: Path | None = None,
+) -> str:
+    init_observation_db(path)
+    now = utc_now()
+    run_id = f"{now.replace('-', '').replace(':', '').replace('T', '_').replace('Z', '')}_{uuid.uuid4().hex[:8]}"
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO runs(
+                run_id, run_type, started_at, status, config_hash, git_commit, log_path, created_at
+            ) VALUES (?, ?, ?, 'running', ?, ?, ?, ?)
+            """,
+            (
+                run_id,
+                run_type,
+                now,
+                _config_hash(settings_path),
+                _git_commit(project_root),
+                None if log_path is None else str(log_path),
+                now,
+            ),
+        )
+    return run_id
+
+
+def finish_run(path: Path, run_id: str, *, success: bool, error_message: str | None = None) -> None:
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            UPDATE runs
+            SET finished_at = ?, status = ?, error_message = ?
+            WHERE run_id = ? AND status = 'running'
+            """,
+            (utc_now(), "success" if success else "failed", error_message, run_id),
+        )
+
+
+@contextmanager
+def tracked_run(
+    path: Path,
+    run_type: str,
+    *,
+    settings_path: Path | None = None,
+    project_root: Path | None = None,
+    log_path: Path | None = None,
+):
+    run_id = start_run(
+        path,
+        run_type,
+        settings_path=settings_path,
+        project_root=project_root,
+        log_path=log_path,
+    )
+    try:
+        yield run_id
+    except Exception as exc:
+        finish_run(path, run_id, success=False, error_message=f"{type(exc).__name__}: {exc}")
+        raise
+    else:
+        finish_run(path, run_id, success=True)
+
+
+def database_status(path: Path) -> dict:
+    init_observation_db(path)
+    with connect_db(path) as connection:
+        schema_row = connection.execute(
+            "SELECT value FROM schema_metadata WHERE key = 'schema_version'"
+        ).fetchone()
+        tables = {
+            str(row[0])
+            for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        }
+        required = {"runs", "market_scans", "scan_candidates", "paper_plans", "paper_events", "paper_snapshots"}
+        latest_run = connection.execute(
+            "SELECT * FROM runs ORDER BY started_at DESC LIMIT 1"
+        ).fetchone()
+        latest_failed = connection.execute(
+            "SELECT * FROM runs WHERE status='failed' ORDER BY started_at DESC LIMIT 1"
+        ).fetchone()
+        open_plans = connection.execute(
+            "SELECT COUNT(*) FROM paper_plans WHERE status NOT IN ('CLOSED','STOPPED','EXPIRED','INVALIDATED','ARCHIVED')"
+        ).fetchone()[0]
+        journal_mode = connection.execute("PRAGMA journal_mode").fetchone()[0]
+        synchronous = connection.execute("PRAGMA synchronous").fetchone()[0]
+        foreign_keys = connection.execute("PRAGMA foreign_keys").fetchone()[0]
+        busy_timeout = connection.execute("PRAGMA busy_timeout").fetchone()[0]
+    return {
+        "database_path": str(path.resolve()),
+        "schema_version": None if schema_row is None else schema_row[0],
+        "journal_mode": journal_mode,
+        "synchronous": synchronous,
+        "foreign_keys": foreign_keys,
+        "busy_timeout_ms": busy_timeout,
+        "tables_ok": required.issubset(tables),
+        "missing_tables": sorted(required - tables),
+        "latest_run": None if latest_run is None else dict(latest_run),
+        "latest_failed_run": None if latest_failed is None else dict(latest_failed),
+        "open_plan_count": open_plans,
+    }

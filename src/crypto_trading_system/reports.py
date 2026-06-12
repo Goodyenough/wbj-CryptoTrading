@@ -291,7 +291,13 @@ def write_candidate_charts(result: ScanResult, report_dir: Path) -> None:
         chart_path.write_text(render_candidate_chart(candidate), encoding="utf-8")
 
 
-def generate_scan_report(result: ScanResult, settings: Settings, report_version: str | None = None) -> str:
+def generate_scan_report(
+    result: ScanResult,
+    settings: Settings,
+    report_version: str | None = None,
+    run_id: str | None = None,
+    run_type: str = "manual",
+) -> str:
     report_title = _report_title(result, report_version)
     version_lines = [] if report_version is None else [f"report_version: {report_version}"]
     version_summary = [] if report_version is None else [f"- 报告版本：{report_version}"]
@@ -309,6 +315,9 @@ def generate_scan_report(result: ScanResult, settings: Settings, report_version:
         f"# {report_title}",
         "",
         f"- 报告时间：{_local_timestamp(result.timestamp_utc)}",
+        f"- Run ID：`{run_id or 'n/a'}`",
+        f"- Run type：`{run_type}`",
+        "- 数据来源：SQLite",
         *version_summary,
         f"- 扫描 ID：{result.scan_id}",
         f"- 数据源：{result.source}",
@@ -461,6 +470,8 @@ def write_scan_reports(
     result: ScanResult,
     settings: Settings,
     include_obsidian: bool = True,
+    run_id: str | None = None,
+    run_type: str = "manual",
 ) -> list[Path]:
     project_report_dir = _project_report_dir(settings, result.timestamp_utc)
     obsidian_report_dir = _obsidian_report_dir(settings, result.timestamp_utc)
@@ -472,7 +483,13 @@ def write_scan_reports(
     report_version_number = next_report_version(target_dirs, filename_prefix)
     report_version = f"v{report_version_number}"
     filename = versioned_markdown_filename(filename_prefix, report_version_number)
-    markdown = generate_scan_report(result, settings, report_version=report_version)
+    markdown = generate_scan_report(
+        result,
+        settings,
+        report_version=report_version,
+        run_id=run_id,
+        run_type=run_type,
+    )
     paths: list[Path] = []
 
     project_report_dir.mkdir(parents=True, exist_ok=True)

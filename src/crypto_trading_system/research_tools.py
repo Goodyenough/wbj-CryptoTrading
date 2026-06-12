@@ -9,6 +9,7 @@ import sqlite3
 
 from .backtest.universe import SymbolMaster, load_symbol_master, save_symbol_master
 from .config import Settings
+from .database import connect_db
 from .paper_trader import CLOSED_STATUSES, OPEN_STATUSES, load_all_paper_trades, load_paper_events
 from .report_versions import next_report_version, versioned_markdown_filename
 
@@ -204,7 +205,7 @@ def _scan_action_summary(settings: Settings) -> tuple[Counter, Counter]:
     if not settings.output.database_path.exists():
         return action_counter, risk_off_counter
     today = _local_now().strftime("%Y-%m-%d")
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
         rows = connection.execute(
             """
@@ -231,7 +232,12 @@ def _scan_action_summary(settings: Settings) -> tuple[Counter, Counter]:
     return action_counter, risk_off_counter
 
 
-def generate_observation_dashboard(settings: Settings, account_name: str | None = None) -> tuple[str, list[Path]]:
+def generate_observation_dashboard(
+    settings: Settings,
+    account_name: str | None = None,
+    run_id: str | None = None,
+    run_type: str = "manual",
+) -> tuple[str, list[Path]]:
     account = account_name or settings.paper.account_name
     trades = load_all_paper_trades(settings, account)
     events_by_trade = load_paper_events(settings, account)
@@ -252,7 +258,10 @@ def generate_observation_dashboard(settings: Settings, account_name: str | None 
 
     report_dir = settings.output.reports_dir / now.strftime("%Y-%m-%d")
     obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / now.strftime("%Y-%m-%d")
-    prefix = f"paper_observation_dashboard_{now.strftime('%Y-%m-%d')}_{account}"
+    if run_type == "paper_4h_update":
+        prefix = f"paper_4h_dashboard_{now.strftime('%H%M')}_{account}"
+    else:
+        prefix = f"paper_observation_dashboard_{now.strftime('%Y-%m-%d')}_{account}"
     version = next_report_version([report_dir, obsidian_dir], prefix)
     filename = versioned_markdown_filename(prefix, version)
     lines = [
@@ -267,6 +276,10 @@ def generate_observation_dashboard(settings: Settings, account_name: str | None 
         "---",
         "",
         f"# 三周观察仪表 {now.strftime('%Y-%m-%d')} {account} v{version}",
+        "",
+        f"- Run ID：`{run_id or 'n/a'}`",
+        f"- Run type：`{run_type}`",
+        "- 数据来源：SQLite",
         "",
         "## 核心指标",
         "",

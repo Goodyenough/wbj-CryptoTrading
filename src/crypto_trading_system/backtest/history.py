@@ -6,6 +6,7 @@ import sqlite3
 from typing import Callable
 
 from ..config import Settings
+from ..database import connect_db
 from ..market_data import BinanceClient
 from ..storage import init_db
 
@@ -274,7 +275,7 @@ def fetch_klines_cached(
 ) -> KlineFetchResult:
     init_db(settings.output.database_path)
     step = interval_ms(interval)
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         cached = _load_cached_klines(connection, symbol, interval, start_time_ms, end_time_ms)
         expected = max(0, (end_time_ms - start_time_ms + step - 1) // step)
         fetched_from_api = 0
@@ -398,7 +399,7 @@ def batch_load_klines_cached(
     params = [source, *symbols, *intervals, start_time_ms, end_time_ms]
 
     result: dict[str, dict[str, list[list]]] = {sym: {iv: [] for iv in intervals} for sym in symbols}
-    with sqlite3.connect(settings.output.database_path) as conn:
+    with connect_db(settings.output.database_path) as conn:
         for row in conn.execute(sql, params):
             sym = row[1]
             iv = row[2]

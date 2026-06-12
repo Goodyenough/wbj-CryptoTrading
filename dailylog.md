@@ -15,6 +15,18 @@
 
 ## 2026-06-12
 
+### 22:40:52 +08:00 - 实现三周模拟盘 SQLite 结构化观察基础设施
+- 类型：代码 / 数据库 / 脚本 / 测试 / 文档 / Git
+- 改动：在现有 `data/crypto_trading.db` 上新增兼容 schema migration，创建 `schema_metadata`、`runs`、`market_scans`、`paper_plans`、`paper_events`、`paper_snapshots`，并为旧 scan、paper trade 和 event 幂等回填观察数据。
+- 改动：统一 SQLite 连接为 WAL、`synchronous=NORMAL`、`foreign_keys=ON`、`busy_timeout=30000`、30 秒 connect timeout；新增 `python main.py db init/status`。
+- 改动：将 daily 定时脚本改为调用单一 `python main.py daily --account demo`；daily 五个步骤共享 `daily_full` run_id，失败时 runs 写入 error_message，成功后标记 success。
+- 改动：paper update 将 API 请求移出写事务，每个 plan 使用独立短事务；增加前置状态条件、非法状态回滚拒绝、stop 不降低校验、严格 4h close_time 校验、`API_DELAY_SKIPPED`、结构化 event 和每 run/plan snapshot。
+- 改动：新增 `paper db-summary`、`paper db-events`、`paper db-export` 与 `paper cycle --run-type paper_4h_update`；4h cycle 不执行 scan/add-from-scan，并使用独立报告文件名前缀。暂不安装 4h Windows 任务，需先通过 5 天稳定观察门槛。
+- 改动：market scan、paper report、observation dashboard 增加 `run_id`、`run_type` 和 SQLite 数据来源说明；同步更新 `README.md`、`TODO.md`、`开发计划.md` 与 `数据库开发计划.md`。
+- 验证：`python -m compileall main.py src tests -q` 通过；`test_database.py`、`test_trade_state.py`、`test_replay.py`、`test_abtest.py`、`test_history.py`、`test_scanner_regime.py`、`test_universe.py`、`test_abtest_summary.py`、`test_abtest_walk_forward.py`、`test_regime_analysis.py` 全部通过。
+- 验证：生产库执行 `python main.py db init/status` 成功，确认 schema version=1、journal_mode=wal、synchronous=1、foreign_keys=1、busy_timeout=30000、open_plan_count=4；`paper db-events` 和三份 CSV 导出成功。
+- Git：本次提交 `Add structured paper observation database`。
+
 ### 22:24:29 +08:00 - 保存数据库开发前基线
 - 类型：脚本 / 文档 / Git
 - 改动：提交用户新增的 `数据库开发计划.md`，作为三周模拟盘 SQLite 主数据源、状态事件、快照、复盘查询和后续 4h update 的开发依据。

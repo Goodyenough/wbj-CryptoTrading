@@ -9,6 +9,7 @@ import subprocess
 from typing import Callable
 
 from ..config import Settings
+from ..database import connect_db
 from ..report_versions import next_report_version, versioned_markdown_filename
 from ..storage import init_db
 from .history import fetch_klines_cached
@@ -501,7 +502,7 @@ def _save_backtest_result(
 ) -> None:
     init_db(settings.output.database_path)
     commit_hash = _commit_hash()
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         connection.execute(
             """
             INSERT OR REPLACE INTO backtest_runs (

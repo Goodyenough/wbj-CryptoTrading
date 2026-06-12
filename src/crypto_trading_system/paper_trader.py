@@ -8,6 +8,7 @@ import sqlite3
 import uuid
 
 from .config import Settings
+from .database import connect_db, utc_now
 from .market_data import BinanceClient
 from .market_regime import classify_market_regime
 from .models import PaperTrade, PaperTradeEvent
@@ -18,10 +19,19 @@ from .indicators import ema as _ema
 
 OPEN_STATUSES = {"WATCHING", "ENTERED", "TP1_HIT"}
 CLOSED_STATUSES = {"STOPPED", "CLOSED", "INVALIDATED", "ARCHIVED"}
+ALLOWED_TRANSITIONS = {
+    "WATCHING": {"WATCHING", "ENTERED", "INVALIDATED", "ARCHIVED"},
+    "ENTERED": {"ENTERED", "TP1_HIT", "STOPPED", "CLOSED"},
+    "TP1_HIT": {"TP1_HIT", "STOPPED", "CLOSED"},
+    "STOPPED": {"STOPPED"},
+    "CLOSED": {"CLOSED"},
+    "INVALIDATED": {"INVALIDATED"},
+    "ARCHIVED": {"ARCHIVED"},
+}
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return utc_now()
 
 
 def _local_timestamp(timestamp_utc: str) -> str:
@@ -140,8 +150,15 @@ def _record_event(
     message: str,
     event_time_utc: str | None = None,
     price: float | None = None,
+    run_id: str | None = None,
+    old_status: str | None = None,
+    new_status: str | None = None,
+    old_stop: float | None = None,
+    new_stop: float | None = None,
+    kline_time: str | None = None,
 ) -> None:
     event_time = event_time_utc or _utc_now()
+    event_id = uuid.uuid4().hex[:12]
     connection.execute(
         """
         INSERT INTO paper_trade_events (
@@ -151,7 +168,7 @@ def _record_event(
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            uuid.uuid4().hex[:12],
+            event_id,
             trade.paper_trade_id,
             trade.account_name,
             trade.symbol,
@@ -162,6 +179,141 @@ def _record_event(
             trade.realized_pnl,
             trade.unrealized_pnl,
             message,
+        ),
+    )
+    if run_id is not None:
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO paper_events(
+                event_id, plan_id, run_id, event_time, event_type, symbol, price,
+                old_status, new_status, old_stop, new_stop, kline_time,
+                reason, raw_json, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                event_id,
+                trade.paper_trade_id,
+                run_id,
+                event_time,
+                event_type,
+                trade.symbol,
+                trade.last_price if price is None else price,
+                old_status,
+                new_status,
+                old_stop,
+                new_stop,
+                kline_time,
+                message,
+                json.dumps(
+                    {
+                        "quantity": trade.quantity,
+                        "realized_pnl": trade.realized_pnl,
+                        "unrealized_pnl": trade.unrealized_pnl,
+                    },
+                    ensure_ascii=False,
+                ),
+                event_time,
+            ),
+        )
+
+
+def _sync_paper_plan(
+    connection: sqlite3.Connection,
+    trade: PaperTrade,
+    *,
+    run_id: str | None = None,
+    payload: dict | None = None,
+) -> None:
+    raw_json = json.dumps(payload or {}, ensure_ascii=False)
+    initial_stop = trade.stop_loss
+    if payload is not None and payload.get("stop_loss") is not None:
+        initial_stop = float(payload["stop_loss"])
+    connection.execute(
+        """
+        INSERT INTO paper_plans(
+            plan_id, account_name, source_scan_id, source_symbol, created_run_id,
+            created_at, symbol, entry_low, entry_high, stop_initial, stop_current,
+            tp1, tp2, status, created_reason, raw_json, updated_at, closed_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(plan_id) DO UPDATE SET
+            stop_current=excluded.stop_current,
+            status=excluded.status,
+            created_reason=excluded.created_reason,
+            raw_json=CASE WHEN excluded.raw_json='{}' THEN paper_plans.raw_json ELSE excluded.raw_json END,
+            updated_at=excluded.updated_at,
+            closed_at=excluded.closed_at
+        """,
+        (
+            trade.paper_trade_id,
+            trade.account_name,
+            trade.source_scan_id,
+            trade.symbol,
+            run_id,
+            trade.created_at_utc,
+            trade.symbol,
+            trade.entry_low,
+            trade.entry_high,
+            initial_stop,
+            trade.stop_loss,
+            trade.take_profit_1,
+            trade.take_profit_2,
+            trade.status,
+            trade.notes,
+            raw_json,
+            trade.updated_at_utc,
+            trade.closed_at_utc,
+        ),
+    )
+
+
+def _write_snapshot(connection: sqlite3.Connection, trade: PaperTrade, run_id: str, snapshot_time: str) -> None:
+    holding_hours = None
+    if trade.entered_at_utc:
+        entered = datetime.fromisoformat(trade.entered_at_utc.replace("Z", "+00:00"))
+        end = datetime.fromisoformat((trade.closed_at_utc or snapshot_time).replace("Z", "+00:00"))
+        holding_hours = max(0.0, (end - entered).total_seconds() / 3600)
+    connection.execute(
+        """
+        INSERT INTO paper_snapshots(
+            snapshot_id, run_id, snapshot_time, plan_id, symbol, status,
+            current_price, entry_price, stop_current, tp1, tp2, tp1_hit,
+            ema_trailing_active, ema_stop, unrealized_pnl, realized_pnl,
+            holding_hours, raw_json, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(run_id, plan_id) DO UPDATE SET
+            snapshot_time=excluded.snapshot_time,
+            status=excluded.status,
+            current_price=excluded.current_price,
+            entry_price=excluded.entry_price,
+            stop_current=excluded.stop_current,
+            tp1_hit=excluded.tp1_hit,
+            ema_trailing_active=excluded.ema_trailing_active,
+            ema_stop=excluded.ema_stop,
+            unrealized_pnl=excluded.unrealized_pnl,
+            realized_pnl=excluded.realized_pnl,
+            holding_hours=excluded.holding_hours,
+            raw_json=excluded.raw_json
+        """,
+        (
+            uuid.uuid4().hex,
+            run_id,
+            snapshot_time,
+            trade.paper_trade_id,
+            trade.symbol,
+            trade.status,
+            trade.last_price,
+            trade.entry_price,
+            trade.stop_loss,
+            trade.take_profit_1,
+            trade.take_profit_2,
+            1 if trade.tp1_hit_at_utc or trade.status == "TP1_HIT" else 0,
+            1 if trade.tp1_trailing_ema_stop_active else 0,
+            trade.stop_loss if trade.tp1_trailing_ema_stop_active else None,
+            trade.unrealized_pnl,
+            trade.realized_pnl,
+            holding_hours,
+            json.dumps(asdict(trade), ensure_ascii=False),
+            snapshot_time,
         ),
     )
 
@@ -233,6 +385,7 @@ def _archive_replaced_watching_trades(
     symbol: str,
     replacement_scan_id: str,
     now: str,
+    run_id: str | None = None,
 ) -> int:
     connection.row_factory = sqlite3.Row
     rows = connection.execute(
@@ -254,7 +407,8 @@ def _archive_replaced_watching_trades(
         old_trade.updated_at_utc = now
         old_trade.closed_at_utc = now
         old_trade.notes = f"Archived because scan {replacement_scan_id} created a newer WATCHING plan for {symbol}."
-        _save_trade_update(connection, old_trade)
+        _save_trade_update(connection, old_trade, expected_status="WATCHING")
+        _sync_paper_plan(connection, old_trade, run_id=run_id)
         _record_event(
             connection,
             old_trade,
@@ -262,12 +416,22 @@ def _archive_replaced_watching_trades(
             old_trade.notes,
             event_time_utc=now,
             price=old_trade.last_price,
+            run_id=run_id,
+            old_status="WATCHING",
+            new_status="ARCHIVED",
+            old_stop=old_trade.stop_loss,
+            new_stop=old_trade.stop_loss,
         )
         archived += 1
     return archived
 
 
-def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: str | None = None) -> dict:
+def add_from_scan(
+    settings: Settings,
+    scan_id: str | None = None,
+    account_name: str | None = None,
+    run_id: str | None = None,
+) -> dict:
     account = account_name or settings.paper.account_name
     now = _utc_now()
     added = 0
@@ -276,7 +440,7 @@ def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: 
     archived = 0
     allowed_actions = {action.upper() for action in settings.paper.import_actions}
 
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
         chosen_scan_id = scan_id or _latest_scan_id(connection)
         rows = connection.execute(
@@ -304,6 +468,7 @@ def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: 
                 payload["symbol"],
                 chosen_scan_id,
                 now,
+                run_id,
             )
             entry_low = float(payload["entry_low"])
             entry_high = float(payload["entry_high"])
@@ -336,6 +501,7 @@ def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: 
                 notes="Imported from scan candidate.",
             )
             if _insert_paper_trade(connection, trade, payload):
+                _sync_paper_plan(connection, trade, run_id=run_id, payload=payload)
                 _record_event(
                     connection,
                     trade,
@@ -346,6 +512,11 @@ def add_from_scan(settings: Settings, scan_id: str | None = None, account_name: 
                     ),
                     event_time_utc=now,
                     price=trade.last_price,
+                    run_id=run_id,
+                    old_status=None,
+                    new_status="WATCHING",
+                    old_stop=None,
+                    new_stop=trade.stop_loss,
                 )
                 added += 1
             else:
@@ -376,36 +547,67 @@ def _load_open_trades(connection: sqlite3.Connection, account_name: str) -> list
     return [_paper_trade_from_row(row) for row in rows]
 
 
-def _save_trade_update(connection: sqlite3.Connection, trade: PaperTrade) -> None:
-    connection.execute(
-        """
+def _save_trade_update(
+    connection: sqlite3.Connection,
+    trade: PaperTrade,
+    expected_status: str | None = None,
+) -> None:
+    if expected_status is not None and trade.status not in ALLOWED_TRANSITIONS.get(expected_status, set()):
+        raise ValueError(f"Illegal paper state transition: {expected_status} -> {trade.status}")
+    current = connection.execute(
+        "SELECT status, stop_loss FROM paper_trades WHERE paper_trade_id = ?",
+        (trade.paper_trade_id,),
+    ).fetchone()
+    if current is None:
+        raise RuntimeError(f"Paper plan not found: {trade.paper_trade_id}")
+    current_stop = float(current["stop_loss"])
+    if trade.stop_loss + 1e-12 < current_stop:
+        raise ValueError(
+            f"Paper stop cannot decrease for {trade.paper_trade_id}: {current_stop} -> {trade.stop_loss}"
+        )
+    sql = """
         UPDATE paper_trades
         SET status = ?, updated_at_utc = ?, quantity = ?, entry_price = ?,
             entered_at_utc = ?, tp1_hit_at_utc = ?, closed_at_utc = ?, exit_price = ?,
             realized_pnl = ?, unrealized_pnl = ?, last_price = ?, notes = ?,
-            tp1_trailing_ema_stop_active = ?
+            tp1_trailing_ema_stop_active = ?, stop_loss = ?
         WHERE paper_trade_id = ?
-        """,
-        (
-            trade.status,
-            trade.updated_at_utc,
-            trade.quantity,
-            trade.entry_price,
-            trade.entered_at_utc,
-            trade.tp1_hit_at_utc,
-            trade.closed_at_utc,
-            trade.exit_price,
-            trade.realized_pnl,
-            trade.unrealized_pnl,
-            trade.last_price,
-            trade.notes,
-            1 if trade.tp1_trailing_ema_stop_active else 0,
-            trade.paper_trade_id,
-        ),
+    """
+    params: list = [
+        trade.status,
+        trade.updated_at_utc,
+        trade.quantity,
+        trade.entry_price,
+        trade.entered_at_utc,
+        trade.tp1_hit_at_utc,
+        trade.closed_at_utc,
+        trade.exit_price,
+        trade.realized_pnl,
+        trade.unrealized_pnl,
+        trade.last_price,
+        trade.notes,
+        1 if trade.tp1_trailing_ema_stop_active else 0,
+        trade.stop_loss,
+        trade.paper_trade_id,
+    ]
+    if expected_status is not None:
+        sql += " AND status = ?"
+        params.append(expected_status)
+    cursor = connection.execute(
+        sql,
+        tuple(params),
     )
+    if expected_status is not None and cursor.rowcount != 1:
+        raise RuntimeError(
+            f"Stale paper plan update rejected for {trade.paper_trade_id}: expected status {expected_status}."
+        )
 
 
-def update_paper_trades(settings: Settings, account_name: str | None = None) -> list[PaperTrade]:
+def update_paper_trades(
+    settings: Settings,
+    account_name: str | None = None,
+    run_id: str | None = None,
+) -> list[PaperTrade]:
     account = account_name or settings.paper.account_name
     client = BinanceClient(
         settings.market.base_url,
@@ -419,58 +621,105 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
     entry_reclaim_enabled = settings.analysis.entry_reclaim_close_enabled
     ema_trailing_enabled = settings.analysis.tp1_ema_trailing_stop_enabled
 
-    # 按需批量拉 4h K线：entry_reclaim 需要当前收盘价（用 lastPrice 代替），
-    # ema_trailing 需要最近 20 根 4h K线。两者共用同一次 API 请求。
+    # API 请求全部在写事务之外完成，避免网络等待期间占用 SQLite 锁。
     klines_4h_cache: dict[str, list[list]] = {}
 
-    def _get_4h_closes(symbol: str) -> list[float]:
+    def _get_closed_4h(symbol: str) -> list[list]:
         if symbol not in klines_4h_cache:
             klines_4h_cache[symbol] = client.klines(symbol, "4h", limit=25)
-        # 只取已完全收盘的 K线（排除最后一根未收盘的）
-        closed = klines_4h_cache[symbol][:-1]
-        return [float(k[4]) for k in closed]
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+        safety_buffer_ms = 60_000
+        return [row for row in klines_4h_cache[symbol] if int(row[6]) <= now_ms - safety_buffer_ms]
 
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         trades = _load_open_trades(connection, account)
-        for trade in trades:
+    errors: list[str] = []
+    for trade in trades:
+        try:
             current_price = ticker_map.get(trade.symbol)
             if current_price is None:
                 trade.notes = f"{trade.notes} | No ticker price found during update."
+                with connect_db(settings.output.database_path) as connection:
+                    _sync_paper_plan(connection, trade, run_id=run_id)
+                    if run_id is not None:
+                        _write_snapshot(connection, trade, run_id, now)
                 continue
 
-            # entry_reclaim_close：WATCHING 状态下，entry zone 已触碰但 4h 收盘未重新站上 entry_high
-            # 用当前价格作为"最新 4h 收盘"的近似值（模拟盘每次更新间隔远大于 1 tick）
+            needs_closed_4h = (
+                entry_reclaim_enabled and trade.status == "WATCHING" and current_price <= trade.entry_high
+            ) or (ema_trailing_enabled and trade.status in {"ENTERED", "TP1_HIT"})
+            closed_4h = _get_closed_4h(trade.symbol) if needs_closed_4h else []
+            if needs_closed_4h and not closed_4h:
+                with connect_db(settings.output.database_path) as connection:
+                    _sync_paper_plan(connection, trade, run_id=run_id)
+                    _record_event(
+                        connection,
+                        trade,
+                        "API_DELAY_SKIPPED",
+                        "4h kline not closed at update time, skip state update.",
+                        event_time_utc=now,
+                        price=current_price,
+                        run_id=run_id,
+                        old_status=trade.status,
+                        new_status=trade.status,
+                        old_stop=trade.stop_loss,
+                        new_stop=trade.stop_loss,
+                    )
+                    if run_id is not None:
+                        _write_snapshot(connection, trade, run_id, now)
+                updated.append(trade)
+                continue
+
+            last_closed_time = None
+            if closed_4h:
+                last_closed_time = datetime.fromtimestamp(
+                    int(closed_4h[-1][6]) / 1000,
+                    tz=timezone.utc,
+                ).isoformat(timespec="seconds").replace("+00:00", "Z")
+
             if (
                 entry_reclaim_enabled
                 and trade.status == "WATCHING"
                 and current_price <= trade.entry_high
             ):
-                closes_4h = _get_4h_closes(trade.symbol)
-                last_close = closes_4h[-1] if closes_4h else current_price
+                last_close = float(closed_4h[-1][4])
                 if last_close < trade.entry_high:
+                    old_status = trade.status
+                    old_stop = trade.stop_loss
                     trade.last_price = current_price
                     trade.updated_at_utc = now
                     trade.notes = "Watching: entry zone touched, but 4h close has not reclaimed entry_high."
-                    _record_event(
-                        connection,
-                        trade,
-                        "RECLAIM_PENDING",
-                        f"Entry zone touched (price={_fmt_price(current_price)}) but 4h close {_fmt_price(last_close)} < entry_high {_fmt_price(trade.entry_high)}; waiting for reclaim.",
-                        price=current_price,
-                    )
-                    _save_trade_update(connection, trade)
+                    with connect_db(settings.output.database_path) as connection:
+                        _sync_paper_plan(connection, trade, run_id=run_id)
+                        _record_event(
+                            connection,
+                            trade,
+                            "RECLAIM_PENDING",
+                            f"Entry zone touched (price={_fmt_price(current_price)}) but 4h close {_fmt_price(last_close)} < entry_high {_fmt_price(trade.entry_high)}; waiting for reclaim.",
+                            price=current_price,
+                            run_id=run_id,
+                            old_status=old_status,
+                            new_status=trade.status,
+                            old_stop=old_stop,
+                            new_stop=trade.stop_loss,
+                            kline_time=last_closed_time,
+                        )
+                        _save_trade_update(connection, trade, expected_status=old_status)
+                        if run_id is not None:
+                            _write_snapshot(connection, trade, run_id, now)
                     updated.append(trade)
                     continue
 
-            # tp1_ema_trailing_stop：ENTERED/TP1_HIT 状态下计算 4h EMA20
             ema20_4h: float | None = None
             ema20_4h_ready = False
             if ema_trailing_enabled and trade.status in {"ENTERED", "TP1_HIT"}:
-                closes_4h = _get_4h_closes(trade.symbol)
+                closes_4h = [float(row[4]) for row in closed_4h]
                 if len(closes_4h) >= 20:
                     ema20_4h = _ema(closes_4h, 20)
                     ema20_4h_ready = True
 
+            old_status = trade.status
+            old_stop = trade.stop_loss
             events = step_trade(
                 trade,
                 high=current_price,
@@ -481,25 +730,37 @@ def update_paper_trades(settings: Settings, account_name: str | None = None) -> 
                 tp1_trailing_ema_stop=ema20_4h,
                 tp1_trailing_ema_stop_ready=ema20_4h_ready,
             )
-            for event in events:
-                _record_event(
-                    connection,
-                    trade,
-                    event.event_type,
-                    event.message,
-                    event_time_utc=event.event_time_utc,
-                    price=event.price,
-                )
-
-            _save_trade_update(connection, trade)
+            with connect_db(settings.output.database_path) as connection:
+                _sync_paper_plan(connection, trade, run_id=run_id)
+                for event in events:
+                    _record_event(
+                        connection,
+                        trade,
+                        event.event_type,
+                        event.message,
+                        event_time_utc=event.event_time_utc,
+                        price=event.price,
+                        run_id=run_id,
+                        old_status=old_status,
+                        new_status=trade.status,
+                        old_stop=old_stop,
+                        new_stop=trade.stop_loss,
+                        kline_time=last_closed_time,
+                    )
+                _save_trade_update(connection, trade, expected_status=old_status)
+                if run_id is not None:
+                    _write_snapshot(connection, trade, run_id, now)
             updated.append(trade)
-
+        except Exception as exc:
+            errors.append(f"{trade.paper_trade_id}/{trade.symbol}: {type(exc).__name__}: {exc}")
+    if errors:
+        raise RuntimeError("Paper update completed with plan errors: " + " | ".join(errors))
     return updated
 
 
 def load_paper_events(settings: Settings, account_name: str | None = None) -> dict[str, list[PaperTradeEvent]]:
     account = account_name or settings.paper.account_name
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
         rows = connection.execute(
             """
@@ -521,7 +782,7 @@ def load_paper_events(settings: Settings, account_name: str | None = None) -> di
 def backfill_missing_events(settings: Settings, account_name: str | None = None) -> int:
     account = account_name or settings.paper.account_name
     inserted = 0
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
         trades = load_all_paper_trades(settings, account)
         for trade in trades:
@@ -576,7 +837,7 @@ def backfill_missing_events(settings: Settings, account_name: str | None = None)
 
 def load_all_paper_trades(settings: Settings, account_name: str | None = None) -> list[PaperTrade]:
     account = account_name or settings.paper.account_name
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
         rows = connection.execute(
             """
@@ -638,7 +899,12 @@ def _reclaim_outcome(trade: PaperTrade, events: list[PaperTradeEvent]) -> tuple[
     return trade.status.lower(), trade.notes
 
 
-def generate_paper_report(settings: Settings, account_name: str | None = None) -> tuple[str, list[Path]]:
+def generate_paper_report(
+    settings: Settings,
+    account_name: str | None = None,
+    run_id: str | None = None,
+    run_type: str = "manual",
+) -> tuple[str, list[Path]]:
     account = account_name or settings.paper.account_name
     backfill_missing_events(settings, account)
     trades = load_all_paper_trades(settings, account)
@@ -646,7 +912,13 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
     now = _utc_now()
     project_report_dir = _project_report_dir(settings, now)
     obsidian_report_dir = _obsidian_report_dir(settings, now)
-    filename_prefix = f"paper_report_{_local_date(now)}_{account}"
+    if run_type == "paper_4h_update":
+        local_hhmm = datetime.fromisoformat(now.replace("Z", "+00:00")).astimezone(
+            timezone(timedelta(hours=8))
+        ).strftime("%H%M")
+        filename_prefix = f"paper_4h_update_{local_hhmm}_{account}"
+    else:
+        filename_prefix = f"paper_report_{_local_date(now)}_{account}"
     target_dirs = [project_report_dir]
     if obsidian_report_dir is not None:
         target_dirs.append(obsidian_report_dir)
@@ -730,6 +1002,9 @@ def generate_paper_report(settings: Settings, account_name: str | None = None) -
         f"# 模拟盘报告 {account} {report_version}",
         "",
         f"- 报告时间：{_local_timestamp(now)}",
+        f"- Run ID：`{run_id or 'n/a'}`",
+        f"- Run type：`{run_type}`",
+        "- 数据来源：SQLite",
         f"- 报告版本：{report_version}",
         f"- 模拟账户权益基准：{settings.paper.account_equity:,.2f} USDT",
         f"- 单笔计划风险：{settings.paper.risk_per_trade_pct * 100:.2f}%",

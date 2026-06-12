@@ -7,6 +7,7 @@ import sqlite3
 from pathlib import Path
 
 from ..config import Settings
+from ..database import connect_db
 from ..market_regime import classify_market_regime
 from ..report_versions import next_report_version, versioned_markdown_filename
 from ..storage import init_db
@@ -313,7 +314,7 @@ def write_regime_comparison_report(settings: Settings, comparison: RegimeCompari
 
 def build_regime_comparison(settings: Settings, baseline_run_id: str, variant_run_id: str) -> RegimeComparison:
     init_db(settings.output.database_path)
-    with sqlite3.connect(settings.output.database_path) as connection:
+    with connect_db(settings.output.database_path) as connection:
         comparison = RegimeComparison(
             baseline=_analyse_run(connection, baseline_run_id, "baseline"),
             variant=_analyse_run(connection, variant_run_id, "variant"),

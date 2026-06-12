@@ -40,6 +40,31 @@ python main.py daily
 4. 更新所有模拟盘状态；
 5. 生成模拟盘报告。
 
+以上步骤共享一个 SQLite `run_id`，运行状态记录在 `runs` 表；daily 还会生成三周观察 dashboard。
+
+初始化或检查数据库：
+
+```powershell
+python main.py db init
+python main.py db status
+```
+
+结构化复盘和导出：
+
+```powershell
+python main.py paper db-summary
+python main.py paper db-events --limit 100
+python main.py paper db-export --output-dir exports
+```
+
+为后续 4h 更新准备的单次循环命令：
+
+```powershell
+python main.py paper cycle --run-type paper_4h_update --account demo
+```
+
+该命令只更新已有 paper plans 并生成报告/dashboard，不运行 scan，也不从 scan 创建新计划。Windows 4h 计划任务必须等 SQLite daily_full 连续稳定运行 5 天后再启用。
+
 导入最新候选时，系统会自动归档同币种的旧 `WATCHING` 计划。已经入场的 `ENTERED` / `TP1_HIT` 持仓不会被替换。
 
 只想盘中更新已有模拟仓位：

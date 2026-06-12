@@ -7,6 +7,7 @@ from .config import Settings
 from .data_validation import ProviderError, _get_json
 from .market_data import BinanceClient
 from .storage import init_db
+from .database import connect_db
 
 
 @dataclass
@@ -89,7 +90,7 @@ def _check_coinmarketcap(settings: Settings) -> DoctorCheck:
 def _check_database(settings: Settings) -> DoctorCheck:
     try:
         init_db(settings.output.database_path)
-        with sqlite3.connect(settings.output.database_path) as connection:
+        with connect_db(settings.output.database_path) as connection:
             rows = connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
         table_names = {str(row[0]) for row in rows}
         required = {"scan_runs", "scan_candidates", "paper_trades", "paper_trade_events", "data_cross_checks"}

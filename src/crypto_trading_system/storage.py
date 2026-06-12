@@ -5,12 +5,13 @@ import json
 from pathlib import Path
 import sqlite3
 
+from .database import connect_db, init_observation_db, utc_now
 from .models import ScanResult
 
 
 def init_db(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(path) as connection:
+    with connect_db(path) as connection:
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS scan_runs (
@@ -252,11 +253,12 @@ def init_db(path: Path) -> None:
             )
             """
         )
+    init_observation_db(path)
 
 
-def save_scan_result(path: Path, result: ScanResult) -> None:
+def save_scan_result(path: Path, result: ScanResult, run_id: str | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(path) as connection:
+    with connect_db(path) as connection:
         connection.execute(
             """
             INSERT OR REPLACE INTO scan_runs
@@ -318,3 +320,68 @@ def save_scan_result(path: Path, result: ScanResult) -> None:
                         check.message,
                     ),
                 )
+        if run_id is not None:
+            actions = [str(candidate.action) for candidate in result.candidates]
+            risk_off_count = sum(
+                1
+                for candidate in result.candidates
+                if "大盘环境未确认强势" in " ".join(candidate.risks)
+            )
+            connection.execute(
+                """
+                INSERT INTO market_scans(
+                    scan_id, run_id, scan_time, candidate_count, buy_candidate_count,
+                    watch_only_count, risk_off_count, config_hash, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)
+                ON CONFLICT(scan_id) DO UPDATE SET
+                    run_id=excluded.run_id,
+                    scan_time=excluded.scan_time,
+                    candidate_count=excluded.candidate_count,
+                    buy_candidate_count=excluded.buy_candidate_count,
+                    watch_only_count=excluded.watch_only_count,
+                    risk_off_count=excluded.risk_off_count
+                """,
+                (
+                    result.scan_id,
+                    run_id,
+                    result.timestamp_utc,
+                    len(result.candidates),
+                    actions.count("BUY_CANDIDATE"),
+                    actions.count("WATCH_ONLY"),
+                    risk_off_count,
+                    utc_now(),
+                ),
+            )
+            for candidate in result.candidates:
+                payload = asdict(candidate)
+                connection.execute(
+                    """
+                    UPDATE scan_candidates SET
+                        action=?, price=?, volume=?, entry_low=?, entry_high=?, stop=?,
+                        tp1=?, tp2=?, reason=?, raw_json=?, created_at=?
+                    WHERE scan_id=? AND symbol=?
+                    """,
+                    (
+                        candidate.action,
+                        candidate.price,
+                        candidate.quote_volume_24h,
+                        candidate.entry_low,
+                        candidate.entry_high,
+                        candidate.stop_loss,
+                        candidate.take_profit_1,
+                        candidate.take_profit_2,
+                        candidate.setup,
+                        json.dumps(payload, ensure_ascii=False),
+                        result.timestamp_utc,
+                        result.scan_id,
+                        candidate.symbol,
+                    ),
+                )
+
+
+def update_market_scan_report_path(path: Path, scan_id: str, report_path: Path) -> None:
+    with connect_db(path) as connection:
+        connection.execute(
+            "UPDATE market_scans SET report_path = ? WHERE scan_id = ?",
+            (str(report_path), scan_id),
+        )

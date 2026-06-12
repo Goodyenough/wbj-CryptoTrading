@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import json
 from pathlib import Path
 import sys
 
@@ -21,8 +22,10 @@ from crypto_trading_system.backtest.regime_analysis import build_regime_comparis
 from crypto_trading_system.backtest.universe import build_current_symbol_master, load_symbol_master, save_symbol_master
 from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
+from crypto_trading_system.database import database_status, tracked_run
 from crypto_trading_system.doctor import run_doctor
 from crypto_trading_system.paper_trader import add_from_scan, generate_paper_report, update_paper_trades
+from crypto_trading_system.paper_db import build_paper_db_summary, export_paper_db, load_paper_db_events
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
     build_experiment_index,
@@ -30,7 +33,7 @@ from crypto_trading_system.research_tools import (
     split_symbol_master_by_cap,
 )
 from crypto_trading_system.scanner import run_market_scan
-from crypto_trading_system.storage import init_db, save_scan_result
+from crypto_trading_system.storage import init_db, save_scan_result, update_market_scan_report_path
 from crypto_trading_system.verify import verify_symbol
 
 
@@ -61,6 +64,11 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     subparsers.add_parser("doctor", help="Check API connectivity, local paths, and database readiness.")
+
+    db = subparsers.add_parser("db", help="Initialize and inspect the SQLite observation database.")
+    db_subparsers = db.add_subparsers(dest="db_command", required=True)
+    db_subparsers.add_parser("init", help="Create or migrate the database schema.")
+    db_subparsers.add_parser("status", help="Show schema, PRAGMA, run, and open-plan status.")
 
     scan = subparsers.add_parser("scan", help="Scan the market and write reports.")
     scan.add_argument("--top", type=int, default=None, help="Override number of candidates.")
@@ -356,9 +364,38 @@ def build_parser() -> argparse.ArgumentParser:
 
     paper_update = paper_subparsers.add_parser("update", help="Update paper trades using current market prices.")
     paper_update.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_update.add_argument(
+        "--run-type",
+        default="manual",
+        choices=["manual", "paper_4h_update"],
+        help="Run classification stored in SQLite.",
+    )
 
     paper_report = paper_subparsers.add_parser("report", help="Write a paper trading report.")
     paper_report.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+
+    paper_summary = paper_subparsers.add_parser("db-summary", help="Summarize runs, plans, events, and snapshots.")
+    paper_summary.add_argument("--limit", type=int, default=10, help="Maximum recent and failed runs to show.")
+
+    paper_events = paper_subparsers.add_parser("db-events", help="Show structured paper events.")
+    paper_events.add_argument("--plan-id", default=None, help="Optional plan id filter.")
+    paper_events.add_argument("--limit", type=int, default=200, help="Maximum events to show.")
+
+    paper_export = paper_subparsers.add_parser("db-export", help="Export plans, events, and snapshots as CSV.")
+    paper_export.add_argument("--output-dir", default="exports", help="CSV output directory.")
+
+    paper_cycle = paper_subparsers.add_parser(
+        "cycle",
+        help="Update existing plans and write report/dashboard without scanning or creating plans.",
+    )
+    paper_cycle.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_cycle.add_argument(
+        "--run-type",
+        default="paper_4h_update",
+        choices=["paper_4h_update", "manual"],
+        help="Run classification stored in SQLite.",
+    )
+    paper_cycle.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
     return parser
 
 
@@ -367,19 +404,23 @@ def _progress(message: str) -> None:
     print(f"[{timestamp}] {message}", flush=True)
 
 
-def _run_scan_and_write(settings, include_obsidian: bool, progress=None):
+def _run_scan_and_write(settings, include_obsidian: bool, progress=None, run_id: str | None = None):
     result = run_market_scan(settings, progress=progress)
     if progress is not None:
         progress("saving scan result to SQLite")
     init_db(settings.output.database_path)
-    save_scan_result(settings.output.database_path, result)
+    save_scan_result(settings.output.database_path, result, run_id=run_id)
     if progress is not None:
         progress("writing Markdown reports")
     report_paths = write_scan_reports(
         result,
         settings,
         include_obsidian=include_obsidian,
+        run_id=run_id,
+        run_type="daily_full" if run_id else "manual",
     )
+    if run_id is not None and report_paths:
+        update_market_scan_report_path(settings.output.database_path, result.scan_id, report_paths[0])
     return result, report_paths
 
 
@@ -387,6 +428,16 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     settings = load_settings(Path(args.settings))
+    settings_path = Path(args.settings).resolve()
+
+    if args.command == "db":
+        init_db(settings.output.database_path)
+        if args.db_command == "init":
+            print(f"database_initialized={settings.output.database_path.resolve()}")
+        if args.db_command == "status":
+            status = database_status(settings.output.database_path)
+            print(json.dumps(status, ensure_ascii=False, indent=2))
+        return
 
     if args.command == "scan" and args.top is not None:
         settings.market.top_n = args.top
@@ -410,47 +461,76 @@ def main() -> None:
             print(f"report={path}")
 
     if args.command == "daily":
-        result, scan_report_paths = _run_scan_and_write(settings, include_obsidian=not args.no_obsidian, progress=_progress)
-        _progress("adding latest candidates to paper trading")
-        summary = add_from_scan(settings, scan_id=result.scan_id, account_name=args.account)
-        _progress("updating paper trading positions")
-        updated = update_paper_trades(settings, account_name=args.account)
-        _progress("writing paper trading report")
-        _, paper_report_paths = generate_paper_report(settings, account_name=args.account)
-        _progress("writing three-week observation dashboard")
-        original_obsidian = settings.output.obsidian_dir
-        if args.no_obsidian:
-            settings.output.obsidian_dir = None
-        _, observation_paths = generate_observation_dashboard(settings, account_name=args.account)
-        settings.output.obsidian_dir = original_obsidian
+        init_db(settings.output.database_path)
+        with tracked_run(
+            settings.output.database_path,
+            "daily_full",
+            settings_path=settings_path,
+            project_root=PROJECT_ROOT,
+            log_path=PROJECT_ROOT / "logs" / "daily_paper_update.log",
+        ) as run_id:
+            print(f"run_id={run_id}")
+            result, scan_report_paths = _run_scan_and_write(
+                settings,
+                include_obsidian=not args.no_obsidian,
+                progress=_progress,
+                run_id=run_id,
+            )
+            _progress("adding latest candidates to paper trading")
+            summary = add_from_scan(
+                settings,
+                scan_id=result.scan_id,
+                account_name=args.account,
+                run_id=run_id,
+            )
+            _progress("updating paper trading positions")
+            updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
+            _progress("writing paper trading report")
+            _, paper_report_paths = generate_paper_report(
+                settings,
+                account_name=args.account,
+                run_id=run_id,
+                run_type="daily_full",
+            )
+            _progress("writing three-week observation dashboard")
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            _, observation_paths = generate_observation_dashboard(
+                settings,
+                account_name=args.account,
+                run_id=run_id,
+                run_type="daily_full",
+            )
+            settings.output.obsidian_dir = original_obsidian
 
-        print("daily=completed")
-        print(f"scan_id={result.scan_id}")
-        print(f"candidates={len(result.candidates)}")
-        print(f"paper_added={summary['added']}")
-        print(f"paper_skipped={summary['skipped']}")
-        print(f"paper_skipped_action={summary.get('skipped_action', 0)}")
-        print(f"paper_archived={summary['archived']}")
-        print(f"paper_updated={len(updated)}")
-        print("candidate_summary:")
-        for candidate in result.candidates:
-            print(
-                f"- rank={candidate.rank} symbol={candidate.symbol} verdict={candidate.verdict} "
-                f"entry={candidate.entry_low:.8g}-{candidate.entry_high:.8g} "
-                f"stop={candidate.stop_loss:.8g} tp1={candidate.take_profit_1:.8g}"
-            )
-        print("paper_status_summary:")
-        for trade in updated:
-            print(
-                f"- {trade.symbol} status={trade.status} last={trade.last_price} "
-                f"entry={trade.entry_price} pnl={trade.unrealized_pnl + trade.realized_pnl:.2f}"
-            )
-        for path in scan_report_paths:
-            print(f"scan_report={path}")
-        for path in paper_report_paths:
-            print(f"paper_report={path}")
-        for path in observation_paths:
-            print(f"observation_dashboard={path}")
+            print("daily=completed")
+            print(f"scan_id={result.scan_id}")
+            print(f"candidates={len(result.candidates)}")
+            print(f"paper_added={summary['added']}")
+            print(f"paper_skipped={summary['skipped']}")
+            print(f"paper_skipped_action={summary.get('skipped_action', 0)}")
+            print(f"paper_archived={summary['archived']}")
+            print(f"paper_updated={len(updated)}")
+            print("candidate_summary:")
+            for candidate in result.candidates:
+                print(
+                    f"- rank={candidate.rank} symbol={candidate.symbol} verdict={candidate.verdict} "
+                    f"entry={candidate.entry_low:.8g}-{candidate.entry_high:.8g} "
+                    f"stop={candidate.stop_loss:.8g} tp1={candidate.take_profit_1:.8g}"
+                )
+            print("paper_status_summary:")
+            for trade in updated:
+                print(
+                    f"- {trade.symbol} status={trade.status} last={trade.last_price} "
+                    f"entry={trade.entry_price} pnl={trade.unrealized_pnl + trade.realized_pnl:.2f}"
+                )
+            for path in scan_report_paths:
+                print(f"scan_report={path}")
+            for path in paper_report_paths:
+                print(f"paper_report={path}")
+            for path in observation_paths:
+                print(f"observation_dashboard={path}")
 
     if args.command == "verify":
         result = verify_symbol(settings, args.symbol, progress=_progress)
@@ -780,7 +860,19 @@ def main() -> None:
         init_db(settings.output.database_path)
 
         if args.paper_command == "add-from-scan":
-            summary = add_from_scan(settings, scan_id=args.scan_id, account_name=args.account)
+            with tracked_run(
+                settings.output.database_path,
+                "manual",
+                settings_path=settings_path,
+                project_root=PROJECT_ROOT,
+            ) as run_id:
+                summary = add_from_scan(
+                    settings,
+                    scan_id=args.scan_id,
+                    account_name=args.account,
+                    run_id=run_id,
+                )
+            print(f"run_id={run_id}")
             print(f"account={summary['account_name']}")
             print(f"scan_id={summary['scan_id']}")
             print(f"added={summary['added']}")
@@ -790,7 +882,14 @@ def main() -> None:
             print(f"archived={summary['archived']}")
 
         if args.paper_command == "update":
-            updated = update_paper_trades(settings, account_name=args.account)
+            with tracked_run(
+                settings.output.database_path,
+                args.run_type,
+                settings_path=settings_path,
+                project_root=PROJECT_ROOT,
+            ) as run_id:
+                updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
+            print(f"run_id={run_id}")
             print(f"updated={len(updated)}")
             for trade in updated:
                 print(
@@ -802,6 +901,54 @@ def main() -> None:
             _, report_paths = generate_paper_report(settings, account_name=args.account)
             for path in report_paths:
                 print(f"report={path}")
+
+        if args.paper_command == "db-summary":
+            print(json.dumps(build_paper_db_summary(settings.output.database_path, args.limit), ensure_ascii=False, indent=2))
+
+        if args.paper_command == "db-events":
+            print(
+                json.dumps(
+                    load_paper_db_events(settings.output.database_path, args.plan_id, args.limit),
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+
+        if args.paper_command == "db-export":
+            for path in export_paper_db(settings.output.database_path, Path(args.output_dir)):
+                print(f"export={path}")
+
+        if args.paper_command == "cycle":
+            with tracked_run(
+                settings.output.database_path,
+                args.run_type,
+                settings_path=settings_path,
+                project_root=PROJECT_ROOT,
+                log_path=PROJECT_ROOT / "logs" / "paper_4h_update.log",
+            ) as run_id:
+                updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
+                _, report_paths = generate_paper_report(
+                    settings,
+                    account_name=args.account,
+                    run_id=run_id,
+                    run_type=args.run_type,
+                )
+                original_obsidian = settings.output.obsidian_dir
+                if args.no_obsidian:
+                    settings.output.obsidian_dir = None
+                _, dashboard_paths = generate_observation_dashboard(
+                    settings,
+                    account_name=args.account,
+                    run_id=run_id,
+                    run_type=args.run_type,
+                )
+                settings.output.obsidian_dir = original_obsidian
+            print(f"run_id={run_id}")
+            print(f"updated={len(updated)}")
+            for path in report_paths:
+                print(f"report={path}")
+            for path in dashboard_paths:
+                print(f"dashboard={path}")
 
 
 if __name__ == "__main__":

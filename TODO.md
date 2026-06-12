@@ -117,6 +117,9 @@
 ## 运维待办
 
 - [ ] 用管理员权限运行 `powershell -ExecutionPolicy Bypass -File scripts\install_daily_task.ps1` 修正 Windows 任务计划 `CryptoTrading_DailyPaperUpdate`：将触发时间从当前 09:00 改为每天 20:05，并确认 `LastRunTime`、`LastTaskResult` 和 `logs/daily_paper_update.log` 正常更新。
+- [x] 完成 SQLite 三周观察基础设施：`runs`、`market_scans`、`paper_plans`、`paper_events`、`paper_snapshots`、WAL、30 秒 timeout、UTC 时间、daily_full run_id、snapshot、db-summary/events/export。
+- [ ] 从首次新版 `daily_full` 成功运行开始连续观察 5 天：每日检查 `runs.status=success`、snapshot 数量、重复 plan/event、状态回滚、`database is locked`、报告与数据库统计一致性。
+- [ ] 5 天稳定门槛通过后新增并安装 `CryptoTrading_4H_PaperUpdate`：仅运行 `python main.py paper cycle --run-type paper_4h_update --account demo`，触发时间为 00:10、04:10、08:10、12:10、16:10，不执行 scan 或 add-from-scan。
 
 ## TODO 维护规则
 
