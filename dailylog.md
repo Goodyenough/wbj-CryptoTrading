@@ -13,6 +13,16 @@
 - Git：
 ```
 
+## 2026-06-12
+
+### 21:09:43 +08:00 - 将三周观察仪表接入 daily 定时脚本
+- 类型：代码 / 脚本 / 报告 / 运维 / Git
+- 改动：在 `scripts/daily_paper_update.bat` 的 `paper report` 之后新增 `python main.py observation-dashboard --account demo`，并向 `logs/daily_paper_update.log` 写入独立的 `observation-dashboard done` 完成标记。
+- 改动：修复 observation dashboard 的 `RISK_OFF-tagged` 统计口径；除英文 `RISK_OFF` 外，同时识别扫描候选实际保存的中文风险标记“BTC/ETH 大盘环境未确认强势”。
+- 影响：从下一次每天 20:05 定时运行开始，将自动生成三周观察仪表，持续记录 reclaim 后续、TP1 EMA trailing、逐仓持仓时长及每日 action/RISK_OFF 摘要。
+- 验证：运行 `python -m compileall main.py src -q` 通过；两次手动运行 `python main.py observation-dashboard --account demo` 成功生成 v1/v2，v2 确认今日 `All candidates` 与 `RISK_OFF-tagged` 均为 5 个 `WATCH_ONLY`。
+- Git：本次提交 `Add observation dashboard to daily task`。
+
 ## 2026-06-11
 
 ### 23:15:00 +08:00 - 实现并运行 large_cap_only_risk_off 实验

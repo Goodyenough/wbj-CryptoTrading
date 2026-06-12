@@ -226,7 +226,7 @@ def _scan_action_summary(settings: Settings) -> tuple[Counter, Counter]:
                 " ".join(str(item) for item in payload.get("risks", [])),
             ]
         ).upper()
-        if "RISK_OFF" in haystack:
+        if "RISK_OFF" in haystack or "大盘环境未确认强势" in haystack:
             risk_off_counter[action] += 1
     return action_counter, risk_off_counter
 

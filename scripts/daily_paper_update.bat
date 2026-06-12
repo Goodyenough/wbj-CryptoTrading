@@ -19,4 +19,7 @@ echo [%DATE% %TIME%] paper update done >> "%LOG%"
 "%PYTHON%" main.py paper report >> "%LOG%" 2>&1
 echo [%DATE% %TIME%] paper report done >> "%LOG%"
 
+"%PYTHON%" main.py observation-dashboard --account demo >> "%LOG%" 2>&1
+echo [%DATE% %TIME%] observation-dashboard done >> "%LOG%"
+
 echo [%DATE% %TIME%] === daily paper update complete === >> "%LOG%"
