@@ -14,17 +14,23 @@
 
 ## daily 实际做了什么
 
-当前 Windows 计划任务每天北京时间 20:05 执行 `scripts/daily_paper_update.bat`，依次运行：
+当前 Windows 计划任务每天北京时间 20:05 执行 `scripts/daily_paper_update.bat`。批处理实际只调用一个统一入口：
 
 ```text
-python main.py scan
-python main.py paper add-from-scan
-python main.py paper update
-python main.py paper report
-python main.py observation-dashboard --account demo
+python main.py daily --account demo
 ```
 
-这五步分别承担不同职责。
+`daily` 命令会创建一个 `run_type=daily_full` 的唯一 `run_id`，然后在同一次受追踪运行中依次完成：
+
+```text
+scan
+  -> paper add-from-scan
+  -> paper update
+  -> paper report
+  -> observation dashboard
+```
+
+因此，下面仍按五个业务步骤解释，但它们现在属于同一个可审计的每日运行，不再是彼此无关的五条人工命令。如果中途失败，`runs` 表会把该次运行标记为 `failed` 并保存错误信息；成功时，扫描、计划、事件、快照和报告都可以通过同一个 `run_id` 对齐。
 
 ### 1. scan：保存当天的市场截面
 
@@ -79,6 +85,55 @@ WATCHING
 三周后只更新一次，系统通常只能比较三周后的当前价格与当前状态阈值。中间曾经发生但后来价格又返回的事件可能已经不可见。
 
 例如，某币在第 5 天进入 entry zone，第 7 天重新 reclaim 并入场，第 12 天触发 TP1，第 15 天 EMA stop 被抬高，第 18 天跌破 EMA stop。若第 21 天才运行一次，系统看到的可能只是第 21 天的价格。它无法可靠确定上述事件的先后顺序、触发时间和触发价格。
+
+## 数据库为什么也要求逐日写入
+
+当前实现已经不再只依赖 Markdown 报告，而是把每次运行拆成可关联的结构化记录：
+
+- `runs`：记录这一天的 `daily_full` 是否开始、成功或失败，以及配置哈希和错误信息。
+- `market_scans` / `scan_candidates`：记录当日扫描和候选市场截面。
+- `paper_plans`：记录计划的当前状态和当前 stop。
+- `paper_events`：记录 `PLAN_CREATED`、`RECLAIM_PENDING_SET`、`RECLAIM_CONFIRMED_ENTERED`、EMA trailing、TP2 等状态事件。
+- `paper_snapshots`：记录每次运行时开放计划的状态、价格、PnL 和 stop 快照。
+
+这里最重要的区别是：`paper_plans` 更像“现在是什么状态”，而 `paper_events` 和 `paper_snapshots` 保存“它是怎样一步步走到这里的”。三周后只跑一次，最多补上一张终点快照；它不会自动产生此前 20 天本应存在的运行记录、扫描记录和状态快照。
+
+连续运行后，可以用 `run_id` 回答以下审计问题：
+
+- 某个状态变化属于哪一天、哪次任务执行。
+- 当天扫描报告、paper report 和 dashboard 是否来自同一批数据。
+- 某天没有事件是因为市场没有触发，还是因为任务失败。
+- stop 的变化是否单调，是否存在重复计划、重复事件或数据库锁错误。
+- 最终统计能否回溯到具体计划、具体 K 线时间和具体运行。
+
+如果没有这条逐日证据链，三周后的汇总数字即使看起来合理，也很难证明其完整性。
+
+## 为什么固定在每天 20:05 也很重要
+
+固定时间运行的意义不只是自动化方便，还在于保持样本口径一致。每天都在相近的北京时间采集市场截面，能够减少“今天早上扫、明天半夜扫、后天因为看到行情才扫”带来的主观选择偏差。
+
+20:05 不是神奇的交易时点，但它是当前实验预先约定的观察时点。三周内保持这个时点，意味着每日结果之间具有更好的可比性：
+
+- 相邻样本间隔大致稳定。
+- 运行行为不由当天涨跌决定。
+- 持仓时长和事件间隔更容易解释。
+- 漏跑和延迟更容易从日志、`runs` 表和报告时间戳中识别。
+
+三周后临时运行一次则完全失去这种固定频率的前向采样，只剩一个由最终日期决定的截面。
+
+## 连续 5 日稳定性门槛为什么不能靠补跑伪造
+
+项目目前要求先通过 `python main.py db stability --days 5`，再允许安装更高频的 4h paper update 定时任务。门槛会检查最近 5 个连续自然日是否都存在合格的 `daily_full` 运行，包括：
+
+- 运行状态为 `success`。
+- 每次恰有一份关联扫描。
+- 存在开放计划快照。
+- 市场扫描报告、paper report 和 dashboard 都能通过 `run_id` 找到。
+- 没有 `database is locked`、外键错误、重复计划组或重复事件组。
+
+这个门槛验证的是“系统能否跨多个真实日期稳定运行”，不是“同一天能否连续成功执行五次”。在同一天补跑多次，不能替代 5 个连续自然日，因为它没有覆盖跨日持久化、任务调度、市场变化、报告目录切换和无人值守恢复等风险。
+
+同理，三周后一次性运行也只能证明那一刻命令可执行，不能证明过去三周自动化链路可靠。
 
 ## 为什么历史 K 线不能完全补回
 

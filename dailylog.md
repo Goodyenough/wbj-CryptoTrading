@@ -15,6 +15,14 @@
 
 ## 2026-06-12
 
+### 22:57:48 +08:00 - 更新三周每日运行 daily 的必要性说明
+- 类型：文档 / Git
+- 改动：更新 `为什么未来三周每天运行daily.md`，将旧的五条独立命令说明修正为当前统一的 `python main.py daily --account demo` 和 `daily_full` run_id 执行链。
+- 改动：补充 SQLite 逐日证据链、固定 20:05 采样口径，以及 `python main.py db stability --days 5` 连续自然日门槛为何不能由同日补跑或三周后单次运行替代。
+- 原因：数据库化和统一 daily 入口已经落地，原说明需要与当前实现一致，并进一步解释连续前向采样对状态事件、快照、报告关联和无人值守稳定性验证的意义。
+- 验证：对照 `scripts/daily_paper_update.bat`、`main.py` 的 `daily` 路径和 `src/crypto_trading_system/paper_db.py` 的稳定性审计规则人工核对；仅文档变更，未运行代码测试。
+- Git：本次提交 `Update daily observation rationale`。
+
 ### 22:48:56 +08:00 - 准备 4h 更新任务并增加五天稳定性硬门槛
 - 类型：代码 / 脚本 / 测试 / 运维 / 文档 / Git
 - 改动：新增 `python main.py db stability --days 5`，自动审计连续 daily_full 日期、run success、market scan、snapshot、三类带 run_id 报告、重复 plan/event、外键错误及 `database is locked`；未满足时退出码为 2。
