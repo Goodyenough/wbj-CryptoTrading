@@ -9,6 +9,14 @@ from .database import connect_db, init_observation_db, utc_now
 from .models import ScanResult
 
 
+def _market_regime_from_limitations(limitations: list[str]) -> str | None:
+    text = " ".join(str(item) for item in limitations).upper()
+    for status in ("RISK_OFF", "RISK_ON", "NEUTRAL", "UNKNOWN"):
+        if status in text:
+            return status
+    return None
+
+
 def init_db(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with connect_db(path) as connection:
@@ -322,6 +330,12 @@ def save_scan_result(path: Path, result: ScanResult, run_id: str | None = None) 
                 )
         if run_id is not None:
             actions = [str(candidate.action) for candidate in result.candidates]
+            market_regime = _market_regime_from_limitations(result.limitations)
+            run_row = connection.execute(
+                "SELECT config_hash FROM runs WHERE run_id = ?",
+                (run_id,),
+            ).fetchone()
+            config_hash = None if run_row is None else run_row["config_hash"]
             risk_off_count = sum(
                 1
                 for candidate in result.candidates
@@ -330,25 +344,29 @@ def save_scan_result(path: Path, result: ScanResult, run_id: str | None = None) 
             connection.execute(
                 """
                 INSERT INTO market_scans(
-                    scan_id, run_id, scan_time, candidate_count, buy_candidate_count,
+                    scan_id, run_id, scan_time, market_regime, candidate_count, buy_candidate_count,
                     watch_only_count, risk_off_count, config_hash, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(scan_id) DO UPDATE SET
                     run_id=excluded.run_id,
                     scan_time=excluded.scan_time,
+                    market_regime=excluded.market_regime,
                     candidate_count=excluded.candidate_count,
                     buy_candidate_count=excluded.buy_candidate_count,
                     watch_only_count=excluded.watch_only_count,
-                    risk_off_count=excluded.risk_off_count
+                    risk_off_count=excluded.risk_off_count,
+                    config_hash=excluded.config_hash
                 """,
                 (
                     result.scan_id,
                     run_id,
                     result.timestamp_utc,
+                    market_regime,
                     len(result.candidates),
                     actions.count("BUY_CANDIDATE"),
                     actions.count("WATCH_ONLY"),
                     risk_off_count,
+                    config_hash,
                     utc_now(),
                 ),
             )
@@ -358,7 +376,7 @@ def save_scan_result(path: Path, result: ScanResult, run_id: str | None = None) 
                     """
                     UPDATE scan_candidates SET
                         action=?, price=?, volume=?, entry_low=?, entry_high=?, stop=?,
-                        tp1=?, tp2=?, reason=?, raw_json=?, created_at=?
+                        tp1=?, tp2=?, market_regime=?, reason=?, raw_json=?, created_at=?
                     WHERE scan_id=? AND symbol=?
                     """,
                     (
@@ -370,6 +388,7 @@ def save_scan_result(path: Path, result: ScanResult, run_id: str | None = None) 
                         candidate.stop_loss,
                         candidate.take_profit_1,
                         candidate.take_profit_2,
+                        market_regime,
                         candidate.setup,
                         json.dumps(payload, ensure_ascii=False),
                         result.timestamp_utc,

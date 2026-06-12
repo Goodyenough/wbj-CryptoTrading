@@ -15,6 +15,16 @@
 
 ## 2026-06-12
 
+### 23:04:25 +08:00 - 完成结构化 paper 事件与 4h 报告审计
+- 类型：代码 / 数据库 / 报告 / 测试 / 文档 / Git
+- 改动：统一新写入 `paper_events` 的事件语义，新计划写 `PLAN_CREATED`，reclaim 后入场写 `RECLAIM_CONFIRMED_ENTERED`，TP2 和 EMA trailing stop 出场分别写 `TP2_HIT`、`EMA_TRAILING_STOPPED`；保留 legacy `paper_trade_events` 兼容口径。
+- 改动：4h paper report 增加本次 `run_id` 的结构化状态变化表、事件总数和 `API_DELAY_SKIPPED` 数量；K 线未收盘或 K 线 API 延迟时按 plan 跳过，不再改写 `paper_plans`，并按 plan + kline_time 防重复写入跳过事件。
+- 改动：`market_scans` 自动保存 run 的 `config_hash` 和扫描 `market_regime`，候选与 `paper_plans` 继承同一市场环境；补充 `EXPIRED` 终态与单向流转保护。
+- 原因：完成 `数据库开发计划.md` 对事件可复盘性、4h 报告、API 延迟安全、元数据关联和幂等性的逐项收尾，确保三周后可直接按结构化表归因。
+- 验证：`python -m compileall main.py src tests -q`、`test_database.py`、`test_trade_state.py`、`test_replay.py`、`test_history.py`、`test_scanner_regime.py`、`test_universe.py`、`test_regime_analysis.py`、`test_abtest.py`、`test_abtest_summary.py`、`test_abtest_walk_forward.py` 全部通过；两个 PowerShell 安装脚本 parser 检查及 4h batch 禁止 scan/add-from-scan 检查通过。
+- 验证：生产库 `db status` 为 schema version 1、WAL、foreign_keys=1、busy_timeout=30000、无缺表；`db stability --days 5` 当前按预期返回 exit 2、`observed_day_count=0`、`ready_for_4h_task=false`；每日任务最近一次 2026-06-12 20:05 成功，下一次为 2026-06-13 20:05。
+- Git：本次提交 `Complete structured paper event audit`。
+
 ### 22:57:48 +08:00 - 更新三周每日运行 daily 的必要性说明
 - 类型：文档 / Git
 - 改动：更新 `为什么未来三周每天运行daily.md`，将旧的五条独立命令说明修正为当前统一的 `python main.py daily --account demo` 和 `daily_full` run_id 执行链。

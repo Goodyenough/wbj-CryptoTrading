@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import sqlite3
 import sys
@@ -10,16 +11,19 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system.database import connect_db, database_status, tracked_run
 from crypto_trading_system.config import load_settings
-from crypto_trading_system.models import PaperTrade
+from crypto_trading_system.models import PaperTrade, ScanResult
 from crypto_trading_system.paper_db import audit_database_stability, build_paper_db_summary, export_paper_db
 from crypto_trading_system import paper_trader as paper_trader_module
 from crypto_trading_system.paper_trader import (
     _insert_paper_trade,
     _save_trade_update,
+    _structured_step_event_type,
     _sync_paper_plan,
+    add_from_scan,
+    generate_paper_report,
     update_paper_trades,
 )
-from crypto_trading_system.storage import init_db
+from crypto_trading_system.storage import init_db, save_scan_result
 
 
 def _temp_db() -> Path:
@@ -179,6 +183,7 @@ def test_wal_allows_reader_during_write_transaction() -> None:
 class _FakeBinanceClient:
     close_time: int = 1
     close_price: float = 106.0
+    kline_error: Exception | None = None
 
     def __init__(self, *args, **kwargs) -> None:
         pass
@@ -187,6 +192,8 @@ class _FakeBinanceClient:
         return [{"symbol": "TESTUSDT", "lastPrice": "103"}]
 
     def klines(self, symbol: str, interval: str, limit: int) -> list[list]:
+        if self.kline_error is not None:
+            raise self.kline_error
         return [
             [index, "100", "107", "99", str(self.close_price), "1", self.close_time, "1", 1, "1", "1", "0"]
             for index in range(25)
@@ -220,6 +227,85 @@ def test_paper_update_writes_event_plan_and_snapshot_atomically() -> None:
         assert connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id='run1'").fetchone()[0] == 1
 
 
+def test_scan_and_plan_inherit_run_metadata() -> None:
+    path = _temp_db()
+    init_db(path)
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO runs(
+                run_id, run_type, started_at, finished_at, status, config_hash, created_at
+            ) VALUES (
+                'metadata_run', 'daily_full', '2026-06-12T00:00:00Z',
+                '2026-06-12T00:00:01Z', 'success', 'config123', '2026-06-12T00:00:00Z'
+            )
+            """
+        )
+    result = ScanResult(
+        scan_id="metadata_scan",
+        timestamp_utc="2026-06-12T00:00:00Z",
+        source="test",
+        filters="test",
+        limitations=["Market regime: RISK_OFF"],
+        candidates=[],
+    )
+    save_scan_result(path, result, run_id="metadata_run")
+    trade = _trade()
+    trade.source_scan_id = "metadata_scan"
+    with connect_db(path) as connection:
+        scan = connection.execute(
+            "SELECT market_regime, config_hash FROM market_scans WHERE scan_id='metadata_scan'"
+        ).fetchone()
+        assert scan["market_regime"] == "RISK_OFF"
+        assert scan["config_hash"] == "config123"
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="metadata_run", payload={"stop_loss": 90.0})
+        plan = connection.execute(
+            "SELECT market_regime FROM paper_plans WHERE plan_id='plan1'"
+        ).fetchone()
+        assert plan["market_regime"] == "RISK_OFF"
+
+
+def test_add_from_scan_writes_plan_created_once() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    payload = {
+        "action": "BUY_CANDIDATE",
+        "symbol": "TESTUSDT",
+        "base_asset": "TEST",
+        "setup": "test setup",
+        "verdict": "test verdict",
+        "entry_low": 100.0,
+        "entry_high": 105.0,
+        "stop_loss": 90.0,
+        "take_profit_1": 120.0,
+        "take_profit_2": 135.0,
+        "risk_reward_1": 2.0,
+        "risk_reward_2": 3.0,
+        "price": 103.0,
+    }
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO scan_candidates(
+                scan_id, rank, symbol, base_asset, verdict, score, payload_json
+            ) VALUES ('scan1', 1, 'TESTUSDT', 'TEST', 'test verdict', 1.0, ?)
+            """,
+            (json.dumps(payload),),
+        )
+    settings = _settings_for(path)
+    first = add_from_scan(settings, scan_id="scan1", run_id="run1")
+    second = add_from_scan(settings, scan_id="scan1", run_id="run1")
+    assert first["added"] == 1
+    assert second["added"] == 0
+    with connect_db(path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM paper_plans").fetchone()[0] == 1
+        assert connection.execute(
+            "SELECT COUNT(*) FROM paper_events WHERE event_type='PLAN_CREATED'"
+        ).fetchone()[0] == 1
+
+
 def test_unclosed_kline_records_skip_without_state_change() -> None:
     path = _temp_db()
     init_db(path)
@@ -234,6 +320,7 @@ def test_unclosed_kline_records_skip_without_state_change() -> None:
     paper_trader_module.BinanceClient = _FakeBinanceClient
     try:
         update_paper_trades(_settings_for(path), run_id="run1")
+        update_paper_trades(_settings_for(path), run_id="run1")
     finally:
         paper_trader_module.BinanceClient = original_client
         _FakeBinanceClient.close_time = 1
@@ -243,6 +330,99 @@ def test_unclosed_kline_records_skip_without_state_change() -> None:
         assert connection.execute(
             "SELECT COUNT(*) FROM paper_events WHERE event_type='API_DELAY_SKIPPED'"
         ).fetchone()[0] == 1
+        assert connection.execute(
+            "SELECT COUNT(*) FROM paper_trade_events WHERE event_type='API_DELAY_SKIPPED'"
+        ).fetchone()[0] == 1
+        plan = connection.execute(
+            "SELECT updated_at, created_reason FROM paper_plans WHERE plan_id='plan1'"
+        ).fetchone()
+        assert plan["updated_at"] == "2026-06-12T00:00:00Z"
+        assert plan["created_reason"] == ""
+
+
+def test_kline_api_error_is_recorded_and_does_not_fail_run() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+    original_client = paper_trader_module.BinanceClient
+    _FakeBinanceClient.kline_error = TimeoutError("exchange delayed")
+    paper_trader_module.BinanceClient = _FakeBinanceClient
+    try:
+        updated = update_paper_trades(_settings_for(path), run_id="run1")
+    finally:
+        paper_trader_module.BinanceClient = original_client
+        _FakeBinanceClient.kline_error = None
+    assert len(updated) == 1
+    assert updated[0].status == "WATCHING"
+    with connect_db(path) as connection:
+        row = connection.execute(
+            "SELECT reason FROM paper_events WHERE event_type='API_DELAY_SKIPPED'"
+        ).fetchone()
+        assert row is not None
+        assert "exchange delayed" in row["reason"]
+        assert connection.execute(
+            "SELECT COUNT(*) FROM paper_trade_events WHERE event_type='API_DELAY_SKIPPED'"
+        ).fetchone()[0] == 1
+        plan = connection.execute(
+            "SELECT updated_at, created_reason FROM paper_plans WHERE plan_id='plan1'"
+        ).fetchone()
+        assert plan["updated_at"] == "2026-06-12T00:00:00Z"
+        assert plan["created_reason"] == ""
+
+
+def test_structured_event_names_cover_plan_requirements() -> None:
+    assert _structured_step_event_type("ENTERED", "entered", True) == "RECLAIM_CONFIRMED_ENTERED"
+    assert (
+        _structured_step_event_type("STOPPED", "EMA20 trailing stop hit.", False)
+        == "EMA_TRAILING_STOPPED"
+    )
+    assert _structured_step_event_type("CLOSED", "TP2 hit; trade closed.", False) == "TP2_HIT"
+    assert _structured_step_event_type("TP1_HIT", "TP1 hit", False) == "TP1_HIT"
+
+
+def test_report_contains_current_run_events_and_api_delay_count() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+        connection.execute(
+            """
+            INSERT INTO paper_events(
+                event_id, plan_id, run_id, event_time, event_type, symbol,
+                old_status, new_status, reason, created_at
+            ) VALUES (
+                'delay1', 'plan1', 'run1', '2026-06-12T04:10:00Z',
+                'API_DELAY_SKIPPED', 'TESTUSDT', 'WATCHING', 'WATCHING',
+                '4h kline not closed', '2026-06-12T04:10:00Z'
+            )
+            """
+        )
+    settings = _settings_for(path)
+    settings.output.reports_dir = root / "reports"
+    settings.output.obsidian_dir = None
+    original_client = paper_trader_module.BinanceClient
+    paper_trader_module.BinanceClient = _FakeBinanceClient
+    try:
+        report, paths = generate_paper_report(
+            settings,
+            run_id="run1",
+            run_type="paper_4h_update",
+        )
+    finally:
+        paper_trader_module.BinanceClient = original_client
+    assert paths
+    assert "## 本次 Run 状态变化" in report
+    assert "This run API delay skipped | 1" in report
+    assert "API_DELAY_SKIPPED" in report
+    assert paths[0].name.startswith("paper_4h_update_")
 
 
 def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> None:
@@ -333,7 +513,12 @@ if __name__ == "__main__":
     test_summary_and_export_use_structured_tables()
     test_wal_allows_reader_during_write_transaction()
     test_paper_update_writes_event_plan_and_snapshot_atomically()
+    test_scan_and_plan_inherit_run_metadata()
+    test_add_from_scan_writes_plan_created_once()
     test_unclosed_kline_records_skip_without_state_change()
+    test_kline_api_error_is_recorded_and_does_not_fail_run()
+    test_structured_event_names_cover_plan_requirements()
+    test_report_contains_current_run_events_and_api_delay_count()
     test_stability_audit_requires_five_complete_consecutive_days()
     test_stability_audit_rejects_missing_snapshot()
     test_4h_batch_never_scans_or_creates_plans()
