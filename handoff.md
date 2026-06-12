@@ -36,18 +36,21 @@
 
 ## 尚未完成的事项
 
-### 1. `sensitive + max_holding_42x4h` 组合实验（被用户中断，进行到一半）
+### 1. 2026-07-02 模拟盘复盘决策（主线，等待观察期结束）
 
-**当前状态**：
-- `abtest.py` 已新增 `combined_regime_entry_exit_sensitivity_holding` dimension（未 commit）
-- `experiments.toml` **尚未**添加对应实验定义
-- TODO.md 有对应任务条目（未 commit）
-- `scripts/install_daily_task.ps1` 也有未 commit 的修改
+届时检查：entry_reclaim 拦截次数、RISK_OFF 频率、WLDUSDT/ONDOUSDT 持仓结果，决定 sensitive 组合是否 keep。观察期结束后再一起决定下一步实验方向。
 
-**下一步直接执行**：
+### 2. `sensitive + max_holding_42x4h` 组合实验（等观察期结束后再做）
 
-```python
-# 1. 在 experiments.toml 末尾添加：
+**不着急，等 2026-07-02 复盘后再推进。**
+
+当前准备工作已完成：
+- `abtest.py` 已注册 `combined_regime_entry_exit_sensitivity_holding` dimension（commit `6cab41d`）
+- `experiments.toml` 尚未添加实验定义（留待观察期结束后补）
+
+届时在 `experiments.toml` 末尾添加：
+
+```toml
 [sensitive_max_holding_42x4h]
 enabled = true
 description = "Sensitive combo (6 params) + max_holding_42x4h: validate that time-based exit still improves on top of sensitive defaults."
@@ -65,32 +68,7 @@ regime_require_both_trend = true
 max_holding_bars_without_tp1 = 42
 ```
 
-```powershell
-# 2. 编译检查
-python -m compileall main.py src tests -q
-
-# 3. 串行跑两段 A/B（SQLite 不能并行）
-python main.py abtest --experiment sensitive_max_holding_42x4h `
-  --dynamic-universe `
-  --symbol-master-file reports/2026-06-09/dynamic_master_full.json `
-  --start 2024-07-01 --end 2025-06-01 `
-  --max-symbols 40 --allow-data-gaps --no-obsidian
-
-python main.py abtest --experiment sensitive_max_holding_42x4h `
-  --dynamic-universe `
-  --symbol-master-file reports/2026-06-09/dynamic_master_full.json `
-  --start 2025-06-01 --end 2026-06-01 `
-  --max-symbols 40 --allow-data-gaps --no-obsidian
-
-# 4. commit + push
-git add config/experiments.toml src/crypto_trading_system/abtest.py TODO.md reports/
-git commit -m "Add sensitive_max_holding_42x4h combo experiment and walk-forward results"
-git push origin main
-```
-
-### 2. 2026-07-02 模拟盘复盘决策（等待观察期结束）
-
-届时检查：entry_reclaim 拦截次数、RISK_OFF 频率、WLDUSDT/ONDOUSDT 持仓结果，决定 sensitive 组合是否 keep。
+然后串行跑两段 A/B（`2024-07-01 -> 2025-06-01` 和 `2025-06-01 -> 2026-06-01`），使用 `reports/2026-06-09/dynamic_master_full.json`，`--max-symbols 40`。
 
 ---
 
