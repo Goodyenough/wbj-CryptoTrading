@@ -59,6 +59,15 @@ ALLOWED_OVERRIDE_PATHS: dict[str, set[str]] = {
         "analysis.risk_off_core_buy_enabled",
         "analysis.risk_off_large_cap_buy_enabled",
     },
+    "combined_regime_entry_exit_sensitivity_holding": {
+        "analysis.risk_off_core_buy_enabled",
+        "analysis.entry_reclaim_close_enabled",
+        "analysis.tp1_ema_trailing_stop_enabled",
+        "analysis.regime_btc_7d_drop_pct",
+        "analysis.regime_eth_7d_drop_pct",
+        "analysis.regime_require_both_trend",
+        "backtest.max_holding_bars_without_tp1",
+    },
 }
 
 

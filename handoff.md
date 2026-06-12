@@ -1,4 +1,113 @@
+# Handoff — 2026-06-12 00:00 +08:00
+
+## 项目目录
+
+`D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects`
+
+- **Git 远端**：`https://github.com/Goodyenough/wbj-CryptoTrading.git`
+- **当前分支**：`main`
+- **最新已 push commit**：`d45b609`
+- **运行环境**：Windows 11 Pro，PowerShell，Python，SQLite
+- **数据库**：`data/crypto_trading.db`（SQLite，**两段回测必须串行**）
+
+---
+
+## 任务背景
+
+当前处于"策略质量优化"阶段。sensitive 组合（`risk_off_core_buy=false` + `entry_reclaim_close=true` + `tp1_ema_trailing_stop=true` + BTC -3% / ETH -5% / `require_both_trend=true`）已于 2026-06-11 写入 `settings.toml` 并在模拟盘生效，观察期至 **2026-07-02**。
+
+本次 session 的主要工作：市值分层两段 walk-forward、max_holding 三阈值两段 walk-forward、实现并运行 `large_cap_only_risk_off` 实验。
+
+---
+
+## 已完成的工作
+
+| 内容 | commit / 状态 |
+|---|---|
+| 市值分层 2024-07→2025-06 早期段：large-cap +14.14%/MDD 7.77%，altcoin +11.71%/MDD 15.92% | `d45b609` |
+| max_holding 三阈值（18/30/42根）两段全部改善，42根最平衡（近端 MDD 9.27%，net +26.93%） | `d45b609` |
+| 实现 `risk_off_large_cap_buy_enabled` 字段（`config.py`、`scanner.py`、`replay.py`）| `d45b609` |
+| 注册 `large_cap_regime` dimension，新增 `large_cap_only_risk_off` 实验 | `d45b609` |
+| `large_cap_only_risk_off` 两段 walk-forward：早期 +11.17%，近端 -6.24%，结论 `retest` | `d45b609` |
+| dailylog、TODO、开发计划、实验日志全部更新 | `d45b609` |
+| experiments.toml 新增 `max_holding_18x4h_no_tp1` 和 `max_holding_42x4h_no_tp1` 定义 | `d45b609` |
+
+---
+
+## 尚未完成的事项
+
+### 1. `sensitive + max_holding_42x4h` 组合实验（被用户中断，进行到一半）
+
+**当前状态**：
+- `abtest.py` 已新增 `combined_regime_entry_exit_sensitivity_holding` dimension（未 commit）
+- `experiments.toml` **尚未**添加对应实验定义
+- TODO.md 有对应任务条目（未 commit）
+- `scripts/install_daily_task.ps1` 也有未 commit 的修改
+
+**下一步直接执行**：
+
+```python
+# 1. 在 experiments.toml 末尾添加：
+[sensitive_max_holding_42x4h]
+enabled = true
+description = "Sensitive combo (6 params) + max_holding_42x4h: validate that time-based exit still improves on top of sensitive defaults."
+dimension = "combined_regime_entry_exit_sensitivity_holding"
+
+[sensitive_max_holding_42x4h.overrides.analysis]
+risk_off_core_buy_enabled = false
+entry_reclaim_close_enabled = true
+tp1_ema_trailing_stop_enabled = true
+regime_btc_7d_drop_pct = -3.0
+regime_eth_7d_drop_pct = -5.0
+regime_require_both_trend = true
+
+[sensitive_max_holding_42x4h.overrides.backtest]
+max_holding_bars_without_tp1 = 42
+```
+
+```powershell
+# 2. 编译检查
+python -m compileall main.py src tests -q
+
+# 3. 串行跑两段 A/B（SQLite 不能并行）
+python main.py abtest --experiment sensitive_max_holding_42x4h `
+  --dynamic-universe `
+  --symbol-master-file reports/2026-06-09/dynamic_master_full.json `
+  --start 2024-07-01 --end 2025-06-01 `
+  --max-symbols 40 --allow-data-gaps --no-obsidian
+
+python main.py abtest --experiment sensitive_max_holding_42x4h `
+  --dynamic-universe `
+  --symbol-master-file reports/2026-06-09/dynamic_master_full.json `
+  --start 2025-06-01 --end 2026-06-01 `
+  --max-symbols 40 --allow-data-gaps --no-obsidian
+
+# 4. commit + push
+git add config/experiments.toml src/crypto_trading_system/abtest.py TODO.md reports/
+git commit -m "Add sensitive_max_holding_42x4h combo experiment and walk-forward results"
+git push origin main
+```
+
+### 2. 2026-07-02 模拟盘复盘决策（等待观察期结束）
+
+届时检查：entry_reclaim 拦截次数、RISK_OFF 频率、WLDUSDT/ONDOUSDT 持仓结果，决定 sensitive 组合是否 keep。
+
+---
+
+## 重要声明
+
+1. **SQLite 单写**：两段 A/B 必须串行，不能并行跑。
+2. **symbol master**：所有回测使用 `reports/2026-06-09/dynamic_master_full.json`（418 个币）。
+3. **实验新增 dimension 必须先在 `abtest.py` 的 `ALLOWED_OVERRIDE_PATHS` 里注册**，否则运行时报错。`combined_regime_entry_exit_sensitivity_holding` 已注册（未 commit）。
+4. **`daily_trend_required` 已 reject**，不要在新实验里复用。
+5. **`large_cap_only_risk_off` 已 retest**：近端熊市反而变差，不要 keep，不要继续推进参数叠加方向。
+6. **当前未 commit 的文件**：`src/crypto_trading_system/abtest.py`（已加新 dimension）、`TODO.md`、`scripts/install_daily_task.ps1`——下次 session 完成 experiments.toml 添加后一起 commit。
+7. **定时任务**：`CryptoTrading_DailyPaperUpdate` 每天 20:05 自动执行，但当前触发时间仍是 09:00，需要管理员权限运行 `powershell -ExecutionPolicy Bypass -File scripts\install_daily_task.ps1` 修正。
+
+---
+
 # Handoff — 2026-06-11 18:00 +08:00
+
 
 ## 项目基本信息
 
