@@ -65,6 +65,18 @@ python main.py paper cycle --run-type paper_4h_update --account demo
 
 该命令只更新已有 paper plans 并生成报告/dashboard，不运行 scan，也不从 scan 创建新计划。Windows 4h 计划任务必须等 SQLite daily_full 连续稳定运行 5 天后再启用。
 
+检查 5 天门槛：
+
+```powershell
+python main.py db stability --days 5
+```
+
+只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\install_4h_paper_task.ps1
+```
+
 导入最新候选时，系统会自动归档同币种的旧 `WATCHING` 计划。已经入场的 `ENTERED` / `TP1_HIT` 持仓不会被替换。
 
 只想盘中更新已有模拟仓位：

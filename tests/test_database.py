@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from crypto_trading_system.database import connect_db, database_status, tracked_run
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.models import PaperTrade
-from crypto_trading_system.paper_db import build_paper_db_summary, export_paper_db
+from crypto_trading_system.paper_db import audit_database_stability, build_paper_db_summary, export_paper_db
 from crypto_trading_system import paper_trader as paper_trader_module
 from crypto_trading_system.paper_trader import (
     _insert_paper_trade,
@@ -245,6 +245,87 @@ def test_unclosed_kline_records_skip_without_state_change() -> None:
         ).fetchone()[0] == 1
 
 
+def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> None:
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+        for index in range(day_count):
+            date_text = f"2026-06-{13 + index:02d}"
+            run_id = f"daily_{index}"
+            timestamp = f"{date_text}T12:05:00Z"
+            connection.execute(
+                """
+                INSERT INTO runs(run_id, run_type, started_at, finished_at, status, created_at)
+                VALUES (?, 'daily_full', ?, ?, 'success', ?)
+                """,
+                (run_id, timestamp, f"{date_text}T12:07:00Z", timestamp),
+            )
+            scan_id = f"daily_scan_{index}"
+            connection.execute(
+                """
+                INSERT INTO scan_runs(scan_id, timestamp_utc, source, filters, limitations_json)
+                VALUES (?, ?, 'test', 'test', '[]')
+                """,
+                (scan_id, timestamp),
+            )
+            connection.execute(
+                """
+                INSERT INTO market_scans(scan_id, run_id, scan_time, candidate_count, created_at)
+                VALUES (?, ?, ?, 1, ?)
+                """,
+                (scan_id, run_id, timestamp, timestamp),
+            )
+            connection.execute(
+                """
+                INSERT INTO paper_snapshots(
+                    snapshot_id, run_id, snapshot_time, plan_id, symbol, status, created_at
+                ) VALUES (?, ?, ?, 'plan1', 'TESTUSDT', 'WATCHING', ?)
+                """,
+                (f"snapshot_{index}", run_id, timestamp, timestamp),
+            )
+            report_dir = reports_dir / date_text
+            report_dir.mkdir(parents=True, exist_ok=True)
+            (report_dir / f"market_scan_{date_text}_v1.md").write_text(run_id, encoding="utf-8")
+            (report_dir / f"paper_report_{date_text}_demo_v1.md").write_text(run_id, encoding="utf-8")
+            (report_dir / f"paper_observation_dashboard_{date_text}_demo_v1.md").write_text(
+                run_id,
+                encoding="utf-8",
+            )
+
+
+def test_stability_audit_requires_five_complete_consecutive_days() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is True
+    assert audit["observed_day_count"] == 5
+    assert all(item["ready"] for item in audit["run_checks"])
+
+
+def test_stability_audit_rejects_missing_snapshot() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute("DELETE FROM paper_snapshots WHERE run_id='daily_4'")
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["snapshot_count"] == 0
+
+
+def test_4h_batch_never_scans_or_creates_plans() -> None:
+    text = (ROOT / "scripts" / "paper_4h_update.bat").read_text(encoding="utf-8").lower()
+    assert "paper cycle" in text
+    assert "main.py scan" not in text
+    assert "add-from-scan" not in text
+
+
 if __name__ == "__main__":
     test_database_init_is_idempotent_and_configured()
     test_tracked_run_records_success_and_failure()
@@ -253,4 +334,7 @@ if __name__ == "__main__":
     test_wal_allows_reader_during_write_transaction()
     test_paper_update_writes_event_plan_and_snapshot_atomically()
     test_unclosed_kline_records_skip_without_state_change()
+    test_stability_audit_requires_five_complete_consecutive_days()
+    test_stability_audit_rejects_missing_snapshot()
+    test_4h_batch_never_scans_or_creates_plans()
     print("test_database=passed")

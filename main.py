@@ -25,7 +25,12 @@ from crypto_trading_system.config import load_settings
 from crypto_trading_system.database import database_status, tracked_run
 from crypto_trading_system.doctor import run_doctor
 from crypto_trading_system.paper_trader import add_from_scan, generate_paper_report, update_paper_trades
-from crypto_trading_system.paper_db import build_paper_db_summary, export_paper_db, load_paper_db_events
+from crypto_trading_system.paper_db import (
+    audit_database_stability,
+    build_paper_db_summary,
+    export_paper_db,
+    load_paper_db_events,
+)
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
     build_experiment_index,
@@ -69,6 +74,11 @@ def build_parser() -> argparse.ArgumentParser:
     db_subparsers = db.add_subparsers(dest="db_command", required=True)
     db_subparsers.add_parser("init", help="Create or migrate the database schema.")
     db_subparsers.add_parser("status", help="Show schema, PRAGMA, run, and open-plan status.")
+    db_stability = db_subparsers.add_parser(
+        "stability",
+        help="Audit the consecutive daily_full gate required before enabling the 4h task.",
+    )
+    db_stability.add_argument("--days", type=int, default=5, help="Required consecutive successful days.")
 
     scan = subparsers.add_parser("scan", help="Scan the market and write reports.")
     scan.add_argument("--top", type=int, default=None, help="Override number of candidates.")
@@ -437,6 +447,15 @@ def main() -> None:
         if args.db_command == "status":
             status = database_status(settings.output.database_path)
             print(json.dumps(status, ensure_ascii=False, indent=2))
+        if args.db_command == "stability":
+            audit = audit_database_stability(
+                settings.output.database_path,
+                settings.output.reports_dir,
+                required_days=args.days,
+            )
+            print(json.dumps(audit, ensure_ascii=False, indent=2))
+            if not audit["ready_for_4h_task"]:
+                sys.exit(2)
         return
 
     if args.command == "scan" and args.top is not None:

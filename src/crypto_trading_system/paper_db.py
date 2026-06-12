@@ -3,8 +3,128 @@ from __future__ import annotations
 import csv
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from .database import connect_db
+
+
+def audit_database_stability(path: Path, reports_dir: Path, required_days: int = 5) -> dict:
+    beijing = ZoneInfo("Asia/Shanghai")
+    with connect_db(path) as connection:
+        runs = [
+            dict(row)
+            for row in connection.execute(
+                """
+                SELECT * FROM runs
+                WHERE run_type = 'daily_full'
+                ORDER BY started_at DESC
+                """
+            ).fetchall()
+        ]
+        duplicate_plans = int(
+            connection.execute(
+                """
+                SELECT COUNT(*) FROM (
+                    SELECT account_name, source_scan_id, source_symbol, COUNT(*) AS count
+                    FROM paper_plans
+                    GROUP BY account_name, source_scan_id, source_symbol
+                    HAVING count > 1
+                )
+                """
+            ).fetchone()[0]
+        )
+        duplicate_events = int(
+            connection.execute(
+                """
+                SELECT COUNT(*) FROM (
+                    SELECT plan_id, event_type, event_time, COUNT(*) AS count
+                    FROM paper_events
+                    GROUP BY plan_id, event_type, event_time
+                    HAVING count > 1
+                )
+                """
+            ).fetchone()[0]
+        )
+        foreign_key_errors = [dict(row) for row in connection.execute("PRAGMA foreign_key_check").fetchall()]
+
+        daily_by_date: dict[str, dict] = {}
+        for run in runs:
+            started = datetime.fromisoformat(str(run["started_at"]).replace("Z", "+00:00"))
+            date_text = started.astimezone(beijing).strftime("%Y-%m-%d")
+            daily_by_date.setdefault(date_text, run)
+        selected_dates = sorted(daily_by_date, reverse=True)[:required_days]
+        selected = [daily_by_date[date_text] for date_text in selected_dates]
+
+        run_checks = []
+        for run in sorted(selected, key=lambda item: item["started_at"]):
+            run_id = str(run["run_id"])
+            scan_count = int(
+                connection.execute("SELECT COUNT(*) FROM market_scans WHERE run_id = ?", (run_id,)).fetchone()[0]
+            )
+            snapshot_count = int(
+                connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id = ?", (run_id,)).fetchone()[0]
+            )
+            started = datetime.fromisoformat(str(run["started_at"]).replace("Z", "+00:00"))
+            date_text = started.astimezone(beijing).strftime("%Y-%m-%d")
+            report_dir = reports_dir / date_text
+            report_files = list(report_dir.glob("*.md")) if report_dir.exists() else []
+            run_report_names = []
+            for report in report_files:
+                try:
+                    if run_id in report.read_text(encoding="utf-8"):
+                        run_report_names.append(report.name)
+                except OSError:
+                    continue
+            has_scan_report = any(name.startswith("market_scan_") for name in run_report_names)
+            has_paper_report = any(name.startswith("paper_report_") for name in run_report_names)
+            has_dashboard = any(name.startswith("paper_observation_dashboard_") for name in run_report_names)
+            error_text = str(run.get("error_message") or "").lower()
+            run_checks.append(
+                {
+                    "date_beijing": date_text,
+                    "run_id": run_id,
+                    "status": run["status"],
+                    "scan_count": scan_count,
+                    "snapshot_count": snapshot_count,
+                    "database_locked": "database is locked" in error_text,
+                    "market_scan_report": has_scan_report,
+                    "paper_report": has_paper_report,
+                    "observation_dashboard": has_dashboard,
+                    "ready": (
+                        run["status"] == "success"
+                        and scan_count == 1
+                        and snapshot_count > 0
+                        and "database is locked" not in error_text
+                        and has_scan_report
+                        and has_paper_report
+                        and has_dashboard
+                    ),
+                }
+            )
+
+    consecutive = False
+    if len(selected_dates) == required_days:
+        date_values = [datetime.strptime(value, "%Y-%m-%d").date() for value in sorted(selected_dates)]
+        consecutive = all((right - left).days == 1 for left, right in zip(date_values, date_values[1:]))
+    ready = (
+        len(selected_dates) == required_days
+        and consecutive
+        and all(item["ready"] for item in run_checks)
+        and duplicate_plans == 0
+        and duplicate_events == 0
+        and not foreign_key_errors
+    )
+    return {
+        "required_days": required_days,
+        "observed_daily_dates": sorted(selected_dates),
+        "observed_day_count": len(selected_dates),
+        "consecutive_days": consecutive,
+        "run_checks": run_checks,
+        "duplicate_plan_groups": duplicate_plans,
+        "duplicate_event_groups": duplicate_events,
+        "foreign_key_errors": foreign_key_errors,
+        "ready_for_4h_task": ready,
+    }
 
 
 def build_paper_db_summary(path: Path, limit: int = 10) -> dict:

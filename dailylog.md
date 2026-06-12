@@ -15,6 +15,15 @@
 
 ## 2026-06-12
 
+### 22:48:56 +08:00 - 准备 4h 更新任务并增加五天稳定性硬门槛
+- 类型：代码 / 脚本 / 测试 / 运维 / 文档 / Git
+- 改动：新增 `python main.py db stability --days 5`，自动审计连续 daily_full 日期、run success、market scan、snapshot、三类带 run_id 报告、重复 plan/event、外键错误及 `database is locked`；未满足时退出码为 2。
+- 改动：新增 `scripts/paper_4h_update.bat`，只运行 `python main.py paper cycle --run-type paper_4h_update --account demo`，不执行 scan 或 add-from-scan，并记录独立 `logs/paper_4h_update.log`。
+- 改动：新增 `scripts/install_4h_paper_task.ps1`，注册 00:10、04:10、08:10、12:10、16:10 五个触发器；安装前强制通过 5 天数据库审计，设置 30 分钟执行上限和 `IgnoreNew` 防止任务重叠。当前未实际安装任务。
+- 改动：同步更新 `README.md`、`TODO.md`、`开发计划.md` 和 `数据库开发计划.md`，明确管理员最后执行步骤。
+- 验证：`test_database.py` 增加完整 5 天通过、缺 snapshot 拒绝和 4h batch 禁止 scan/add-from-scan 测试并通过；PowerShell parser 检查安装脚本通过；当前生产库审计正确返回 `observed_day_count=0`、`ready_for_4h_task=false`。
+- Git：本次提交 `Prepare gated 4h paper task`。
+
 ### 22:40:52 +08:00 - 实现三周模拟盘 SQLite 结构化观察基础设施
 - 类型：代码 / 数据库 / 脚本 / 测试 / 文档 / Git
 - 改动：在现有 `data/crypto_trading.db` 上新增兼容 schema migration，创建 `schema_metadata`、`runs`、`market_scans`、`paper_plans`、`paper_events`、`paper_snapshots`，并为旧 scan、paper trade 和 event 幂等回填观察数据。
