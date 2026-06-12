@@ -15,6 +15,13 @@
 
 ## 2026-06-12
 
+### 21:25:26 +08:00 - 补充三周内每日运行 daily 的必要性说明
+- 类型：文档 / Git
+- 改动：新增 `为什么未来三周每天运行daily.md`，详细说明 daily 的扫描快照、计划导入、模拟盘状态推进、事件记录和 dashboard 沉淀职责，并解释为何三周后单次运行或事后历史回放不能替代连续前向观察。
+- 影响：明确三周观察的数据口径、漏跑风险、每日最低检查项及“每日运行不等于实时监控”的能力边界，便于后续统一执行和解释实验结果。
+- 验证：人工检查文档覆盖 `RECLAIM_PENDING`、TP1 EMA trailing、持仓时长、市场环境、定时任务可靠性和漏跑影响；仅文档变更，未运行代码测试。
+- Git：本次提交 `Document daily observation rationale`。
+
 ### 21:09:43 +08:00 - 将三周观察仪表接入 daily 定时脚本
 - 类型：代码 / 脚本 / 报告 / 运维 / Git
 - 改动：在 `scripts/daily_paper_update.bat` 的 `paper report` 之后新增 `python main.py observation-dashboard --account demo`，并向 `logs/daily_paper_update.log` 写入独立的 `observation-dashboard done` 完成标记。
