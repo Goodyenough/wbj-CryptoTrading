@@ -15,6 +15,14 @@
 
 ## 2026-06-13
 
+### 23:45:00 +08:00 - 完成 sensitive 与 42 根持仓过滤组合实验
+- 类型：配置 / 回测 / 报告 / 文档 / Git
+- 改动：在 `config/experiments.toml` 新增 `risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42`，使用固定 full master 完成两个非重叠窗口 A/B、regime breakdown 和 95 笔 `TIME_EXIT` 后续 42 根 4h K 路径审查。
+- 结果：两段 PF、Sharpe、净收益均改善；近端 MDD 20.74% -> 11.05%，较早窗口 MDD 18.03% -> 20.66%，总体 `retest`。路径审查显示 33/95 先触原 stop、15/95 先触原 TP1、60/95 一周后低于退出价。
+- 影响：新增实验定义和研究报告，未修改 `settings.toml`，未运行 daily，未改变 20:05 连续观察样本。
+- 验证：两段 `abtest-walk-forward` 成功；两份 `backtest-regime-breakdown` 成功；后续路径 95/95 均有完整 42 根 4h K；`compileall`、`tests/test_abtest.py`、实验定义加载和 `git diff --check` 均通过。
+- Git：计划提交 `Evaluate sensitive 42-bar time exit`。
+
 ### 22:05:37 +08:00 - 验收首个新版 daily_full 真实样本
 - 类型：运行验收 / 数据库 / 报告 / 日志 / 配置 / Git
 - 运行结果：Windows 任务于 20:05:02 自动触发，`LastTaskResult=0`；run `20260613_120503_7a5f6892` 为 `daily_full/success`，20:06:39 完成，稳定性进度从 `0/5` 变为 `1/5`。

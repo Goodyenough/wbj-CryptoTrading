@@ -175,6 +175,22 @@ dimension = "holding_time"
 [max_holding_42x4h_no_tp1.overrides.backtest]
 max_holding_bars_without_tp1 = 42
 
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42]
+enabled = true
+description = "Current sensitive combo plus force-close when TP1 remains untouched after 42 closed 4h bars."
+dimension = "combined_regime_entry_exit_sensitivity_holding"
+
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42.overrides.analysis]
+risk_off_core_buy_enabled = false
+entry_reclaim_close_enabled = true
+tp1_ema_trailing_stop_enabled = true
+regime_btc_7d_drop_pct = -3.0
+regime_eth_7d_drop_pct = -5.0
+regime_require_both_trend = true
+
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42.overrides.backtest]
+max_holding_bars_without_tp1 = 42
+
 [large_cap_only_risk_off]
 enabled = true
 description = "RISK_OFF: pause altcoin only; allow BTC/ETH/BNB/SOL entry via risk_off_large_cap_buy_enabled. Baseline keeps both flags false (all paused)."
