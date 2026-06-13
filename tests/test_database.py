@@ -121,6 +121,28 @@ def test_tracked_run_records_success_and_failure() -> None:
     assert "expected failure" in rows[-1]["error_message"]
 
 
+def test_run_step_persists_run_id_step_and_lock_error() -> None:
+    path = _temp_db()
+    init_db(path)
+    try:
+        with tracked_run(path, "manual") as run_id:
+            with main_module._run_step(run_id, "paper_update"):
+                raise sqlite3.OperationalError("database is locked")
+    except RuntimeError as exc:
+        assert f"run_id={run_id}" in str(exc)
+        assert "step=paper_update" in str(exc)
+        assert "database is locked" in str(exc)
+    else:
+        raise AssertionError("Step context must preserve the failing run and step")
+
+    with connect_db(path) as connection:
+        row = connection.execute("SELECT status, error_message FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+    assert row["status"] == "failed"
+    assert f"run_id={run_id}" in row["error_message"]
+    assert "step=paper_update" in row["error_message"]
+    assert "database is locked" in row["error_message"]
+
+
 def test_state_transition_and_stop_are_monotonic() -> None:
     path = _temp_db()
     init_db(path)
@@ -792,6 +814,7 @@ def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:
 if __name__ == "__main__":
     test_database_init_is_idempotent_and_configured()
     test_tracked_run_records_success_and_failure()
+    test_run_step_persists_run_id_step_and_lock_error()
     test_state_transition_and_stop_are_monotonic()
     test_summary_and_export_use_structured_tables()
     test_wal_allows_reader_during_write_transaction()

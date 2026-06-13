@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 from datetime import datetime
 import json
 from pathlib import Path
@@ -434,6 +435,14 @@ def _run_scan_and_write(settings, include_obsidian: bool, progress=None, run_id:
     return result, report_paths
 
 
+@contextmanager
+def _run_step(run_id: str, step: str):
+    try:
+        yield
+    except Exception as exc:
+        raise RuntimeError(f"run_id={run_id} step={step}: {type(exc).__name__}: {exc}") from exc
+
+
 def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_obsidian: bool, settings_path: Path):
     init_db(settings.output.database_path)
     with tracked_run(
@@ -443,23 +452,26 @@ def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_ob
         project_root=PROJECT_ROOT,
         log_path=PROJECT_ROOT / "logs" / "paper_4h_update.log",
     ) as run_id:
-        updated = update_paper_trades(settings, account_name=account_name, run_id=run_id)
-        _, report_paths = generate_paper_report(
-            settings,
-            account_name=account_name,
-            run_id=run_id,
-            run_type=run_type,
-        )
-        original_obsidian = settings.output.obsidian_dir
-        try:
-            if no_obsidian:
-                settings.output.obsidian_dir = None
-            _, dashboard_paths = generate_observation_dashboard(
+        with _run_step(run_id, "paper_update"):
+            updated = update_paper_trades(settings, account_name=account_name, run_id=run_id)
+        with _run_step(run_id, "paper_report"):
+            _, report_paths = generate_paper_report(
                 settings,
                 account_name=account_name,
                 run_id=run_id,
                 run_type=run_type,
             )
+        original_obsidian = settings.output.obsidian_dir
+        try:
+            if no_obsidian:
+                settings.output.obsidian_dir = None
+            with _run_step(run_id, "observation_dashboard"):
+                _, dashboard_paths = generate_observation_dashboard(
+                    settings,
+                    account_name=account_name,
+                    run_id=run_id,
+                    run_type=run_type,
+                )
         finally:
             settings.output.obsidian_dir = original_obsidian
     return run_id, updated, report_paths, dashboard_paths
@@ -520,39 +532,46 @@ def main() -> None:
             log_path=PROJECT_ROOT / "logs" / "daily_paper_update.log",
         ) as run_id:
             print(f"run_id={run_id}")
-            result, scan_report_paths = _run_scan_and_write(
-                settings,
-                include_obsidian=not args.no_obsidian,
-                progress=_progress,
-                run_id=run_id,
-            )
+            with _run_step(run_id, "scan"):
+                result, scan_report_paths = _run_scan_and_write(
+                    settings,
+                    include_obsidian=not args.no_obsidian,
+                    progress=_progress,
+                    run_id=run_id,
+                )
             _progress("adding latest candidates to paper trading")
-            summary = add_from_scan(
-                settings,
-                scan_id=result.scan_id,
-                account_name=args.account,
-                run_id=run_id,
-            )
+            with _run_step(run_id, "add_from_scan"):
+                summary = add_from_scan(
+                    settings,
+                    scan_id=result.scan_id,
+                    account_name=args.account,
+                    run_id=run_id,
+                )
             _progress("updating paper trading positions")
-            updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
+            with _run_step(run_id, "paper_update"):
+                updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
             _progress("writing paper trading report")
-            _, paper_report_paths = generate_paper_report(
-                settings,
-                account_name=args.account,
-                run_id=run_id,
-                run_type="daily_full",
-            )
+            with _run_step(run_id, "paper_report"):
+                _, paper_report_paths = generate_paper_report(
+                    settings,
+                    account_name=args.account,
+                    run_id=run_id,
+                    run_type="daily_full",
+                )
             _progress("writing three-week observation dashboard")
             original_obsidian = settings.output.obsidian_dir
-            if args.no_obsidian:
-                settings.output.obsidian_dir = None
-            _, observation_paths = generate_observation_dashboard(
-                settings,
-                account_name=args.account,
-                run_id=run_id,
-                run_type="daily_full",
-            )
-            settings.output.obsidian_dir = original_obsidian
+            try:
+                if args.no_obsidian:
+                    settings.output.obsidian_dir = None
+                with _run_step(run_id, "observation_dashboard"):
+                    _, observation_paths = generate_observation_dashboard(
+                        settings,
+                        account_name=args.account,
+                        run_id=run_id,
+                        run_type="daily_full",
+                    )
+            finally:
+                settings.output.obsidian_dir = original_obsidian
 
             print("daily=completed")
             print(f"scan_id={result.scan_id}")
@@ -938,7 +957,8 @@ def main() -> None:
                 settings_path=settings_path,
                 project_root=PROJECT_ROOT,
             ) as run_id:
-                updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
+                with _run_step(run_id, "paper_update"):
+                    updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
             print(f"run_id={run_id}")
             print(f"updated={len(updated)}")
             for trade in updated:

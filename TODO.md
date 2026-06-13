@@ -117,7 +117,7 @@
 ## 运维待办
 
 - [x] Windows 任务计划 `CryptoTrading_DailyPaperUpdate` 已固定为每天 20:05；2026-06-13 08:38 检查时任务为 `Ready`，最近一次 2026-06-12 20:05:02 成功且 `LastTaskResult=0`，下一次为 2026-06-13 20:05。
-- [x] 完成 SQLite 三周观察基础设施与主数据层切换：`runs`、`market_scans`、`paper_plans`、`paper_events`、`paper_snapshots`、WAL、30 秒 timeout、UTC 时间、daily_full run_id、snapshot、db-summary/events/export；`db-summary` 已直接汇总三周核心指标与 daily/4h 北京时间覆盖日期；paper update/report/dashboard 已读取结构化主表，legacy 表仅保留兼容镜像；故障注入测试证明单 plan 的状态、事件和快照原子回滚，且不阻断后续 plan。
+- [x] 完成 SQLite 三周观察基础设施与主数据层切换：`runs`、`market_scans`、`paper_plans`、`paper_events`、`paper_snapshots`、WAL、30 秒 timeout、UTC 时间、daily_full run_id、snapshot、db-summary/events/export；`db-summary` 已直接汇总三周核心指标与 daily/4h 北京时间覆盖日期；失败 run 会记录 `run_id`、当前 `step` 和原异常；paper update/report/dashboard 已读取结构化主表，legacy 表仅保留兼容镜像；故障注入测试证明单 plan 的状态、事件和快照原子回滚，且不阻断后续 plan。
 - [ ] 从首次新版 `daily_full` 成功运行开始连续观察 5 天，并运行 `python main.py db stability --days 5`；审计自动检查 success、scan、snapshot、三类报告、重复 plan/event、外键和 `database is locked`。
 - [x] 准备并验收 `scripts/paper_4h_update.bat` 与 `scripts/install_4h_paper_task.ps1`：仅运行 `paper cycle`，固定 00:10、04:10、08:10、12:10、16:10，禁止 scan/add-from-scan，并设置 30 分钟上限与 `IgnoreNew` 防重入；临时库集成测试确认 cycle 不新增 scan/plan，只更新已有计划并写 run/event/snapshot/report/dashboard。
 - [ ] 5 天审计返回 `ready_for_4h_task=true` 后，在管理员 PowerShell 运行 `powershell -ExecutionPolicy Bypass -File scripts\install_4h_paper_task.ps1` 安装 `CryptoTrading_4H_PaperUpdate`。

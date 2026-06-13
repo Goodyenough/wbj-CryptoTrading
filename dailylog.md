@@ -15,6 +15,14 @@
 
 ## 2026-06-13
 
+### 16:22:36 +08:00 - 为受跟踪运行补充失败步骤上下文
+- 类型：代码 / 数据库 / 日志 / 测试 / 文档 / Git
+- 改动：新增 `_run_step` 上下文，将 `run_id`、步骤名、原异常类型和原因包装进异常；接入 daily 的 scan/add_from_scan/paper_update/paper_report/observation_dashboard、4h cycle 三步及手工 paper update。
+- 改动：daily dashboard 的临时 Obsidian 路径恢复改用 `finally`，即使 dashboard 失败也不会污染同进程配置状态。
+- 原因：满足 `数据库开发计划.md` 对 `database is locked` 日志必须明确记录 run_id 和当前步骤的要求，同时让所有失败 run 都具备一致诊断口径。
+- 验证：故障注入 `sqlite3.OperationalError("database is locked")` 后，异常与 `runs.error_message` 均包含真实 run_id、`step=paper_update` 和锁错误，run status 为 failed；`test_database.py`、`test_trade_state.py`、`test_replay.py` 全部通过。
+- Git：本次提交 `Add tracked run step context`。
+
 ### 16:18:00 +08:00 - 将外键与索引验收接入快速 db status
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：为 `python main.py db status` 增加 `foreign_key_errors`、`indexes_ok` 和 `missing_indexes`，直接检查开发计划要求的 11 个观察索引，不再依赖临时 SQL 人工核对。
