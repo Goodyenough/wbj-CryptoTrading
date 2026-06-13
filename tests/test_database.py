@@ -97,6 +97,9 @@ def test_database_init_is_idempotent_and_configured() -> None:
     assert status["synchronous"] == 1
     assert status["foreign_keys"] == 1
     assert status["busy_timeout_ms"] == 30_000
+    assert status["foreign_key_errors"] == []
+    assert status["indexes_ok"] is True
+    assert status["missing_indexes"] == []
     assert status["tables_ok"] is True
 
 

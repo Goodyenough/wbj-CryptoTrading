@@ -15,6 +15,14 @@
 
 ## 2026-06-13
 
+### 16:18:00 +08:00 - 将外键与索引验收接入快速 db status
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：为 `python main.py db status` 增加 `foreign_key_errors`、`indexes_ok` 和 `missing_indexes`，直接检查开发计划要求的 11 个观察索引，不再依赖临时 SQL 人工核对。
+- 验证：生产库 `PRAGMA integrity_check=ok`、`foreign_key_check=[]`，11 个必需索引全部存在；所有 runs、scan、plan、event、snapshot 时间字段均为 `Z` 或 `+00:00` UTC 表达。
+- 性能决策：完整 `integrity_check` 约需数十秒，`quick_check` 也约 11.5 秒，因此不纳入高频 `db status`；保留低成本外键与索引检查后命令耗时约 0.40 秒。
+- 验证：`python tests\test_database.py` 通过，新增状态字段断言覆盖无外键错误、索引完整和空缺失列表。
+- Git：本次提交 `Expose database index and foreign key health`。
+
 ### 16:14:31 +08:00 - 补齐三周数据库复盘汇总指标
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：扩展 `python main.py paper db-summary`，新增 `observation_totals`，直接汇总 scan、候选、`BUY_CANDIDATE`、paper plan、reclaim pending plan、TP1、EMA trailing 激活/抬 stop/出场、`API_DELAY_SKIPPED` 和各终态数量。

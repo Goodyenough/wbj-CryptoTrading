@@ -13,6 +13,19 @@ import uuid
 SCHEMA_VERSION = 2
 BUSY_TIMEOUT_MS = 30_000
 TERMINAL_PLAN_STATUSES = {"CLOSED", "STOPPED", "EXPIRED", "INVALIDATED", "ARCHIVED"}
+REQUIRED_OBSERVATION_INDEXES = {
+    "idx_runs_type_started",
+    "idx_runs_status_started",
+    "idx_scan_candidates_symbol",
+    "idx_scan_candidates_scan_action",
+    "idx_plans_symbol_status",
+    "idx_plans_status_updated",
+    "idx_event_plan_type",
+    "idx_event_type_time",
+    "idx_event_run",
+    "idx_snapshot_run_plan",
+    "idx_snapshot_plan_time",
+}
 
 
 def utc_now() -> str:
@@ -484,6 +497,14 @@ def database_status(path: Path) -> dict:
         synchronous = connection.execute("PRAGMA synchronous").fetchone()[0]
         foreign_keys = connection.execute("PRAGMA foreign_keys").fetchone()[0]
         busy_timeout = connection.execute("PRAGMA busy_timeout").fetchone()[0]
+        foreign_key_errors = [tuple(row) for row in connection.execute("PRAGMA foreign_key_check").fetchall()]
+        indexes = {
+            str(row[0])
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+        }
+        missing_indexes = sorted(REQUIRED_OBSERVATION_INDEXES - indexes)
     return {
         "database_path": str(path.resolve()),
         "schema_version": None if schema_row is None else schema_row[0],
@@ -491,6 +512,9 @@ def database_status(path: Path) -> dict:
         "synchronous": synchronous,
         "foreign_keys": foreign_keys,
         "busy_timeout_ms": busy_timeout,
+        "foreign_key_errors": foreign_key_errors,
+        "indexes_ok": not missing_indexes,
+        "missing_indexes": missing_indexes,
         "tables_ok": required.issubset(tables),
         "missing_tables": sorted(required - tables),
         "latest_run": None if latest_run is None else dict(latest_run),

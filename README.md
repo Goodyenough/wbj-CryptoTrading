@@ -49,6 +49,8 @@ python main.py db init
 python main.py db status
 ```
 
+`db status` 同时检查观察表、外键错误和开发计划要求的基础索引，保持为快速只读命令；耗时更高的 SQLite 全库 integrity scan 不放入日常状态路径。
+
 结构化复盘和导出：
 
 ```powershell
