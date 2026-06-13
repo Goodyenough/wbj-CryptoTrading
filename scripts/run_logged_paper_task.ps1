@@ -5,6 +5,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[Console]::InputEncoding = $utf8NoBom
+[Console]::OutputEncoding = $utf8NoBom
+$OutputEncoding = $utf8NoBom
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $python = "C:\Users\10537\miniconda3\envs\ppt-master\python.exe"
 $logDir = Join-Path $projectRoot "logs"
@@ -40,6 +44,7 @@ function Write-LogLine([string]$Message) {
 }
 
 $env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
 Set-Location $projectRoot
 Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label start ==="
 

@@ -769,6 +769,9 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert '"add-from-scan"' not in runner_text
     assert "add-content -literalpath $logpath" in runner_text
     assert "-encoding utf8" in runner_text
+    assert "[console]::outputencoding = $utf8nobom" in runner_text
+    assert "$outputencoding = $utf8nobom" in runner_text
+    assert '$env:pythonioencoding = "utf-8"' in runner_text
     assert "exit $exitcode" in runner_text
 
 

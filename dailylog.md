@@ -15,6 +15,15 @@
 
 ## 2026-06-13
 
+### 22:05:37 +08:00 - 验收首个新版 daily_full 真实样本
+- 类型：运行验收 / 数据库 / 报告 / 日志 / 配置 / Git
+- 运行结果：Windows 任务于 20:05:02 自动触发，`LastTaskResult=0`；run `20260613_120503_7a5f6892` 为 `daily_full/success`，20:06:39 完成，稳定性进度从 `0/5` 变为 `1/5`。
+- 数据证据：本次恰有 1 个 scan、5 个候选、0 个 BUY_CANDIDATE、4 个开放计划 snapshot；无 `database is locked`、重复 plan/event 或外键错误，market scan、paper report、observation dashboard 均存在并包含同一 run_id、`daily_full` 与 SQLite 来源。
+- 事件证据：ONDOUSDT 写入 1 条 `RECLAIM_PENDING_SET`，目标 4h kline_time=`2026-06-13T11:59:59Z`，状态保持 WATCHING；其余 3 个 ENTERED 计划也写入 snapshot。
+- 日志修复：首样本日志文件已统一为 UTF-8，但 Python 中文经过 Windows PowerShell 5.1 native pipeline 时仍出现误解码；runner 增加 Console Input/OutputEncoding、`$OutputEncoding` 与 `PYTHONIOENCODING=utf-8`，独立中文路径/候选探针通过。未重跑 daily，不改变第 1 天样本。
+- 验证：生产 `db stability --days 5` 返回 date=2026-06-13、run ready=true、总体 `ready_for_4h_task=false`；Python UTF-8 读取确认三份报告中文内容完整，数据库路径字段字节为正确 UTF-8。
+- Git：本次提交 `Validate first daily database sample`。
+
 ### 16:22:36 +08:00 - 为受跟踪运行补充失败步骤上下文
 - 类型：代码 / 数据库 / 日志 / 测试 / 文档 / Git
 - 改动：新增 `_run_step` 上下文，将 `run_id`、步骤名、原异常类型和原因包装进异常；接入 daily 的 scan/add_from_scan/paper_update/paper_report/observation_dashboard、4h cycle 三步及手工 paper update。
