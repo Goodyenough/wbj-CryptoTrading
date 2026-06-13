@@ -709,10 +709,16 @@ def test_stability_audit_rejects_missing_snapshot() -> None:
 
 
 def test_4h_batch_never_scans_or_creates_plans() -> None:
-    text = (ROOT / "scripts" / "paper_4h_update.bat").read_text(encoding="utf-8").lower()
-    assert "paper cycle" in text
-    assert "main.py scan" not in text
-    assert "add-from-scan" not in text
+    batch_text = (ROOT / "scripts" / "paper_4h_update.bat").read_text(encoding="utf-8").lower()
+    runner_text = (ROOT / "scripts" / "run_logged_paper_task.ps1").read_text(encoding="utf-8").lower()
+    assert "run_logged_paper_task.ps1" in batch_text
+    assert "-mode paper_4h" in batch_text
+    assert '@("main.py", "paper", "cycle", "--run-type", "paper_4h_update"' in runner_text
+    assert '"main.py", "scan"' not in runner_text
+    assert '"add-from-scan"' not in runner_text
+    assert "add-content -literalpath $logpath" in runner_text
+    assert "-encoding utf8" in runner_text
+    assert "exit $exitcode" in runner_text
 
 
 def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:

@@ -15,6 +15,15 @@
 
 ## 2026-06-13
 
+### 16:10:00 +08:00 - 修复定时任务日志混合编码
+- 类型：代码 / 运维 / 测试 / 文档 / Git
+- 改动：新增 `scripts/run_logged_paper_task.ps1`，统一执行 daily 与 4h paper 命令，以 UTF-8 逐行写日志、设置 `PYTHONUTF8=1`、记录成功步骤和失败退出码，并向任务计划原样返回 Python exit code。
+- 改动：`daily_paper_update.bat` 与 `paper_4h_update.bat` 保留为稳定计划任务入口，改为委托 PowerShell 日志执行器；检测到 UTF-16 BOM 的历史日志时自动带时间戳归档，杜绝 UTF-16、OEM 和 UTF-8 内容继续混写。
+- 本地状态：原 `logs/daily_paper_update.log` 已原样移动为 `daily_paper_update.legacy_utf16_20260613_1610.log`；任务计划仍指向原 daily `.bat`，无需管理员重装，今晚 20:05 将创建全新 UTF-8 日志。
+- 原因：旧日志起始为 UTF-16LE BOM，后续由 cmd/Python 追加单字节内容，导致人工读取和错误审计出现乱码；SQLite 数据不受影响，但不满足清晰运维日志要求。
+- 验证：`python tests\test_database.py` 通过；三个 PowerShell 脚本 parser 均通过；测试验证 4h runner 命令不包含 scan/add-from-scan、使用 UTF-8 追加并传递非零退出码；任务 Action 路径和 WorkingDirectory 保持不变。
+- Git：本次提交 `Normalize scheduled task logs to UTF-8`。
+
 ### 16:08:11 +08:00 - 验证 per-plan 事务原子回滚与故障隔离
 - 类型：测试 / 数据库 / 文档 / Git
 - 改动：新增双 plan 故障注入测试，强制第一笔在 `paper_plans` UPDATE 后、`paper_events` INSERT 前抛错，验证同一事务中的 plan/event/snapshot 全部回滚。
