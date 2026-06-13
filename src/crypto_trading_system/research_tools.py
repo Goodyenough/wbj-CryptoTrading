@@ -181,12 +181,14 @@ def _event_time(event) -> datetime:
 
 
 def _reclaim_follow_up(trade, events) -> str:
-    pending = [event for event in events if event.event_type == "RECLAIM_PENDING"]
+    pending = [
+        event for event in events if event.event_type in {"RECLAIM_PENDING", "RECLAIM_PENDING_SET"}
+    ]
     if not pending:
         return "n/a"
     first_time = _event_time(pending[0])
     later = [event for event in events if _event_time(event) > first_time]
-    if any(event.event_type == "ENTERED" for event in later):
+    if any(event.event_type in {"ENTERED", "RECLAIM_CONFIRMED_ENTERED"} for event in later):
         return "reclaimed_entered"
     if any(event.event_type in {"INVALIDATED", "STOPPED"} for event in later):
         return "fell_below_stop_or_invalidated"
@@ -242,11 +244,23 @@ def generate_observation_dashboard(
     trades = load_all_paper_trades(settings, account)
     events_by_trade = load_paper_events(settings, account)
     all_events = [event for events in events_by_trade.values() for event in events]
-    reclaim_trades = [trade for trade in trades if any(e.event_type == "RECLAIM_PENDING" for e in events_by_trade.get(trade.paper_trade_id, []))]
+    reclaim_trades = [
+        trade
+        for trade in trades
+        if any(
+            event.event_type in {"RECLAIM_PENDING", "RECLAIM_PENDING_SET"}
+            for event in events_by_trade.get(trade.paper_trade_id, [])
+        )
+    ]
     reclaim_outcomes = Counter(_reclaim_follow_up(trade, events_by_trade.get(trade.paper_trade_id, [])) for trade in reclaim_trades)
     ema_activations = sum(1 for event in all_events if event.event_type == "TP1_EMA_TRAILING_ACTIVATED")
     ema_raises = sum(1 for event in all_events if event.event_type == "TP1_EMA_TRAILING_RAISED")
-    ema_stops = sum(1 for event in all_events if event.event_type == "STOPPED" and "EMA20 trailing stop" in event.message)
+    ema_stops = sum(
+        1
+        for event in all_events
+        if event.event_type == "EMA_TRAILING_STOPPED"
+        or (event.event_type == "STOPPED" and "EMA20 trailing stop" in event.message)
+    )
     now = _local_now()
     now_utc = datetime.now(timezone.utc)
     open_holding_hours = []
@@ -285,7 +299,7 @@ def generate_observation_dashboard(
         "",
         "| Metric | Value |",
         "|---|---:|",
-        f"| RECLAIM_PENDING events | {sum(1 for event in all_events if event.event_type == 'RECLAIM_PENDING')} |",
+        f"| RECLAIM_PENDING events | {sum(1 for event in all_events if event.event_type in {'RECLAIM_PENDING', 'RECLAIM_PENDING_SET'})} |",
         f"| Reclaim trades | {len(reclaim_trades)} |",
         f"| Reclaim fell below stop / invalidated | {reclaim_outcomes.get('fell_below_stop_or_invalidated', 0)} |",
         f"| Reclaim later entered | {reclaim_outcomes.get('reclaimed_entered', 0)} |",
@@ -328,7 +342,11 @@ def generate_observation_dashboard(
     if reclaim_trades:
         for trade in reclaim_trades:
             events = events_by_trade.get(trade.paper_trade_id, [])
-            pending = [event for event in events if event.event_type == "RECLAIM_PENDING"]
+            pending = [
+                event
+                for event in events
+                if event.event_type in {"RECLAIM_PENDING", "RECLAIM_PENDING_SET"}
+            ]
             lines.append(
                 f"| `{trade.symbol}` | {trade.status} | {trade.stop_loss:.8g} | "
                 f"{'n/a' if trade.last_price is None else f'{trade.last_price:.8g}'} | "

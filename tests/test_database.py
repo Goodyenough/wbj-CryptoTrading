@@ -21,8 +21,11 @@ from crypto_trading_system.paper_trader import (
     _sync_paper_plan,
     add_from_scan,
     generate_paper_report,
+    load_all_paper_trades,
+    load_paper_events,
     update_paper_trades,
 )
+from crypto_trading_system.research_tools import generate_observation_dashboard
 from crypto_trading_system.storage import init_db, save_scan_result
 
 
@@ -84,7 +87,7 @@ def test_database_init_is_idempotent_and_configured() -> None:
     init_db(path)
     init_db(path)
     status = database_status(path)
-    assert status["schema_version"] == "1"
+    assert status["schema_version"] == "2"
     assert status["journal_mode"] == "wal"
     assert status["synchronous"] == 1
     assert status["foreign_keys"] == 1
@@ -266,6 +269,51 @@ def test_scan_and_plan_inherit_run_metadata() -> None:
         assert plan["market_regime"] == "RISK_OFF"
 
 
+def test_schema_v2_backfills_operational_plan_fields() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade(status="ENTERED")
+    trade.quantity = 12.5
+    trade.entry_price = 103.0
+    trade.entered_at_utc = "2026-06-12T01:00:00Z"
+    trade.realized_pnl = 7.5
+    trade.unrealized_pnl = 11.25
+    trade.last_price = 104.5
+    trade.notes = "migrated state"
+    trade.tp1_trailing_ema_stop_active = True
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+        connection.execute(
+            """
+            UPDATE paper_plans SET
+                source_rank=NULL, quantity=NULL, entry_price=NULL, entered_at_utc=NULL,
+                realized_pnl=0, unrealized_pnl=0, last_price=NULL, notes='',
+                tp1_trailing_ema_stop_active=0
+            WHERE plan_id='plan1'
+            """
+        )
+    init_db(path)
+    with connect_db(path) as connection:
+        row = connection.execute(
+            """
+            SELECT source_rank, quantity, entry_price, entered_at_utc, realized_pnl,
+                   unrealized_pnl, last_price, notes, tp1_trailing_ema_stop_active
+            FROM paper_plans WHERE plan_id='plan1'
+            """
+        ).fetchone()
+    assert row["source_rank"] == 1
+    assert row["quantity"] == 12.5
+    assert row["entry_price"] == 103.0
+    assert row["entered_at_utc"] == "2026-06-12T01:00:00Z"
+    assert row["realized_pnl"] == 7.5
+    assert row["unrealized_pnl"] == 11.25
+    assert row["last_price"] == 104.5
+    assert row["notes"] == "migrated state"
+    assert row["tp1_trailing_ema_stop_active"] == 1
+
+
 def test_add_from_scan_writes_plan_created_once() -> None:
     path = _temp_db()
     init_db(path)
@@ -425,6 +473,55 @@ def test_report_contains_current_run_events_and_api_delay_count() -> None:
     assert paths[0].name.startswith("paper_4h_update_")
 
 
+def test_structured_tables_remain_operational_without_legacy_rows() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+        connection.execute("DELETE FROM paper_trade_events")
+        connection.execute("DELETE FROM paper_trades")
+
+    settings = _settings_for(path)
+    settings.output.reports_dir = root / "reports"
+    settings.output.obsidian_dir = None
+    original_client = paper_trader_module.BinanceClient
+    paper_trader_module.BinanceClient = _FakeBinanceClient
+    try:
+        updated = update_paper_trades(settings, run_id="run1")
+        report, report_paths = generate_paper_report(
+            settings,
+            run_id="run1",
+            run_type="paper_4h_update",
+        )
+        dashboard, dashboard_paths = generate_observation_dashboard(
+            settings,
+            run_id="run1",
+            run_type="paper_4h_update",
+        )
+    finally:
+        paper_trader_module.BinanceClient = original_client
+
+    assert updated[0].status == "ENTERED"
+    assert load_all_paper_trades(settings)[0].status == "ENTERED"
+    events = load_paper_events(settings)["plan1"]
+    assert any(event.event_type == "ENTERED" for event in events)
+    assert report_paths and dashboard_paths
+    assert "This run events" in report
+    assert "Run ID" in dashboard
+    with connect_db(path) as connection:
+        assert connection.execute(
+            "SELECT status FROM paper_plans WHERE plan_id='plan1'"
+        ).fetchone()[0] == "ENTERED"
+        assert connection.execute(
+            "SELECT COUNT(*) FROM paper_events WHERE plan_id='plan1'"
+        ).fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM paper_trades").fetchone()[0] == 0
+
+
 def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> None:
     init_db(path)
     _seed_scan_and_run(path)
@@ -514,11 +611,13 @@ if __name__ == "__main__":
     test_wal_allows_reader_during_write_transaction()
     test_paper_update_writes_event_plan_and_snapshot_atomically()
     test_scan_and_plan_inherit_run_metadata()
+    test_schema_v2_backfills_operational_plan_fields()
     test_add_from_scan_writes_plan_created_once()
     test_unclosed_kline_records_skip_without_state_change()
     test_kline_api_error_is_recorded_and_does_not_fail_run()
     test_structured_event_names_cover_plan_requirements()
     test_report_contains_current_run_events_and_api_delay_count()
+    test_structured_tables_remain_operational_without_legacy_rows()
     test_stability_audit_requires_five_complete_consecutive_days()
     test_stability_audit_rejects_missing_snapshot()
     test_4h_batch_never_scans_or_creates_plans()

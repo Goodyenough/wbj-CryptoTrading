@@ -65,6 +65,8 @@ python main.py paper cycle --run-type paper_4h_update --account demo
 
 该命令只更新已有 paper plans 并生成报告/dashboard，不运行 scan，也不从 scan 创建新计划。Windows 4h 计划任务必须等 SQLite daily_full 连续稳定运行 5 天后再启用。
 
+模拟盘当前以 `paper_plans` 和 `paper_events` 作为结构化主数据层。`paper_trades` 和 `paper_trade_events` 仅保留为兼容镜像；paper update、paper report 和 observation dashboard 不依赖 legacy 行即可工作。
+
 检查 5 天门槛：
 
 ```powershell

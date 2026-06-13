@@ -13,6 +13,20 @@
 - Git：
 ```
 
+## 2026-06-13
+
+### 08:33:47 +08:00 - 将结构化 paper 表切换为模拟盘主数据层
+- 类型：代码 / 数据库 / 报告 / 测试 / 文档 / Git
+- 改动：数据库 schema 升级到 v2，为 `paper_plans` 增加 source rank、仓位、入场、TP1、退出、PnL、last price、EMA trailing 等完整运行态字段，并从 legacy `paper_trades` 幂等迁移已有状态。
+- 改动：`paper update` 的开放计划读取、状态前置检查和单向更新改为以 `paper_plans` 为准；`paper report` 与 observation dashboard 改为读取 `paper_plans/paper_events`。旧 `paper_trades/paper_trade_events` 继续在同一事务中兼容镜像，但不再是报告和状态推进的必需依赖。
+- 改动：结构化事件优先写入 `paper_events`，legacy plan 存在时再镜像；报告和 dashboard 同时兼容旧 `RECLAIM_PENDING/ENTERED/STOPPED` 与新 `RECLAIM_PENDING_SET/RECLAIM_CONFIRMED_ENTERED/EMA_TRAILING_STOPPED` 事件语义。
+- 改动：删除不再被调用的 legacy row 转换函数，消除 `paper update`、paper report 和 observation dashboard 误回退读取旧表的代码入口。
+- 原因：补齐 `数据库开发计划.md` 的核心验收项“SQLite 成为 paper trading 主数据源”以及 report/dashboard 从结构化表读取，避免仅建立观察副本却继续依赖 legacy 表。
+- 验证：新增 schema v2 状态迁移测试，以及删除 legacy plan/event 行后仍能推进状态、写结构化事件并生成 4h paper report/dashboard 的独立性测试；完整数据库、状态机、回放、历史、scanner regime、universe、regime analysis 和 A/B 测试全部通过。
+- 验证：生产库执行幂等迁移后为 schema version 2、WAL、foreign_keys=1、busy_timeout=30000；成功从结构化表加载 25 个计划和 25 条 plan 事件路径，新旧层均为 25 个计划、57 个事件，`missing_operational_fields=0`，当前开放计划 4 个。
+- 运行态：2026-06-13 08:26 检查时 daily 任务最近一次仍为 2026-06-12 20:05 成功，下一次为 2026-06-13 20:05；稳定性门槛仍为 `0/5`，未提前手工运行，避免破坏固定采样口径。
+- Git：本次提交 `Make structured paper tables canonical`。
+
 ## 2026-06-12
 
 ### 23:04:25 +08:00 - 完成结构化 paper 事件与 4h 报告审计

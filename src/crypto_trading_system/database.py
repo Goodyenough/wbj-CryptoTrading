@@ -10,7 +10,7 @@ import subprocess
 import uuid
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 BUSY_TIMEOUT_MS = 30_000
 TERMINAL_PLAN_STATUSES = {"CLOSED", "STOPPED", "EXPIRED", "INVALIDATED", "ARCHIVED"}
 
@@ -200,6 +200,30 @@ def init_observation_db(path: Path) -> None:
         ]
         for definition in scan_columns:
             _add_column(connection, "scan_candidates", definition)
+        plan_columns = [
+            "source_rank INTEGER",
+            "base_asset TEXT",
+            "setup TEXT",
+            "verdict TEXT",
+            "planned_entry_mid REAL",
+            "risk_reward_1 REAL",
+            "risk_reward_2 REAL",
+            "account_equity REAL",
+            "risk_per_trade_pct REAL",
+            "cash_risk REAL",
+            "quantity REAL",
+            "entry_price REAL",
+            "entered_at_utc TEXT",
+            "tp1_hit_at_utc TEXT",
+            "exit_price REAL",
+            "realized_pnl REAL NOT NULL DEFAULT 0",
+            "unrealized_pnl REAL NOT NULL DEFAULT 0",
+            "last_price REAL",
+            "notes TEXT NOT NULL DEFAULT ''",
+            "tp1_trailing_ema_stop_active INTEGER NOT NULL DEFAULT 0",
+        ]
+        for definition in plan_columns:
+            _add_column(connection, "paper_plans", definition)
         connection.execute(
             "CREATE INDEX IF NOT EXISTS idx_scan_candidates_symbol ON scan_candidates(symbol)"
         )
@@ -284,22 +308,70 @@ def _backfill_legacy_data(connection: sqlite3.Connection) -> None:
             )
     trade_rows = connection.execute("SELECT * FROM paper_trades").fetchall()
     for trade in trade_rows:
+        payload = json.loads(trade["payload_json"])
         connection.execute(
             """
             INSERT OR IGNORE INTO paper_plans(
                 plan_id, account_name, source_scan_id, source_symbol, created_run_id,
                 created_at, symbol, entry_low, entry_high, stop_initial, stop_current,
-                tp1, tp2, status, created_reason, raw_json, updated_at, closed_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                tp1, tp2, status, created_reason, raw_json, updated_at, closed_at,
+                source_rank, base_asset, setup, verdict, planned_entry_mid,
+                risk_reward_1, risk_reward_2, account_equity, risk_per_trade_pct,
+                cash_risk, quantity, entry_price, entered_at_utc, tp1_hit_at_utc,
+                exit_price, realized_pnl, unrealized_pnl, last_price, notes,
+                tp1_trailing_ema_stop_active
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 trade["paper_trade_id"], trade["account_name"], trade["source_scan_id"],
                 trade["symbol"], legacy_run_id, trade["created_at_utc"], trade["symbol"],
                 trade["entry_low"], trade["entry_high"],
-                json.loads(trade["payload_json"]).get("stop_loss", trade["stop_loss"]),
+                payload.get("stop_loss", trade["stop_loss"]),
                 trade["stop_loss"], trade["take_profit_1"], trade["take_profit_2"],
                 trade["status"], trade["notes"], trade["payload_json"],
                 trade["updated_at_utc"], trade["closed_at_utc"],
+                trade["source_rank"], trade["base_asset"], trade["setup"], trade["verdict"],
+                trade["planned_entry_mid"], trade["risk_reward_1"], trade["risk_reward_2"],
+                trade["account_equity"], trade["risk_per_trade_pct"], trade["cash_risk"],
+                trade["quantity"], trade["entry_price"], trade["entered_at_utc"],
+                trade["tp1_hit_at_utc"], trade["exit_price"], trade["realized_pnl"],
+                trade["unrealized_pnl"], trade["last_price"], trade["notes"],
+                trade["tp1_trailing_ema_stop_active"],
+            ),
+        )
+        connection.execute(
+            """
+            UPDATE paper_plans SET
+                source_rank=?,
+                base_asset=?,
+                setup=?,
+                verdict=?,
+                planned_entry_mid=?,
+                risk_reward_1=?,
+                risk_reward_2=?,
+                account_equity=?,
+                risk_per_trade_pct=?,
+                cash_risk=?,
+                quantity=?,
+                entry_price=?,
+                entered_at_utc=?,
+                tp1_hit_at_utc=?,
+                exit_price=?,
+                realized_pnl=?,
+                unrealized_pnl=?,
+                last_price=?,
+                notes=?,
+                tp1_trailing_ema_stop_active=?
+            WHERE plan_id=?
+            """,
+            (
+                trade["source_rank"], trade["base_asset"], trade["setup"], trade["verdict"],
+                trade["planned_entry_mid"], trade["risk_reward_1"], trade["risk_reward_2"],
+                trade["account_equity"], trade["risk_per_trade_pct"], trade["cash_risk"],
+                trade["quantity"], trade["entry_price"], trade["entered_at_utc"],
+                trade["tp1_hit_at_utc"], trade["exit_price"], trade["realized_pnl"],
+                trade["unrealized_pnl"], trade["last_price"], trade["notes"],
+                trade["tp1_trailing_ema_stop_active"], trade["paper_trade_id"],
             ),
         )
     event_rows = connection.execute("SELECT * FROM paper_trade_events").fetchall()
