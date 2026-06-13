@@ -15,6 +15,15 @@
 
 ## 2026-06-13
 
+### 16:08:11 +08:00 - 验证 per-plan 事务原子回滚与故障隔离
+- 类型：测试 / 数据库 / 文档 / Git
+- 改动：新增双 plan 故障注入测试，强制第一笔在 `paper_plans` UPDATE 后、`paper_events` INSERT 前抛错，验证同一事务中的 plan/event/snapshot 全部回滚。
+- 改动：验证第一笔失败后循环仍继续处理第二笔，第二笔正常推进为 `ENTERED` 并写入 event 与 snapshot；处理结束后整轮抛出汇总错误，供 `tracked_run` 标记 failed。
+- 原因：为 `数据库开发计划.md` 第 7.4 节“单 plan 失败回滚、继续下一 plan、三类写入原子化”提供直接故障注入证据，而不是仅用成功路径推断原子性。
+- 验证：`python tests\test_database.py` 通过；失败 plan 保持 `WATCHING` 且 event/snapshot 均为 0，后续 plan 为 `ENTERED` 且 event/snapshot 均为 1。
+- 运行态：北京时间 16:08，尚未到 2026-06-13 20:05 的首个新版 daily_full 固定采样点，未手工运行 daily。
+- Git：本次提交 `Verify per-plan transaction isolation`。
+
 ### 08:43:00 +08:00 - 补齐 4h cycle 与数据库锁竞争验收
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：将 `paper cycle` 提取为可直接验收的 `_run_paper_cycle` 应用流程，并用 `finally` 恢复临时修改的 Obsidian 输出目录，避免 dashboard 异常污染同进程后续状态。

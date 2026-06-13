@@ -286,6 +286,62 @@ def test_paper_update_writes_event_plan_and_snapshot_atomically() -> None:
         assert connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id='run1'").fetchone()[0] == 1
 
 
+def test_plan_failure_rolls_back_atomically_and_next_plan_continues() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    first = _trade()
+    second = _trade()
+    second.paper_trade_id = "plan2"
+    second.source_rank = 2
+    second.symbol = "SECONDUSDT"
+    second.base_asset = "SECOND"
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, first, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, first, run_id="run1", payload={"stop_loss": 90.0})
+        assert _insert_paper_trade(connection, second, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, second, run_id="run1", payload={"stop_loss": 90.0})
+
+    class _TwoSymbolClient(_FakeBinanceClient):
+        def ticker_24hr(self) -> list[dict]:
+            return [
+                {"symbol": "TESTUSDT", "lastPrice": "103"},
+                {"symbol": "SECONDUSDT", "lastPrice": "103"},
+            ]
+
+    original_client = paper_trader_module.BinanceClient
+    original_record_event = paper_trader_module._record_event
+
+    def fail_first_event(connection, trade, *args, **kwargs):
+        if trade.paper_trade_id == "plan1":
+            raise RuntimeError("injected event failure")
+        return original_record_event(connection, trade, *args, **kwargs)
+
+    paper_trader_module.BinanceClient = _TwoSymbolClient
+    paper_trader_module._record_event = fail_first_event
+    try:
+        try:
+            update_paper_trades(_settings_for(path), run_id="run1")
+        except RuntimeError as exc:
+            assert "plan1/TESTUSDT" in str(exc)
+            assert "injected event failure" in str(exc)
+        else:
+            raise AssertionError("A plan-level write failure must fail the overall update run")
+    finally:
+        paper_trader_module.BinanceClient = original_client
+        paper_trader_module._record_event = original_record_event
+
+    with connect_db(path) as connection:
+        first_row = connection.execute("SELECT status FROM paper_plans WHERE plan_id='plan1'").fetchone()
+        second_row = connection.execute("SELECT status FROM paper_plans WHERE plan_id='plan2'").fetchone()
+        assert first_row["status"] == "WATCHING"
+        assert second_row["status"] == "ENTERED"
+        assert connection.execute("SELECT COUNT(*) FROM paper_events WHERE plan_id='plan1'").fetchone()[0] == 0
+        assert connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE plan_id='plan1'").fetchone()[0] == 0
+        assert connection.execute("SELECT COUNT(*) FROM paper_events WHERE plan_id='plan2'").fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE plan_id='plan2'").fetchone()[0] == 1
+
+
 def test_scan_and_plan_inherit_run_metadata() -> None:
     path = _temp_db()
     init_db(path)
@@ -706,6 +762,7 @@ if __name__ == "__main__":
     test_wal_allows_reader_during_write_transaction()
     test_locked_write_waits_then_marks_run_failed()
     test_paper_update_writes_event_plan_and_snapshot_atomically()
+    test_plan_failure_rolls_back_atomically_and_next_plan_continues()
     test_scan_and_plan_inherit_run_metadata()
     test_schema_v2_backfills_operational_plan_fields()
     test_add_from_scan_writes_plan_created_once()
