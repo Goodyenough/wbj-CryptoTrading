@@ -15,6 +15,14 @@
 
 ## 2026-06-13
 
+### 16:14:31 +08:00 - 补齐三周数据库复盘汇总指标
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：扩展 `python main.py paper db-summary`，新增 `observation_totals`，直接汇总 scan、候选、`BUY_CANDIDATE`、paper plan、reclaim pending plan、TP1、EMA trailing 激活/抬 stop/出场、`API_DELAY_SKIPPED` 和各终态数量。
+- 改动：新增 `run_type_summary`，分别统计 `daily_full` 与 `paper_4h_update` 的 total/success/failed/running，并把 UTC started_at 转换为北京时间日期列表，便于审计两类运行是否连续覆盖。
+- 原因：补齐 `数据库开发计划.md` 第十二节与三周后 15 个复盘问题的直接查询能力，避免用户从通用 `event_counts` 或 Markdown 手工拼接核心指标。
+- 验证：`python tests\test_database.py` 通过，新增有数据断言覆盖 scan、candidate、BUY_CANDIDATE、plan、TP1、EMA 和北京时间日期；生产 `db-summary` 当前显示历史 scan=17、candidate=66、BUY_CANDIDATE=1、plan=25，且新版 `daily_full=0`，未把 backfill 误计为自动运行。
+- Git：本次提交 `Expand database observation summary`。
+
 ### 16:10:00 +08:00 - 修复定时任务日志混合编码
 - 类型：代码 / 运维 / 测试 / 文档 / Git
 - 改动：新增 `scripts/run_logged_paper_task.ps1`，统一执行 daily 与 4h paper 命令，以 UTF-8 逐行写日志、设置 `PYTHONUTF8=1`、记录成功步骤和失败退出码，并向任务计划原样返回 Python exit code。

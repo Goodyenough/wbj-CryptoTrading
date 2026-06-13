@@ -57,6 +57,8 @@ python main.py paper db-events --limit 100
 python main.py paper db-export --output-dir exports
 ```
 
+`db-summary` 的 `observation_totals` 会直接汇总 scan、候选、`BUY_CANDIDATE`、paper plan、reclaim、TP1、EMA trailing、API delay 和终态数量；`run_type_summary` 按 `daily_full` / `paper_4h_update` 展示成功失败次数及北京时间运行日期。
+
 为后续 4h 更新准备的单次循环命令：
 
 ```powershell

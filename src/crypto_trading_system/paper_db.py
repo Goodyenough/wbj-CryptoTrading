@@ -8,8 +8,11 @@ from zoneinfo import ZoneInfo
 from .database import connect_db
 
 
+BEIJING_TZ = ZoneInfo("Asia/Shanghai")
+
+
 def audit_database_stability(path: Path, reports_dir: Path, required_days: int = 5) -> dict:
-    beijing = ZoneInfo("Asia/Shanghai")
+    beijing = BEIJING_TZ
     with connect_db(path) as connection:
         runs = [
             dict(row)
@@ -202,6 +205,23 @@ def build_paper_db_summary(path: Path, limit: int = 10) -> dict:
             HAVING pending_count > 0
             """
         ).fetchall()
+        scan_totals = connection.execute(
+            """
+            SELECT COUNT(*) AS scan_count,
+                   COALESCE(SUM(candidate_count), 0) AS candidate_count,
+                   COALESCE(SUM(buy_candidate_count), 0) AS buy_candidate_count
+            FROM market_scans
+            """
+        ).fetchone()
+        plan_count = int(connection.execute("SELECT COUNT(*) FROM paper_plans").fetchone()[0])
+        run_type_rows = connection.execute(
+            """
+            SELECT run_type, status, started_at
+            FROM runs
+            WHERE run_type IN ('daily_full', 'paper_4h_update')
+            ORDER BY started_at
+            """
+        ).fetchall()
     reclaim_summary = {"total_plans": len(reclaim_rows), "later_entered": 0, "failed_or_invalidated": 0, "still_waiting": 0}
     for row in reclaim_rows:
         if int(row["entered_count"] or 0) > 0:
@@ -210,6 +230,32 @@ def build_paper_db_summary(path: Path, limit: int = 10) -> dict:
             reclaim_summary["failed_or_invalidated"] += 1
         else:
             reclaim_summary["still_waiting"] += 1
+    event_metric_types = {
+        "tp1_hit": "TP1_HIT",
+        "ema_trailing_activated": "TP1_EMA_TRAILING_ACTIVATED",
+        "ema_stop_raised": "TP1_EMA_TRAILING_RAISED",
+        "ema_trailing_stopped": "EMA_TRAILING_STOPPED",
+        "api_delay_skipped": "API_DELAY_SKIPPED",
+    }
+    run_type_summary: dict[str, dict] = {}
+    for run_type in ("daily_full", "paper_4h_update"):
+        matching = [row for row in run_type_rows if row["run_type"] == run_type]
+        local_dates = sorted(
+            {
+                datetime.fromisoformat(str(row["started_at"]).replace("Z", "+00:00"))
+                .astimezone(BEIJING_TZ)
+                .date()
+                .isoformat()
+                for row in matching
+            }
+        )
+        run_type_summary[run_type] = {
+            "total": len(matching),
+            "success": sum(1 for row in matching if row["status"] == "success"),
+            "failed": sum(1 for row in matching if row["status"] == "failed"),
+            "running": sum(1 for row in matching if row["status"] == "running"),
+            "beijing_dates": local_dates,
+        }
     return {
         "recent_runs": runs,
         "failed_runs": failed_runs,
@@ -217,6 +263,19 @@ def build_paper_db_summary(path: Path, limit: int = 10) -> dict:
         "plan_status_counts": status_counts,
         "event_counts": event_counts,
         "reclaim_summary": reclaim_summary,
+        "observation_totals": {
+            "scan_count": int(scan_totals["scan_count"]),
+            "candidate_count": int(scan_totals["candidate_count"]),
+            "buy_candidate_count": int(scan_totals["buy_candidate_count"]),
+            "paper_plan_count": plan_count,
+            "reclaim_pending_plan_count": reclaim_summary["total_plans"],
+            **{name: int(event_counts.get(event_type, 0)) for name, event_type in event_metric_types.items()},
+            "terminal_status_counts": {
+                status: int(status_counts.get(status, 0))
+                for status in ("CLOSED", "STOPPED", "EXPIRED", "INVALIDATED", "ARCHIVED")
+            },
+        },
+        "run_type_summary": run_type_summary,
         "holding_hours": holding_rows,
         "snapshot_counts_utc_hour": snapshot_counts,
     }

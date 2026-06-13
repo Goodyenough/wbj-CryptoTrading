@@ -158,9 +158,35 @@ def test_state_transition_and_stop_are_monotonic() -> None:
 def test_summary_and_export_use_structured_tables() -> None:
     path = _temp_db()
     init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        connection.execute("UPDATE runs SET run_type='daily_full' WHERE run_id='run1'")
+        connection.execute(
+            "UPDATE market_scans SET candidate_count=3, buy_candidate_count=2 WHERE scan_id='scan1'"
+        )
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+        for index, event_type in enumerate(("PLAN_CREATED", "TP1_HIT", "TP1_EMA_TRAILING_ACTIVATED")):
+            connection.execute(
+                """
+                INSERT INTO paper_events(
+                    event_id, plan_id, run_id, event_time, event_type, symbol, created_at
+                ) VALUES (?, 'plan1', 'run1', ?, ?, 'TESTUSDT', ?)
+                """,
+                (f"event{index}", f"2026-06-12T0{index}:00:00Z", event_type, f"2026-06-12T0{index}:00:00Z"),
+            )
     summary = build_paper_db_summary(path)
     assert "recent_runs" in summary
     assert "event_counts" in summary
+    assert summary["observation_totals"]["scan_count"] == 1
+    assert summary["observation_totals"]["candidate_count"] == 3
+    assert summary["observation_totals"]["buy_candidate_count"] == 2
+    assert summary["observation_totals"]["paper_plan_count"] == 1
+    assert summary["observation_totals"]["tp1_hit"] == 1
+    assert summary["observation_totals"]["ema_trailing_activated"] == 1
+    assert summary["run_type_summary"]["daily_full"]["success"] == 1
+    assert summary["run_type_summary"]["daily_full"]["beijing_dates"] == ["2026-06-12"]
     output_dir = path.parent / "exports"
     exports = export_paper_db(path, output_dir)
     assert len(exports) == 3
