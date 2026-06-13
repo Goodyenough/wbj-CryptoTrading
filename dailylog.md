@@ -15,6 +15,17 @@
 
 ## 2026-06-13
 
+### 08:43:00 +08:00 - 补齐 4h cycle 与数据库锁竞争验收
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：将 `paper cycle` 提取为可直接验收的 `_run_paper_cycle` 应用流程，并用 `finally` 恢复临时修改的 Obsidian 输出目录，避免 dashboard 异常污染同进程后续状态。
+- 改动：新增临时 SQLite 集成测试，真实执行 `paper_4h_update` cycle，验证只推进已有计划，写入 success run、结构化 event、snapshot、独立 4h report/dashboard，且 scan 与 plan 数量不增加。
+- 改动：新增写锁竞争测试，以缩短的测试 timeout 模拟生产 30 秒 busy timeout，验证业务 SQL 会等待、超时抛出 `database is locked`，并由 `tracked_run` 将该次 run 标记为 `failed`、保存错误原因。
+- 改动：修正 `TODO.md` 中已过期的 09:00 定时任务描述；当前 daily 任务已是每天 20:05，并在 2026-06-12 20:05 成功执行。
+- 原因：补齐 `数据库开发计划.md` 第 14.6、14.7 节对锁超时失败审计和 4h update 运行级行为的直接证据，避免只依赖静态脚本文本或局部单元测试验收。
+- 验证：`python tests\test_database.py` 及完整 compile、状态机、回放、历史、scanner regime、universe、regime analysis、A/B 测试全部通过；生产定时任务为 `Ready`，`LastTaskResult=0`，下一次为 2026-06-13 20:05。
+- 运行态：稳定性门槛仍为 `0/5`，因为 2026-06-13 20:05 的首个新版 `daily_full` 自然日样本尚未产生；未手工补跑。
+- Git：本次提交 `Strengthen database cycle acceptance tests`。
+
 ### 08:33:47 +08:00 - 将结构化 paper 表切换为模拟盘主数据层
 - 类型：代码 / 数据库 / 报告 / 测试 / 文档 / Git
 - 改动：数据库 schema 升级到 v2，为 `paper_plans` 增加 source rank、仓位、入场、TP1、退出、PnL、last price、EMA trailing 等完整运行态字段，并从 legacy `paper_trades` 幂等迁移已有状态。

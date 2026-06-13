@@ -5,11 +5,15 @@ from pathlib import Path
 import sqlite3
 import sys
 import tempfile
+import threading
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system.database import connect_db, database_status, tracked_run
+from crypto_trading_system import database as database_module
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.models import PaperTrade, ScanResult
 from crypto_trading_system.paper_db import audit_database_stability, build_paper_db_summary, export_paper_db
@@ -27,6 +31,7 @@ from crypto_trading_system.paper_trader import (
 )
 from crypto_trading_system.research_tools import generate_observation_dashboard
 from crypto_trading_system.storage import init_db, save_scan_result
+import main as main_module
 
 
 def _temp_db() -> Path:
@@ -181,6 +186,57 @@ def test_wal_allows_reader_during_write_transaction() -> None:
         writer.rollback()
         writer.close()
         reader.close()
+
+
+def test_locked_write_waits_then_marks_run_failed() -> None:
+    path = _temp_db()
+    init_db(path)
+    original_timeout = database_module.BUSY_TIMEOUT_MS
+    database_module.BUSY_TIMEOUT_MS = 50
+    lock_started = threading.Event()
+
+    def hold_write_lock() -> None:
+        with connect_db(path) as blocker:
+            blocker.execute("BEGIN IMMEDIATE")
+            blocker.execute(
+                """
+                INSERT INTO runs(run_id, run_type, started_at, status, created_at)
+                VALUES ('blocker', 'manual', '2026-06-12T00:00:00Z', 'running', '2026-06-12T00:00:00Z')
+                """
+            )
+            lock_started.set()
+            time.sleep(0.5)
+
+    try:
+        with tracked_run(path, "manual") as run_id:
+            contender = connect_db(path)
+            worker = threading.Thread(target=hold_write_lock)
+            worker.start()
+            assert lock_started.wait(timeout=1)
+            started = time.monotonic()
+            try:
+                contender.execute(
+                    """
+                    INSERT INTO runs(run_id, run_type, started_at, status, created_at)
+                    VALUES ('contended', 'manual', '2026-06-12T00:00:00Z', 'running', '2026-06-12T00:00:00Z')
+                    """
+                )
+            except sqlite3.OperationalError as exc:
+                assert "locked" in str(exc).lower()
+                assert time.monotonic() - started >= 0.04
+                raise
+            finally:
+                contender.close()
+                worker.join(timeout=1)
+    except sqlite3.OperationalError:
+        pass
+    finally:
+        database_module.BUSY_TIMEOUT_MS = original_timeout
+
+    with connect_db(path) as connection:
+        row = connection.execute("SELECT status, error_message FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+    assert row["status"] == "failed", dict(row)
+    assert "database is locked" in row["error_message"].lower()
 
 
 class _FakeBinanceClient:
@@ -603,12 +659,52 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert "add-from-scan" not in text
 
 
+def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+
+    settings = _settings_for(path)
+    output_root = path.parent / "reports"
+    settings.output.reports_dir = output_root
+    settings.output.obsidian_dir = path.parent / "obsidian"
+    original_client = paper_trader_module.BinanceClient
+    paper_trader_module.BinanceClient = _FakeBinanceClient
+    try:
+        run_id, updated, report_paths, dashboard_paths = main_module._run_paper_cycle(
+            settings,
+            account_name="demo",
+            run_type="paper_4h_update",
+            no_obsidian=True,
+            settings_path=ROOT / "config" / "settings.toml",
+        )
+    finally:
+        paper_trader_module.BinanceClient = original_client
+
+    assert len(updated) == 1
+    assert settings.output.obsidian_dir == path.parent / "obsidian"
+    assert report_paths[0].name.startswith("paper_4h_update_")
+    assert dashboard_paths[0].name.startswith("paper_4h_dashboard_")
+    with connect_db(path) as connection:
+        run = connection.execute("SELECT run_type, status FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+        assert tuple(run) == ("paper_4h_update", "success")
+        assert connection.execute("SELECT COUNT(*) FROM market_scans").fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM paper_plans").fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id = ?", (run_id,)).fetchone()[0] == 1
+        assert connection.execute("SELECT status FROM paper_plans WHERE plan_id='plan1'").fetchone()[0] == "ENTERED"
+
+
 if __name__ == "__main__":
     test_database_init_is_idempotent_and_configured()
     test_tracked_run_records_success_and_failure()
     test_state_transition_and_stop_are_monotonic()
     test_summary_and_export_use_structured_tables()
     test_wal_allows_reader_during_write_transaction()
+    test_locked_write_waits_then_marks_run_failed()
     test_paper_update_writes_event_plan_and_snapshot_atomically()
     test_scan_and_plan_inherit_run_metadata()
     test_schema_v2_backfills_operational_plan_fields()
@@ -621,4 +717,5 @@ if __name__ == "__main__":
     test_stability_audit_requires_five_complete_consecutive_days()
     test_stability_audit_rejects_missing_snapshot()
     test_4h_batch_never_scans_or_creates_plans()
+    test_4h_cycle_updates_existing_plans_without_scanning_or_creating()
     print("test_database=passed")

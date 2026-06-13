@@ -434,6 +434,37 @@ def _run_scan_and_write(settings, include_obsidian: bool, progress=None, run_id:
     return result, report_paths
 
 
+def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_obsidian: bool, settings_path: Path):
+    init_db(settings.output.database_path)
+    with tracked_run(
+        settings.output.database_path,
+        run_type,
+        settings_path=settings_path,
+        project_root=PROJECT_ROOT,
+        log_path=PROJECT_ROOT / "logs" / "paper_4h_update.log",
+    ) as run_id:
+        updated = update_paper_trades(settings, account_name=account_name, run_id=run_id)
+        _, report_paths = generate_paper_report(
+            settings,
+            account_name=account_name,
+            run_id=run_id,
+            run_type=run_type,
+        )
+        original_obsidian = settings.output.obsidian_dir
+        try:
+            if no_obsidian:
+                settings.output.obsidian_dir = None
+            _, dashboard_paths = generate_observation_dashboard(
+                settings,
+                account_name=account_name,
+                run_id=run_id,
+                run_type=run_type,
+            )
+        finally:
+            settings.output.obsidian_dir = original_obsidian
+    return run_id, updated, report_paths, dashboard_paths
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
@@ -938,30 +969,13 @@ def main() -> None:
                 print(f"export={path}")
 
         if args.paper_command == "cycle":
-            with tracked_run(
-                settings.output.database_path,
-                args.run_type,
+            run_id, updated, report_paths, dashboard_paths = _run_paper_cycle(
+                settings,
+                account_name=args.account,
+                run_type=args.run_type,
+                no_obsidian=args.no_obsidian,
                 settings_path=settings_path,
-                project_root=PROJECT_ROOT,
-                log_path=PROJECT_ROOT / "logs" / "paper_4h_update.log",
-            ) as run_id:
-                updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
-                _, report_paths = generate_paper_report(
-                    settings,
-                    account_name=args.account,
-                    run_id=run_id,
-                    run_type=args.run_type,
-                )
-                original_obsidian = settings.output.obsidian_dir
-                if args.no_obsidian:
-                    settings.output.obsidian_dir = None
-                _, dashboard_paths = generate_observation_dashboard(
-                    settings,
-                    account_name=args.account,
-                    run_id=run_id,
-                    run_type=args.run_type,
-                )
-                settings.output.obsidian_dir = original_obsidian
+            )
             print(f"run_id={run_id}")
             print(f"updated={len(updated)}")
             for path in report_paths:
