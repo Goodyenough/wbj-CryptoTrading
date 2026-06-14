@@ -762,6 +762,7 @@ def test_stability_audit_rejects_missing_snapshot() -> None:
 def test_4h_batch_never_scans_or_creates_plans() -> None:
     batch_text = (ROOT / "scripts" / "paper_4h_update.bat").read_text(encoding="utf-8").lower()
     runner_text = (ROOT / "scripts" / "run_logged_paper_task.ps1").read_text(encoding="utf-8").lower()
+    installer_text = (ROOT / "scripts" / "install_4h_paper_task.ps1").read_text(encoding="utf-8").lower()
     assert "run_logged_paper_task.ps1" in batch_text
     assert "-mode paper_4h" in batch_text
     assert '@("main.py", "paper", "cycle", "--run-type", "paper_4h_update"' in runner_text
@@ -773,6 +774,12 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert "$outputencoding = $utf8nobom" in runner_text
     assert '$env:pythonioencoding = "utf-8"' in runner_text
     assert "exit $exitcode" in runner_text
+    assert installer_text.index("main.py db stability") < installer_text.index("windowsidentity")
+    assert installer_text.index("windowsidentity") < installer_text.index("register-scheduledtask")
+    assert 'new-scheduledtasktrigger -daily -at "20:10"' not in installer_text
+    assert installer_text.count("new-scheduledtasktrigger -daily -at") == 5
+    assert "-multipleinstances ignorenew" in installer_text
+    assert "-executiontimelimit (new-timespan -minutes 30)" in installer_text
 
 
 def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:

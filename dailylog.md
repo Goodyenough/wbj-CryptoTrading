@@ -15,6 +15,13 @@
 
 ## 2026-06-14
 
+### 20:32:00 +08:00 - 将 4h 安装稳定性门槛前移到提权检查之前
+- 类型：代码 / 运维 / 测试 / 文档 / Git
+- 改动：`install_4h_paper_task.ps1` 现在先运行只读的 `db stability --days 5`，门槛通过后才检查管理员权限；普通 PowerShell 可直接预检稳定性，`2/5` 时不会触及任务注册。
+- 安全约束：任务仍固定 00:10、04:10、08:10、12:10、16:10，不含 20:10；仍使用 30 分钟上限与 `IgnoreNew`，4h runner 仍只执行 `paper cycle`。
+- 验证：`tests/test_database.py` 与 PowerShell parser 通过；生产库 `2/5` 非管理员拒绝探针返回 exit code 1 和稳定性门槛消息，未提前进入管理员检查；执行前后 `CryptoTrading_4H_PaperUpdate` 均未注册；`git diff --check` 通过。
+- Git：计划提交 `Validate 4h task installation gate`。
+
 ### 20:19:34 +08:00 - 验收第二个新版 daily_full 真实样本
 - 类型：运行验收 / 数据库 / 报告 / 文档 / Git
 - 运行结果：Windows 任务于 20:05:01 自动触发，`LastTaskResult=0`；run `20260614_120504_da0fe713` 为 `daily_full/success`，20:06:30 完成，稳定性进度从 `1/5` 变为 `2/5`。

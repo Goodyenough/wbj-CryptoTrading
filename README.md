@@ -85,6 +85,8 @@ python main.py db stability --days 5
 powershell -ExecutionPolicy Bypass -File scripts\install_4h_paper_task.ps1
 ```
 
+安装脚本会先以普通权限运行只读的 5 天稳定性门槛；未达到 `5/5` 时直接拒绝安装。门槛通过后如当前 PowerShell 未提权，脚本才会提示使用管理员 PowerShell 重新运行。
+
 导入最新候选时，系统会自动归档同币种的旧 `WATCHING` 计划。已经入场的 `ENTERED` / `TP1_HIT` 持仓不会被替换。
 
 只想盘中更新已有模拟仓位：

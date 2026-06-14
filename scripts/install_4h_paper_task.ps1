@@ -17,14 +17,6 @@ if (-not (Test-Path -LiteralPath $pythonPath)) {
     throw "Cannot find configured Python interpreter: $pythonPath"
 }
 
-$currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
-$principalCheck = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
-$isAdmin = $principalCheck.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-if (-not $isAdmin) {
-    throw "Please run this script from an elevated PowerShell session."
-}
-
 Push-Location $projectRoot
 try {
     & $pythonPath main.py db stability --days $RequiredStableDays
@@ -34,6 +26,14 @@ try {
 }
 finally {
     Pop-Location
+}
+
+$currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principalCheck = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
+$isAdmin = $principalCheck.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $isAdmin) {
+    throw "Stability gate passed. Please rerun this script from an elevated PowerShell session."
 }
 
 $action = New-ScheduledTaskAction `
