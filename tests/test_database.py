@@ -822,6 +822,74 @@ def test_stability_audit_reports_partial_date_gap() -> None:
     assert audit["ready_for_4h_task"] is False
 
 
+def test_stability_audit_rejects_two_success_runs_on_same_day() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    log_path = path.parent / "daily.log"
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO runs(
+                run_id, run_type, started_at, finished_at, status, config_hash,
+                git_commit, log_path, created_at
+            ) VALUES (
+                'daily_duplicate', 'daily_full', '2026-06-17T11:00:00Z',
+                '2026-06-17T11:01:00Z', 'success', 'config123', ?, ?,
+                '2026-06-17T11:00:00Z'
+            )
+            """,
+            ("b" * 40, str(log_path)),
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["duplicate_daily_run_dates"] == [
+        {
+            "date_beijing": "2026-06-17",
+            "run_count": 2,
+            "runs": [
+                {"run_id": "daily_duplicate", "status": "success"},
+                {"run_id": "daily_4", "status": "success"},
+            ],
+        }
+    ]
+
+
+def test_stability_audit_rejects_failed_then_success_rerun() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    log_path = path.parent / "daily.log"
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO runs(
+                run_id, run_type, started_at, finished_at, status, config_hash,
+                git_commit, log_path, error_message, created_at
+            ) VALUES (
+                'daily_failed', 'daily_full', '2026-06-17T11:00:00Z',
+                '2026-06-17T11:01:00Z', 'failed', 'config123', ?, ?,
+                'RuntimeError: expected', '2026-06-17T11:00:00Z'
+            )
+            """,
+            ("b" * 40, str(log_path)),
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["duplicate_daily_run_dates"] == [
+        {
+            "date_beijing": "2026-06-17",
+            "run_count": 2,
+            "runs": [
+                {"run_id": "daily_failed", "status": "failed"},
+                {"run_id": "daily_4", "status": "success"},
+            ],
+        }
+    ]
+
+
 def test_stability_audit_rejects_missing_snapshot() -> None:
     root = Path(tempfile.mkdtemp())
     path = root / "paper.db"
@@ -1133,6 +1201,8 @@ if __name__ == "__main__":
     test_stability_audit_requires_five_complete_consecutive_days()
     test_stability_audit_reports_partial_consecutive_progress()
     test_stability_audit_reports_partial_date_gap()
+    test_stability_audit_rejects_two_success_runs_on_same_day()
+    test_stability_audit_rejects_failed_then_success_rerun()
     test_stability_audit_rejects_missing_snapshot()
     test_stability_audit_rejects_incomplete_success_run()
     test_stability_audit_rejects_reversed_run_time()

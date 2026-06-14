@@ -93,6 +93,8 @@ python main.py db stability --days 5
 
 每个 success run 还必须具备有效 `finished_at`、40 位 Git commit、实际存在的日志文件，且完成时间不得早于开始时间。异常会进入 `run_metadata_errors`，不能只靠 status 标签通过验收。
 
+同一个北京时间自然日只能有一条 `daily_full`。`duplicate_daily_run_dates` 会列出同日的全部 run ID 和状态；无论是双 success，还是失败后同日补跑成功，都不能作为干净的连续观察样本放行。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

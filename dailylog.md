@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 22:21:00 +08:00 - 将同日重复 daily_full 接入稳定性门槛
+- 类型：代码 / 数据库 / 运维 / 测试 / 文档 / Git
+- 改动：新增 `duplicate_daily_run_dates`，按北京时间自然日列出全部 daily_full run ID/status；同日超过一条即拒绝 4h 安装，不再静默只取最新 run。
+- 原因：同日双 success 或失败后补跑会污染“一日一次”的前向观察样本，不能因最后一次成功而被遮蔽。
+- 测试：新增同日双 success、同日 failed 后 success 两个拒绝案例；生产库当前 2026-06-13、14 均恰好一条 success。
+- 验证：`tests/test_database.py`、`compileall` 与 `git diff --check` 通过；生产输出 `duplicate_daily_run_dates=[]`，两天逐 run 及全局审计继续通过；安装拒绝探针仍为非零且 4h 任务不存在。
+- Git：计划提交 `Reject duplicate daily observation runs`。
+
 ### 22:08:00 +08:00 - 将 run 生命周期与日志元数据接入稳定性门槛
 - 类型：代码 / 数据库 / 日志 / 测试 / 文档 / Git
 - 改动：每个 success daily run 新增 `run_metadata_errors` 审计，要求 `finished_at` 存在且不早于 started_at、Git commit 为 40 位十六进制、log_path 非空且文件存在、success 不携带 error_message。

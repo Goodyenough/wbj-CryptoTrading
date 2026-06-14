@@ -52,11 +52,24 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         foreign_key_errors = [dict(row) for row in connection.execute("PRAGMA foreign_key_check").fetchall()]
         utc_timestamp_errors = audit_utc_timestamps(connection)
 
-        daily_by_date: dict[str, dict] = {}
+        daily_runs_by_date: dict[str, list[dict]] = {}
         for run in runs:
             started = datetime.fromisoformat(str(run["started_at"]).replace("Z", "+00:00"))
             date_text = started.astimezone(beijing).strftime("%Y-%m-%d")
-            daily_by_date.setdefault(date_text, run)
+            daily_runs_by_date.setdefault(date_text, []).append(run)
+        duplicate_daily_run_dates = [
+            {
+                "date_beijing": date_text,
+                "run_count": len(date_runs),
+                "runs": [
+                    {"run_id": str(run["run_id"]), "status": str(run["status"])}
+                    for run in sorted(date_runs, key=lambda item: item["started_at"])
+                ],
+            }
+            for date_text, date_runs in sorted(daily_runs_by_date.items())
+            if len(date_runs) > 1
+        ]
+        daily_by_date = {date_text: date_runs[0] for date_text, date_runs in daily_runs_by_date.items()}
         selected_dates = sorted(daily_by_date, reverse=True)[:required_days]
         selected = [daily_by_date[date_text] for date_text in selected_dates]
         selected_config_hashes = sorted(
@@ -254,6 +267,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         and not foreign_key_errors
         and not utc_timestamp_errors
         and not config_hash_errors
+        and not duplicate_daily_run_dates
     )
     return {
         "required_days": required_days,
@@ -268,6 +282,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         "utc_timestamp_errors": utc_timestamp_errors,
         "observed_config_hashes": selected_config_hashes,
         "config_hash_errors": config_hash_errors,
+        "duplicate_daily_run_dates": duplicate_daily_run_dates,
         "ready_for_4h_task": ready,
     }
 
