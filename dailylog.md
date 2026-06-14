@@ -15,6 +15,18 @@
 
 ## 2026-06-14
 
+### 22:45:00 +08:00 - 实验：条件 42-bar 时间退出（max_holding_42x4h_conditional）
+- 类型：代码 / 实验 / 报告 / 测试 / Git
+- 改动：新增 `max_holding_bars_conditional` bool 字段（`config.py`、`settings.toml`）；在 `replay.py` 将 42-bar TIME_EXIT 改为条件触发：仅当 `close < EMA20` 或 `close < entry_price` 时才强制退出，否则继续持仓。EMA20 计算复用 `tp1_ema_trailing_stop` 已有路径，零额外开销。`abtest.py` 新增 `holding_time_conditional` 和 `combined_regime_entry_exit_sensitivity_holding_conditional` 两个维度；`experiments.toml` 新增两个实验。测试：新增 `test_conditional_holding_time_override_sets_both_fields`（abtest）、`test_conditional_time_exit_does_not_fire_when_above_entry_and_ema`、`test_conditional_time_exit_fires_when_below_entry`（replay）；全套 10 个测试脚本通过。
+- 动机：TIME_EXIT 复盘发现 95 单中 47 单两者均未触及，60/95 在 42-bar 强退后 7 日继续上涨（ORDIUSDT +52.9%、PEPEUSDT +40.6%）；固定退出切掉了延迟启动的赢家，条件退出保留真正停滞/反转的单子。
+- walk-forward 结果（两时段均充足样本，418 个 symbol 动态 universe）：
+  - 2024-07-01→2025-06-01：Net 2.4%→**27.6%**，PF 1.04→**1.38**，Sharpe 0.23→**1.21**，MDD 18.0%→21.0%（微升），Stop rate 84%→54%
+  - 2025-06-01→2026-06-01：Net 3.1%→**30.8%**，PF 1.11→**1.64**，Sharpe 0.26→**1.42**，MDD 20.7%→**12.4%**（改善），Stop rate 86%→47%
+  - Sensitive combo 叠加版结果完全相同（settings.toml 默认值已是 production sensitive combo，两个实验的 baseline 一致）。
+- 结论：两时段净收益均改善 +25~28pp，PF 和 Sharpe 双升，最近时段 MDD 也改善；自动 verdict=retest（系统规则，不自动写 keep）。下一步需增加第三时段或更早时间段复测，并在通过 3 周 paper 观察后评估是否部署。
+- 验证：5 个源文件 + 2 个测试文件，全套测试退出码 0；`git diff --check` 通过；settings.toml 改动仅为默认值 false，不影响生产 config_hash。
+- Git：提交 `Add conditional 42-bar time exit experiment`（b665076）。
+
 ### 22:50:00 +08:00 - 验证快速连续 4h cycle 的幂等性与无锁运行
 - 类型：测试 / 文档 / Git
 - 改动：将 4h cycle 集成测试扩展为快速连续执行两轮，校验两个独立 `paper_4h_update` run 均成功、每轮各有 snapshot，且 scan/plan 数量不增加、`ENTERED` 事件不重复。
