@@ -507,7 +507,7 @@ def run_backtest_replay(
             tp2_fill = target_exit_fill(item.paper.take_profit_2, qty, settings.backtest)
             ema20_4h_current: float | None = None
             ema20_4h_current_ready = False
-            if settings.analysis.tp1_ema_trailing_stop_enabled:
+            if settings.analysis.tp1_ema_trailing_stop_enabled or settings.backtest.max_holding_bars_conditional:
                 k4h_closed = _closed_slice(klines_by_symbol[item.paper.symbol]["4h"], "4h", bar_close_ms)
                 closes_4h = [float(k[4]) for k in k4h_closed]
                 if len(closes_4h) >= 20:
@@ -546,16 +546,27 @@ def run_backtest_replay(
                 and holding_bars >= max_holding_bars
                 and item.paper.quantity
             ):
-                time_fill = stop_exit_fill(float(bar[4]), item.paper.quantity, settings.backtest)
-                _force_time_exit(
-                    item,
-                    fill_price=time_fill.filled_price,
-                    fill_fee=time_fill.fee,
-                    slippage_cost=time_fill.slippage_cost,
-                    raw_price=time_fill.raw_price,
-                    bar_time=bar_time,
-                )
-                cash += item.paper.quantity * time_fill.filled_price - time_fill.fee
+                bar_close = float(bar[4])
+                if settings.backtest.max_holding_bars_conditional:
+                    # Conditional mode: only exit if close < EMA20 or close < entry price.
+                    # Signals the trade is stalling/reversing rather than just running long.
+                    entry_px = item.paper.entry_price or bar_close
+                    below_entry = bar_close < entry_px
+                    below_ema = ema20_4h_current_ready and bar_close < ema20_4h_current
+                    trigger_exit = below_entry or below_ema
+                else:
+                    trigger_exit = True
+                if trigger_exit:
+                    time_fill = stop_exit_fill(bar_close, item.paper.quantity, settings.backtest)
+                    _force_time_exit(
+                        item,
+                        fill_price=time_fill.filled_price,
+                        fill_fee=time_fill.fee,
+                        slippage_cost=time_fill.slippage_cost,
+                        raw_price=time_fill.raw_price,
+                        bar_time=bar_time,
+                    )
+                    cash += item.paper.quantity * time_fill.filled_price - time_fill.fee
             _sync_record(item)
 
         watching = [

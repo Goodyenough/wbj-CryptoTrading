@@ -148,6 +148,21 @@ def test_holding_time_override_can_force_timeout_exit() -> None:
     ]
 
 
+def test_conditional_holding_time_override_sets_both_fields() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    assert settings.backtest.max_holding_bars_without_tp1 == 0
+    assert settings.backtest.max_holding_bars_conditional is False
+    definition = load_experiment("max_holding_42x4h_conditional", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.backtest.max_holding_bars_without_tp1 == 0
+    assert settings.backtest.max_holding_bars_conditional is False
+    assert variant.backtest.max_holding_bars_without_tp1 == 42
+    assert variant.backtest.max_holding_bars_conditional is True
+    change_paths = {(c.path, c.old_value, c.new_value) for c in changes}
+    assert ("backtest.max_holding_bars_without_tp1", 0, 42) in change_paths
+    assert ("backtest.max_holding_bars_conditional", False, True) in change_paths
+
+
 def test_override_paths_are_dimension_scoped() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")

@@ -199,3 +199,29 @@ dimension = "large_cap_regime"
 [large_cap_only_risk_off.overrides.analysis]
 risk_off_core_buy_enabled = false
 risk_off_large_cap_buy_enabled = true
+
+[max_holding_42x4h_conditional]
+enabled = true
+description = "After 42 closed 4h bars without TP1, exit only if close < EMA20 or close < entry price. Preserves stalling-trade stops while keeping delayed-start winners."
+dimension = "holding_time_conditional"
+
+[max_holding_42x4h_conditional.overrides.backtest]
+max_holding_bars_without_tp1 = 42
+max_holding_bars_conditional = true
+
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42_conditional]
+enabled = true
+description = "Sensitive combo plus conditional 42-bar exit: only force-close when close < EMA20 or close < entry price after 42 bars without TP1."
+dimension = "combined_regime_entry_exit_sensitivity_holding_conditional"
+
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42_conditional.overrides.analysis]
+risk_off_core_buy_enabled = false
+entry_reclaim_close_enabled = true
+tp1_ema_trailing_stop_enabled = true
+regime_btc_7d_drop_pct = -3.0
+regime_eth_7d_drop_pct = -5.0
+regime_require_both_trend = true
+
+[risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42_conditional.overrides.backtest]
+max_holding_bars_without_tp1 = 42
+max_holding_bars_conditional = true

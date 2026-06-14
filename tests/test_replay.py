@@ -172,6 +172,89 @@ def test_force_time_exit_marks_closed_trade() -> None:
     assert record.events[-1]["event_type"] == "TIME_EXIT"
 
 
+def _make_sim_trade(entry_price: float = 105.0, stop_loss: float = 90.0) -> "_SimTrade":
+    from crypto_trading_system.models import PaperTrade
+    paper = PaperTrade(
+        plan_id="test",
+        source_scan_id="scan",
+        source_rank=1,
+        symbol="TESTUSDT",
+        base_asset="TEST",
+        status="ENTERED",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        updated_at_utc="2026-01-01T04:00:00+00:00",
+        setup="test",
+        verdict="test",
+        entry_low=100,
+        entry_high=105,
+        planned_entry_mid=102.5,
+        stop_loss=stop_loss,
+        take_profit_1=120,
+        take_profit_2=135,
+        risk_reward_1=2,
+        risk_reward_2=3,
+        account_equity=10_000,
+        risk_per_trade_pct=0.01,
+        cash_risk=100,
+        quantity=10,
+        entry_price=entry_price,
+    )
+    record = BacktestTrade(
+        trade_id="test2",
+        symbol="TESTUSDT",
+        status="ENTERED",
+        created_at_utc="2026-01-01T00:00:00+00:00",
+        updated_at_utc="2026-01-01T04:00:00+00:00",
+        score=80,
+        action="BUY_CANDIDATE",
+        setup="test",
+        verdict="test",
+        entry_low=100,
+        entry_high=105,
+        stop_loss=stop_loss,
+        take_profit_1=120,
+        take_profit_2=135,
+        entry_fee=1,
+    )
+    return _SimTrade(paper=paper, record=record, active_from_ms=0, created_index=0, score=80, initial_cash_risk=100)
+
+
+def test_conditional_time_exit_does_not_fire_when_above_entry_and_ema() -> None:
+    # close > entry_price and close > EMA20 — conditional mode should NOT exit
+    item = _make_sim_trade(entry_price=100.0)
+    ema20 = 108.0
+    bar_close = 110.0  # above both entry and EMA20
+    entry_px = item.paper.entry_price or bar_close
+    below_entry = bar_close < entry_px
+    below_ema = bar_close < ema20
+    trigger_exit = below_entry or below_ema
+    assert not trigger_exit
+    # Ensure status is untouched (no _force_time_exit called)
+    assert item.paper.status == "ENTERED"
+
+
+def test_conditional_time_exit_fires_when_below_entry() -> None:
+    # close < entry_price — conditional mode should exit
+    item = _make_sim_trade(entry_price=115.0)
+    ema20 = 120.0
+    bar_close = 110.0  # below entry_price
+    entry_px = item.paper.entry_price or bar_close
+    below_entry = bar_close < entry_px
+    below_ema = bar_close < ema20
+    trigger_exit = below_entry or below_ema
+    assert trigger_exit
+    _force_time_exit(
+        item,
+        fill_price=bar_close,
+        fill_fee=0.5,
+        slippage_cost=0.1,
+        raw_price=bar_close,
+        bar_time="2026-01-03T00:00:00+00:00",
+    )
+    assert item.paper.status == "TIME_EXIT"
+    assert item.paper.events[-1]["event_type"] == "TIME_EXIT"
+
+
 def test_dynamic_universe_requires_btc_timeline() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     master = SymbolMaster(

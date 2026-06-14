@@ -74,6 +74,7 @@ class BacktestSettings:
     allow_leverage: bool
     watch_expiry_bars: int
     max_holding_bars_without_tp1: int
+    max_holding_bars_conditional: bool
     warmup_1h_bars: int
     warmup_4h_bars: int
     warmup_1d_bars: int
@@ -195,6 +196,7 @@ def load_settings(path: Path) -> Settings:
             allow_leverage=bool(backtest.get("allow_leverage", False)),
             watch_expiry_bars=int(backtest.get("watch_expiry_bars", 18)),
             max_holding_bars_without_tp1=int(backtest.get("max_holding_bars_without_tp1", 0)),
+            max_holding_bars_conditional=bool(backtest.get("max_holding_bars_conditional", False)),
             warmup_1h_bars=int(backtest.get("warmup_1h_bars", 200)),
             warmup_4h_bars=int(backtest.get("warmup_4h_bars", 100)),
             warmup_1d_bars=int(backtest.get("warmup_1d_bars", 80)),
