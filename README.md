@@ -79,6 +79,8 @@ Windows daily 与 4h 批处理统一通过 `scripts/run_logged_paper_task.ps1` �
 python main.py db stability --days 5
 ```
 
+输出中的 `consecutive_days` 表示当前已观察日期本身是否连续，`required_window_complete` 表示是否已经收满要求的天数；只有两者都为 true 且每个 run 检查通过，`ready_for_4h_task` 才会为 true。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

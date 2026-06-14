@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 20:52:00 +08:00 - 拆分稳定性日期连续性与窗口完整性
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：`db stability` 的 `consecutive_days` 现在真实反映当前已观察日期是否连续；新增 `required_window_complete` 表示是否已收满要求天数，避免 `2/5` 连续日期被显示为不连续。
+- 门槛：`ready_for_4h_task` 仍要求窗口完整、日期连续、每个 run ready、无重复 plan/event 且无外键错误，不降低安装标准。
+- 测试：新增 2 天连续进度和 2 天日期断档测试，并补充完整 5 天字段断言。
+- 验证：`tests/test_database.py`、`compileall` 与 `git diff --check` 通过；生产审计输出 `observed_day_count=2`、`consecutive_days=true`、`required_window_complete=false`、`ready_for_4h_task=false`；安装拒绝探针继续通过且未注册 4h 任务。
+- Git：计划提交 `Clarify database stability progress`。
+
 ### 20:43:00 +08:00 - 禁止 4h 任务错过触发后延迟补跑
 - 类型：代码 / 运维 / 测试 / 文档 / Git
 - 改动：从 `CryptoTrading_4H_PaperUpdate` 设置中移除 `StartWhenAvailable`；电脑休眠或关机期间错过的 4h 时点不再于恢复后补跑，而是等待下一个固定时点。

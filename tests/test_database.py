@@ -744,7 +744,37 @@ def test_stability_audit_requires_five_complete_consecutive_days() -> None:
     audit = audit_database_stability(path, reports_dir, required_days=5)
     assert audit["ready_for_4h_task"] is True
     assert audit["observed_day_count"] == 5
+    assert audit["consecutive_days"] is True
+    assert audit["required_window_complete"] is True
     assert all(item["ready"] for item in audit["run_checks"])
+
+
+def test_stability_audit_reports_partial_consecutive_progress() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir, day_count=2)
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["observed_day_count"] == 2
+    assert audit["consecutive_days"] is True
+    assert audit["required_window_complete"] is False
+    assert audit["ready_for_4h_task"] is False
+
+
+def test_stability_audit_reports_partial_date_gap() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir, day_count=2)
+    with connect_db(path) as connection:
+        connection.execute(
+            "UPDATE runs SET started_at='2026-06-15T12:05:00Z' WHERE run_id='daily_1'"
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["observed_daily_dates"] == ["2026-06-13", "2026-06-15"]
+    assert audit["consecutive_days"] is False
+    assert audit["required_window_complete"] is False
+    assert audit["ready_for_4h_task"] is False
 
 
 def test_stability_audit_rejects_missing_snapshot() -> None:
@@ -841,6 +871,8 @@ if __name__ == "__main__":
     test_report_contains_current_run_events_and_api_delay_count()
     test_structured_tables_remain_operational_without_legacy_rows()
     test_stability_audit_requires_five_complete_consecutive_days()
+    test_stability_audit_reports_partial_consecutive_progress()
+    test_stability_audit_reports_partial_date_gap()
     test_stability_audit_rejects_missing_snapshot()
     test_4h_batch_never_scans_or_creates_plans()
     test_4h_cycle_updates_existing_plans_without_scanning_or_creating()

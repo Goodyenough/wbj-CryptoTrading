@@ -105,12 +105,13 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                 }
             )
 
-    consecutive = False
-    if len(selected_dates) == required_days:
+    required_window_complete = len(selected_dates) == required_days
+    consecutive = bool(selected_dates)
+    if len(selected_dates) > 1:
         date_values = [datetime.strptime(value, "%Y-%m-%d").date() for value in sorted(selected_dates)]
         consecutive = all((right - left).days == 1 for left, right in zip(date_values, date_values[1:]))
     ready = (
-        len(selected_dates) == required_days
+        required_window_complete
         and consecutive
         and all(item["ready"] for item in run_checks)
         and duplicate_plans == 0
@@ -122,6 +123,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         "observed_daily_dates": sorted(selected_dates),
         "observed_day_count": len(selected_dates),
         "consecutive_days": consecutive,
+        "required_window_complete": required_window_complete,
         "run_checks": run_checks,
         "duplicate_plan_groups": duplicate_plans,
         "duplicate_event_groups": duplicate_events,
