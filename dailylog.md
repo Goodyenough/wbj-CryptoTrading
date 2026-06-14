@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 22:50:00 +08:00 - 验证快速连续 4h cycle 的幂等性与无锁运行
+- 类型：测试 / 文档 / Git
+- 改动：将 4h cycle 集成测试扩展为快速连续执行两轮，校验两个独立 `paper_4h_update` run 均成功、每轮各有 snapshot，且 scan/plan 数量不增加、`ENTERED` 事件不重复。
+- 原因：开发计划第 14.3 和 14.6 要求重复 update 不重复写关键事件，快速连续执行两个 paper update 不产生 `database locked`；原测试只覆盖单轮 cycle。
+- 影响：不修改生产策略、配置、数据库或定时任务，仅增强 4h 启用前的可执行验收证据。
+- 验证：仓库 10 个带 `__main__` 的测试脚本全部退出码 0（含 database、trade_state、scanner_regime、replay、history、universe、abtest、summary、walk-forward、regime analysis）；`python -m compileall -q src main.py tests` 与 `git diff --check` 通过；生产稳定性审计仍为健康的 2/5，自然日门槛未被测试运行污染。
+- Git：计划提交 `Verify consecutive 4h paper cycles`。
+
 ### 22:36:00 +08:00 - 将数据库底层健康接入 4h 安装门槛
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：稳定性审计新增 `database_health/database_health_errors`，非修复式检查 schema v2、WAL、`synchronous=NORMAL`、foreign keys、busy timeout=30000、6 张观察表和 11 个必需索引。

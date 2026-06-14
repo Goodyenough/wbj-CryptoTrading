@@ -1189,7 +1189,7 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert "-startwhenavailable" not in installer_text
 
 
-def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:
+def test_consecutive_4h_cycles_are_idempotent_and_do_not_lock() -> None:
     path = _temp_db()
     init_db(path)
     _seed_scan_and_run(path)
@@ -1205,26 +1205,43 @@ def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:
     original_client = paper_trader_module.BinanceClient
     paper_trader_module.BinanceClient = _FakeBinanceClient
     try:
-        run_id, updated, report_paths, dashboard_paths = main_module._run_paper_cycle(
-            settings,
-            account_name="demo",
-            run_type="paper_4h_update",
-            no_obsidian=True,
-            settings_path=ROOT / "config" / "settings.toml",
-        )
+        cycles = [
+            main_module._run_paper_cycle(
+                settings,
+                account_name="demo",
+                run_type="paper_4h_update",
+                no_obsidian=True,
+                settings_path=ROOT / "config" / "settings.toml",
+            )
+            for _ in range(2)
+        ]
     finally:
         paper_trader_module.BinanceClient = original_client
 
-    assert len(updated) == 1
+    run_ids = [cycle[0] for cycle in cycles]
+    assert len(set(run_ids)) == 2
+    assert all(len(cycle[1]) == 1 for cycle in cycles)
     assert settings.output.obsidian_dir == path.parent / "obsidian"
-    assert report_paths[0].name.startswith("paper_4h_update_")
-    assert dashboard_paths[0].name.startswith("paper_4h_dashboard_")
+    assert all(cycle[2][0].name.startswith("paper_4h_update_") for cycle in cycles)
+    assert all(cycle[3][0].name.startswith("paper_4h_dashboard_") for cycle in cycles)
     with connect_db(path) as connection:
-        run = connection.execute("SELECT run_type, status FROM runs WHERE run_id = ?", (run_id,)).fetchone()
-        assert tuple(run) == ("paper_4h_update", "success")
+        runs = connection.execute(
+            "SELECT run_type, status FROM runs WHERE run_id IN (?, ?) ORDER BY started_at, run_id",
+            run_ids,
+        ).fetchall()
+        assert [tuple(run) for run in runs] == [
+            ("paper_4h_update", "success"),
+            ("paper_4h_update", "success"),
+        ]
         assert connection.execute("SELECT COUNT(*) FROM market_scans").fetchone()[0] == 1
         assert connection.execute("SELECT COUNT(*) FROM paper_plans").fetchone()[0] == 1
-        assert connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id = ?", (run_id,)).fetchone()[0] == 1
+        assert connection.execute(
+            "SELECT COUNT(*) FROM paper_snapshots WHERE run_id IN (?, ?)",
+            run_ids,
+        ).fetchone()[0] == 2
+        assert connection.execute(
+            "SELECT COUNT(*) FROM paper_events WHERE plan_id='plan1' AND event_type='ENTERED'"
+        ).fetchone()[0] == 1
         assert connection.execute("SELECT status FROM paper_plans WHERE plan_id='plan1'").fetchone()[0] == "ENTERED"
 
 
@@ -1268,5 +1285,5 @@ if __name__ == "__main__":
     test_stability_audit_rejects_partial_snapshot_coverage()
     test_stability_audit_rejects_non_utc_observation_timestamp()
     test_4h_batch_never_scans_or_creates_plans()
-    test_4h_cycle_updates_existing_plans_without_scanning_or_creating()
+    test_consecutive_4h_cycles_are_idempotent_and_do_not_lock()
     print("test_database=passed")
