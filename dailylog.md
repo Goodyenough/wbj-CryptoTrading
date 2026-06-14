@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 21:31:00 +08:00 - 将 scan 汇总与候选明细一致性接入稳定性门槛
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：每个 daily run 新增 `scan_integrity_errors`，核对 `candidate_count`、`buy_candidate_count`、`watch_only_count` 与 `scan_candidates` 实际行数/action 分组是否一致。
+- 门槛：即使存在一条 market scan，只要候选明细缺失或 action 汇总漂移，该 run 也不能 ready，防止三周复盘使用不完整选币样本。
+- 测试：稳定性种子现在写入真实 candidate 明细；新增候选总数不一致和 BUY_CANDIDATE 计数不一致两个拒绝案例。
+- 验证：`tests/test_database.py`、`compileall` 与 `git diff --check` 通过；生产两个 run 均为 `scan_integrity_errors=[]`、5 行候选明细与汇总一致，snapshot 仍为 4/4；安装拒绝探针继续通过且 4h 任务不存在。
+- Git：计划提交 `Validate scan candidate integrity`。
+
 ### 21:18:00 +08:00 - 将 snapshot 完整覆盖接入 5 天稳定性门槛
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：稳定性审计不再只检查 `snapshot_count > 0`，而是按 run 时间范围计算所有应由 paper update 处理的活动计划，输出 `expected_snapshot_count` 与 `missing_snapshot_plan_ids`。

@@ -740,6 +740,15 @@ def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> N
             )
             connection.execute(
                 """
+                INSERT INTO scan_candidates(
+                    scan_id, rank, symbol, base_asset, verdict, score, payload_json,
+                    action, created_at
+                ) VALUES (?, 1, 'TESTUSDT', 'TEST', 'test', 1, '{}', NULL, ?)
+                """,
+                (scan_id, timestamp),
+            )
+            connection.execute(
+                """
                 INSERT INTO paper_snapshots(
                     snapshot_id, run_id, snapshot_time, plan_id, symbol, status, created_at
                 ) VALUES (?, ?, ?, 'plan1', 'TESTUSDT', 'WATCHING', ?)
@@ -767,6 +776,7 @@ def test_stability_audit_requires_five_complete_consecutive_days() -> None:
     assert audit["consecutive_days"] is True
     assert audit["required_window_complete"] is True
     assert all(item["ready"] for item in audit["run_checks"])
+    assert all(item["scan_integrity_errors"] == [] for item in audit["run_checks"])
     assert all(item["expected_snapshot_count"] == 1 for item in audit["run_checks"])
     assert all(item["missing_snapshot_plan_ids"] == [] for item in audit["run_checks"])
 
@@ -811,6 +821,48 @@ def test_stability_audit_rejects_missing_snapshot() -> None:
     assert audit["run_checks"][-1]["snapshot_count"] == 0
     assert audit["run_checks"][-1]["expected_snapshot_count"] == 1
     assert audit["run_checks"][-1]["missing_snapshot_plan_ids"] == ["plan1"]
+
+
+def test_stability_audit_rejects_scan_candidate_count_mismatch() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute(
+            "UPDATE market_scans SET candidate_count=2 WHERE scan_id='daily_scan_4'"
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["scan_integrity_errors"] == [
+        {
+            "scan_id": "daily_scan_4",
+            "field": "candidate_count",
+            "declared": 2,
+            "observed": 1,
+        }
+    ]
+
+
+def test_stability_audit_rejects_scan_action_count_mismatch() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute(
+            "UPDATE market_scans SET buy_candidate_count=1 WHERE scan_id='daily_scan_4'"
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["scan_integrity_errors"] == [
+        {
+            "scan_id": "daily_scan_4",
+            "field": "buy_candidate_count",
+            "declared": 1,
+            "observed": 0,
+        }
+    ]
 
 
 def test_stability_audit_rejects_partial_snapshot_coverage() -> None:
@@ -937,6 +989,8 @@ if __name__ == "__main__":
     test_stability_audit_reports_partial_consecutive_progress()
     test_stability_audit_reports_partial_date_gap()
     test_stability_audit_rejects_missing_snapshot()
+    test_stability_audit_rejects_scan_candidate_count_mismatch()
+    test_stability_audit_rejects_scan_action_count_mismatch()
     test_stability_audit_rejects_partial_snapshot_coverage()
     test_stability_audit_rejects_non_utc_observation_timestamp()
     test_4h_batch_never_scans_or_creates_plans()

@@ -85,6 +85,8 @@ python main.py db stability --days 5
 
 每个 daily run 还会输出 `expected_snapshot_count` 与 `missing_snapshot_plan_ids`。只要当时应被 paper update 处理的任一活动计划缺少 snapshot，即使该 run 已写入其他 snapshot，也不能通过安装门槛。
 
+`scan_integrity_errors` 会核对 `market_scans` 声明的候选总数、BUY_CANDIDATE 数和 WATCH_ONLY 数是否与 `scan_candidates` 明细一致；汇总与明细发生漂移时同样拒绝启用 4h 任务。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

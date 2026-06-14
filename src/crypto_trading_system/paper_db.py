@@ -65,6 +65,36 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
             scan_count = int(
                 connection.execute("SELECT COUNT(*) FROM market_scans WHERE run_id = ?", (run_id,)).fetchone()[0]
             )
+            scan_integrity_errors: list[dict[str, object]] = []
+            scan_rows = connection.execute(
+                """
+                SELECT scan_id, candidate_count, buy_candidate_count, watch_only_count
+                FROM market_scans WHERE run_id = ?
+                """,
+                (run_id,),
+            ).fetchall()
+            for scan in scan_rows:
+                actual = connection.execute(
+                    """
+                    SELECT COUNT(*) AS candidate_count,
+                           SUM(CASE WHEN action='BUY_CANDIDATE' THEN 1 ELSE 0 END) AS buy_candidate_count,
+                           SUM(CASE WHEN action='WATCH_ONLY' THEN 1 ELSE 0 END) AS watch_only_count
+                    FROM scan_candidates WHERE scan_id = ?
+                    """,
+                    (scan["scan_id"],),
+                ).fetchone()
+                for field in ("candidate_count", "buy_candidate_count", "watch_only_count"):
+                    declared = int(scan[field] or 0)
+                    observed = int(actual[field] or 0)
+                    if declared != observed:
+                        scan_integrity_errors.append(
+                            {
+                                "scan_id": str(scan["scan_id"]),
+                                "field": field,
+                                "declared": declared,
+                                "observed": observed,
+                            }
+                        )
             snapshot_count = int(
                 connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id = ?", (run_id,)).fetchone()[0]
             )
@@ -114,6 +144,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                     "run_id": run_id,
                     "status": run["status"],
                     "scan_count": scan_count,
+                    "scan_integrity_errors": scan_integrity_errors,
                     "snapshot_count": snapshot_count,
                     "expected_snapshot_count": len(expected_snapshot_plan_ids),
                     "missing_snapshot_plan_ids": missing_snapshot_plan_ids,
@@ -124,6 +155,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                     "ready": (
                         run["status"] == "success"
                         and scan_count == 1
+                        and not scan_integrity_errors
                         and not missing_snapshot_plan_ids
                         and "database is locked" not in error_text
                         and has_scan_report
