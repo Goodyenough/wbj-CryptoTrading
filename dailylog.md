@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 21:55:00 +08:00 - 将配置口径一致性接入 5 天稳定性门槛
+- 类型：代码 / 配置 / 数据库 / 测试 / 文档 / Git
+- 改动：稳定窗口内 daily run 必须具有同一个非空 `config_hash`；新增 `observed_config_hashes/config_hash_errors`，并要求 `market_scans.config_hash` 与所属 run 一致。
+- 口径：git commit 允许因工程修复跨日变化，不作为失败；策略配置 hash 变化则表示观察条件发生改变，不能拼成同一个 5 天样本。
+- 测试：稳定性种子补齐 run/scan config hash；新增跨日配置漂移和 scan 未继承 run hash 两个拒绝案例。
+- 验证：`tests/test_database.py`、`compileall` 与 `git diff --check` 通过；生产稳定性输出唯一 `observed_config_hashes=[311322be2029f063]`、`config_hash_errors=[]`，其余 scan/snapshot/report/UTC 审计继续通过；安装拒绝探针仍未注册 4h 任务。
+- Git：计划提交 `Require stable observation config`。
+
 ### 21:43:00 +08:00 - 将报告 run 元数据完整性接入稳定性门槛
 - 类型：代码 / 报告 / 数据库 / 测试 / 文档 / Git
 - 改动：三类 daily Markdown 报告必须精确包含对应 `Run ID`、`Run type=daily_full` 与 `数据来源：SQLite`；新增 `report_metadata_errors` 定位具体报告和字段。

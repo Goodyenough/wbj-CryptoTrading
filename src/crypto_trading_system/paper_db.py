@@ -58,6 +58,19 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
             daily_by_date.setdefault(date_text, run)
         selected_dates = sorted(daily_by_date, reverse=True)[:required_days]
         selected = [daily_by_date[date_text] for date_text in selected_dates]
+        selected_config_hashes = sorted(
+            {str(run["config_hash"]) for run in selected if run.get("config_hash")}
+        )
+        config_hash_errors: list[dict[str, object]] = []
+        for run in selected:
+            if not run.get("config_hash"):
+                config_hash_errors.append(
+                    {"run_id": str(run["run_id"]), "error": "missing_run_config_hash"}
+                )
+        if len(selected_config_hashes) > 1:
+            config_hash_errors.append(
+                {"error": "config_hash_drift", "observed_hashes": selected_config_hashes}
+            )
 
         run_checks = []
         for run in sorted(selected, key=lambda item: item["started_at"]):
@@ -68,12 +81,21 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
             scan_integrity_errors: list[dict[str, object]] = []
             scan_rows = connection.execute(
                 """
-                SELECT scan_id, candidate_count, buy_candidate_count, watch_only_count
+                SELECT scan_id, candidate_count, buy_candidate_count, watch_only_count, config_hash
                 FROM market_scans WHERE run_id = ?
                 """,
                 (run_id,),
             ).fetchall()
             for scan in scan_rows:
+                if scan["config_hash"] != run["config_hash"]:
+                    scan_integrity_errors.append(
+                        {
+                            "scan_id": str(scan["scan_id"]),
+                            "field": "config_hash",
+                            "declared": scan["config_hash"],
+                            "observed": run["config_hash"],
+                        }
+                    )
                 actual = connection.execute(
                     """
                     SELECT COUNT(*) AS candidate_count,
@@ -193,6 +215,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         and duplicate_events == 0
         and not foreign_key_errors
         and not utc_timestamp_errors
+        and not config_hash_errors
     )
     return {
         "required_days": required_days,
@@ -205,6 +228,8 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         "duplicate_event_groups": duplicate_events,
         "foreign_key_errors": foreign_key_errors,
         "utc_timestamp_errors": utc_timestamp_errors,
+        "observed_config_hashes": selected_config_hashes,
+        "config_hash_errors": config_hash_errors,
         "ready_for_4h_task": ready,
     }
 

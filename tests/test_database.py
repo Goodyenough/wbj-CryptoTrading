@@ -718,8 +718,8 @@ def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> N
             timestamp = f"{date_text}T12:05:00Z"
             connection.execute(
                 """
-                INSERT INTO runs(run_id, run_type, started_at, finished_at, status, created_at)
-                VALUES (?, 'daily_full', ?, ?, 'success', ?)
+                INSERT INTO runs(run_id, run_type, started_at, finished_at, status, config_hash, created_at)
+                VALUES (?, 'daily_full', ?, ?, 'success', 'config123', ?)
                 """,
                 (run_id, timestamp, f"{date_text}T12:07:00Z", timestamp),
             )
@@ -733,8 +733,8 @@ def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> N
             )
             connection.execute(
                 """
-                INSERT INTO market_scans(scan_id, run_id, scan_time, candidate_count, created_at)
-                VALUES (?, ?, ?, 1, ?)
+                INSERT INTO market_scans(scan_id, run_id, scan_time, candidate_count, config_hash, created_at)
+                VALUES (?, ?, ?, 1, 'config123', ?)
                 """,
                 (scan_id, run_id, timestamp, timestamp),
             )
@@ -783,6 +783,8 @@ def test_stability_audit_requires_five_complete_consecutive_days() -> None:
     assert all(item["ready"] for item in audit["run_checks"])
     assert all(item["scan_integrity_errors"] == [] for item in audit["run_checks"])
     assert all(item["report_metadata_errors"] == [] for item in audit["run_checks"])
+    assert audit["observed_config_hashes"] == ["config123"]
+    assert audit["config_hash_errors"] == []
     assert all(item["expected_snapshot_count"] == 1 for item in audit["run_checks"])
     assert all(item["missing_snapshot_plan_ids"] == [] for item in audit["run_checks"])
 
@@ -888,6 +890,41 @@ def test_stability_audit_rejects_wrong_report_run_type() -> None:
             "report": "paper_report_2026-06-17_demo_v1.md",
             "field": "run_type",
             "expected": "- Run type：`daily_full`",
+        }
+    ]
+
+
+def test_stability_audit_rejects_config_hash_drift() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute("UPDATE runs SET config_hash='config456' WHERE run_id='daily_4'")
+        connection.execute("UPDATE market_scans SET config_hash='config456' WHERE run_id='daily_4'")
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["observed_config_hashes"] == ["config123", "config456"]
+    assert audit["config_hash_errors"] == [
+        {"error": "config_hash_drift", "observed_hashes": ["config123", "config456"]}
+    ]
+
+
+def test_stability_audit_rejects_scan_config_hash_mismatch() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute("UPDATE market_scans SET config_hash='wrong' WHERE scan_id='daily_scan_4'")
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["scan_integrity_errors"] == [
+        {
+            "scan_id": "daily_scan_4",
+            "field": "config_hash",
+            "declared": "wrong",
+            "observed": "config123",
         }
     ]
 
@@ -1040,6 +1077,8 @@ if __name__ == "__main__":
     test_stability_audit_rejects_scan_candidate_count_mismatch()
     test_stability_audit_rejects_scan_action_count_mismatch()
     test_stability_audit_rejects_wrong_report_run_type()
+    test_stability_audit_rejects_config_hash_drift()
+    test_stability_audit_rejects_scan_config_hash_mismatch()
     test_stability_audit_rejects_missing_report_sqlite_source()
     test_stability_audit_rejects_partial_snapshot_coverage()
     test_stability_audit_rejects_non_utc_observation_timestamp()

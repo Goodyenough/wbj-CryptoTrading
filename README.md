@@ -89,6 +89,8 @@ python main.py db stability --days 5
 
 三类 Markdown 报告还必须精确标注对应的 `Run ID`、`Run type` 和 `数据来源：SQLite`。`report_metadata_errors` 会指出具体报告及缺失字段，避免展示层与数据库 run 错配。
 
+稳定窗口内所有 daily run 必须有同一个非空 `config_hash`，且每条 `market_scans.config_hash` 必须继承所属 run。`config_hash_errors` 会阻止把不同策略配置下的自然日拼成一个 5 天样本。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell
