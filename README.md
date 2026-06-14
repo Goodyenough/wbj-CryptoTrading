@@ -91,6 +91,8 @@ python main.py db stability --days 5
 
 稳定窗口内所有 daily run 必须有同一个非空 `config_hash`，且每条 `market_scans.config_hash` 必须继承所属 run。`config_hash_errors` 会阻止把不同策略配置下的自然日拼成一个 5 天样本。
 
+每个 success run 还必须具备有效 `finished_at`、40 位 Git commit、实际存在的日志文件，且完成时间不得早于开始时间。异常会进入 `run_metadata_errors`，不能只靠 status 标签通过验收。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

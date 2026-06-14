@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 22:08:00 +08:00 - 将 run 生命周期与日志元数据接入稳定性门槛
+- 类型：代码 / 数据库 / 日志 / 测试 / 文档 / Git
+- 改动：每个 success daily run 新增 `run_metadata_errors` 审计，要求 `finished_at` 存在且不早于 started_at、Git commit 为 40 位十六进制、log_path 非空且文件存在、success 不携带 error_message。
+- 原因：避免残缺或手工误标为 success 的 run 只凭 status 通过 5 天门槛，确保运行审计链真实可追溯。
+- 测试：稳定性种子补齐 commit 和真实日志；新增缺完成时间、完成时间倒序、日志文件不存在三个拒绝案例。
+- 验证：`tests/test_database.py`、`compileall` 与 `git diff --check` 通过；生产两个 run 均为 `run_metadata_errors=[]`，配置、scan、snapshot、报告和 UTC 审计继续通过；安装拒绝探针保持非零且 4h 任务未注册。
+- Git：计划提交 `Validate daily run lifecycle`。
+
 ### 21:55:00 +08:00 - 将配置口径一致性接入 5 天稳定性门槛
 - 类型：代码 / 配置 / 数据库 / 测试 / 文档 / Git
 - 改动：稳定窗口内 daily run 必须具有同一个非空 `config_hash`；新增 `observed_config_hashes/config_hash_errors`，并要求 `market_scans.config_hash` 与所属 run 一致。

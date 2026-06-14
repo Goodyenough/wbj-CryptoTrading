@@ -708,6 +708,8 @@ def test_structured_tables_remain_operational_without_legacy_rows() -> None:
 def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> None:
     init_db(path)
     _seed_scan_and_run(path)
+    log_path = path.parent / "daily.log"
+    log_path.write_text("daily test log\n", encoding="utf-8")
     trade = _trade()
     with connect_db(path) as connection:
         assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
@@ -718,10 +720,12 @@ def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> N
             timestamp = f"{date_text}T12:05:00Z"
             connection.execute(
                 """
-                INSERT INTO runs(run_id, run_type, started_at, finished_at, status, config_hash, created_at)
-                VALUES (?, 'daily_full', ?, ?, 'success', 'config123', ?)
+                INSERT INTO runs(
+                    run_id, run_type, started_at, finished_at, status, config_hash,
+                    git_commit, log_path, created_at
+                ) VALUES (?, 'daily_full', ?, ?, 'success', 'config123', ?, ?, ?)
                 """,
-                (run_id, timestamp, f"{date_text}T12:07:00Z", timestamp),
+                (run_id, timestamp, f"{date_text}T12:07:00Z", "a" * 40, str(log_path), timestamp),
             )
             scan_id = f"daily_scan_{index}"
             connection.execute(
@@ -781,6 +785,7 @@ def test_stability_audit_requires_five_complete_consecutive_days() -> None:
     assert audit["consecutive_days"] is True
     assert audit["required_window_complete"] is True
     assert all(item["ready"] for item in audit["run_checks"])
+    assert all(item["run_metadata_errors"] == [] for item in audit["run_checks"])
     assert all(item["scan_integrity_errors"] == [] for item in audit["run_checks"])
     assert all(item["report_metadata_errors"] == [] for item in audit["run_checks"])
     assert audit["observed_config_hashes"] == ["config123"]
@@ -829,6 +834,61 @@ def test_stability_audit_rejects_missing_snapshot() -> None:
     assert audit["run_checks"][-1]["snapshot_count"] == 0
     assert audit["run_checks"][-1]["expected_snapshot_count"] == 1
     assert audit["run_checks"][-1]["missing_snapshot_plan_ids"] == ["plan1"]
+
+
+def test_stability_audit_rejects_incomplete_success_run() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute("UPDATE runs SET finished_at=NULL WHERE run_id='daily_4'")
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["run_metadata_errors"] == [
+        {"field": "finished_at", "error": "missing"}
+    ]
+
+
+def test_stability_audit_rejects_reversed_run_time() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute(
+            "UPDATE runs SET finished_at='2026-06-17T11:00:00Z' WHERE run_id='daily_4'"
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["run_metadata_errors"] == [
+        {
+            "field": "finished_at",
+            "error": "before_started_at",
+            "value": "2026-06-17T11:00:00Z",
+        }
+    ]
+
+
+def test_stability_audit_rejects_missing_run_log() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute(
+            "UPDATE runs SET log_path=? WHERE run_id='daily_4'",
+            (str(root / "missing.log"),),
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["run_metadata_errors"] == [
+        {
+            "field": "log_path",
+            "error": "file_not_found",
+            "value": str(root / "missing.log"),
+        }
+    ]
 
 
 def test_stability_audit_rejects_scan_candidate_count_mismatch() -> None:
@@ -1074,6 +1134,9 @@ if __name__ == "__main__":
     test_stability_audit_reports_partial_consecutive_progress()
     test_stability_audit_reports_partial_date_gap()
     test_stability_audit_rejects_missing_snapshot()
+    test_stability_audit_rejects_incomplete_success_run()
+    test_stability_audit_rejects_reversed_run_time()
+    test_stability_audit_rejects_missing_run_log()
     test_stability_audit_rejects_scan_candidate_count_mismatch()
     test_stability_audit_rejects_scan_action_count_mismatch()
     test_stability_audit_rejects_wrong_report_run_type()

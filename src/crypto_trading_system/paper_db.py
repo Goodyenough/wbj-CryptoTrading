@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import re
 from zoneinfo import ZoneInfo
 
 from .database import audit_utc_timestamps, connect_db
@@ -75,6 +76,41 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         run_checks = []
         for run in sorted(selected, key=lambda item: item["started_at"]):
             run_id = str(run["run_id"])
+            run_metadata_errors: list[dict[str, object]] = []
+            finished_at = run.get("finished_at")
+            if not finished_at:
+                run_metadata_errors.append({"field": "finished_at", "error": "missing"})
+            else:
+                started_dt = datetime.fromisoformat(str(run["started_at"]).replace("Z", "+00:00"))
+                finished_dt = datetime.fromisoformat(str(finished_at).replace("Z", "+00:00"))
+                if finished_dt < started_dt:
+                    run_metadata_errors.append(
+                        {
+                            "field": "finished_at",
+                            "error": "before_started_at",
+                            "value": str(finished_at),
+                        }
+                    )
+            git_commit = str(run.get("git_commit") or "")
+            if not re.fullmatch(r"[0-9a-f]{40}", git_commit):
+                run_metadata_errors.append(
+                    {"field": "git_commit", "error": "missing_or_invalid", "value": git_commit or None}
+                )
+            log_path = str(run.get("log_path") or "")
+            if not log_path:
+                run_metadata_errors.append({"field": "log_path", "error": "missing"})
+            elif not Path(log_path).is_file():
+                run_metadata_errors.append(
+                    {"field": "log_path", "error": "file_not_found", "value": log_path}
+                )
+            if run["status"] == "success" and run.get("error_message"):
+                run_metadata_errors.append(
+                    {
+                        "field": "error_message",
+                        "error": "present_on_success",
+                        "value": str(run["error_message"]),
+                    }
+                )
             scan_count = int(
                 connection.execute("SELECT COUNT(*) FROM market_scans WHERE run_id = ?", (run_id,)).fetchone()[0]
             )
@@ -178,6 +214,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                     "date_beijing": date_text,
                     "run_id": run_id,
                     "status": run["status"],
+                    "run_metadata_errors": run_metadata_errors,
                     "scan_count": scan_count,
                     "scan_integrity_errors": scan_integrity_errors,
                     "snapshot_count": snapshot_count,
@@ -190,6 +227,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                     "report_metadata_errors": report_metadata_errors,
                     "ready": (
                         run["status"] == "success"
+                        and not run_metadata_errors
                         and scan_count == 1
                         and not scan_integrity_errors
                         and not missing_snapshot_plan_ids
