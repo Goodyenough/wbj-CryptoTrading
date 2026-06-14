@@ -68,6 +68,31 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
             snapshot_count = int(
                 connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id = ?", (run_id,)).fetchone()[0]
             )
+            run_end = str(run.get("finished_at") or run["started_at"])
+            expected_snapshot_plan_ids = {
+                str(row[0])
+                for row in connection.execute(
+                    """
+                    SELECT plan_id
+                    FROM paper_plans
+                    WHERE created_at <= ?
+                      AND (closed_at IS NULL OR closed_at >= ?)
+                      AND plan_id NOT IN (
+                          SELECT plan_id FROM paper_events
+                          WHERE run_id = ? AND event_type = 'ARCHIVED'
+                      )
+                    """,
+                    (run_end, run["started_at"], run_id),
+                ).fetchall()
+            }
+            snapshot_plan_ids = {
+                str(row[0])
+                for row in connection.execute(
+                    "SELECT plan_id FROM paper_snapshots WHERE run_id = ?",
+                    (run_id,),
+                ).fetchall()
+            }
+            missing_snapshot_plan_ids = sorted(expected_snapshot_plan_ids - snapshot_plan_ids)
             started = datetime.fromisoformat(str(run["started_at"]).replace("Z", "+00:00"))
             date_text = started.astimezone(beijing).strftime("%Y-%m-%d")
             report_dir = reports_dir / date_text
@@ -90,6 +115,8 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                     "status": run["status"],
                     "scan_count": scan_count,
                     "snapshot_count": snapshot_count,
+                    "expected_snapshot_count": len(expected_snapshot_plan_ids),
+                    "missing_snapshot_plan_ids": missing_snapshot_plan_ids,
                     "database_locked": "database is locked" in error_text,
                     "market_scan_report": has_scan_report,
                     "paper_report": has_paper_report,
@@ -97,7 +124,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                     "ready": (
                         run["status"] == "success"
                         and scan_count == 1
-                        and snapshot_count > 0
+                        and not missing_snapshot_plan_ids
                         and "database is locked" not in error_text
                         and has_scan_report
                         and has_paper_report

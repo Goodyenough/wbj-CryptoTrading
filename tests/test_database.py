@@ -767,6 +767,8 @@ def test_stability_audit_requires_five_complete_consecutive_days() -> None:
     assert audit["consecutive_days"] is True
     assert audit["required_window_complete"] is True
     assert all(item["ready"] for item in audit["run_checks"])
+    assert all(item["expected_snapshot_count"] == 1 for item in audit["run_checks"])
+    assert all(item["missing_snapshot_plan_ids"] == [] for item in audit["run_checks"])
 
 
 def test_stability_audit_reports_partial_consecutive_progress() -> None:
@@ -807,6 +809,25 @@ def test_stability_audit_rejects_missing_snapshot() -> None:
     audit = audit_database_stability(path, reports_dir, required_days=5)
     assert audit["ready_for_4h_task"] is False
     assert audit["run_checks"][-1]["snapshot_count"] == 0
+    assert audit["run_checks"][-1]["expected_snapshot_count"] == 1
+    assert audit["run_checks"][-1]["missing_snapshot_plan_ids"] == ["plan1"]
+
+
+def test_stability_audit_rejects_partial_snapshot_coverage() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    second = _trade()
+    second.paper_trade_id = "plan2"
+    second.symbol = "SECONDUSDT"
+    with connect_db(path) as connection:
+        _sync_paper_plan(connection, second, run_id="run1", payload={"stop_loss": 90.0})
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert all(item["snapshot_count"] == 1 for item in audit["run_checks"])
+    assert all(item["expected_snapshot_count"] == 2 for item in audit["run_checks"])
+    assert all(item["missing_snapshot_plan_ids"] == ["plan2"] for item in audit["run_checks"])
 
 
 def test_stability_audit_rejects_non_utc_observation_timestamp() -> None:
@@ -916,6 +937,7 @@ if __name__ == "__main__":
     test_stability_audit_reports_partial_consecutive_progress()
     test_stability_audit_reports_partial_date_gap()
     test_stability_audit_rejects_missing_snapshot()
+    test_stability_audit_rejects_partial_snapshot_coverage()
     test_stability_audit_rejects_non_utc_observation_timestamp()
     test_4h_batch_never_scans_or_creates_plans()
     test_4h_cycle_updates_existing_plans_without_scanning_or_creating()

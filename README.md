@@ -83,6 +83,8 @@ python main.py db stability --days 5
 
 `db status` 与稳定性门槛还会审计观察表的所有时间字段；出现无时区、本地时区或不可解析时间时，`utc_timestamp_errors` 会列出具体表、字段、行和原值，并阻止启用 4h 任务。
 
+每个 daily run 还会输出 `expected_snapshot_count` 与 `missing_snapshot_plan_ids`。只要当时应被 paper update 处理的任一活动计划缺少 snapshot，即使该 run 已写入其他 snapshot，也不能通过安装门槛。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

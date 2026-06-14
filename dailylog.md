@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 21:18:00 +08:00 - 将 snapshot 完整覆盖接入 5 天稳定性门槛
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：稳定性审计不再只检查 `snapshot_count > 0`，而是按 run 时间范围计算所有应由 paper update 处理的活动计划，输出 `expected_snapshot_count` 与 `missing_snapshot_plan_ids`。
+- 口径：同一 daily run 在 add-from-scan 阶段已经归档的旧 WATCHING 计划不要求 snapshot；其余当时活动的计划必须逐一存在。
+- 测试：新增两个活动计划只写一个 snapshot 的部分覆盖案例，要求即使 `snapshot_count > 0` 也必须拒绝安装；强化原缺失 snapshot 测试的具体 plan 断言。
+- 验证：`tests/test_database.py`、`compileall` 与 `git diff --check` 通过；生产 2026-06-13、14 两个 run 均为 `snapshot_count=4`、`expected_snapshot_count=4`、缺失列表为空；安装拒绝探针继续通过，4h 任务未注册。
+- Git：计划提交 `Require complete paper snapshots`。
+
 ### 21:04:00 +08:00 - 将 UTC 时间字段审计接入数据库状态与安装门槛
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：新增 17 个观察时间字段的严格 UTC 审计，要求值可解析且明确以 `Z` 或 `+00:00` 表示零时区；`db status` 输出 `utc_timestamps_ok/utc_timestamp_errors`，5 天稳定性门槛在存在异常时拒绝 4h 安装。
