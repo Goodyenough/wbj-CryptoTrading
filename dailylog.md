@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-06-14
+
+### 20:19:34 +08:00 - 验收第二个新版 daily_full 真实样本
+- 类型：运行验收 / 数据库 / 报告 / 文档 / Git
+- 运行结果：Windows 任务于 20:05:01 自动触发，`LastTaskResult=0`；run `20260614_120504_da0fe713` 为 `daily_full/success`，20:06:30 完成，稳定性进度从 `1/5` 变为 `2/5`。
+- 数据证据：本次恰有 1 个 scan、5 个候选、0 个 BUY_CANDIDATE、4 个开放计划 snapshot；market scan、paper report、observation dashboard 均包含同一 run_id、`daily_full` 与 SQLite 来源。
+- 状态证据：ONDOUSDT 再次写入 `RECLAIM_PENDING_SET`，目标 4h kline_time=`2026-06-14T11:59:59Z`，继续保持 WATCHING；另外 3 个 ENTERED 计划正常写入 snapshot，证明 pending 与持仓状态可跨日持续推进。
+- 验证：`db status` 显示 schema v2、WAL、30 秒 timeout、外键与 11 个索引正常；`db stability --days 5` 的两个 run check 均 `ready=true`，无重复 plan/event；生产库 `quick_check=ok`、外键错误为 0；`tests/test_database.py` 通过。
+- 影响：只更新稳定性审计记录并纳入当天自动生成的 reports；未手工运行 daily，未安装 4h 任务，未修改策略配置或生产数据库内容。
+- Git：计划提交 `Validate second daily database sample`。
+
 ## 2026-06-13
 
 ### 23:45:00 +08:00 - 完成 sensitive 与 42 根持仓过滤组合实验
