@@ -87,6 +87,8 @@ python main.py db stability --days 5
 
 `scan_integrity_errors` 会核对 `market_scans` 声明的候选总数、BUY_CANDIDATE 数和 WATCH_ONLY 数是否与 `scan_candidates` 明细一致；汇总与明细发生漂移时同样拒绝启用 4h 任务。
 
+三类 Markdown 报告还必须精确标注对应的 `Run ID`、`Run type` 和 `数据来源：SQLite`。`report_metadata_errors` 会指出具体报告及缺失字段，避免展示层与数据库 run 错配。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 21:43:00 +08:00 - 将报告 run 元数据完整性接入稳定性门槛
+- 类型：代码 / 报告 / 数据库 / 测试 / 文档 / Git
+- 改动：三类 daily Markdown 报告必须精确包含对应 `Run ID`、`Run type=daily_full` 与 `数据来源：SQLite`；新增 `report_metadata_errors` 定位具体报告和字段。
+- 原因：原门槛只搜索 run_id 任意子串，无法识别报告误标 run type 或漏写 SQLite 来源，展示层可能与结构化主数据错配。
+- 测试：稳定性报告种子改为真实元数据格式；新增错误 run type 和缺少 SQLite 来源两个拒绝案例。
+- 验证：`tests/test_database.py`、`compileall` 与 `git diff --check` 通过；生产两个 run 的三类报告均为 `report_metadata_errors=[]`，scan 和 snapshot 审计继续通过；安装拒绝探针返回非零码且未注册 4h 任务。
+- Git：计划提交 `Validate report run metadata`。
+
 ### 21:31:00 +08:00 - 将 scan 汇总与候选明细一致性接入稳定性门槛
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：每个 daily run 新增 `scan_integrity_errors`，核对 `candidate_count`、`buy_candidate_count`、`watch_only_count` 与 `scan_candidates` 实际行数/action 分组是否一致。

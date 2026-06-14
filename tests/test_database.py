@@ -757,10 +757,15 @@ def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> N
             )
             report_dir = reports_dir / date_text
             report_dir.mkdir(parents=True, exist_ok=True)
-            (report_dir / f"market_scan_{date_text}_v1.md").write_text(run_id, encoding="utf-8")
-            (report_dir / f"paper_report_{date_text}_demo_v1.md").write_text(run_id, encoding="utf-8")
+            report_metadata = (
+                f"- Run ID：`{run_id}`\n"
+                "- Run type：`daily_full`\n"
+                "- 数据来源：SQLite\n"
+            )
+            (report_dir / f"market_scan_{date_text}_v1.md").write_text(report_metadata, encoding="utf-8")
+            (report_dir / f"paper_report_{date_text}_demo_v1.md").write_text(report_metadata, encoding="utf-8")
             (report_dir / f"paper_observation_dashboard_{date_text}_demo_v1.md").write_text(
-                run_id,
+                report_metadata,
                 encoding="utf-8",
             )
 
@@ -777,6 +782,7 @@ def test_stability_audit_requires_five_complete_consecutive_days() -> None:
     assert audit["required_window_complete"] is True
     assert all(item["ready"] for item in audit["run_checks"])
     assert all(item["scan_integrity_errors"] == [] for item in audit["run_checks"])
+    assert all(item["report_metadata_errors"] == [] for item in audit["run_checks"])
     assert all(item["expected_snapshot_count"] == 1 for item in audit["run_checks"])
     assert all(item["missing_snapshot_plan_ids"] == [] for item in audit["run_checks"])
 
@@ -861,6 +867,48 @@ def test_stability_audit_rejects_scan_action_count_mismatch() -> None:
             "field": "buy_candidate_count",
             "declared": 1,
             "observed": 0,
+        }
+    ]
+
+
+def test_stability_audit_rejects_wrong_report_run_type() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    report = reports_dir / "2026-06-17" / "paper_report_2026-06-17_demo_v1.md"
+    report.write_text(
+        report.read_text(encoding="utf-8").replace("`daily_full`", "`manual`"),
+        encoding="utf-8",
+    )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["report_metadata_errors"] == [
+        {
+            "report": "paper_report_2026-06-17_demo_v1.md",
+            "field": "run_type",
+            "expected": "- Run type：`daily_full`",
+        }
+    ]
+
+
+def test_stability_audit_rejects_missing_report_sqlite_source() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    report = reports_dir / "2026-06-17" / "paper_observation_dashboard_2026-06-17_demo_v1.md"
+    report.write_text(
+        report.read_text(encoding="utf-8").replace("- 数据来源：SQLite\n", ""),
+        encoding="utf-8",
+    )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["run_checks"][-1]["report_metadata_errors"] == [
+        {
+            "report": "paper_observation_dashboard_2026-06-17_demo_v1.md",
+            "field": "data_source",
+            "expected": "- 数据来源：SQLite",
         }
     ]
 
@@ -991,6 +1039,8 @@ if __name__ == "__main__":
     test_stability_audit_rejects_missing_snapshot()
     test_stability_audit_rejects_scan_candidate_count_mismatch()
     test_stability_audit_rejects_scan_action_count_mismatch()
+    test_stability_audit_rejects_wrong_report_run_type()
+    test_stability_audit_rejects_missing_report_sqlite_source()
     test_stability_audit_rejects_partial_snapshot_coverage()
     test_stability_audit_rejects_non_utc_observation_timestamp()
     test_4h_batch_never_scans_or_creates_plans()

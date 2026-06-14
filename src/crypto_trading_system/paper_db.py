@@ -128,10 +128,23 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
             report_dir = reports_dir / date_text
             report_files = list(report_dir.glob("*.md")) if report_dir.exists() else []
             run_report_names = []
+            report_metadata_errors: list[dict[str, str]] = []
+            expected_run_id_line = f"- Run ID：`{run_id}`"
+            expected_run_type_line = f"- Run type：`{run['run_type']}`"
+            expected_source_line = "- 数据来源：SQLite"
             for report in report_files:
                 try:
-                    if run_id in report.read_text(encoding="utf-8"):
+                    report_text = report.read_text(encoding="utf-8")
+                    if expected_run_id_line in report_text:
                         run_report_names.append(report.name)
+                        for field, expected in (
+                            ("run_type", expected_run_type_line),
+                            ("data_source", expected_source_line),
+                        ):
+                            if expected not in report_text:
+                                report_metadata_errors.append(
+                                    {"report": report.name, "field": field, "expected": expected}
+                                )
                 except OSError:
                     continue
             has_scan_report = any(name.startswith("market_scan_") for name in run_report_names)
@@ -152,6 +165,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                     "market_scan_report": has_scan_report,
                     "paper_report": has_paper_report,
                     "observation_dashboard": has_dashboard,
+                    "report_metadata_errors": report_metadata_errors,
                     "ready": (
                         run["status"] == "success"
                         and scan_count == 1
@@ -161,6 +175,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
                         and has_scan_report
                         and has_paper_report
                         and has_dashboard
+                        and not report_metadata_errors
                     ),
                 }
             )
