@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from .database import connect_db
+from .database import audit_utc_timestamps, connect_db
 
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
@@ -49,6 +49,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
             ).fetchone()[0]
         )
         foreign_key_errors = [dict(row) for row in connection.execute("PRAGMA foreign_key_check").fetchall()]
+        utc_timestamp_errors = audit_utc_timestamps(connection)
 
         daily_by_date: dict[str, dict] = {}
         for run in runs:
@@ -117,6 +118,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         and duplicate_plans == 0
         and duplicate_events == 0
         and not foreign_key_errors
+        and not utc_timestamp_errors
     )
     return {
         "required_days": required_days,
@@ -128,6 +130,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         "duplicate_plan_groups": duplicate_plans,
         "duplicate_event_groups": duplicate_events,
         "foreign_key_errors": foreign_key_errors,
+        "utc_timestamp_errors": utc_timestamp_errors,
         "ready_for_4h_task": ready,
     }
 

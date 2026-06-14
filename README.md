@@ -81,6 +81,8 @@ python main.py db stability --days 5
 
 输出中的 `consecutive_days` 表示当前已观察日期本身是否连续，`required_window_complete` 表示是否已经收满要求的天数；只有两者都为 true 且每个 run 检查通过，`ready_for_4h_task` 才会为 true。
 
+`db status` 与稳定性门槛还会审计观察表的所有时间字段；出现无时区、本地时区或不可解析时间时，`utc_timestamp_errors` 会列出具体表、字段、行和原值，并阻止启用 4h 任务。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

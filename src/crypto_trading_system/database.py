@@ -26,6 +26,15 @@ REQUIRED_OBSERVATION_INDEXES = {
     "idx_snapshot_run_plan",
     "idx_snapshot_plan_time",
 }
+OBSERVATION_UTC_COLUMNS = {
+    "schema_metadata": ("updated_at",),
+    "runs": ("started_at", "finished_at", "created_at"),
+    "market_scans": ("scan_time", "created_at"),
+    "scan_candidates": ("created_at",),
+    "paper_plans": ("created_at", "updated_at", "closed_at", "entered_at_utc", "tp1_hit_at_utc"),
+    "paper_events": ("event_time", "kline_time", "created_at"),
+    "paper_snapshots": ("snapshot_time", "created_at"),
+}
 
 
 def utc_now() -> str:
@@ -44,6 +53,36 @@ def connect_db(path: Path) -> sqlite3.Connection:
 
 def _table_columns(connection: sqlite3.Connection, table: str) -> set[str]:
     return {str(row[1]) for row in connection.execute(f"PRAGMA table_info({table})")}
+
+
+def audit_utc_timestamps(connection: sqlite3.Connection) -> list[dict[str, object]]:
+    errors: list[dict[str, object]] = []
+    for table, columns in OBSERVATION_UTC_COLUMNS.items():
+        available = _table_columns(connection, table)
+        for column in columns:
+            if column not in available:
+                continue
+            rows = connection.execute(
+                f'SELECT rowid, "{column}" FROM "{table}" WHERE "{column}" IS NOT NULL'
+            ).fetchall()
+            for row in rows:
+                value = str(row[1])
+                valid_suffix = value.endswith("Z") or value.endswith("+00:00")
+                try:
+                    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+                    valid_timezone = parsed.tzinfo is not None and parsed.utcoffset() == timezone.utc.utcoffset(parsed)
+                except ValueError:
+                    valid_timezone = False
+                if not (valid_suffix and valid_timezone):
+                    errors.append(
+                        {
+                            "table": table,
+                            "column": column,
+                            "rowid": int(row[0]),
+                            "value": value,
+                        }
+                    )
+    return errors
 
 
 def _add_column(connection: sqlite3.Connection, table: str, definition: str) -> None:
@@ -498,6 +537,7 @@ def database_status(path: Path) -> dict:
         foreign_keys = connection.execute("PRAGMA foreign_keys").fetchone()[0]
         busy_timeout = connection.execute("PRAGMA busy_timeout").fetchone()[0]
         foreign_key_errors = [tuple(row) for row in connection.execute("PRAGMA foreign_key_check").fetchall()]
+        utc_timestamp_errors = audit_utc_timestamps(connection)
         indexes = {
             str(row[0])
             for row in connection.execute(
@@ -513,6 +553,8 @@ def database_status(path: Path) -> dict:
         "foreign_keys": foreign_keys,
         "busy_timeout_ms": busy_timeout,
         "foreign_key_errors": foreign_key_errors,
+        "utc_timestamps_ok": not utc_timestamp_errors,
+        "utc_timestamp_errors": utc_timestamp_errors,
         "indexes_ok": not missing_indexes,
         "missing_indexes": missing_indexes,
         "tables_ok": required.issubset(tables),

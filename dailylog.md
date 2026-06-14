@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 21:04:00 +08:00 - 将 UTC 时间字段审计接入数据库状态与安装门槛
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：新增 17 个观察时间字段的严格 UTC 审计，要求值可解析且明确以 `Z` 或 `+00:00` 表示零时区；`db status` 输出 `utc_timestamps_ok/utc_timestamp_errors`，5 天稳定性门槛在存在异常时拒绝 4h 安装。
+- 诊断：错误条目包含 table、column、rowid 和 value，可直接定位无时区、本地时区或损坏时间戳。
+- 测试：新增 `db status` 识别 `+08:00` 时间，以及完整 5 天审计因无时区 snapshot 时间而拒绝安装的测试。
+- 验证：`tests/test_database.py`、`compileall` 和 `git diff --check` 通过；生产 `db status` 返回 `utc_timestamps_ok=true`、错误为空，稳定性输出同样无 UTC 错误且保持 `ready_for_4h_task=false`；安装拒绝探针返回非零码，执行前后 4h 任务均不存在。
+- Git：计划提交 `Enforce UTC observation timestamps`。
+
 ### 20:52:00 +08:00 - 拆分稳定性日期连续性与窗口完整性
 - 类型：代码 / 数据库 / 测试 / 文档 / Git
 - 改动：`db stability` 的 `consecutive_days` 现在真实反映当前已观察日期是否连续；新增 `required_window_complete` 表示是否已收满要求天数，避免 `2/5` 连续日期被显示为不连续。

@@ -98,9 +98,29 @@ def test_database_init_is_idempotent_and_configured() -> None:
     assert status["foreign_keys"] == 1
     assert status["busy_timeout_ms"] == 30_000
     assert status["foreign_key_errors"] == []
+    assert status["utc_timestamps_ok"] is True
+    assert status["utc_timestamp_errors"] == []
     assert status["indexes_ok"] is True
     assert status["missing_indexes"] == []
     assert status["tables_ok"] is True
+
+
+def test_database_status_reports_non_utc_observation_timestamp() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    with connect_db(path) as connection:
+        connection.execute("UPDATE runs SET created_at='2026-06-12T08:00:00+08:00' WHERE run_id='run1'")
+    status = database_status(path)
+    assert status["utc_timestamps_ok"] is False
+    assert status["utc_timestamp_errors"] == [
+        {
+            "table": "runs",
+            "column": "created_at",
+            "rowid": 2,
+            "value": "2026-06-12T08:00:00+08:00",
+        }
+    ]
 
 
 def test_tracked_run_records_success_and_failure() -> None:
@@ -789,6 +809,27 @@ def test_stability_audit_rejects_missing_snapshot() -> None:
     assert audit["run_checks"][-1]["snapshot_count"] == 0
 
 
+def test_stability_audit_rejects_non_utc_observation_timestamp() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute(
+            "UPDATE paper_snapshots SET created_at='2026-06-17T20:05:00' WHERE snapshot_id='snapshot_4'"
+        )
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["utc_timestamp_errors"] == [
+        {
+            "table": "paper_snapshots",
+            "column": "created_at",
+            "rowid": 5,
+            "value": "2026-06-17T20:05:00",
+        }
+    ]
+
+
 def test_4h_batch_never_scans_or_creates_plans() -> None:
     batch_text = (ROOT / "scripts" / "paper_4h_update.bat").read_text(encoding="utf-8").lower()
     runner_text = (ROOT / "scripts" / "run_logged_paper_task.ps1").read_text(encoding="utf-8").lower()
@@ -854,6 +895,7 @@ def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:
 
 if __name__ == "__main__":
     test_database_init_is_idempotent_and_configured()
+    test_database_status_reports_non_utc_observation_timestamp()
     test_tracked_run_records_success_and_failure()
     test_run_step_persists_run_id_step_and_lock_error()
     test_state_transition_and_stop_are_monotonic()
@@ -874,6 +916,7 @@ if __name__ == "__main__":
     test_stability_audit_reports_partial_consecutive_progress()
     test_stability_audit_reports_partial_date_gap()
     test_stability_audit_rejects_missing_snapshot()
+    test_stability_audit_rejects_non_utc_observation_timestamp()
     test_4h_batch_never_scans_or_creates_plans()
     test_4h_cycle_updates_existing_plans_without_scanning_or_creating()
     print("test_database=passed")
