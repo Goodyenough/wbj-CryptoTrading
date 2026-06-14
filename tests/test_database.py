@@ -780,6 +780,7 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert installer_text.count("new-scheduledtasktrigger -daily -at") == 5
     assert "-multipleinstances ignorenew" in installer_text
     assert "-executiontimelimit (new-timespan -minutes 30)" in installer_text
+    assert "-startwhenavailable" not in installer_text
 
 
 def test_4h_cycle_updates_existing_plans_without_scanning_or_creating() -> None:

@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 20:43:00 +08:00 - 禁止 4h 任务错过触发后延迟补跑
+- 类型：代码 / 运维 / 测试 / 文档 / Git
+- 改动：从 `CryptoTrading_4H_PaperUpdate` 设置中移除 `StartWhenAvailable`；电脑休眠或关机期间错过的 4h 时点不再于恢复后补跑，而是等待下一个固定时点。
+- 原因：若错过 16:10 后在 20:05 左右恢复，补跑可能与 `CryptoTrading_DailyPaperUpdate` 并发；这与开发计划“不设置 20:10，避免重复和锁冲突”的约束相悖。
+- 保留：daily 任务继续允许错过后补跑；4h 任务仍保留 5 个固定触发器、30 分钟执行上限和 `IgnoreNew` 防重入。
+- 验证：`tests/test_database.py` 与 PowerShell parser 通过；任务对象探针确认 `StartWhenAvailable=False`、`ExecutionTimeLimit=PT30M`、`MultipleInstances=IgnoreNew`，5 个触发器为 00:10/04:10/08:10/12:10/16:10；现有 daily 仍为 `StartWhenAvailable=True/Ready`，4h 任务仍未注册；`git diff --check` 通过。
+- Git：计划提交 `Prevent delayed 4h task conflicts`。
+
 ### 20:32:00 +08:00 - 将 4h 安装稳定性门槛前移到提权检查之前
 - 类型：代码 / 运维 / 测试 / 文档 / Git
 - 改动：`install_4h_paper_task.ps1` 现在先运行只读的 `db stability --days 5`，门槛通过后才检查管理员权限；普通 PowerShell 可直接预检稳定性，`2/5` 时不会触及任务注册。

@@ -87,6 +87,8 @@ powershell -ExecutionPolicy Bypass -File scripts\install_4h_paper_task.ps1
 
 安装脚本会先以普通权限运行只读的 5 天稳定性门槛；未达到 `5/5` 时直接拒绝安装。门槛通过后如当前 PowerShell 未提权，脚本才会提示使用管理员 PowerShell 重新运行。
 
+4h 任务不会补跑错过的触发时点：电脑休眠或关机期间错过一次更新后，等待下一个固定 4h 时点即可，避免恢复运行时恰好撞上 20:05 daily。
+
 导入最新候选时，系统会自动归档同币种的旧 `WATCHING` 计划。已经入场的 `ENTERED` / `TP1_HIT` 持仓不会被替换。
 
 只想盘中更新已有模拟仓位：
