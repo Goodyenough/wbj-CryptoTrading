@@ -15,6 +15,14 @@
 
 ## 2026-06-14
 
+### 22:36:00 +08:00 - 将数据库底层健康接入 4h 安装门槛
+- 类型：代码 / 数据库 / 测试 / 文档 / Git
+- 改动：稳定性审计新增 `database_health/database_health_errors`，非修复式检查 schema v2、WAL、`synchronous=NORMAL`、foreign keys、busy timeout=30000、6 张观察表和 11 个必需索引。
+- 原因：原先这些指标只由 `db status` 展示，5 天审计没有把它们纳入放行条件；底层配置退化时仍可能错误安装 4h 任务。
+- 测试：新增 journal mode 退回 DELETE、删除必需索引、schema version 错配三个拒绝案例。
+- 验证：`python tests\\test_database.py` 通过；`python -m compileall -q src main.py` 与 `git diff --check` 通过；生产 `python main.py db stability --days 5` 显示 schema v2、WAL、`synchronous=1`、`foreign_keys=1`、`busy_timeout_ms=30000`、无缺表/缺索引及健康错误，当前自然日样本 2/5，故仍为 `ready_for_4h_task=false`；安装拒绝探针退出码 1、包含稳定性门槛提示且未创建 `CryptoTrading_4H_PaperUpdate`。
+- Git：计划提交 `Gate 4h task on database health`。
+
 ### 22:21:00 +08:00 - 将同日重复 daily_full 接入稳定性门槛
 - 类型：代码 / 数据库 / 运维 / 测试 / 文档 / Git
 - 改动：新增 `duplicate_daily_run_dates`，按北京时间自然日列出全部 daily_full run ID/status；同日超过一条即拒绝 4h 安装，不再静默只取最新 run。

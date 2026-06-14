@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gc
 import json
 from pathlib import Path
 import sqlite3
@@ -790,6 +791,10 @@ def test_stability_audit_requires_five_complete_consecutive_days() -> None:
     assert all(item["report_metadata_errors"] == [] for item in audit["run_checks"])
     assert audit["observed_config_hashes"] == ["config123"]
     assert audit["config_hash_errors"] == []
+    assert audit["duplicate_daily_run_dates"] == []
+    assert audit["database_health_errors"] == []
+    assert audit["database_health"]["journal_mode"] == "wal"
+    assert audit["database_health"]["busy_timeout_ms"] == 30_000
     assert all(item["expected_snapshot_count"] == 1 for item in audit["run_checks"])
     assert all(item["missing_snapshot_plan_ids"] == [] for item in audit["run_checks"])
 
@@ -887,6 +892,50 @@ def test_stability_audit_rejects_failed_then_success_rerun() -> None:
                 {"run_id": "daily_4", "status": "success"},
             ],
         }
+    ]
+
+
+def test_stability_audit_rejects_non_wal_database() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    gc.collect()
+    with sqlite3.connect(path, isolation_level=None) as connection:
+        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        assert connection.execute("PRAGMA journal_mode=DELETE").fetchone()[0] == "delete"
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["database_health_errors"] == [
+        {"field": "journal_mode", "expected": "wal", "observed": "delete"}
+    ]
+
+
+def test_stability_audit_rejects_missing_required_index() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute("DROP INDEX idx_event_run")
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["database_health_errors"] == [
+        {"field": "missing_indexes", "observed": ["idx_event_run"]}
+    ]
+
+
+def test_stability_audit_rejects_schema_version_mismatch() -> None:
+    root = Path(tempfile.mkdtemp())
+    path = root / "paper.db"
+    reports_dir = root / "reports"
+    _seed_stability_days(path, reports_dir)
+    with connect_db(path) as connection:
+        connection.execute("UPDATE schema_metadata SET value='999' WHERE key='schema_version'")
+    audit = audit_database_stability(path, reports_dir, required_days=5)
+    assert audit["ready_for_4h_task"] is False
+    assert audit["database_health_errors"] == [
+        {"field": "schema_version", "expected": "2", "observed": "999"}
     ]
 
 
@@ -1203,6 +1252,9 @@ if __name__ == "__main__":
     test_stability_audit_reports_partial_date_gap()
     test_stability_audit_rejects_two_success_runs_on_same_day()
     test_stability_audit_rejects_failed_then_success_rerun()
+    test_stability_audit_rejects_non_wal_database()
+    test_stability_audit_rejects_missing_required_index()
+    test_stability_audit_rejects_schema_version_mismatch()
     test_stability_audit_rejects_missing_snapshot()
     test_stability_audit_rejects_incomplete_success_run()
     test_stability_audit_rejects_reversed_run_time()

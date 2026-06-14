@@ -26,6 +26,14 @@ REQUIRED_OBSERVATION_INDEXES = {
     "idx_snapshot_run_plan",
     "idx_snapshot_plan_time",
 }
+REQUIRED_OBSERVATION_TABLES = {
+    "runs",
+    "market_scans",
+    "scan_candidates",
+    "paper_plans",
+    "paper_events",
+    "paper_snapshots",
+}
 OBSERVATION_UTC_COLUMNS = {
     "schema_metadata": ("updated_at",),
     "runs": ("started_at", "finished_at", "created_at"),
@@ -522,7 +530,6 @@ def database_status(path: Path) -> dict:
             str(row[0])
             for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")
         }
-        required = {"runs", "market_scans", "scan_candidates", "paper_plans", "paper_events", "paper_snapshots"}
         latest_run = connection.execute(
             "SELECT * FROM runs ORDER BY started_at DESC LIMIT 1"
         ).fetchone()
@@ -557,8 +564,8 @@ def database_status(path: Path) -> dict:
         "utc_timestamp_errors": utc_timestamp_errors,
         "indexes_ok": not missing_indexes,
         "missing_indexes": missing_indexes,
-        "tables_ok": required.issubset(tables),
-        "missing_tables": sorted(required - tables),
+        "tables_ok": REQUIRED_OBSERVATION_TABLES.issubset(tables),
+        "missing_tables": sorted(REQUIRED_OBSERVATION_TABLES - tables),
         "latest_run": None if latest_run is None else dict(latest_run),
         "latest_failed_run": None if latest_failed is None else dict(latest_failed),
         "open_plan_count": open_plans,

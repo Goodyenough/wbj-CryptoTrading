@@ -95,6 +95,8 @@ python main.py db stability --days 5
 
 同一个北京时间自然日只能有一条 `daily_full`。`duplicate_daily_run_dates` 会列出同日的全部 run ID 和状态；无论是双 success，还是失败后同日补跑成功，都不能作为干净的连续观察样本放行。
 
+`database_health` 会直接检查 schema version、WAL、`synchronous=NORMAL`、foreign keys、30 秒 timeout、必需表和 11 个索引。该检查不会调用初始化命令掩盖缺失项；异常进入 `database_health_errors` 并阻止安装。
+
 只有输出 `ready_for_4h_task: true` 后，才在管理员 PowerShell 中安装任务：
 
 ```powershell

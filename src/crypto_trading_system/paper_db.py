@@ -6,7 +6,14 @@ from pathlib import Path
 import re
 from zoneinfo import ZoneInfo
 
-from .database import audit_utc_timestamps, connect_db
+from .database import (
+    BUSY_TIMEOUT_MS,
+    REQUIRED_OBSERVATION_INDEXES,
+    REQUIRED_OBSERVATION_TABLES,
+    SCHEMA_VERSION,
+    audit_utc_timestamps,
+    connect_db,
+)
 
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
@@ -15,6 +22,47 @@ BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 def audit_database_stability(path: Path, reports_dir: Path, required_days: int = 5) -> dict:
     beijing = BEIJING_TZ
     with connect_db(path) as connection:
+        tables = {
+            str(row[0])
+            for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+        }
+        indexes = {
+            str(row[0])
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+        }
+        schema_row = connection.execute(
+            "SELECT value FROM schema_metadata WHERE key='schema_version'"
+        ).fetchone()
+        database_health = {
+            "schema_version": None if schema_row is None else str(schema_row[0]),
+            "journal_mode": str(connection.execute("PRAGMA journal_mode").fetchone()[0]),
+            "synchronous": int(connection.execute("PRAGMA synchronous").fetchone()[0]),
+            "foreign_keys": int(connection.execute("PRAGMA foreign_keys").fetchone()[0]),
+            "busy_timeout_ms": int(connection.execute("PRAGMA busy_timeout").fetchone()[0]),
+            "missing_tables": sorted(REQUIRED_OBSERVATION_TABLES - tables),
+            "missing_indexes": sorted(REQUIRED_OBSERVATION_INDEXES - indexes),
+        }
+        database_health_errors: list[dict[str, object]] = []
+        expected_health = {
+            "schema_version": str(SCHEMA_VERSION),
+            "journal_mode": "wal",
+            "synchronous": 1,
+            "foreign_keys": 1,
+            "busy_timeout_ms": BUSY_TIMEOUT_MS,
+        }
+        for field, expected in expected_health.items():
+            observed = database_health[field]
+            if observed != expected:
+                database_health_errors.append(
+                    {"field": field, "expected": expected, "observed": observed}
+                )
+        for field in ("missing_tables", "missing_indexes"):
+            if database_health[field]:
+                database_health_errors.append(
+                    {"field": field, "observed": database_health[field]}
+                )
         runs = [
             dict(row)
             for row in connection.execute(
@@ -268,6 +316,7 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         and not utc_timestamp_errors
         and not config_hash_errors
         and not duplicate_daily_run_dates
+        and not database_health_errors
     )
     return {
         "required_days": required_days,
@@ -283,6 +332,8 @@ def audit_database_stability(path: Path, reports_dir: Path, required_days: int =
         "observed_config_hashes": selected_config_hashes,
         "config_hash_errors": config_hash_errors,
         "duplicate_daily_run_dates": duplicate_daily_run_dates,
+        "database_health": database_health,
+        "database_health_errors": database_health_errors,
         "ready_for_4h_task": ready,
     }
 
