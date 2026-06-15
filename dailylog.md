@@ -15,7 +15,15 @@
 
 ## 2026-06-15
 
-### 23:51:00 +08:00 - 支持带固定 baseline 的单变量 A/B
+### 20:15:00 +08:00 - 发现 config_hash 漂移，5 天稳定窗口重置
+- 类型：运维 / 文档
+- 改动：无代码变更；记录原因与新窗口起点。
+- 原因：`b665076`（2026-06-14 晚条件退出实验）向 `settings.toml` 新增了 `max_holding_bars_conditional = false` 一行。该字段值未变，但 `_config_hash` 使用 `read_bytes()` 计算原始字节 hash，文件字节发生变化，导致 hash 从 `311322be2029f063` 变为 `be7ec39ec21f6a83`。今日 20:05 daily run 使用了新 hash，db stability 报告 `config_hash_drift`，6/13–6/14 两天样本作废。
+- 影响：5 天稳定窗口重置为 2026-06-15（1/5）；4h 任务安装最早推迟至 **2026-06-20**（需 6/15–6/19 连续 5 天同 hash 且全部 ready）。当前 settings.toml 状态正确，无需任何修改。
+- 教训：今后凡修改 `settings.toml`（即使只加注释或默认值行），须在 5 天窗口完成后再操作，或接受重置并更新 TODO 中的预计安装日期。
+- 验证：`python main.py db stability --days 5` 显示 3/5、config_hash `be7ec39ec21f6a83`、今日 run ready；6/14 run 仍 ready 但 hash 不一致，稳定性整体仍为 `ready_for_4h_task=false`。
+
+
 - 类型：代码 / 配置 / 测试 / 文档 / Git
 - 改动：A/B 实验定义新增可选 `baseline_overrides`，runner 先构造固定 baseline，再从该 baseline 应用 variant override；新增 `max_holding_42_fixed_vs_conditional_sensitive`，两组均固定 sensitive 组合与 42 根阈值，唯一变量为 `max_holding_bars_conditional=false -> true`。
 - 原因：原 `max_holding_42x4h_conditional` 实验以无时间退出为 baseline，无法直接回答条件式 42 根是否优于固定 42 根。
