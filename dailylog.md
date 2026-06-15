@@ -13,6 +13,16 @@
 - Git：
 ```
 
+## 2026-06-15
+
+### 23:43:00 +08:00 - 补交上一轮回测与当日 daily 报告
+- 类型：报告 / Git
+- 改动：将 2026-06-14 条件式 42-bar A/B 已生成的 8 份原始 dynamic-universe backtest 报告，以及 2026-06-15 20:05 daily 自动生成的 market scan、paper report、observation dashboard 和图表纳入版本控制。
+- 原因：上一轮实验提交已包含 A/B 汇总与结论，但原始 baseline/variant backtest 报告仍未跟踪；新实验开始前先清理并固定既有证据边界。
+- 影响：仅补交既有生成报告，不运行回测、不修改策略配置或生产数据库。
+- 验证：确认 Git 变更仅为 `reports/` 与本条 `dailylog.md`；提交后推送并重新检查工作区。
+- Git：计划提交 `Track generated experiment and daily reports`。
+
 ## 2026-06-14
 
 ### 22:45:00 +08:00 - 实验：条件 42-bar 时间退出（max_holding_42x4h_conditional）
