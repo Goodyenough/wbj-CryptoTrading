@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system import abtest as abtest_module
-from crypto_trading_system.abtest import apply_experiment_overrides, load_experiment
+from crypto_trading_system.abtest import apply_experiment_overrides, build_experiment_settings, load_experiment
 from crypto_trading_system.backtest.metrics import BacktestMetrics
 from crypto_trading_system.config import load_settings
 
@@ -161,6 +161,27 @@ def test_conditional_holding_time_override_sets_both_fields() -> None:
     change_paths = {(c.path, c.old_value, c.new_value) for c in changes}
     assert ("backtest.max_holding_bars_without_tp1", 0, 42) in change_paths
     assert ("backtest.max_holding_bars_conditional", False, True) in change_paths
+
+
+def test_fixed_vs_conditional_42_bar_experiment_changes_one_variable() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    definition = load_experiment(
+        "max_holding_42_fixed_vs_conditional_sensitive",
+        ROOT / "config" / "experiments.toml",
+    )
+    baseline, variant, changes = build_experiment_settings(settings, definition)
+
+    assert settings.backtest.max_holding_bars_without_tp1 == 0
+    assert baseline.backtest.max_holding_bars_without_tp1 == 42
+    assert variant.backtest.max_holding_bars_without_tp1 == 42
+    assert baseline.backtest.max_holding_bars_conditional is False
+    assert variant.backtest.max_holding_bars_conditional is True
+    assert baseline.analysis.risk_off_core_buy_enabled is False
+    assert baseline.analysis.entry_reclaim_close_enabled is True
+    assert baseline.analysis.tp1_ema_trailing_stop_enabled is True
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("backtest.max_holding_bars_conditional", False, True),
+    ]
 
 
 def test_override_paths_are_dimension_scoped() -> None:
@@ -316,6 +337,8 @@ if __name__ == "__main__":
     test_exit_timing_override_can_move_stop_to_breakeven()
     test_exit_timing_override_can_enable_ema_trailing_stop()
     test_holding_time_override_can_force_timeout_exit()
+    test_conditional_holding_time_override_sets_both_fields()
+    test_fixed_vs_conditional_42_bar_experiment_changes_one_variable()
     test_override_paths_are_dimension_scoped()
     test_dynamic_abtest_reuses_one_symbol_master()
     test_dynamic_abtest_accepts_prebuilt_symbol_master()

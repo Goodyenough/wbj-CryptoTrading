@@ -225,3 +225,23 @@ regime_require_both_trend = true
 [risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42_conditional.overrides.backtest]
 max_holding_bars_without_tp1 = 42
 max_holding_bars_conditional = true
+
+[max_holding_42_fixed_vs_conditional_sensitive]
+enabled = true
+description = "Direct fixed-vs-conditional 42-bar exit comparison under the same sensitive strategy. Both arms use 42 bars; only conditional gating changes."
+dimension = "combined_regime_entry_exit_sensitivity_holding_conditional"
+
+[max_holding_42_fixed_vs_conditional_sensitive.baseline_overrides.analysis]
+risk_off_core_buy_enabled = false
+entry_reclaim_close_enabled = true
+tp1_ema_trailing_stop_enabled = true
+regime_btc_7d_drop_pct = -3.0
+regime_eth_7d_drop_pct = -5.0
+regime_require_both_trend = true
+
+[max_holding_42_fixed_vs_conditional_sensitive.baseline_overrides.backtest]
+max_holding_bars_without_tp1 = 42
+max_holding_bars_conditional = false
+
+[max_holding_42_fixed_vs_conditional_sensitive.overrides.backtest]
+max_holding_bars_conditional = true

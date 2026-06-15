@@ -15,6 +15,14 @@
 
 ## 2026-06-15
 
+### 23:51:00 +08:00 - 支持带固定 baseline 的单变量 A/B
+- 类型：代码 / 配置 / 测试 / 文档 / Git
+- 改动：A/B 实验定义新增可选 `baseline_overrides`，runner 先构造固定 baseline，再从该 baseline 应用 variant override；新增 `max_holding_42_fixed_vs_conditional_sensitive`，两组均固定 sensitive 组合与 42 根阈值，唯一变量为 `max_holding_bars_conditional=false -> true`。
+- 原因：原 `max_holding_42x4h_conditional` 实验以无时间退出为 baseline，无法直接回答条件式 42 根是否优于固定 42 根。
+- 影响：不修改默认 `settings.toml`，不影响生产 paper 策略或 daily 的 `config_hash`；仅增强研究 A/B 编排能力。
+- 验证：新增测试确认源 settings 不变、两组阈值均为 42、sensitive 参数一致且变更列表只有 conditional bool；`python tests\\test_abtest.py`、`python tests\\test_replay.py`、compileall 和 `git diff --check` 通过。
+- Git：计划提交 `Support fixed baseline A/B overrides`。
+
 ### 23:43:00 +08:00 - 补交上一轮回测与当日 daily 报告
 - 类型：报告 / Git
 - 改动：将 2026-06-14 条件式 42-bar A/B 已生成的 8 份原始 dynamic-universe backtest 报告，以及 2026-06-15 20:05 daily 自动生成的 market scan、paper report、observation dashboard 和图表纳入版本控制。

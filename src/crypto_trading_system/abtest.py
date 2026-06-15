@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
@@ -93,6 +93,7 @@ class ExperimentDefinition:
     enabled: bool
     requires_logic: bool
     overrides: dict[str, Any]
+    baseline_overrides: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -194,6 +195,9 @@ def load_experiment(experiment_id: str, path: Path | None = None) -> ExperimentD
     overrides = raw.get("overrides", {})
     if not isinstance(overrides, dict) or not overrides:
         raise ValueError(f"Experiment '{experiment_id}' must define non-empty overrides.")
+    baseline_overrides = raw.get("baseline_overrides", {})
+    if not isinstance(baseline_overrides, dict):
+        raise ValueError(f"Experiment '{experiment_id}' baseline_overrides must be a table.")
 
     return ExperimentDefinition(
         experiment_id=experiment_id,
@@ -202,23 +206,47 @@ def load_experiment(experiment_id: str, path: Path | None = None) -> ExperimentD
         enabled=enabled,
         requires_logic=requires_logic,
         overrides=overrides,
+        baseline_overrides=baseline_overrides,
     )
 
 
-def apply_experiment_overrides(settings: Settings, definition: ExperimentDefinition) -> tuple[Settings, list[ChangedValue]]:
+def _apply_scoped_overrides(
+    settings: Settings,
+    definition: ExperimentDefinition,
+    overrides: dict[str, Any],
+) -> Settings:
     allowed = ALLOWED_OVERRIDE_PATHS.get(definition.dimension)
     if not allowed:
         raise ValueError(f"Experiment '{definition.experiment_id}' has unsupported dimension '{definition.dimension}'.")
 
-    variant = deepcopy(settings)
-    changes: list[ChangedValue] = []
-    for path, new_value in _flatten_overrides(definition.overrides):
+    updated = deepcopy(settings)
+    for path, new_value in _flatten_overrides(overrides):
         if path not in allowed:
             allowed_text = ", ".join(sorted(allowed))
             raise ValueError(f"Override path '{path}' is not allowed for dimension '{definition.dimension}'. Allowed: {allowed_text}")
-        old_value = _get_path(settings, path)
-        _set_path(variant, path, new_value)
+        _set_path(updated, path, new_value)
+    return updated
+
+
+def build_experiment_settings(
+    settings: Settings,
+    definition: ExperimentDefinition,
+) -> tuple[Settings, Settings, list[ChangedValue]]:
+    baseline = _apply_scoped_overrides(settings, definition, definition.baseline_overrides)
+    variant = _apply_scoped_overrides(baseline, definition, definition.overrides)
+    changes: list[ChangedValue] = []
+    for path, new_value in _flatten_overrides(definition.overrides):
+        old_value = _get_path(baseline, path)
+        if old_value == new_value:
+            continue
         changes.append(ChangedValue(path=path, old_value=old_value, new_value=new_value))
+    if not changes:
+        raise ValueError(f"Experiment '{definition.experiment_id}' does not change the baseline.")
+    return baseline, variant, changes
+
+
+def apply_experiment_overrides(settings: Settings, definition: ExperimentDefinition) -> tuple[Settings, list[ChangedValue]]:
+    _, variant, changes = build_experiment_settings(settings, definition)
     return variant, changes
 
 
@@ -452,8 +480,7 @@ def run_abtest(
     progress: Callable[[str], None] | None = None,
 ) -> AbtestSummary:
     definition = load_experiment(experiment_id, experiments_path)
-    baseline_settings = deepcopy(settings)
-    variant_settings, changes = apply_experiment_overrides(settings, definition)
+    baseline_settings, variant_settings, changes = build_experiment_settings(settings, definition)
     if dynamic_universe:
         if dynamic_symbol_master is None and progress is not None:
             progress("building shared dynamic universe symbol master for A/B")
