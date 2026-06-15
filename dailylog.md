@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-06-16
+
+### 00:10:00 +08:00 - 实验：固定 42 根退出 vs 条件式 42 根退出
+- 类型：实验 / 报告 / 文档 / Git
+- 实验：`max_holding_42_fixed_vs_conditional_sensitive`，固定 sensitive 策略、418-symbol master、`max-symbols=40` 与 42 根阈值，唯一变量为 `max_holding_bars_conditional=false -> true`。
+- 结果：早期窗口条件版 Net 31.86% -> 27.57%、PF 1.48 -> 1.38、Sharpe 1.31 -> 1.21、MDD 20.66% -> 21.04%；近端窗口 Net 15.95% -> 30.75%、PF 1.31 -> 1.64、Sharpe 0.86 -> 1.42、MDD 11.05% -> 12.40%。两段 closed_trades 分别保持 134 与 110。
+- 分层：差异主要来自 `RISK_ON`；早期净 PnL 3226.48 -> 2911.83，近端 1996.22 -> 3480.82；近端 `RISK_OFF` 基本不变。
+- 结论：`retest`。条件版在近端捕捉延迟趋势赢家，但早期全面弱于固定退出，且两个窗口 MDD 均上升；暂不修改默认配置，下一步补 `2023-07-01 -> 2024-07-01` 第三非重叠窗口。
+- 验证：四份 raw backtest 配置确认 baseline/variant 都为 42 根且 sensitive 参数一致；A/B 报告只列出 conditional bool 一个变化；两段样本均充足、覆盖 700 天、无重叠；生成两份 regime breakdown 与人工复盘报告。
+- Git：计划提交 `Record fixed versus conditional 42-bar experiment`。
+
 ## 2026-06-15
 
 ### 20:15:00 +08:00 - 发现 config_hash 漂移，5 天稳定窗口重置
