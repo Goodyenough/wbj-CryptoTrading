@@ -15,6 +15,14 @@
 
 ## 2026-06-16
 
+### 23:02:12 +08:00 - 补充实验索引与三周观察仪表待办
+- 类型：文档 / Git
+- 改动：在 `TODO.md` 新增两项待办：增强实验结论索引页，以及增强 3 周观察仪表的 daily 汇总指标。
+- 原因：报告数量增加后，实验结论和 paper 观察证据开始分散，需要把实验名、时间段、结论、`keep/retest/reject`、下一步，以及 `RECLAIM_PENDING`、TP1 EMA stop、开放持仓时长、RISK_OFF 新计划等三周复盘证据集中管理。
+- 影响：仅更新任务清单，不修改策略代码、`settings.toml`、定时任务或数据库。
+- 验证：检查 `TODO.md` 已在实验索引和观察仪表既有完成项旁新增两条未完成增强任务；`git status` 仅包含文档变更。
+- Git：计划提交 `Add experiment index and observation dashboard todos`。
+
 ### 20:19:51 +08:00 - 跟踪 2026-06-16 daily 自动报告
 - 类型：报告 / 文档 / Git
 - 改动：将 2026-06-16 20:05 daily 自动生成的 market scan、paper report、three-week observation dashboard 和对应 5 张候选 SVG 图表纳入版本控制。
