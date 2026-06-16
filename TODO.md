@@ -111,8 +111,9 @@
 - [x] 将 `max_holding_42x4h_no_tp1` 与当前 sensitive 组合叠加并完成两段非重叠 walk-forward：两段 PF、Sharpe、净收益均改善，近端 MDD 20.74% -> 11.05%，但较早窗口 MDD 18.03% -> 20.66%，结论 `retest`；95 笔 TIME_EXIT 后续路径更偏向止血，但存在延迟启动赢家，不写入默认配置。
 - [x] 完成条件式 42 根相对“无时间退出”的初筛：两段非重叠 walk-forward 均明显改善，但该实验不能回答条件式是否优于固定 42 根。
 - [x] 完成固定 42 根 vs 条件式 42 根严格单变量 A/B：早期窗口条件版净收益 31.86% -> 27.57%、PF 1.48 -> 1.38、MDD 20.66% -> 21.04%；近端窗口净收益 15.95% -> 30.75%、PF 1.31 -> 1.64、MDD 11.05% -> 12.40%。结论 `retest`，条件版存在阶段依赖，暂不部署。
-- [ ] 用 `max_holding_42_fixed_vs_conditional_sensitive` 补更早非重叠窗口 `2023-07-01 -> 2024-07-01`；若样本充足，结合三窗口决定固定 42、条件 42 或继续研究 EMA20 斜率确认。
-- [ ] 3 周 paper 观察期结束后，仅在三窗口证据支持时才评估将 42 根退出写入默认 `settings.toml`；须先确认 db stability 5 天稳定窗口空闲，并结合模拟盘持仓时长与 TIME_EXIT 案例人工复盘。
+- [x] 用 `max_holding_42_fixed_vs_conditional_sensitive` 补更早非重叠窗口 `2023-07-01 -> 2024-07-01`：条件版 Net 38.96% -> 22.26%、PF 1.32 -> 1.20、Sharpe 1.40 -> 0.89、MDD 19.81% -> 20.69%，结论 `reject_candidate`；三窗口中条件版 2 段变差、3 段 MDD 均更高，不部署 `max_holding_bars_conditional=true`。
+- [ ] 3 周 paper 观察期结束后，优先评估固定 `max_holding_bars_without_tp1=42` 是否写入默认 `settings.toml`；须先确认 db stability 5 天稳定窗口空闲，并结合模拟盘持仓时长与 TIME_EXIT 案例人工复盘。
+- [ ] 如继续研究延迟赢家保留，另开单变量实验：42 根后只有在 price > entry、price > EMA20 且 EMA20 斜率为正时才允许继续持有。
 - [x] 设计 large-cap 单独入场规则实验：若市值分层复测确认 large-cap 在弱市仍正收益，新增 `large_cap_only_risk_off` dimension，RISK_OFF 时只允许 BTC/ETH/BNB/SOL 入场，altcoin 全部暂停；需在 `abtest.py` 注册 dimension、`experiments.toml` 加实验定义。实验已完成两段 walk-forward：早期段（2024-07→2025-06）variant net +2.37%→+13.54%（+11.17%），近端段（2025-06→2026-06）variant net +3.12%→-3.12%（-6.24%）。两段方向相反，结论 `retest`；在已有 altcoin 组合上叠加 BNB/SOL RISK_OFF 入场反而在熊市拖累整体，与单独 large-cap 回测结论不一致，暂不 keep。
 - [ ] 2026-07-02 模拟盘复盘决策：根据 3 周观察结果（entry_reclaim 拦截次数、RISK_OFF 频率、现有持仓 WLDUSDT/ONDOUSDT 结果）决定 sensitive 组合是 keep、调参还是继续观察。
 - [x] 建实验结论索引页：新增 `python main.py experiment-index`，生成 `reports/2026-06-11/experiment_index_2026-06-11_v2.md`。

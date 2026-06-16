@@ -15,6 +15,15 @@
 
 ## 2026-06-16
 
+### 10:05:00 +08:00 - 补跑固定 vs 条件式 42 根第三窗口
+- 类型：实验 / 报告 / 文档 / Git
+- 实验：继续 `max_holding_42_fixed_vs_conditional_sensitive`，补跑 `2023-07-01 -> 2024-07-01`，仍使用固定 `dynamic_master_full.json`、`max-symbols=40`、sensitive 策略与 42 根阈值，唯一变量为 `max_holding_bars_conditional=false -> true`。
+- 结果：条件版 trades 769 -> 758、closed_trades 207 -> 197、胜率 49.76% -> 45.69%、PF 1.32 -> 1.20、Sharpe 1.40 -> 0.89、MDD 19.81% -> 20.69%、Net 38.96% -> 22.26%、stop rate 47.34% -> 48.22%。
+- 分层：第三窗口全部闭合交易均为 `RISK_ON`，净 PnL 3896.37 -> 2225.91；证明条件式延迟持有在更早强趋势窗口反而保留了更多回吐仓位。
+- 结论：`reject_candidate`。三窗口中条件版 2 段变差、3 段 MDD 均更高；不部署 `max_holding_bars_conditional=true`，下一步回到固定 42 根的 keep review，或另开 EMA20 斜率确认实验。
+- 约束：未修改 `settings.toml`；保留用户已有暂存 `# test` 原样，不纳入本次提交。
+- Git：计划提交 `Record third fixed versus conditional 42-bar window`。
+
 ### 00:10:00 +08:00 - 实验：固定 42 根退出 vs 条件式 42 根退出
 - 类型：实验 / 报告 / 文档 / Git
 - 实验：`max_holding_42_fixed_vs_conditional_sensitive`，固定 sensitive 策略、418-symbol master、`max-symbols=40` 与 42 根阈值，唯一变量为 `max_holding_bars_conditional=false -> true`。

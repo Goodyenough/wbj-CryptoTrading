@@ -69,8 +69,37 @@ experiment: max_holding_42_fixed_vs_conditional_sensitive
 2. 若第三窗口仍显示阶段分化，再测试“42 根后必须同时位于 entry 与 EMA20 上方，且 EMA20 斜率为正才继续持有”，只新增 EMA 斜率确认一个变量。
 3. 在额外证据完成前，不修改默认 `settings.toml`，也不影响当前 5 天数据库稳定性窗口。
 
+## 第三窗口补测（2026-06-16）
+
+按上述下一步补跑 `2023-07-01 -> 2024-07-01`，仍使用固定 `dynamic_master_full.json`、`max-symbols=40`、同一 sensitive 组合，唯一变量仍为 `max_holding_bars_conditional=false -> true`。
+
+- trades：baseline 769 -> variant 758，变化 -1.43%
+- closed_trades：207 -> 197，变化 -4.83%
+- 胜率：49.76% -> 45.69%，变化 -4.07 个百分点
+- Profit factor：1.32 -> 1.20
+- Sharpe：1.40 -> 0.89
+- 最大回撤：19.81% -> 20.69%
+- 净收益：38.96% -> 22.26%，变化 -16.70 个百分点
+- avg R：0.173 -> 0.117
+- stop rate：47.34% -> 48.22%
+- regime：全部闭合交易均为 `RISK_ON`，净 PnL 3896.37 -> 2225.91
+
+### 三窗口综合判断
+
+`reject_candidate`：第三窗口样本充足，并且与较早的 `2024-07-01 -> 2025-06-01` 一样，条件式 42 根弱于固定 42 根；只有近端 `2025-06-01 -> 2026-06-01` 明显改善。三段中条件版有 2 段净收益/PF/Sharpe 变差，3 段 MDD 全部更高，因此不应部署 `max_holding_bars_conditional=true`。
+
+更稳健的结论是：固定 42 根退出仍是当前较优候选；条件式退出更像近端行情特化，对早期强 RISK_ON 趋势阶段反而保留了更多最终回吐的仓位。
+
+### 更新后的下一步
+
+1. 不把 `max_holding_bars_conditional=true` 写入默认 `settings.toml`。
+2. 若继续研究“延迟赢家保留”，应另开单变量实验：42 根后只有在 price > entry、price > EMA20 且 EMA20 斜率为正时才允许继续持有。
+3. 固定 42 根退出可进入 3 周 paper 观察后的 keep review，但必须等待当前数据库稳定窗口完成，避免再次改动 `settings.toml` 重置 config hash。
+
 ## 证据
 
 - `abtest_summary_dynamic_universe_max_holding_42_fixed_vs_conditional_sensitive_2026-06-15_v1.md`
 - `backtest_regime_breakdown_5c8c378c16fd_e562c08d5fca_v1.md`
 - `backtest_regime_breakdown_31f5e44d3d40_eb11621e6738_v1.md`
+- `abtest_dynamic_universe_max_holding_42_fixed_vs_conditional_sensitive_2023-07-01_2024-07-01_v1.md`
+- `backtest_regime_breakdown_6228ab0da9d5_769b52c120b5_v1.md`
