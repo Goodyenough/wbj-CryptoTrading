@@ -15,6 +15,14 @@
 
 ## 2026-06-16
 
+### 14:32:05 +08:00 - 固定 settings.toml 的 Git 换行规则
+- 类型：配置 / 文档 / Git
+- 改动：新增 `.gitattributes`，将 `config/settings.toml` 显式设置为 `text eol=lf`，并将 `.gitattributes` 自身固定为 LF。
+- 原因：本机全局 `core.autocrlf=true` 会在 Git 触碰文件时提示或尝试把 LF 转为 CRLF；`settings.toml` 的 `config_hash` 依赖原始字节，换行变化会导致 paper 观察窗口出现不必要的 hash drift。
+- 影响：不修改 `settings.toml` 内容，不改变策略参数；以后 `git restore`、checkout、merge 等操作应保持该文件 LF，降低误操作导致 `config_hash` 变化的风险。
+- 验证：`git ls-files --eol -- config/settings.toml .gitattributes` 显示 `config/settings.toml` 命中 `attr/text eol=lf`；`_config_hash(Path("config/settings.toml"))` 仍为 `be7ec39ec21f6a83`；`settings.toml` 未出现在待提交变更中。
+- Git：计划提交 `Pin settings line endings for stable config hash`。
+
 ### 10:05:00 +08:00 - 补跑固定 vs 条件式 42 根第三窗口
 - 类型：实验 / 报告 / 文档 / Git
 - 实验：继续 `max_holding_42_fixed_vs_conditional_sensitive`，补跑 `2023-07-01 -> 2024-07-01`，仍使用固定 `dynamic_master_full.json`、`max-symbols=40`、sensitive 策略与 42 根阈值，唯一变量为 `max_holding_bars_conditional=false -> true`。
