@@ -15,6 +15,14 @@
 
 ## 2026-06-16
 
+### 20:19:51 +08:00 - 跟踪 2026-06-16 daily 自动报告
+- 类型：报告 / 文档 / Git
+- 改动：将 2026-06-16 20:05 daily 自动生成的 market scan、paper report、three-week observation dashboard 和对应 5 张候选 SVG 图表纳入版本控制。
+- 原因：项目规则要求提交生成的 `reports/`，便于三周 paper 观察期回溯每日样本和报告证据。
+- 影响：不修改策略代码、`settings.toml` 或本地 SQLite 数据库；仅跟踪已生成的 Markdown/SVG 报告产物。
+- 验证：定时任务返回码为 0；数据库 latest run 为 `20260616_120503_7c6775dd` 且 `status=success`；`config_hash` 保持 `be7ec39ec21f6a83`；报告文件与图表文件均存在。
+- Git：计划提交 `Track 2026-06-16 daily reports`。
+
 ### 14:32:05 +08:00 - 固定 settings.toml 的 Git 换行规则
 - 类型：配置 / 文档 / Git
 - 改动：新增 `.gitattributes`，将 `config/settings.toml` 显式设置为 `text eol=lf`，并将 `.gitattributes` 自身固定为 LF。
