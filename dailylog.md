@@ -15,6 +15,14 @@
 
 ## 2026-06-18
 
+### 21:48:50 +08:00 - 提前安装 4h paper 定时任务
+- 类型：运维 / 文档 / Git
+- 改动：用户确认 2026-06-17 daily 缺失样本的根因为 GPT 会员/用量到期导致的外部执行资源中断，而非脚本、SQLite、定时任务或交易逻辑缺陷；据此提前以 `-RequiredStableDays 1` 安装 `CryptoTrading_4H_PaperUpdate`。
+- 改动：更新 `TODO.md`，将 4h 任务安装项标记完成，并保留 daily 连续观察窗口仍从 2026-06-18 起算的说明。
+- 影响：4h 任务已注册 00:10、04:10、08:10、12:10、16:10 五个触发器，仅运行 `paper cycle`，不执行 scan 或 add-from-scan；仍需观察 2026-06-19 00:10 首轮 4h run 是否成功。
+- 验证：`Get-ScheduledTask -TaskName CryptoTrading_4H_PaperUpdate` 显示任务存在且触发器启用；`Get-ScheduledTaskInfo` 显示 `NextRunTime=2026-06-19 00:10:00`、`LastTaskResult=267011`（尚未首次运行）、`NumberOfMissedRuns=0`。
+- Git：计划提交 `Record early 4h task install`。
+
 ### 21:42:30 +08:00 - 标记 2026-06-17 daily 缺失样本
 - 类型：代码 / 数据库 / 运维 / 测试 / 文档 / Git
 - 改动：新增 `python main.py db mark-run-failed --run-id ... --reason ...`，只允许把仍处于 `running` 的 observation run 显式标记为 `failed`，并要求写入失败原因。
