@@ -15,6 +15,14 @@
 
 ## 2026-06-18
 
+### 22:48:25 +08:00 - RECLAIM_PENDING 机会成本复盘
+- 类型：实验 / 报告 / 文档 / Git
+- 改动：生成 `reports/2026-06-18/reclaim_pending_opportunity_cost_review_2026-06-18_v1.md`，并同步到 Obsidian Reports；更新 Obsidian `CryptoTrading 实验日志.md` 记录实验背景、样本、结论和下一步。
+- 结果：现有 `RECLAIM_PENDING` 样本全部来自 ONDOUSDT plan `9734a33dea2e`，8 次事件价格均低于 `entry_low=0.394505`，没有一次进入计划入场区间或 4h close reclaim `entry_high=0.411568`；当前不能证明 `entry_reclaim_close` 造成明显机会成本。
+- 影响：不修改 `settings.toml`，不新增/修改 paper plan，不运行 backtest 或 daily/4h 任务；仅基于 SQLite paper events/snapshots 和既有报告做离线复盘。
+- 验证：确认报告文件生成；`python main.py db status` 显示数据库健康；`_config_hash(Path("config/settings.toml"))` 保持 `be7ec39ec21f6a83`。
+- Git：计划提交 `Review reclaim pending opportunity cost`。
+
 ### 22:14:16 +08:00 - daily 与 4h 任务完成后发送企业微信通知
 - 类型：脚本 / 运维 / 文档 / Git
 - 改动：在 `scripts/run_logged_paper_task.ps1` 增加企业微信机器人通知逻辑；`daily` 与 `paper_4h` 两种模式成功完成时发送 `completed` 通知，失败时发送 `failed` 通知。
