@@ -117,7 +117,7 @@
 - [x] 设计 large-cap 单独入场规则实验：若市值分层复测确认 large-cap 在弱市仍正收益，新增 `large_cap_only_risk_off` dimension，RISK_OFF 时只允许 BTC/ETH/BNB/SOL 入场，altcoin 全部暂停；需在 `abtest.py` 注册 dimension、`experiments.toml` 加实验定义。实验已完成两段 walk-forward：早期段（2024-07→2025-06）variant net +2.37%→+13.54%（+11.17%），近端段（2025-06→2026-06）variant net +3.12%→-3.12%（-6.24%）。两段方向相反，结论 `retest`；在已有 altcoin 组合上叠加 BNB/SOL RISK_OFF 入场反而在熊市拖累整体，与单独 large-cap 回测结论不一致，暂不 keep。
 - [ ] 2026-07-02 模拟盘复盘决策：根据 3 周观察结果（entry_reclaim 拦截次数、RISK_OFF 频率、现有持仓 WLDUSDT/ONDOUSDT 结果）决定 sensitive 组合是 keep、调参还是继续观察。
 - [x] 建实验结论索引页：新增 `python main.py experiment-index`，生成 `reports/2026-06-11/experiment_index_2026-06-11_v2.md`。
-- [ ] 增强实验结论索引页：汇总 `reports/` 与 Obsidian 实验日志中的关键实验，至少包含实验名、时间段、核心变更、结论、`keep/retest/reject`、下一步，避免后续在多份 A/B 报告中人工翻找线索。
+- [x] 增强实验结论索引页：汇总 `reports/` 中的关键实验，按 `experiment_id` 聚合，输出实验名、时间段、核心变更、结论、`keep/retest/reject`、下一步；`*_review_*.md` frontmatter 覆盖自动 summary，生成 `reports/2026-06-18/experiment_index_2026-06-18_v1.md`。
 - [x] 准备 3 周观察仪表：新增 `python main.py observation-dashboard`，并接入 `python main.py daily`，每天输出 `RECLAIM_PENDING` 后续、TP1 EMA trailing、开放持仓时长和 RISK_OFF 今日候选摘要。
 - [ ] 增强 3 周观察仪表：daily 自动汇总 `RECLAIM_PENDING` 次数、被拦截后是否继续下跌、TP1 EMA stop 激活/抬止损/出场统计、开放持仓时长分布、RISK_OFF 下是否仍产生新计划，确保 2026-07-02 复盘可直接基于证据判断。
 

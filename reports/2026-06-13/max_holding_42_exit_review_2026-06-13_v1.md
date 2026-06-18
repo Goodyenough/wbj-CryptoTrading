@@ -5,6 +5,17 @@ tags:
   - trading-system
   - exit-review
 experiment: risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42
+experiment_id: risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42
+verdict: retest
+reason: 42 根规则更像有效的停滞仓位清理器，但仍存在延迟启动赢家的机会成本。
+next_action: 比较固定 42 根退出与条件式 42 根退出，确认能否保留止血效果并减少延迟赢家损失。
+changed_param: backtest.max_holding_bars_without_tp1
+old_value: 0
+new_value: 42
+start: 2024-07-01
+end: 2026-06-01
+periods: 2
+sufficient_periods: 2
 ---
 
 # 42x4h TIME_EXIT 后续路径审查

@@ -13,6 +13,18 @@
 - Git：
 ```
 
+## 2026-06-18
+
+### 21:33:29 +08:00 - 增强实验结论索引页
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：升级 `python main.py experiment-index`，从“每份报告一行”改为按 `experiment_id` 聚合；仅扫描项目 `reports/`，不读取 Obsidian 作为输入；`*_review_*.md` frontmatter 优先覆盖 `abtest_summary_*.md`，单段 `abtest_*.md` 作为兜底。
+- 改动：为 `max_holding_42_exit_review_2026-06-13_v1.md` 与 `max_holding_42_fixed_vs_conditional_review_2026-06-16_v1.md` 补充 `experiment_id`、`verdict`、`reason`、`next_action` 等结构化 frontmatter，并生成 `reports/2026-06-18/experiment_index_2026-06-18_v1.md`。
+- 改动：按项目规则同步纳入 2026-06-18 20:05 daily 自动生成的 market scan、paper report、observation dashboard 与候选图表。
+- 原因：A/B、summary 和 review 报告数量增加后，原索引需要人工扫描大量重复行；按实验聚合后可直接查看综合结论、核心变更、下一步和证据报告。
+- 影响：不修改 `settings.toml` 或交易策略配置；Obsidian 仍作为索引输出目标，不作为数据输入源。
+- 验证：`python tests\test_research_tools.py` 通过；`python -m compileall main.py src tests` 通过；`python main.py experiment-index` 成功输出项目与 Obsidian 索引；`python main.py db status` 显示 2026-06-18 daily run `20260618_120504_52821c3b` 成功；`config_hash` 保持 `be7ec39ec21f6a83`。
+- Git：计划提交 `Aggregate experiment conclusion index`。
+
 ## 2026-06-16
 
 ### 23:02:12 +08:00 - 补充实验索引与三周观察仪表待办

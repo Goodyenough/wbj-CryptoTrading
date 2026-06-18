@@ -6,6 +6,17 @@ tags:
   - abtest
   - exit-review
 experiment: max_holding_42_fixed_vs_conditional_sensitive
+experiment_id: max_holding_42_fixed_vs_conditional_sensitive
+verdict: reject_candidate
+reason: 三窗口中条件式 42 根有 2 段净收益/PF/Sharpe 变差，且 3 段 MDD 全部更高。
+next_action: 不部署 max_holding_bars_conditional=true；固定 42 根退出进入 3 周 paper 观察后的 keep review。
+changed_param: backtest.max_holding_bars_conditional
+old_value: false
+new_value: true
+start: 2023-07-01
+end: 2026-06-01
+periods: 3
+sufficient_periods: 3
 ---
 
 # 固定 42 根退出 vs 条件式 42 根退出复盘

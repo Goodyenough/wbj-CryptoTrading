@@ -64,15 +64,30 @@ def split_symbol_master_by_cap(
 
 
 @dataclass(frozen=True)
-class ExperimentIndexRow:
+class ExperimentIndexSource:
     path: Path
     report_type: str
     experiment_id: str
     start: str
     end: str
+    changed_param: str
+    old_value: str
+    new_value: str
     verdict: str
     sample_sufficient: str
+    reason: str
     next_action: str
+    periods: int
+    sufficient_periods: int
+    created: str
+    report_version: int
+
+
+@dataclass(frozen=True)
+class ExperimentIndexEntry:
+    experiment_id: str
+    source: ExperimentIndexSource
+    evidence_paths: tuple[Path, ...]
 
 
 def _frontmatter(text: str) -> dict[str, str]:
@@ -90,12 +105,69 @@ def _frontmatter(text: str) -> dict[str, str]:
     return output
 
 
+def _extract_raw_json(text: str, heading: str) -> dict:
+    marker = f"## {heading}"
+    start = text.find(marker)
+    if start == -1:
+        return {}
+    fence_start = text.find("```json", start)
+    if fence_start == -1:
+        return {}
+    json_start = text.find("\n", fence_start)
+    fence_end = text.find("```", json_start + 1)
+    if json_start == -1 or fence_end == -1:
+        return {}
+    try:
+        parsed = json.loads(text[json_start + 1 : fence_end])
+    except json.JSONDecodeError:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _bullet_value(text: str, key: str) -> str:
+    prefix = f"- {key}:"
+    for line in text.splitlines():
+        if line.startswith(prefix):
+            return line[len(prefix) :].strip().strip("`")
+    return ""
+
+
+def _report_version(fm: dict[str, str]) -> int:
+    raw = fm.get("report_version", "v0").strip().lstrip("vV")
+    return int(raw) if raw.isdigit() else 0
+
+
+def _created_value(fm: dict[str, str]) -> str:
+    return fm.get("created", "")
+
+
 def _infer_period(path: Path) -> tuple[str, str]:
     parts = path.stem.split("_")
     dates = [part for part in parts if len(part) == 10 and part[4] == "-" and part[7] == "-"]
     if len(dates) >= 2:
         return dates[-2], dates[-1]
     return "n/a", "n/a"
+
+
+def _format_period(start: str, end: str) -> str:
+    if start == "n/a" and end == "n/a":
+        return "n/a"
+    return f"{start} -> {end}"
+
+
+def _change_summary(changed_param: str, old_value: str, new_value: str) -> str:
+    if not changed_param or changed_param == "n/a":
+        return "n/a"
+    if old_value and new_value:
+        return f"`{changed_param}`: `{old_value}` -> `{new_value}`"
+    return f"`{changed_param}`"
+
+
+def _rel_report_path(path: Path, reports_dir: Path) -> Path:
+    try:
+        return path.relative_to(reports_dir)
+    except ValueError:
+        return path
 
 
 def _next_action(verdict: str, sample_sufficient: str) -> str:
@@ -110,30 +182,153 @@ def _next_action(verdict: str, sample_sufficient: str) -> str:
     return "复核报告细节"
 
 
+def _source_rank(source: ExperimentIndexSource) -> tuple[int, str, int]:
+    priority = {"review": 3, "summary": 2, "abtest": 1}.get(source.report_type, 0)
+    return priority, source.created, source.report_version
+
+
+def _path_from_report_value(value: str, reports_dir: Path) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    if path.exists():
+        return path
+    candidate = reports_dir / value
+    if candidate.exists():
+        return candidate
+    return None
+
+
+def _abtest_change_from_path(path: Path | None) -> tuple[str, str, str]:
+    if path is None or not path.exists():
+        return "n/a", "", ""
+    fm = _frontmatter(path.read_text(encoding="utf-8"))
+    return fm.get("changed_param", "n/a"), fm.get("old_value", ""), fm.get("new_value", "")
+
+
+def _build_review_source(path: Path, text: str) -> ExperimentIndexSource | None:
+    fm = _frontmatter(text)
+    experiment_id = fm.get("experiment_id") or fm.get("experiment")
+    if not experiment_id:
+        return None
+    verdict = fm.get("verdict", "unknown")
+    sample = fm.get("sample_sufficient", "unknown")
+    return ExperimentIndexSource(
+        path=path,
+        report_type="review",
+        experiment_id=experiment_id,
+        start=fm.get("start", "n/a"),
+        end=fm.get("end", "n/a"),
+        changed_param=fm.get("changed_param", "n/a"),
+        old_value=fm.get("old_value", ""),
+        new_value=fm.get("new_value", ""),
+        verdict=verdict,
+        sample_sufficient=sample,
+        reason=fm.get("reason", ""),
+        next_action=fm.get("next_action") or _next_action(verdict, sample),
+        periods=int(fm.get("periods", "0") or 0),
+        sufficient_periods=int(fm.get("sufficient_periods", "0") or 0),
+        created=_created_value(fm),
+        report_version=_report_version(fm),
+    )
+
+
+def _build_summary_source(path: Path, text: str, reports_dir: Path) -> ExperimentIndexSource | None:
+    fm = _frontmatter(text)
+    experiment_id = fm.get("experiment_id")
+    if not experiment_id:
+        return None
+    raw = _extract_raw_json(text, "Raw Summary")
+    records = raw.get("records", []) if isinstance(raw.get("records"), list) else []
+    starts = [str(record.get("start")) for record in records if record.get("start")]
+    ends = [str(record.get("end")) for record in records if record.get("end")]
+    start = min(starts) if starts else "n/a"
+    end = max(ends) if ends else "n/a"
+    source_reports = [record.get("path", "") for record in records if isinstance(record, dict)]
+    first_report = _path_from_report_value(str(source_reports[0]), reports_dir) if source_reports else None
+    changed_param, old_value, new_value = _abtest_change_from_path(first_report)
+    verdict = fm.get("verdict", str(raw.get("verdict", "unknown")))
+    sample = "true" if str(fm.get("variant_under_sample_periods", raw.get("variant_under_sample_periods", 0))) == "0" else "false"
+    reason = str(raw.get("reason") or _bullet_value(text, "reason"))
+    return ExperimentIndexSource(
+        path=path,
+        report_type="summary",
+        experiment_id=experiment_id,
+        start=start,
+        end=end,
+        changed_param=changed_param,
+        old_value=old_value,
+        new_value=new_value,
+        verdict=verdict,
+        sample_sufficient=sample,
+        reason=reason,
+        next_action=fm.get("next_action") or _next_action(verdict, sample),
+        periods=int(fm.get("periods", raw.get("periods", 0)) or 0),
+        sufficient_periods=int(fm.get("sufficient_periods", raw.get("sufficient_periods", 0)) or 0),
+        created=_created_value(fm),
+        report_version=_report_version(fm),
+    )
+
+
+def _build_abtest_source(path: Path, text: str) -> ExperimentIndexSource | None:
+    fm = _frontmatter(text)
+    experiment_id = fm.get("experiment_id")
+    if not experiment_id:
+        return None
+    start, end = _infer_period(path)
+    verdict = fm.get("verdict", "unknown")
+    sample = fm.get("sample_sufficient", "unknown")
+    return ExperimentIndexSource(
+        path=path,
+        report_type="abtest",
+        experiment_id=experiment_id,
+        start=start,
+        end=end,
+        changed_param=fm.get("changed_param", "n/a"),
+        old_value=fm.get("old_value", ""),
+        new_value=fm.get("new_value", ""),
+        verdict=verdict,
+        sample_sufficient=sample,
+        reason=_bullet_value(text, "reason"),
+        next_action=fm.get("next_action") or _next_action(verdict, sample),
+        periods=1,
+        sufficient_periods=1 if sample.lower() == "true" else 0,
+        created=_created_value(fm),
+        report_version=_report_version(fm),
+    )
+
+
+def _experiment_index_sources(root: Path) -> list[ExperimentIndexSource]:
+    sources: list[ExperimentIndexSource] = []
+    for path in sorted(root.glob("**/*.md")):
+        source: ExperimentIndexSource | None = None
+        text = path.read_text(encoding="utf-8")
+        if path.name.startswith("abtest_summary_"):
+            source = _build_summary_source(path, text, root)
+        elif path.name.startswith("abtest_"):
+            source = _build_abtest_source(path, text)
+        elif path.name.endswith(".md") and "_review_" in path.name:
+            source = _build_review_source(path, text)
+        if source is not None:
+            sources.append(source)
+    return sources
+
+
+def _experiment_index_entries(root: Path) -> list[ExperimentIndexEntry]:
+    grouped: dict[str, list[ExperimentIndexSource]] = {}
+    for source in _experiment_index_sources(root):
+        grouped.setdefault(source.experiment_id, []).append(source)
+    entries: list[ExperimentIndexEntry] = []
+    for experiment_id, sources in grouped.items():
+        selected = sorted(sources, key=_source_rank, reverse=True)[0]
+        evidence = tuple(source.path for source in sorted(sources, key=_source_rank, reverse=True)[:5])
+        entries.append(ExperimentIndexEntry(experiment_id=experiment_id, source=selected, evidence_paths=evidence))
+    return sorted(entries, key=lambda entry: (entry.source.verdict, entry.experiment_id))
+
+
 def build_experiment_index(settings: Settings, reports_dir: Path | None = None) -> tuple[str, list[Path]]:
     root = reports_dir or settings.output.reports_dir
-    rows: list[ExperimentIndexRow] = []
-    for path in sorted(root.glob("**/*.md")):
-        if not (path.name.startswith("abtest_") or path.name.startswith("abtest_summary_")):
-            continue
-        text = path.read_text(encoding="utf-8")
-        fm = _frontmatter(text)
-        experiment_id = fm.get("experiment_id", "unknown")
-        verdict = fm.get("verdict", "unknown")
-        sample = fm.get("sample_sufficient", "unknown")
-        start, end = _infer_period(path)
-        rows.append(
-            ExperimentIndexRow(
-                path=path,
-                report_type="summary" if path.name.startswith("abtest_summary_") else "abtest",
-                experiment_id=experiment_id,
-                start=start,
-                end=end,
-                verdict=verdict,
-                sample_sufficient=sample,
-                next_action=_next_action(verdict, sample),
-            )
-        )
+    entries = _experiment_index_entries(root)
 
     now = _local_now()
     report_dir = settings.output.reports_dir / now.strftime("%Y-%m-%d")
@@ -152,17 +347,43 @@ def build_experiment_index(settings: Settings, reports_dir: Path | None = None) 
         "",
         f"# 实验结论索引 {now.strftime('%Y-%m-%d')} v{version}",
         "",
-        "| Experiment | Type | Period | Verdict | Sample | Next Action | Report |",
-        "|---|---|---|---|---|---|---|",
+        "数据源：仅扫描项目 `reports/`；Obsidian 只作为输出目标，不作为输入源。`candidate_keep_review` 仍需人工决策，不会自动等同于 keep。",
+        "",
+        "## 需要关注",
+        "",
+        "| Experiment | Verdict | Reason | Next Action | Evidence |",
+        "|---|---|---|---|---|",
     ]
-    for row in rows:
-        rel = row.path.relative_to(settings.output.reports_dir) if row.path.is_relative_to(settings.output.reports_dir) else row.path
+    attention = [entry for entry in entries if entry.source.verdict in {"candidate_keep_review", "reject_candidate"}]
+    if attention:
+        for entry in attention:
+            source = entry.source
+            rel = _rel_report_path(source.path, settings.output.reports_dir)
+            lines.append(
+                f"| `{entry.experiment_id}` | {source.verdict} | {source.reason or 'n/a'} | "
+                f"{source.next_action} | `{rel}` |"
+            )
+    else:
+        lines.append("| n/a | n/a | 当前没有 candidate_keep_review 或 reject_candidate | n/a | n/a |")
+    lines.extend(
+        [
+            "",
+            "## 完整索引",
+            "",
+            "| Experiment | Source | Period | Change | Windows | Sufficient | Verdict | Reason | Next Action | Evidence |",
+            "|---|---|---|---|---:|---:|---|---|---|---|",
+        ]
+    )
+    for entry in entries:
+        source = entry.source
+        evidence = "<br>".join(f"`{_rel_report_path(path, settings.output.reports_dir)}`" for path in entry.evidence_paths)
         lines.append(
-            f"| `{row.experiment_id}` | {row.report_type} | {row.start} -> {row.end} | "
-            f"{row.verdict} | {row.sample_sufficient} | {row.next_action} | `{rel}` |"
+            f"| `{entry.experiment_id}` | {source.report_type} | {_format_period(source.start, source.end)} | "
+            f"{_change_summary(source.changed_param, source.old_value, source.new_value)} | {source.periods} | "
+            f"{source.sufficient_periods} | {source.verdict} | {source.reason or 'n/a'} | {source.next_action} | {evidence} |"
         )
-    if not rows:
-        lines.append("| n/a | n/a | n/a | no_data | n/a | 先运行 A/B 实验 | n/a |")
+    if not entries:
+        lines.append("| n/a | n/a | n/a | n/a | 0 | 0 | no_data | n/a | 先运行 A/B 实验 | n/a |")
     text = "\n".join(lines) + "\n"
 
     paths: list[Path] = []
