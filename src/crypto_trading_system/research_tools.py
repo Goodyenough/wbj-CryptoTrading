@@ -29,6 +29,10 @@ def _local_timestamp(timestamp_utc: str) -> str:
     return datetime.fromisoformat(timestamp_utc).astimezone(timezone(timedelta(hours=8), name="CST")).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
+def _parse_utc(timestamp: str) -> datetime:
+    return datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+
+
 def split_symbol_master_by_cap(
     input_path: Path,
     output_dir: Path | None = None,
@@ -455,6 +459,150 @@ def _scan_action_summary(settings: Settings) -> tuple[Counter, Counter]:
     return action_counter, risk_off_counter
 
 
+def _run_health_summary(settings: Settings, now_utc: datetime) -> dict:
+    since = (now_utc - timedelta(hours=24)).isoformat(timespec="seconds").replace("+00:00", "Z")
+    with connect_db(settings.output.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        recent_rows = connection.execute(
+            """
+            SELECT run_type, status, COUNT(*) AS count
+            FROM runs
+            WHERE started_at >= ? AND run_type IN ('daily_full', 'paper_4h_update')
+            GROUP BY run_type, status
+            """,
+            (since,),
+        ).fetchall()
+        latest_rows = connection.execute(
+            """
+            SELECT r.*
+            FROM runs r
+            JOIN (
+                SELECT run_type, MAX(started_at) AS max_started
+                FROM runs
+                WHERE run_type IN ('daily_full', 'paper_4h_update')
+                GROUP BY run_type
+            ) latest
+              ON r.run_type = latest.run_type AND r.started_at = latest.max_started
+            """
+        ).fetchall()
+    counts: dict[str, Counter] = {
+        "daily_full": Counter(),
+        "paper_4h_update": Counter(),
+    }
+    for row in recent_rows:
+        counts[str(row["run_type"])][str(row["status"])] = int(row["count"])
+    latest = {str(row["run_type"]): dict(row) for row in latest_rows}
+    return {
+        "since": since,
+        "counts": counts,
+        "latest": latest,
+    }
+
+
+def _stale_running_runs(settings: Settings, now_utc: datetime, max_age_hours: float = 2.0) -> list[dict]:
+    cutoff = (now_utc - timedelta(hours=max_age_hours)).isoformat(timespec="seconds").replace("+00:00", "Z")
+    with connect_db(settings.output.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            """
+            SELECT run_id, run_type, started_at, log_path
+            FROM runs
+            WHERE status = 'running' AND started_at <= ?
+            ORDER BY started_at
+            """,
+            (cutoff,),
+        ).fetchall()
+    output: list[dict] = []
+    for row in rows:
+        started = _parse_utc(str(row["started_at"]))
+        output.append(
+            {
+                "run_id": str(row["run_id"]),
+                "run_type": str(row["run_type"]),
+                "started_at": str(row["started_at"]),
+                "age_hours": max(0.0, (now_utc - started).total_seconds() / 3600),
+                "log_path": str(row["log_path"] or ""),
+            }
+        )
+    return output
+
+
+def _holding_42_bar_review(settings: Settings, threshold_hours: float = 168.0) -> list[dict]:
+    with connect_db(settings.output.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            """
+            SELECT snapshot_time, run_id, plan_id, symbol, status, current_price,
+                   entry_price, stop_current, tp1, tp2, unrealized_pnl,
+                   realized_pnl, holding_hours
+            FROM paper_snapshots
+            WHERE holding_hours IS NOT NULL
+            ORDER BY plan_id, snapshot_time
+            """
+        ).fetchall()
+        event_rows = connection.execute(
+            """
+            SELECT plan_id, event_time, event_type, reason
+            FROM paper_events
+            WHERE event_type IN ('TP1_HIT', 'TP2_HIT', 'CLOSED', 'STOPPED',
+                                 'EMA_TRAILING_STOPPED', 'INVALIDATED', 'ARCHIVED')
+            ORDER BY event_time
+            """
+        ).fetchall()
+    by_plan: dict[str, list[sqlite3.Row]] = {}
+    for row in rows:
+        by_plan.setdefault(str(row["plan_id"]), []).append(row)
+    events_by_plan: dict[str, list[sqlite3.Row]] = {}
+    for row in event_rows:
+        events_by_plan.setdefault(str(row["plan_id"]), []).append(row)
+
+    review: list[dict] = []
+    for plan_id, snapshots in by_plan.items():
+        after_threshold = [row for row in snapshots if row["holding_hours"] is not None and float(row["holding_hours"]) >= threshold_hours]
+        if not after_threshold:
+            continue
+        first = after_threshold[0]
+        latest = snapshots[-1]
+        after_prices = [float(row["current_price"]) for row in after_threshold if row["current_price"] is not None]
+        after_pnls = [float(row["unrealized_pnl"]) for row in after_threshold if row["unrealized_pnl"] is not None]
+        threshold_time = str(first["snapshot_time"])
+        later_events = [
+            row for row in events_by_plan.get(plan_id, [])
+            if str(row["event_time"]) >= threshold_time
+        ]
+        outcome = "still_open" if str(latest["status"]) in OPEN_STATUSES else str(latest["status"]).lower()
+        if later_events:
+            outcome = str(later_events[-1]["event_type"]).lower()
+        review.append(
+            {
+                "plan_id": plan_id,
+                "symbol": str(latest["symbol"]),
+                "status": str(latest["status"]),
+                "threshold_time": threshold_time,
+                "hours_at_threshold": float(first["holding_hours"]),
+                "price_at_threshold": first["current_price"],
+                "pnl_at_threshold": first["unrealized_pnl"],
+                "latest_time": str(latest["snapshot_time"]),
+                "latest_price": latest["current_price"],
+                "latest_pnl": latest["unrealized_pnl"],
+                "max_price_after": max(after_prices) if after_prices else None,
+                "min_price_after": min(after_prices) if after_prices else None,
+                "max_pnl_after": max(after_pnls) if after_pnls else None,
+                "min_pnl_after": min(after_pnls) if after_pnls else None,
+                "outcome_after": outcome,
+            }
+        )
+    return sorted(review, key=lambda item: item["hours_at_threshold"], reverse=True)
+
+
+def _fmt_optional(value: object, digits: int = 2) -> str:
+    if value is None:
+        return "n/a"
+    if isinstance(value, float):
+        return f"{value:.{digits}f}"
+    return str(value)
+
+
 def generate_observation_dashboard(
     settings: Settings,
     account_name: str | None = None,
@@ -484,6 +632,9 @@ def generate_observation_dashboard(
     )
     now = _local_now()
     now_utc = datetime.now(timezone.utc)
+    run_health = _run_health_summary(settings, now_utc)
+    stale_runs = _stale_running_runs(settings, now_utc)
+    holding_42_rows = _holding_42_bar_review(settings)
     open_holding_hours = []
     for trade in trades:
         if trade.status in OPEN_STATUSES and trade.entered_at_utc:
@@ -529,12 +680,76 @@ def generate_observation_dashboard(
         f"| TP1 EMA stop raises | {ema_raises} |",
         f"| TP1 EMA stop exits | {ema_stops} |",
         f"| Open entered/TP1 positions | {len(open_holding_hours)} |",
+        f"| Positions over 42 x 4h / 168h | {len(holding_42_rows)} |",
+        f"| Stale running runs >2h | {len(stale_runs)} |",
+        "",
+        "## Run Health / 自动任务健康",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        "| Expected 4h runs per full day | 5 |",
+        f"| 4h success last 24h | {run_health['counts']['paper_4h_update'].get('success', 0)} |",
+        f"| 4h failed last 24h | {run_health['counts']['paper_4h_update'].get('failed', 0)} |",
+        f"| 4h running last 24h | {run_health['counts']['paper_4h_update'].get('running', 0)} |",
+        f"| daily success last 24h | {run_health['counts']['daily_full'].get('success', 0)} |",
+        f"| daily failed last 24h | {run_health['counts']['daily_full'].get('failed', 0)} |",
+        "",
+        "| Latest Run Type | Run ID | Status | Started | Finished |",
+        "|---|---|---|---|---|",
+    ]
+    for latest_type in ["daily_full", "paper_4h_update"]:
+        latest = run_health["latest"].get(latest_type)
+        if latest:
+            lines.append(
+                f"| `{latest_type}` | `{latest['run_id']}` | {latest['status']} | "
+                f"{_local_timestamp(str(latest['started_at']))} | "
+                f"{_local_timestamp(str(latest['finished_at'])) if latest['finished_at'] else 'n/a'} |"
+            )
+        else:
+            lines.append(f"| `{latest_type}` | n/a | n/a | n/a | n/a |")
+    lines.extend([
+        "",
+        "## Stale Running Run 检测",
+        "",
+        "| Run ID | Type | Started | Age Hours | Log | Suggested Action |",
+        "|---|---|---|---:|---|---|",
+    ])
+    if stale_runs:
+        for row in stale_runs:
+            suggested = f"python main.py db mark-run-failed --run-id {row['run_id']} --reason \"stale run inspected manually\""
+            lines.append(
+                f"| `{row['run_id']}` | `{row['run_type']}` | {_local_timestamp(row['started_at'])} | "
+                f"{row['age_hours']:.1f} | `{row['log_path'] or 'n/a'}` | `{suggested}` |"
+            )
+    else:
+        lines.append("| n/a | n/a | n/a | 0.0 | n/a | n/a |")
+    lines.extend([
+        "",
+        "## 42-bar Holding Review",
+        "",
+        "| Symbol | Plan | Status | First observed >=168h | Price@first | PnL@first | Latest Price | Latest PnL | Max/Min Price After | Max/Min PnL After | Outcome |",
+        "|---|---|---|---|---:|---:|---:|---:|---:|---:|---|",
+    ])
+    if holding_42_rows:
+        for row in holding_42_rows:
+            lines.append(
+                f"| `{row['symbol']}` | `{row['plan_id']}` | {row['status']} | "
+                f"{_local_timestamp(row['threshold_time'])} ({row['hours_at_threshold']:.1f}h) | "
+                f"{_fmt_optional(row['price_at_threshold'], 6)} | {_fmt_optional(row['pnl_at_threshold'], 2)} | "
+                f"{_fmt_optional(row['latest_price'], 6)} | {_fmt_optional(row['latest_pnl'], 2)} | "
+                f"{_fmt_optional(row['max_price_after'], 6)} / {_fmt_optional(row['min_price_after'], 6)} | "
+                f"{_fmt_optional(row['max_pnl_after'], 2)} / {_fmt_optional(row['min_pnl_after'], 2)} | "
+                f"{row['outcome_after']} |"
+            )
+    else:
+        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a |")
+    lines.extend([
         "",
         "## 开放持仓时长",
         "",
         "| Symbol | Status | Holding Hours |",
         "|---|---|---:|",
-    ]
+    ])
     if open_holding_hours:
         for symbol, status, hours in sorted(open_holding_hours, key=lambda item: item[2], reverse=True):
             lines.append(f"| `{symbol}` | {status} | {hours:.1f} |")

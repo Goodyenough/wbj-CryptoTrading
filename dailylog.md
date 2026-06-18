@@ -15,6 +15,15 @@
 
 ## 2026-06-18
 
+### 23:25:15 +08:00 - 增强三周观察仪表
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：在 `python main.py observation-dashboard` 中新增三块观察口径：`Run Health / 自动任务健康`、`Stale Running Run 检测`、`42-bar Holding Review`。
+- 改动：`Run Health` 汇总最近 24h 的 `daily_full` / `paper_4h_update` 成功、失败、running 数，并列出最新 daily 与 4h run；`Stale Running Run 检测` 列出超过 2h 仍为 `running` 的 run，并给出 `mark-run-failed` 建议命令；`42-bar Holding Review` 汇总超过 42 根 4h（168h）的持仓、首次观测超过阈值时的价格/PnL、最新价格/PnL、阈值后最高/最低价格与浮盈亏、后续 outcome。
+- 改动：新增测试 `test_observation_dashboard_includes_run_health_stale_and_42_bar_review`，并生成 `reports/2026-06-18/paper_observation_dashboard_2026-06-18_demo_v3.md` 作为当前证据报告；更新 `TODO.md` 将三周观察仪表增强项标记完成。
+- 影响：不修改 `settings.toml`，不修改交易策略，不新增或修改 paper plan；daily 与 4h 后续运行会自动带出新增观察小节。
+- 验证：`python tests\test_database.py` 通过；`python tests\test_research_tools.py` 通过；`python -m compileall main.py src tests` 通过；`python main.py observation-dashboard --account demo --no-obsidian` 成功生成 v3；`config_hash` 保持 `be7ec39ec21f6a83`。
+- Git：计划提交 `Enhance observation dashboard monitoring`。
+
 ### 22:48:25 +08:00 - RECLAIM_PENDING 机会成本复盘
 - 类型：实验 / 报告 / 文档 / Git
 - 改动：生成 `reports/2026-06-18/reclaim_pending_opportunity_cost_review_2026-06-18_v1.md`，并同步到 Obsidian Reports；更新 Obsidian `CryptoTrading 实验日志.md` 记录实验背景、样本、结论和下一步。

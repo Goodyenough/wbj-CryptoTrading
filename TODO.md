@@ -119,7 +119,7 @@
 - [x] 建实验结论索引页：新增 `python main.py experiment-index`，生成 `reports/2026-06-11/experiment_index_2026-06-11_v2.md`。
 - [x] 增强实验结论索引页：汇总 `reports/` 中的关键实验，按 `experiment_id` 聚合，输出实验名、时间段、核心变更、结论、`keep/retest/reject`、下一步；`*_review_*.md` frontmatter 覆盖自动 summary，生成 `reports/2026-06-18/experiment_index_2026-06-18_v1.md`。
 - [x] 准备 3 周观察仪表：新增 `python main.py observation-dashboard`，并接入 `python main.py daily`，每天输出 `RECLAIM_PENDING` 后续、TP1 EMA trailing、开放持仓时长和 RISK_OFF 今日候选摘要。
-- [ ] 增强 3 周观察仪表：daily 自动汇总 `RECLAIM_PENDING` 次数、被拦截后是否继续下跌、TP1 EMA stop 激活/抬止损/出场统计、开放持仓时长分布、RISK_OFF 下是否仍产生新计划，确保 2026-07-02 复盘可直接基于证据判断。
+- [x] 增强 3 周观察仪表：daily/4h 自动汇总 `RECLAIM_PENDING` 次数与后续、TP1 EMA stop 激活/抬止损/出场统计、开放持仓时长、RISK_OFF 下是否仍产生新计划，并新增 `Run Health`、`Stale Running Run 检测`、`42-bar Holding Review`，确保 2026-07-02 复盘可直接基于证据判断。
 
 ## 运维待办
 

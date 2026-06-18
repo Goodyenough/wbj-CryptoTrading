@@ -738,6 +738,78 @@ def test_structured_tables_remain_operational_without_legacy_rows() -> None:
         assert connection.execute("SELECT COUNT(*) FROM paper_trades").fetchone()[0] == 0
 
 
+def test_observation_dashboard_includes_run_health_stale_and_42_bar_review() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade(status="ENTERED")
+    trade.entry_price = 102.0
+    trade.quantity = 10.0
+    trade.entered_at_utc = "2026-06-01T00:00:00Z"
+    trade.last_price = 112.0
+    trade.unrealized_pnl = 100.0
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+        connection.execute(
+            """
+            INSERT INTO runs(run_id, run_type, started_at, finished_at, status, created_at)
+            VALUES ('daily_recent', 'daily_full', '2026-06-18T12:05:00Z', '2026-06-18T12:06:00Z', 'success', '2026-06-18T12:05:00Z')
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO runs(run_id, run_type, started_at, finished_at, status, created_at)
+            VALUES ('paper_168', 'paper_4h_update', '2026-06-08T00:00:00Z', '2026-06-08T00:01:00Z', 'success', '2026-06-08T00:00:00Z')
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO runs(run_id, run_type, started_at, finished_at, status, created_at)
+            VALUES ('paper_recent', 'paper_4h_update', '2026-06-18T16:10:00Z', '2026-06-18T16:11:00Z', 'success', '2026-06-18T16:10:00Z')
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO runs(run_id, run_type, started_at, status, log_path, created_at)
+            VALUES ('stale_run', 'paper_4h_update', '2000-01-01T00:00:00Z', 'running', 'logs/stale.log', '2000-01-01T00:00:00Z')
+            """
+        )
+        for snapshot_id, run_id, snapshot_time, price, pnl, hours in [
+            ("snap_168", "paper_168", "2026-06-08T00:00:00Z", 110.0, 80.0, 168.0),
+            ("snap_latest", "paper_recent", "2026-06-18T16:11:00Z", 112.0, 100.0, 424.2),
+        ]:
+            connection.execute(
+                """
+                INSERT INTO paper_snapshots(
+                    snapshot_id, run_id, snapshot_time, plan_id, symbol, status,
+                    current_price, entry_price, stop_current, tp1, tp2, tp1_hit,
+                    ema_trailing_active, unrealized_pnl, realized_pnl, holding_hours,
+                    created_at
+                ) VALUES (?, ?, ?, 'plan1', 'TESTUSDT', 'ENTERED',
+                    ?, 102.0, 90.0, 120.0, 135.0, 0,
+                    0, ?, 0.0, ?, ?
+                )
+                """,
+                (snapshot_id, run_id, snapshot_time, price, pnl, hours, snapshot_time),
+            )
+
+    settings = _settings_for(path)
+    settings.output.reports_dir = path.parent / "reports"
+    settings.output.obsidian_dir = None
+    dashboard, paths = generate_observation_dashboard(settings, run_id="paper_recent", run_type="paper_4h_update")
+
+    assert paths
+    assert "## Run Health / 自动任务健康" in dashboard
+    assert "## Stale Running Run 检测" in dashboard
+    assert "## 42-bar Holding Review" in dashboard
+    assert "Positions over 42 x 4h / 168h | 1" in dashboard
+    assert "`stale_run`" in dashboard
+    assert "mark-run-failed --run-id stale_run" in dashboard
+    assert "`TESTUSDT` | `plan1`" in dashboard
+    assert "100.00" in dashboard
+
+
 def _seed_stability_days(path: Path, reports_dir: Path, day_count: int = 5) -> None:
     init_db(path)
     _seed_scan_and_run(path)
@@ -1298,6 +1370,7 @@ if __name__ == "__main__":
     test_structured_event_names_cover_plan_requirements()
     test_report_contains_current_run_events_and_api_delay_count()
     test_structured_tables_remain_operational_without_legacy_rows()
+    test_observation_dashboard_includes_run_health_stale_and_42_bar_review()
     test_stability_audit_requires_five_complete_consecutive_days()
     test_stability_audit_reports_partial_consecutive_progress()
     test_stability_audit_reports_partial_date_gap()
