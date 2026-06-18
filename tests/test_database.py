@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
-from crypto_trading_system.database import connect_db, database_status, tracked_run
+from crypto_trading_system.database import connect_db, database_status, mark_run_failed, start_run, tracked_run
 from crypto_trading_system import database as database_module
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.models import PaperTrade, ScanResult
@@ -140,6 +140,38 @@ def test_tracked_run_records_success_and_failure() -> None:
         ).fetchall()
     assert [row["status"] for row in rows] == ["success", "failed"]
     assert "expected failure" in rows[-1]["error_message"]
+
+
+def test_mark_run_failed_closes_running_run() -> None:
+    path = _temp_db()
+    init_db(path)
+    run_id = start_run(path, "daily_full")
+
+    updated = mark_run_failed(path, run_id, reason="stale run with missing daily sample")
+
+    assert updated["run_id"] == run_id
+    assert updated["status"] == "failed"
+    assert updated["finished_at"] is not None
+    assert updated["error_message"] == "stale run with missing daily sample"
+
+
+def test_mark_run_failed_rejects_non_running_run() -> None:
+    path = _temp_db()
+    init_db(path)
+    with tracked_run(path, "daily_full") as run_id:
+        assert run_id
+
+    try:
+        mark_run_failed(path, run_id, reason="should not overwrite success")
+    except ValueError as exc:
+        assert "run is not running" in str(exc)
+    else:
+        raise AssertionError("mark_run_failed should reject non-running runs")
+
+    with connect_db(path) as connection:
+        row = connection.execute("SELECT status, error_message FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+    assert row["status"] == "success"
+    assert row["error_message"] is None
 
 
 def test_run_step_persists_run_id_step_and_lock_error() -> None:
@@ -1249,6 +1281,8 @@ if __name__ == "__main__":
     test_database_init_is_idempotent_and_configured()
     test_database_status_reports_non_utc_observation_timestamp()
     test_tracked_run_records_success_and_failure()
+    test_mark_run_failed_closes_running_run()
+    test_mark_run_failed_rejects_non_running_run()
     test_run_step_persists_run_id_step_and_lock_error()
     test_state_transition_and_stop_are_monotonic()
     test_summary_and_export_use_structured_tables()

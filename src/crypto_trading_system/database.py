@@ -495,6 +495,22 @@ def finish_run(path: Path, run_id: str, *, success: bool, error_message: str | N
         )
 
 
+def mark_run_failed(path: Path, run_id: str, *, reason: str) -> dict:
+    init_observation_db(path)
+    if not reason.strip():
+        raise ValueError("reason is required")
+    with connect_db(path) as connection:
+        existing = connection.execute("SELECT * FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+        if existing is None:
+            raise ValueError(f"run not found: {run_id}")
+        if existing["status"] != "running":
+            raise ValueError(f"run is not running: {run_id} status={existing['status']}")
+    finish_run(path, run_id, success=False, error_message=reason.strip())
+    with connect_db(path) as connection:
+        updated = connection.execute("SELECT * FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+    return dict(updated)
+
+
 @contextmanager
 def tracked_run(
     path: Path,

@@ -15,6 +15,15 @@
 
 ## 2026-06-18
 
+### 21:42:30 +08:00 - 标记 2026-06-17 daily 缺失样本
+- 类型：代码 / 数据库 / 运维 / 测试 / 文档 / Git
+- 改动：新增 `python main.py db mark-run-failed --run-id ... --reason ...`，只允许把仍处于 `running` 的 observation run 显式标记为 `failed`，并要求写入失败原因。
+- 改动：将 stale run `20260617_120503_5c574dad` 标记为 `failed`；该 run 于 2026-06-17 20:05 +08:00 启动，但未生成 scan、paper snapshots 或 reports，按缺失样本处理，不补跑。
+- 改动：更新 `TODO.md`，将 5 天连续观察窗口从 2026-06-18 重新起算；若 2026-06-18 至 2026-06-22 全部成功且 `config_hash` 保持 `be7ec39ec21f6a83`，最早 2026-06-23 再安装 4h 任务。
+- 影响：不修改 `settings.toml`，不改变交易策略；本地 SQLite 中 2026-06-17 run 的 `finished_at/status/error_message` 已更新，数据库文件仍不纳入 Git。
+- 验证：`python tests\test_database.py` 通过；`python -m compileall main.py src tests` 通过；`python main.py db status` 显示 latest run `20260618_120504_52821c3b` 为 `success`、latest failed run 为 `20260617_120503_5c574dad`；`python main.py db stability --days 5` 预期返回非 0，显示 2026-06-17 `ready=false`、2026-06-18 `ready=true`、`ready_for_4h_task=false`。
+- Git：计划提交 `Mark stale daily run failed`。
+
 ### 21:33:29 +08:00 - 增强实验结论索引页
 - 类型：代码 / 报告 / 测试 / 文档 / Git
 - 改动：升级 `python main.py experiment-index`，从“每份报告一行”改为按 `experiment_id` 聚合；仅扫描项目 `reports/`，不读取 Obsidian 作为输入；`*_review_*.md` frontmatter 优先覆盖 `abtest_summary_*.md`，单段 `abtest_*.md` 作为兜底。

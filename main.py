@@ -23,7 +23,7 @@ from crypto_trading_system.backtest.regime_analysis import build_regime_comparis
 from crypto_trading_system.backtest.universe import build_current_symbol_master, load_symbol_master, save_symbol_master
 from crypto_trading_system.backtest.runner import run_backtest
 from crypto_trading_system.config import load_settings
-from crypto_trading_system.database import database_status, tracked_run
+from crypto_trading_system.database import database_status, mark_run_failed, tracked_run
 from crypto_trading_system.doctor import run_doctor
 from crypto_trading_system.paper_trader import add_from_scan, generate_paper_report, update_paper_trades
 from crypto_trading_system.paper_db import (
@@ -80,6 +80,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Audit the consecutive daily_full gate required before enabling the 4h task.",
     )
     db_stability.add_argument("--days", type=int, default=5, help="Required consecutive successful days.")
+    db_mark_failed = db_subparsers.add_parser(
+        "mark-run-failed",
+        help="Mark one stale running observation run as failed.",
+    )
+    db_mark_failed.add_argument("--run-id", required=True, help="Run id to mark failed.")
+    db_mark_failed.add_argument("--reason", required=True, help="Operational reason recorded in runs.error_message.")
 
     scan = subparsers.add_parser("scan", help="Scan the market and write reports.")
     scan.add_argument("--top", type=int, default=None, help="Override number of candidates.")
@@ -499,6 +505,9 @@ def main() -> None:
             print(json.dumps(audit, ensure_ascii=False, indent=2))
             if not audit["ready_for_4h_task"]:
                 sys.exit(2)
+        if args.db_command == "mark-run-failed":
+            run = mark_run_failed(settings.output.database_path, args.run_id, reason=args.reason)
+            print(json.dumps(run, ensure_ascii=False, indent=2))
         return
 
     if args.command == "scan" and args.top is not None:
