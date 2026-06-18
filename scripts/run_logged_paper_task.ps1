@@ -43,6 +43,64 @@ function Write-LogLine([string]$Message) {
     Add-Content -LiteralPath $logPath -Value $Message -Encoding UTF8
 }
 
+function Get-NotifyWebhookUrl {
+    $candidateNames = @(
+        "CRYPTO_TRADING_WECOM_WEBHOOK_URL",
+        "WECHAT_WORK_WEBHOOK_URL",
+        "WECOM_WEBHOOK_URL",
+        "QYWX_WEBHOOK_URL"
+    )
+    foreach ($name in $candidateNames) {
+        $value = [Environment]::GetEnvironmentVariable($name, "Process")
+        if ([string]::IsNullOrWhiteSpace($value)) {
+            $value = [Environment]::GetEnvironmentVariable($name, "User")
+        }
+        if ([string]::IsNullOrWhiteSpace($value)) {
+            $value = [Environment]::GetEnvironmentVariable($name, "Machine")
+        }
+        if (-not [string]::IsNullOrWhiteSpace($value)) {
+            return $value.Trim()
+        }
+    }
+    return $null
+}
+
+function Send-TaskNotification([string]$Status, [int]$ExitCode, [string]$ExtraLine) {
+    $webhookUrl = Get-NotifyWebhookUrl
+    if ([string]::IsNullOrWhiteSpace($webhookUrl)) {
+        Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] notification skipped: no WeCom webhook env var"
+        return
+    }
+
+    $statusText = if ($Status -eq "success") { "completed" } else { "failed" }
+    $title = "CryptoTrading $label $statusText"
+    $lines = @(
+        "## $title",
+        "- mode: $Mode",
+        "- time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')",
+        "- exit_code: $ExitCode",
+        "- host: $env:COMPUTERNAME",
+        "- project: $projectRoot"
+    )
+    if (-not [string]::IsNullOrWhiteSpace($ExtraLine)) {
+        $lines += "- detail: $ExtraLine"
+    }
+    $body = @{
+        msgtype = "markdown"
+        markdown = @{
+            content = ($lines -join "`n")
+        }
+    } | ConvertTo-Json -Depth 4
+
+    try {
+        Invoke-RestMethod -Uri $webhookUrl -Method Post -ContentType "application/json; charset=utf-8" -Body $body -TimeoutSec 15 | Out-Null
+        Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] notification sent status=$Status"
+    }
+    catch {
+        Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] notification failed: $($_.Exception.Message)"
+    }
+}
+
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
 Set-Location $projectRoot
@@ -55,6 +113,7 @@ $exitCode = $LASTEXITCODE
 
 if ($exitCode -ne 0) {
     Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label failed exit_code=$exitCode ==="
+    Send-TaskNotification "failed" $exitCode "See $logPath"
     exit $exitCode
 }
 
@@ -62,4 +121,5 @@ foreach ($step in $successSteps) {
     Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] $step"
 }
 Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label complete ==="
+Send-TaskNotification "success" 0 "See $logPath"
 exit 0

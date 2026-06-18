@@ -15,6 +15,14 @@
 
 ## 2026-06-18
 
+### 22:14:16 +08:00 - daily 与 4h 任务完成后发送企业微信通知
+- 类型：脚本 / 运维 / 文档 / Git
+- 改动：在 `scripts/run_logged_paper_task.ps1` 增加企业微信机器人通知逻辑；`daily` 与 `paper_4h` 两种模式成功完成时发送 `completed` 通知，失败时发送 `failed` 通知。
+- 改动：通知 webhook 从环境变量读取，依次支持 `CRYPTO_TRADING_WECOM_WEBHOOK_URL`、`WECHAT_WORK_WEBHOOK_URL`、`WECOM_WEBHOOK_URL`、`QYWX_WEBHOOK_URL`，避免把密钥写入仓库；未配置 webhook 时仅写日志 `notification skipped`，不影响任务成功/失败状态。
+- 影响：无需重新注册 Windows 任务；`CryptoTrading_DailyPaperUpdate` 与 `CryptoTrading_4H_PaperUpdate` 均通过同一封装器执行，下一次运行会自动使用新通知逻辑。
+- 验证：使用 `[scriptblock]::Create((Get-Content -Raw scripts\run_logged_paper_task.ps1))` 完成 PowerShell 语法解析检查；未手动触发真实 daily/4h 任务，避免污染 paper 观察样本。
+- Git：计划提交 `Notify on scheduled task completion`。
+
 ### 21:48:50 +08:00 - 提前安装 4h paper 定时任务
 - 类型：运维 / 文档 / Git
 - 改动：用户确认 2026-06-17 daily 缺失样本的根因为 GPT 会员/用量到期导致的外部执行资源中断，而非脚本、SQLite、定时任务或交易逻辑缺陷；据此提前以 `-RequiredStableDays 1` 安装 `CryptoTrading_4H_PaperUpdate`。
