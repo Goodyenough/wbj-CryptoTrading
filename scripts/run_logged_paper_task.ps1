@@ -104,9 +104,13 @@ else:
     )
 "@
     try {
-        $detail = & $python -c $code (Join-Path $projectRoot "data\crypto_trading.db") $RunId 2>&1
+        $detail = $code | & $python - (Join-Path $projectRoot "data\crypto_trading.db") $RunId 2>&1
         if ($LASTEXITCODE -ne 0) {
-            return "database: status check failed exit_code=$LASTEXITCODE"
+            $errorDetail = ($detail -join " ").Trim()
+            if ([string]::IsNullOrWhiteSpace($errorDetail)) {
+                return "database: status check failed exit_code=$LASTEXITCODE"
+            }
+            return "database: status check failed exit_code=$LASTEXITCODE detail=$errorDetail"
         }
         return ($detail -join " ").Trim()
     }

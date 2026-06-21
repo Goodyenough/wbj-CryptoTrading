@@ -15,6 +15,13 @@
 
 ## 2026-06-21
 
+### 16:39:26 +08:00 - 修复企业微信数据库状态检查
+- 类型：脚本 / 运维 / 测试 / Git
+- 改动：修复 `scripts/run_logged_paper_task.ps1` 中企业微信通知的数据库确认逻辑，将 inline Python 从 `python -c` 多行参数调用改为 `python -` stdin 调用，避免计划任务/PowerShell 环境下多行脚本被截断导致 `SyntaxError`。
+- 影响：4h 与 daily 完成通知仍会附带 `database: run_id=... run_type=... status=... snapshots=... events=...`；本次修复不修改 `settings.toml`、交易策略或 paper plan。
+- 验证：用 2026-06-21 16:10 真实 4h run `20260621_081003_20ee7d9a` 验证数据库确认行返回 `status=success snapshots=4 events=1`；PowerShell `[scriptblock]::Create(...)` 解析通过；`python tests\test_database.py` 通过；`python -m compileall main.py src tests` 通过；`settings.toml` SHA256 保持 `be7ec39ec21f6a83...`。
+- Git：计划提交 `Fix database status notification check`。
+
 ### 12:55:43 +08:00 - 企业微信通知增加数据库确认
 - 类型：脚本 / 运维 / 测试 / Git
 - 改动：增强 `scripts/run_logged_paper_task.ps1` 的企业微信通知内容，任务结束后从输出中提取 `run_id`，再查询 SQLite `runs`、`paper_snapshots`、`paper_events`，在通知中追加 `database: run_id=... run_type=... status=... snapshots=... events=...`。
