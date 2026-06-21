@@ -65,7 +65,57 @@ function Get-NotifyWebhookUrl {
     return $null
 }
 
-function Send-TaskNotification([string]$Status, [int]$ExitCode, [string]$ExtraLine) {
+function Get-RunIdFromOutput([string[]]$OutputLines) {
+    foreach ($line in $OutputLines) {
+        if ($line -match "^run_id=(.+)$") {
+            return $Matches[1].Trim()
+        }
+    }
+    return $null
+}
+
+function Get-DatabaseRunDetail([string]$RunId) {
+    if ([string]::IsNullOrWhiteSpace($RunId)) {
+        return "database: run_id not found in task output"
+    }
+    $code = @"
+import sqlite3
+import sys
+
+db_path, run_id = sys.argv[1], sys.argv[2]
+con = sqlite3.connect(db_path)
+con.row_factory = sqlite3.Row
+run = con.execute(
+    "SELECT run_id, run_type, status, started_at, finished_at, error_message FROM runs WHERE run_id = ?",
+    (run_id,),
+).fetchone()
+if run is None:
+    print(f"database: run_id={run_id} not found")
+else:
+    snapshots = con.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id = ?", (run_id,)).fetchone()[0]
+    events = con.execute("SELECT COUNT(*) FROM paper_events WHERE run_id = ?", (run_id,)).fetchone()[0]
+    print(
+        "database: "
+        f"run_id={run['run_id']} "
+        f"run_type={run['run_type']} "
+        f"status={run['status']} "
+        f"snapshots={snapshots} "
+        f"events={events}"
+    )
+"@
+    try {
+        $detail = & $python -c $code (Join-Path $projectRoot "data\crypto_trading.db") $RunId 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            return "database: status check failed exit_code=$LASTEXITCODE"
+        }
+        return ($detail -join " ").Trim()
+    }
+    catch {
+        return "database: status check failed $($_.Exception.Message)"
+    }
+}
+
+function Send-TaskNotification([string]$Status, [int]$ExitCode, [string]$ExtraLine, [string]$DatabaseLine) {
     $webhookUrl = Get-NotifyWebhookUrl
     if ([string]::IsNullOrWhiteSpace($webhookUrl)) {
         Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] notification skipped: no WeCom webhook env var"
@@ -84,6 +134,9 @@ function Send-TaskNotification([string]$Status, [int]$ExitCode, [string]$ExtraLi
     )
     if (-not [string]::IsNullOrWhiteSpace($ExtraLine)) {
         $lines += "- detail: $ExtraLine"
+    }
+    if (-not [string]::IsNullOrWhiteSpace($DatabaseLine)) {
+        $lines += "- $DatabaseLine"
     }
     $body = @{
         msgtype = "markdown"
@@ -106,14 +159,19 @@ $env:PYTHONIOENCODING = "utf-8"
 Set-Location $projectRoot
 Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label start ==="
 
+$taskOutput = New-Object System.Collections.Generic.List[string]
 & $python @commandArgs 2>&1 | ForEach-Object {
-    Write-LogLine $_.ToString()
+    $line = $_.ToString()
+    $taskOutput.Add($line)
+    Write-LogLine $line
 }
 $exitCode = $LASTEXITCODE
+$runId = Get-RunIdFromOutput $taskOutput.ToArray()
+$databaseLine = Get-DatabaseRunDetail $runId
 
 if ($exitCode -ne 0) {
     Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label failed exit_code=$exitCode ==="
-    Send-TaskNotification "failed" $exitCode "See $logPath"
+    Send-TaskNotification "failed" $exitCode "See $logPath" $databaseLine
     exit $exitCode
 }
 
@@ -121,5 +179,5 @@ foreach ($step in $successSteps) {
     Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] $step"
 }
 Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label complete ==="
-Send-TaskNotification "success" 0 "See $logPath"
+Send-TaskNotification "success" 0 "See $logPath" $databaseLine
 exit 0

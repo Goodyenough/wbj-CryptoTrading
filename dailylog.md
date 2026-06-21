@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-06-21
+
+### 12:55:43 +08:00 - 企业微信通知增加数据库确认
+- 类型：脚本 / 运维 / 测试 / Git
+- 改动：增强 `scripts/run_logged_paper_task.ps1` 的企业微信通知内容，任务结束后从输出中提取 `run_id`，再查询 SQLite `runs`、`paper_snapshots`、`paper_events`，在通知中追加 `database: run_id=... run_type=... status=... snapshots=... events=...`。
+- 影响：daily 与 4h 通知会同时显示脚本完成状态和数据库落库状态；不修改 `settings.toml`、交易策略或 paper plan。
+- 验证：PowerShell `[scriptblock]::Create(...)` 语法解析通过；`python tests\test_database.py` 通过；`python -m compileall main.py src tests` 通过；未手动触发真实 daily/4h 任务，避免污染运行样本。
+- Git：计划提交 `Include database status in task notifications`。
+
 ## 2026-06-18
 
 ### 23:25:15 +08:00 - 增强三周观察仪表

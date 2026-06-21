@@ -1283,6 +1283,11 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert "[console]::outputencoding = $utf8nobom" in runner_text
     assert "$outputencoding = $utf8nobom" in runner_text
     assert '$env:pythonioencoding = "utf-8"' in runner_text
+    assert "function get-runidfromoutput" in runner_text
+    assert "function get-databaserundetail" in runner_text
+    assert "select run_id, run_type, status" in runner_text
+    assert "select count(*) from paper_snapshots where run_id" in runner_text
+    assert "database:" in runner_text
     assert "exit $exitcode" in runner_text
     assert installer_text.index("main.py db stability") < installer_text.index("windowsidentity")
     assert installer_text.index("windowsidentity") < installer_text.index("register-scheduledtask")
