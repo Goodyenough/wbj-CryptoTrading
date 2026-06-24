@@ -15,6 +15,13 @@
 
 ## 2026-06-24
 
+### 23:35:22 +08:00 - 提交 daily 运行说明文档补充
+- 类型：文档 / Git
+- 改动：按用户要求将 `为什么未来三周每天运行daily.md` 的本地修改纳入版本控制，内容补充三周后 keep / retest / reject 验收思路和关注指标。
+- 影响：仅提交说明文档，不修改 `settings.toml`、交易策略、定时任务或数据库。
+- 验证：检查 `git diff -- 为什么未来三周每天运行daily.md` 确认目标文件存在修改；提交前确认 `settings.toml` 未纳入变更。
+- Git：计划提交 `Track daily run rationale additions`。
+
 ### 23:03:50 +08:00 - 补充 7 月 2 日 paper 观察验收标准
 - 类型：文档 / 报告 / Git
 - 改动：新增 `2026-07-02-paper-acceptance-criteria.md`，将 7 月 2 日前 paper 观察的验收标准整理为数据链路、`RISK_OFF`、`RECLAIM_PENDING`、42 根 4h 持仓、TP1 EMA trailing stop 与总体策略六个决策问题。

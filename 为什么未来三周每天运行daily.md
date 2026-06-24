@@ -282,3 +282,79 @@ observation-dashboard done
 ## 一句话总结
 
 每天运行 daily，是为了保存市场和交易状态的时间路径；三周后只运行一次，只能看到终点。我们要验证的是这三周里规则如何工作，而不仅是三周后的价格是多少。
+
+
+
+# 4. 三周后要干什么？
+
+三周后不是简单看“赚了还是亏了”。
+
+三周后要做一次正式验收，决定：
+
+<pre class="overflow-visible! px-0!" data-start="2261" data-end="2291"><div class="relative w-full mt-4 mb-1"><div class=""><div class="contents"><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0"><div class="border border-token-border-light border-radius-3xl corner-superellipse/1.1 rounded-3xl"><div class="h-full w-full border-radius-3xl bg-token-bg-elevated-secondary corner-superellipse/1.1 overflow-clip rounded-3xl lxnfua_clipPathFallback"><div class="pointer-events-none absolute end-1.5 top-1 z-2 md:end-2 md:top-1"></div><div class="relative"><div class="pe-11 pt-3"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼd ͼr"><div class="cm-scroller"><pre class="cm-content q9tKkq_readonly m-0"><code><span>keep</span><br/><span>retest</span><br/><span>reject</span></code></pre></div></div></div></div></div></div></div></div></div><div class=""><div class=""></div></div></div></div></div></div></pre>
+
+---
+
+## keep：保留策略，进入下一阶段
+
+如果三周后发现：
+
+<pre class="overflow-visible! px-0!" data-start="2329" data-end="2410"><div class="relative w-full mt-4 mb-1"><div class=""><div class="contents"><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0"><div class="border border-token-border-light border-radius-3xl corner-superellipse/1.1 rounded-3xl"><div class="h-full w-full border-radius-3xl bg-token-bg-elevated-secondary corner-superellipse/1.1 overflow-clip rounded-3xl lxnfua_clipPathFallback"><div class="pointer-events-none absolute end-1.5 top-1 z-2 md:end-2 md:top-1"></div><div class="relative"><div class="pe-11 pt-3"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼd ͼr"><div class="cm-scroller"><pre class="cm-content q9tKkq_readonly m-0"><code><span>系统稳定</span><br/><span>数据完整</span><br/><span>状态机没乱</span><br/><span>回测和模拟盘差异可解释</span><br/><span>风险暴露可控</span><br/><span>TP1 / EMA / reclaim 有实际价值</span><br/><span>收益和回撤能接受</span></code></pre></div></div></div></div></div></div></div></div></div><div class=""><div class=""></div></div></div></div></div></div></pre>
+
+那就可以考虑：
+
+> 保留当前策略，进入小资金实盘或更长周期模拟盘。
+
+---
+
+## retest：继续测试，不急着实盘
+
+如果发现：
+
+<pre class="overflow-visible! px-0!" data-start="2482" data-end="2563"><div class="relative w-full mt-4 mb-1"><div class=""><div class="contents"><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0"><div class="border border-token-border-light border-radius-3xl corner-superellipse/1.1 rounded-3xl"><div class="h-full w-full border-radius-3xl bg-token-bg-elevated-secondary corner-superellipse/1.1 overflow-clip rounded-3xl lxnfua_clipPathFallback"><div class="pointer-events-none absolute end-1.5 top-1 z-2 md:end-2 md:top-1"></div><div class="relative"><div class="pe-11 pt-3"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼd ͼr"><div class="cm-scroller"><pre class="cm-content q9tKkq_readonly m-0"><code><span>样本太少</span><br/><span>RISK_OFF 天数太多</span><br/><span>交易太少</span><br/><span>同币种重复暴露影响判断</span><br/><span>TIME_EXIT 规则还需要比较</span><br/><span>模拟盘和回测有差异但原因不明确</span></code></pre></div></div></div></div></div></div></div></div></div><div class=""><div class=""></div></div></div></div></div></div></pre>
+
+那就不要急着上实盘，而是进入下一轮 retest。
+
+比如继续测试：
+
+<pre class="overflow-visible! px-0!" data-start="2601" data-end="2676"><div class="relative w-full mt-4 mb-1"><div class=""><div class="contents"><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0"><div class="border border-token-border-light border-radius-3xl corner-superellipse/1.1 rounded-3xl"><div class="h-full w-full border-radius-3xl bg-token-bg-elevated-secondary corner-superellipse/1.1 overflow-clip rounded-3xl lxnfua_clipPathFallback"><div class="pointer-events-none absolute end-1.5 top-1 z-2 md:end-2 md:top-1"></div><div class="relative"><div class="pe-11 pt-3"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼd ͼr"><div class="cm-scroller"><pre class="cm-content q9tKkq_readonly m-0"><code><span>42 根固定退出</span><br/><span>42 根 + 低于 EMA20 才退出</span><br/><span>18/30/42 持仓上限</span><br/><span>altcoin 限制</span><br/><span>同币种重复持仓限制</span></code></pre></div></div></div></div></div></div></div></div></div><div class=""><div class=""></div></div></div></div></div></div></pre>
+
+---
+
+## reject：暂时否定策略或暂停实盘
+
+如果三周后发现：
+
+<pre class="overflow-visible! px-0!" data-start="2716" data-end="2790"><div class="relative w-full mt-4 mb-1"><div class=""><div class="contents"><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0"><div class="border border-token-border-light border-radius-3xl corner-superellipse/1.1 rounded-3xl"><div class="h-full w-full border-radius-3xl bg-token-bg-elevated-secondary corner-superellipse/1.1 overflow-clip rounded-3xl lxnfua_clipPathFallback"><div class="pointer-events-none absolute end-1.5 top-1 z-2 md:end-2 md:top-1"></div><div class="relative"><div class="pe-11 pt-3"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼd ͼr"><div class="cm-scroller"><pre class="cm-content q9tKkq_readonly m-0"><code><span>状态机混乱</span><br/><span>任务经常失败</span><br/><span>重复事件严重</span><br/><span>回撤过大</span><br/><span>止损率过高</span><br/><span>TP1 长期无法触发</span><br/><span>同币种风险暴露不可控</span><br/><span>模拟盘明显差于回测</span></code></pre></div></div></div></div></div></div></div></div></div><div class=""><div class=""></div></div></div></div></div></div></pre>
+
+那就应该暂停实盘推进，先修策略或系统。
+
+---
+
+# 5. 三周后具体看哪些指标？
+
+重点看这些：
+
+<pre class="overflow-visible! px-0!" data-start="2844" data-end="3142"><div class="relative w-full mt-4 mb-1"><div class=""><div class="contents"><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0"><div class="border border-token-border-light border-radius-3xl corner-superellipse/1.1 rounded-3xl"><div class="h-full w-full border-radius-3xl bg-token-bg-elevated-secondary corner-superellipse/1.1 overflow-clip rounded-3xl lxnfua_clipPathFallback"><div class="pointer-events-none absolute end-1.5 top-1 z-2 md:end-2 md:top-1"></div><div class="relative"><div class="pe-11 pt-3"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼd ͼr"><div class="cm-scroller"><pre class="cm-content q9tKkq_readonly m-0"><code><span>daily_full 成功天数</span><br/><span>4h update 成功次数</span><br/><span>失败 run 数量</span><br/><span>scan 总数</span><br/><span>BUY_CANDIDATE 总数</span><br/><span>paper plan 总数</span><br/><span>入场计划数</span><br/><span>RECLAIM_PENDING 次数</span><br/><span>pending 后重新入场 / 失效 / 跌破 stop 的比例</span><br/><span>TP1 命中率</span><br/><span>TP2 命中率</span><br/><span>EMA trailing 激活次数</span><br/><span>EMA stop 抬高次数</span><br/><span>EMA trailing 出场次数</span><br/><span>平均持仓时间</span><br/><span>最长持仓时间</span><br/><span>同币种最大并发计划数</span><br/><span>最大风险暴露</span><br/><span>RISK_OFF 下候选和入场数量</span><br/><span>已实现 PnL</span><br/><span>未实现 PnL</span><br/><span>最大回撤</span><br/><span>模拟盘 vs 回测偏差</span></code></pre></div></div></div></div></div></div></div></div></div><div class=""><div class=""></div></div></div></div></div></div></pre>
+
+这些指标能回答：
+
+> 策略有没有机会？
+>
+> 风控有没有效果？
+>
+> 系统有没有稳定运行？
+>
+> 风险是否可控？
+>
+> 是否值得进入下一阶段？
+
+---
+
+# 6. 用一句话总结
+
+三周模拟盘的意义是：
+
+> **用一段连续、真实时间推进、策略配置一致的样本，验证这套自动交易系统能不能稳定运行、规则能不能正确执行、风险是否可控、回测是否可信，并在三周后决定 keep、retest 还是 reject。**
+
+所以这三周不是在浪费时间，而是在做上线前最关键的“试运行验收”。
