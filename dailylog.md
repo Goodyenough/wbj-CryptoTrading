@@ -15,6 +15,14 @@
 
 ## 2026-07-02
 
+### 23:45:17 +08:00 - 记录 7 月 2 日后两周观察路线
+- 类型：文档 / TODO / Git
+- 改动：新增 `2026-07-02-next-two-week-observation-plan.md`，明确 7/2 后下一阶段不是立即优化策略，而是冻结配置、继续 daily + 4h、补 BTC/ETH 基准、新增 opportunity audit、逐笔复盘 entered trades，并在样本足够后再决定是否改选币、入场或退出。
+- 改动：更新 `TODO.md`，新增“2026-07-02 后两周观察路线”任务组，列出冻结配置、opportunity audit、BTC/ETH 基准、8 笔 entered trades 复盘和两周后归因决策。
+- 影响：仅新增计划文档和任务清单，不修改 `settings.toml`、交易策略、定时任务或数据库；当前默认行动仍是 `keep_observing`。
+- 验证：确认工作区初始干净，`settings.toml` SHA256 保持 `be7ec39ec21f6a83...`。
+- Git：计划提交 `Add post-acceptance observation plan`。
+
 ### 23:23:56 +08:00 - 生成 7 月 2 日 paper 阶段性验收报告
 - 类型：文档 / 报告 / Git
 - 改动：新增 `2026-07-02-paper-acceptance-review.md`，按“近三周背景观察、两周连续稳定样本”的口径完成 paper 阶段性验收，覆盖数据链路、`RISK_OFF`、`RECLAIM_PENDING`、42-bar holding、TP1 EMA trailing、收益风险和 downgrade rules。
