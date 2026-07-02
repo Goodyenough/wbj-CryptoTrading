@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-07-02
+
+### 23:23:56 +08:00 - 生成 7 月 2 日 paper 阶段性验收报告
+- 类型：文档 / 报告 / Git
+- 改动：新增 `2026-07-02-paper-acceptance-review.md`，按“近三周背景观察、两周连续稳定样本”的口径完成 paper 阶段性验收，覆盖数据链路、`RISK_OFF`、`RECLAIM_PENDING`、42-bar holding、TP1 EMA trailing、收益风险和 downgrade rules。
+- 影响：仅新增验收报告，不修改 `settings.toml`、交易策略、定时任务或数据库；总体 verdict 写为 `keep_observing`，不将其解释为策略长期盈利能力已被证明。
+- 验证：使用 `python main.py db status`、`python main.py db stability --days 14`、`reports/2026-07-02/paper_report_2026-07-02_demo_v1.md` 与 `reports/2026-07-02/paper_observation_dashboard_2026-07-02_demo_v1.md` 作为证据；确认 `settings.toml` SHA256 仍为 `be7ec39ec21f6a83...`。
+- Git：计划提交 `Add July 2 paper acceptance review`。
+
 ## 2026-06-24
 
 ### 23:35:22 +08:00 - 提交 daily 运行说明文档补充
