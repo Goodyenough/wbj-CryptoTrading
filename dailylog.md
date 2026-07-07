@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-07-08
+
+### 00:22:33 +08:00 - 记录 7 月 6 日 A/B 实验计划
+- 类型：文档 / TODO / Git
+- 改动：新增 `2026-07-06-abtest-plan.md`，记录 7/2 验收后、7/7 `paper audit` 后的工作背景，明确下一轮 A/B 方向优先围绕 `entry_reclaim_confirm_1bar` 和 `relative_strength_gate`，但必须等 2026-07-16 左右新窗口 audit 后再决定是否执行。
+- 改动：更新 `TODO.md`，新增“下一次 `paper audit` 后再决定是否启动 A/B”的待办，强调在此之前不修改 `settings.toml`。
+- 改动：按提交规则一并纳入 2026-07-08 00:10 自动 4h 任务生成的 `reports/2026-07-08/` 报告。
+- 影响：仅新增计划文档和 TODO 记录，不修改策略代码、默认配置、数据库或 paper 状态。
+- 验证：检查文档已生成；`git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add July 6 A/B experiment plan`。
+
 ## 2026-07-07
 
 ### 23:56:13 +08:00 - 新增 paper opportunity audit 报告
