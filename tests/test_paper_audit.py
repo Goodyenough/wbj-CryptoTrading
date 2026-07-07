@@ -14,6 +14,7 @@ from crypto_trading_system.database import connect_db
 from crypto_trading_system.paper_audit import (
     build_benchmark_rows,
     build_entered_trade_rows,
+    build_opportunity_reconciliation,
     build_reclaim_opportunities,
     render_paper_audit_report,
 )
@@ -112,6 +113,8 @@ def test_reclaim_pending_dedupes_and_classifies_avoided_loser() -> None:
     assert len(rows) == 1
     assert rows[0].classification == "avoided_loser"
     assert rows[0].hit_stop is True
+    assert rows[0].maturity_status == "mature"
+    assert rows[0].counterfactual_pnl_r == -1.0
 
 
 def test_reclaim_pending_classifies_missed_winner() -> None:
@@ -135,6 +138,62 @@ def test_reclaim_pending_classifies_missed_winner() -> None:
         rows = build_reclaim_opportunities(settings, "demo", "2026-06-19", "2026-07-02")
     assert rows[0].classification == "missed_winner"
     assert rows[0].hit_tp1 is True
+    assert rows[0].maturity_status == "mature"
+    assert rows[0].mfe_r is not None and rows[0].mfe_r >= 1.0
+
+
+def test_reclaim_pending_marks_right_censored_when_path_is_short_and_inconclusive() -> None:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        settings = _settings(Path(tmp))
+        _seed_base(settings.output.database_path)
+        _seed_plan(settings.output.database_path)
+        with connect_db(settings.output.database_path) as connection:
+            connection.execute(
+                """
+                INSERT INTO paper_events(event_id, plan_id, run_id, event_time, event_type, symbol, price, reason, created_at)
+                VALUES ('e1', 'plan1', 'run1', '2026-06-19T00:00:00Z', 'RECLAIM_PENDING_SET', 'TESTUSDT', 100, 'blocked', '2026-06-19T00:00:00Z')
+                """
+            )
+            connection.execute(
+                """
+                INSERT INTO paper_snapshots(snapshot_id, run_id, snapshot_time, plan_id, symbol, status, current_price, created_at)
+                VALUES ('s1', 'run1', '2026-06-19T04:00:00Z', 'plan1', 'TESTUSDT', 'WATCHING', 104, '2026-06-19T04:00:00Z')
+                """
+            )
+        rows = build_reclaim_opportunities(settings, "demo", "2026-06-19", "2026-07-02")
+    assert rows[0].classification == "neutral_or_unknown"
+    assert rows[0].maturity_status == "right_censored"
+    assert rows[0].classification_final is False
+
+
+def test_opportunity_reconciliation_counts_raw_and_deduped_reclaim_events() -> None:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        settings = _settings(Path(tmp))
+        _seed_base(settings.output.database_path)
+        _seed_plan(settings.output.database_path)
+        with connect_db(settings.output.database_path) as connection:
+            for event_id, event_time in [("e1", "2026-06-19T00:00:00Z"), ("e2", "2026-06-19T04:00:00Z")]:
+                connection.execute(
+                    """
+                    INSERT INTO paper_events(event_id, plan_id, run_id, event_time, event_type, symbol, price, reason, created_at)
+                    VALUES (?, 'plan1', 'run1', ?, 'RECLAIM_PENDING_SET', 'TESTUSDT', 100, 'blocked', ?)
+                    """,
+                    (event_id, event_time, event_time),
+                )
+        reclaim_rows = build_reclaim_opportunities(settings, "demo", "2026-06-19", "2026-07-02")
+        reconciliation = build_opportunity_reconciliation(
+            settings,
+            "demo",
+            "2026-06-19",
+            "2026-07-02",
+            reclaim_rows=reclaim_rows,
+            scan_rows=[],
+            false_entries=[],
+        )
+    assert reconciliation.raw_reclaim_pending_events == 2
+    assert reconciliation.deduped_reclaim_plans == 1
+    assert reconciliation.excluded_reclaim_duplicate_events == 1
+    assert reconciliation.final_classified_opportunities == 1
 
 
 def test_entered_trade_review_calculates_r_and_entry_issue() -> None:
@@ -178,6 +237,9 @@ def test_report_contains_core_sections() -> None:
     )
     assert "## BTC/ETH Benchmark" in text
     assert "## Opportunity Audit Summary" in text
+    assert "### Opportunity Maturity" in text
+    assert "### Reclaim Reconciliation" in text
+    assert "### Counterfactual R Summary" in text
     assert "## Entered Trades Review" in text
 
 
@@ -185,5 +247,7 @@ if __name__ == "__main__":
     test_benchmark_rows_calculate_return_and_drawdown()
     test_reclaim_pending_dedupes_and_classifies_avoided_loser()
     test_reclaim_pending_classifies_missed_winner()
+    test_reclaim_pending_marks_right_censored_when_path_is_short_and_inconclusive()
+    test_opportunity_reconciliation_counts_raw_and_deduped_reclaim_events()
     test_entered_trade_review_calculates_r_and_entry_issue()
     test_report_contains_core_sections()

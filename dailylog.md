@@ -15,6 +15,16 @@
 
 ## 2026-07-08
 
+### 00:57:15 +08:00 - 增强 paper audit 成熟样本与 R 倍数口径
+- 类型：代码 / 报告 / 测试 / TODO / Git
+- 改动：扩展 `src/crypto_trading_system/paper_audit.py`，为 opportunity audit 增加 `maturity_status`、`right_censored`、`classification_final`、`observation_bars`、`mfe_r`、`mae_r`、`counterfactual_pnl_r`、`first_hit` 与 R 倍数汇总。
+- 改动：新增 `OpportunityReconciliation`，在报告中输出全账户与正式窗口内 `RECLAIM_PENDING` 原始事件数、按 `plan_id` 去重后的 reclaim plans、scan candidate opportunities、entered false entries 和最终分类样本数，解释事件数与 audit 样本数差异。
+- 改动：更新 `tests/test_paper_audit.py`，覆盖 mature avoided loser、missed winner R 倍数、短路径 `right_censored`、reconciliation raw vs deduped 统计，以及报告新增小节。
+- 改动：生成增强版旧窗口报告 `reports/2026-07-08/paper_opportunity_audit_2026-06-19_2026-07-02_demo_v2.md`；该报告显示 mature opportunities=51、right_censored opportunities=27、account total reclaim pending events=107、window raw reclaim pending events=83、final classified opportunities=78、mature defense net R=-14.42。
+- 影响：不修改 `settings.toml`、live paper 状态机或数据库结构；本次只增强离线 audit 报告口径。
+- 验证：`python tests\test_paper_audit.py` 通过；`python -m compileall main.py src tests` 通过；`python main.py paper audit --account demo --start-date 2026-06-19 --end-date 2026-07-02 --no-obsidian` 成功；`git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Enhance paper audit maturity metrics`。
+
 ### 00:43:12 +08:00 - 落地 GPT 复核后的 audit 与 shadow replay 路线
 - 类型：文档 / TODO / Git
 - 改动：新增 `2026-07-08-audit-shadow-replay-plan.md`，将 GPT 复核意见整理为可执行路线：2026-07-16 改为阶段检查点，补强 `paper audit` 的样本成熟、右截尾、R 倍数、`RECLAIM_PENDING_SET=104` 到 audit 样本 78 的 reconciliation、opportunity funnel 和数据链路一致性要求。

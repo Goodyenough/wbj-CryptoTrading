@@ -46,6 +46,29 @@ class OpportunityRow:
     hit_stop: bool
     classification: str
     explanation: str
+    observation_bars: int = 0
+    required_bars: int = 42
+    maturity_status: str = "data_gap"
+    classification_final: bool = False
+    risk_r: float | None = None
+    mfe_r: float | None = None
+    mae_r: float | None = None
+    counterfactual_pnl_r: float | None = None
+    first_hit: str = "none"
+    time_to_first_hit_bars: int | None = None
+
+
+@dataclass(frozen=True)
+class OpportunityReconciliation:
+    account_total_reclaim_pending_events: int
+    raw_reclaim_pending_events: int
+    deduped_reclaim_plans: int
+    scan_candidate_opportunities: int
+    entered_false_entries: int
+    final_classified_opportunities: int
+    excluded_reclaim_duplicate_events: int
+    dedupe_key: str
+    note: str
 
 
 @dataclass(frozen=True)
@@ -137,6 +160,66 @@ def _risk(entry: float | None, stop: float | None) -> float | None:
         return None
     risk = entry - stop
     return risk if risk > 0 else None
+
+
+def _opportunity_path_stats(
+    *,
+    entry: float | None,
+    stop: float | None,
+    tp1: float | None,
+    price_path: list[float],
+    required_bars: int = 42,
+) -> dict[str, object]:
+    risk = _risk(entry, stop)
+    max_price = max(price_path) if price_path else None
+    min_price = min(price_path) if price_path else None
+    mfe_r = None if risk is None or max_price is None or entry is None else (max_price - entry) / risk
+    mae_r = None if risk is None or min_price is None or entry is None else (min_price - entry) / risk
+    near_tp1 = None if entry is None or tp1 is None else entry + 0.8 * (tp1 - entry)
+
+    first_hit = "none"
+    time_to_first_hit_bars = None
+    for index, price in enumerate(price_path, start=1):
+        if stop is not None and price <= stop:
+            first_hit = "stop_first"
+            time_to_first_hit_bars = index
+            break
+        if tp1 is not None and price >= tp1:
+            first_hit = "tp1_first"
+            time_to_first_hit_bars = index
+            break
+        if near_tp1 is not None and price >= near_tp1:
+            first_hit = "near_tp1_first"
+            time_to_first_hit_bars = index
+            break
+
+    if first_hit == "stop_first":
+        counterfactual_pnl_r = -1.0
+    elif first_hit in {"tp1_first", "near_tp1_first"}:
+        counterfactual_pnl_r = None if risk is None or entry is None or price_path is None else max(0.0, float(mfe_r or 0.0))
+    else:
+        counterfactual_pnl_r = None
+
+    has_decisive_path = first_hit != "none"
+    if not price_path:
+        maturity_status = "data_gap"
+    elif len(price_path) >= required_bars or has_decisive_path:
+        maturity_status = "mature"
+    else:
+        maturity_status = "right_censored"
+
+    return {
+        "observation_bars": len(price_path),
+        "required_bars": required_bars,
+        "maturity_status": maturity_status,
+        "classification_final": maturity_status == "mature",
+        "risk_r": risk,
+        "mfe_r": mfe_r,
+        "mae_r": mae_r,
+        "counterfactual_pnl_r": counterfactual_pnl_r,
+        "first_hit": first_hit,
+        "time_to_first_hit_bars": time_to_first_hit_bars,
+    }
 
 
 def _return_pct(start: float, end: float) -> float:
@@ -293,6 +376,12 @@ def build_reclaim_opportunities(settings: Settings, account: str, start_date: st
                 min_price=min_price,
                 price_path=prices,
             )
+            stats = _opportunity_path_stats(
+                entry=None if entry is None else float(entry),
+                stop=None if stop is None else float(stop),
+                tp1=None if tp1 is None else float(tp1),
+                price_path=prices,
+            )
             output.append(
                 OpportunityRow(
                     source="RECLAIM_PENDING",
@@ -310,6 +399,7 @@ def build_reclaim_opportunities(settings: Settings, account: str, start_date: st
                     hit_stop=hit_stop,
                     classification=classification,
                     explanation=explanation,
+                    **stats,
                 )
             )
     return output
@@ -363,6 +453,12 @@ def build_scan_candidate_opportunities(settings: Settings, start_date: str, end_
                 min_price=min_price,
                 price_path=prices,
             )
+            stats = _opportunity_path_stats(
+                entry=None if entry is None else float(entry),
+                stop=None if stop is None else float(stop),
+                tp1=None if tp1 is None else float(tp1),
+                price_path=prices,
+            )
             output.append(
                 OpportunityRow(
                     source=str(row["action"]),
@@ -380,9 +476,59 @@ def build_scan_candidate_opportunities(settings: Settings, start_date: str, end_
                     hit_stop=hit_stop,
                     classification=classification,
                     explanation=explanation,
+                    **stats,
                 )
             )
     return output
+
+
+def build_opportunity_reconciliation(
+    settings: Settings,
+    account: str,
+    start_date: str,
+    end_date: str,
+    *,
+    reclaim_rows: list[OpportunityRow],
+    scan_rows: list[OpportunityRow],
+    false_entries: list[OpportunityRow],
+) -> OpportunityReconciliation:
+    start_utc, end_utc = _parse_window(start_date, end_date)
+    start_text = _iso_z(start_utc)
+    end_text = _iso_z(end_utc)
+    with connect_db(settings.output.database_path) as connection:
+        total_reclaim = connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM paper_events e
+            JOIN paper_plans p ON p.plan_id = e.plan_id
+            WHERE p.account_name = ?
+              AND e.event_type IN ('RECLAIM_PENDING', 'RECLAIM_PENDING_SET')
+            """,
+            (account,),
+        ).fetchone()["count"]
+        raw_reclaim = connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM paper_events e
+            JOIN paper_plans p ON p.plan_id = e.plan_id
+            WHERE p.account_name = ?
+              AND e.event_type IN ('RECLAIM_PENDING', 'RECLAIM_PENDING_SET')
+              AND e.event_time >= ? AND e.event_time <= ?
+            """,
+            (account, start_text, end_text),
+        ).fetchone()["count"]
+    final_count = len(reclaim_rows) + len(scan_rows) + len(false_entries)
+    return OpportunityReconciliation(
+        account_total_reclaim_pending_events=int(total_reclaim),
+        raw_reclaim_pending_events=int(raw_reclaim),
+        deduped_reclaim_plans=len(reclaim_rows),
+        scan_candidate_opportunities=len(scan_rows),
+        entered_false_entries=len(false_entries),
+        final_classified_opportunities=final_count,
+        excluded_reclaim_duplicate_events=max(0, int(raw_reclaim) - len(reclaim_rows)),
+        dedupe_key="RECLAIM_PENDING: plan_id; WATCH_ONLY/REJECT: scan_id+symbol+action; false_entry: plan_id",
+        note="final opportunities combine deduped reclaim plans, scan WATCH_ONLY/REJECT candidates, and stopped entered trades classified as false_entry",
+    )
 
 
 def _classify_entered_trade(
@@ -530,11 +676,17 @@ def render_paper_audit_report(
     benchmarks: list[BenchmarkRow],
     opportunities: list[OpportunityRow],
     entered_trades: list[EnteredTradeRow],
+    reconciliation: OpportunityReconciliation | None = None,
 ) -> str:
     now = _local_now()
     opportunity_counts = Counter(row.classification for row in opportunities)
+    maturity_counts = Counter(row.maturity_status for row in opportunities)
     entered_counts = Counter(row.attribution for row in entered_trades)
     symbol_counts = Counter(row.symbol for row in opportunities)
+    final_opportunities = [row for row in opportunities if row.classification_final]
+    avoided_loss_r = abs(sum(float(row.counterfactual_pnl_r or 0.0) for row in final_opportunities if row.classification == "avoided_loser"))
+    missed_profit_r = sum(float(row.counterfactual_pnl_r or 0.0) for row in final_opportunities if row.classification == "missed_winner")
+    defense_net_r = avoided_loss_r - missed_profit_r
     lines = [
         "---",
         f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
@@ -557,6 +709,9 @@ def render_paper_audit_report(
         f"- benchmark_context: {_benchmark_context(benchmarks)}",
         f"- opportunity_verdict: {_opportunity_verdict(opportunity_counts)}",
         f"- entered_trade_verdict: {_entered_trade_verdict(entered_trades)}",
+        f"- mature_opportunities: {maturity_counts.get('mature', 0)}",
+        f"- right_censored_opportunities: {maturity_counts.get('right_censored', 0)}",
+        f"- defense_net_R: {defense_net_r:.2f}",
         "- next_action: keep current settings while the next window collects more entered/TP1/reclaim evidence.",
         "",
         "## BTC/ETH Benchmark",
@@ -580,6 +735,50 @@ def render_paper_audit_report(
         lines.append(f"| {label} | {opportunity_counts.get(label, 0)} |")
     lines.extend([
         "",
+        "### Opportunity Maturity",
+        "",
+        "| Maturity Status | Count |",
+        "|---|---:|",
+    ])
+    for label in ["mature", "right_censored", "open_unknown", "data_gap"]:
+        lines.append(f"| {label} | {maturity_counts.get(label, 0)} |")
+    lines.extend([
+        "",
+        "### Reclaim Reconciliation",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+    ])
+    if reconciliation is None:
+        lines.append("| raw_RECLAIM_PENDING_events | n/a |")
+        lines.append("| final_classified_opportunities | n/a |")
+    else:
+        lines.extend([
+            f"| account_total_RECLAIM_PENDING_events | {reconciliation.account_total_reclaim_pending_events} |",
+            f"| window_raw_RECLAIM_PENDING_events | {reconciliation.raw_reclaim_pending_events} |",
+            f"| deduped_reclaim_plans | {reconciliation.deduped_reclaim_plans} |",
+            f"| excluded_reclaim_duplicate_events | {reconciliation.excluded_reclaim_duplicate_events} |",
+            f"| scan_candidate_opportunities | {reconciliation.scan_candidate_opportunities} |",
+            f"| entered_false_entries | {reconciliation.entered_false_entries} |",
+            f"| final_classified_opportunities | {reconciliation.final_classified_opportunities} |",
+        ])
+        lines.extend([
+            "",
+            f"- dedupe_key: {reconciliation.dedupe_key}",
+            f"- note: {reconciliation.note}",
+        ])
+    lines.extend([
+        "",
+        "### Counterfactual R Summary",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| mature_avoided_loss_R | {avoided_loss_r:.2f} |",
+        f"| mature_missed_profit_R | {missed_profit_r:.2f} |",
+        f"| mature_defense_net_R | {defense_net_r:.2f} |",
+    ])
+    lines.extend([
+        "",
         "### Symbol Repeats",
         "",
         "| Symbol | Opportunity Rows |",
@@ -593,19 +792,20 @@ def render_paper_audit_report(
         "",
         "### Opportunity Details",
         "",
-        "| Source | Symbol | ID | First Time | Entry | Stop | TP1 | Max/Min After | Reclaimed | TP1 | Stop | Classification | Explanation |",
-        "|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|",
+        "| Source | Symbol | ID | First Time | Entry | Stop | TP1 | Max/Min After | Bars | Maturity | MFE_R | MAE_R | First Hit | Classification | Final | Explanation |",
+        "|---|---|---|---|---:|---:|---:|---:|---:|---|---:|---:|---|---|---|---|",
     ])
     for row in opportunities:
         lines.append(
             f"| {row.source} | `{row.symbol}` | `{row.plan_id}` | {_local_timestamp(row.first_time)} | "
             f"{_fmt(row.entry, 6)} | {_fmt(row.stop, 6)} | {_fmt(row.tp1, 6)} | "
             f"{_fmt(row.max_price_after, 6)} / {_fmt(row.min_price_after, 6)} | "
-            f"{str(row.reclaimed).lower()} | {str(row.hit_tp1).lower()} | {str(row.hit_stop).lower()} | "
-            f"{row.classification} | {row.explanation} |"
+            f"{row.observation_bars}/{row.required_bars} | {row.maturity_status} | "
+            f"{_fmt(row.mfe_r, 2)} | {_fmt(row.mae_r, 2)} | {row.first_hit} | "
+            f"{row.classification} | {str(row.classification_final).lower()} | {row.explanation} |"
         )
     if not opportunities:
-        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | false | false | false | neutral_or_unknown | no opportunity rows |")
+        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | 0/42 | data_gap | n/a | n/a | none | neutral_or_unknown | false | no opportunity rows |")
     lines.extend([
         "",
         "## Entered Trades Review",
@@ -638,6 +838,12 @@ def render_paper_audit_report(
         json.dumps(
             {
                 "opportunities": dict(opportunity_counts),
+                "opportunity_maturity": dict(maturity_counts),
+                "opportunity_r": {
+                    "avoided_loss_R": avoided_loss_r,
+                    "missed_profit_R": missed_profit_r,
+                    "defense_net_R": defense_net_r,
+                },
                 "entered_trades": dict(entered_counts),
             },
             ensure_ascii=False,
@@ -677,11 +883,30 @@ def write_paper_audit_report(
             hit_stop=row.status == "STOPPED",
             classification="false_entry",
             explanation=row.explanation,
+            observation_bars=0,
+            required_bars=42,
+            maturity_status="mature" if row.status in {"STOPPED", "CLOSED", "INVALIDATED", "ARCHIVED"} else "open_unknown",
+            classification_final=row.status in {"STOPPED", "CLOSED", "INVALIDATED", "ARCHIVED"},
+            risk_r=_risk(row.entry_price, row.stop),
+            mfe_r=row.mfe_r,
+            mae_r=row.mae_r,
+            counterfactual_pnl_r=-1.0 if row.status == "STOPPED" else None,
+            first_hit="stop_first" if row.status == "STOPPED" else "none",
+            time_to_first_hit_bars=None,
         )
         for row in entered
         if row.attribution in {"entry_issue", "selection_issue", "market_issue"} and row.status == "STOPPED"
     ]
     opportunities = reclaim + scan_opportunities + false_entries
+    reconciliation = build_opportunity_reconciliation(
+        settings,
+        account,
+        start_date,
+        end_date,
+        reclaim_rows=reclaim,
+        scan_rows=scan_opportunities,
+        false_entries=false_entries,
+    )
 
     now = _local_now()
     report_dir = settings.output.reports_dir / now.strftime("%Y-%m-%d")
@@ -697,6 +922,7 @@ def write_paper_audit_report(
         benchmarks=benchmarks,
         opportunities=opportunities,
         entered_trades=entered,
+        reconciliation=reconciliation,
     )
     paths: list[Path] = []
     for directory in [report_dir, obsidian_dir]:
