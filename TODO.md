@@ -127,7 +127,11 @@
 - [x] 新增 opportunity audit 报告：按独立 `plan_id` / `symbol` 统计 `avoided_losers`、`missed_winners`、`false_entries`，尤其不要只按 `RECLAIM_PENDING` 事件次数判断。
 - [x] 补 BTC/ETH 正式窗口基准：每个验收窗口输出 BTC/ETH 收益、最大回撤和趋势状态，用于判断策略空仓或亏损是否由市场环境解释。
 - [x] 逐笔复盘 8 笔 entered trades：记录入场原因、入场时 `market_regime`、最大浮盈 R、是否接近 TP1、失败原因，并归因为选币、入场、止损、退出或市场问题。
-- [ ] 2026-07-16 左右重新运行 `paper audit` 后，再决定是否启动 `2026-07-06-abtest-plan.md` 中的 `entry_reclaim_confirm_1bar` / `relative_strength_gate` A/B；在此之前不修改 `settings.toml`。
+- [ ] 2026-07-16 作为阶段检查点，而不是最终策略结论日；当天先判断数据链路、成熟样本、右截尾比例和 config hash，再决定输出 formal audit 还是 interim report。
+- [ ] 补强 `paper audit` 规范：新增样本成熟规则、`right_censored/open_unknown` 标记、`RECLAIM_PENDING_SET=104` 到 audit 样本 78 的 reconciliation、R 倍数反事实 PnL、opportunity funnel 和数据链路一致性检查。
+- [ ] 2026-07-16 前完成 `entry_reclaim_confirm_1bar` 与 `relative_strength_gate` 的 shadow replay 设计；只做离线诊断，不修改 live paper 配置。
+- [ ] 用增强版 audit 先复核 2026-06-19 -> 2026-07-02 旧窗口，确认新字段能解释旧报告中的 `avoided_loser=25`、`missed_winner=12`、`false_entry=7` 和 `neutral_or_unknown=34`。
+- [ ] 2026-07-16 阶段检查后，再根据 shadow replay 与成熟 audit 决定是否启动 `2026-07-06-abtest-plan.md` 中的正式 A/B；在此之前不修改 `settings.toml`。
 - [ ] 两周后按证据决定下一步实验方向：`missed_winners` 多则复测 `RECLAIM_PENDING`/`RISK_OFF`，entered trades 多数止损则优先改入场，大浮盈回落则优先改退出，BTC/ETH 大涨但策略不参与则检查选币和进攻模式。
 
 ## 运维待办

@@ -15,6 +15,16 @@
 
 ## 2026-07-08
 
+### 00:43:12 +08:00 - 落地 GPT 复核后的 audit 与 shadow replay 路线
+- 类型：文档 / TODO / Git
+- 改动：新增 `2026-07-08-audit-shadow-replay-plan.md`，将 GPT 复核意见整理为可执行路线：2026-07-16 改为阶段检查点，补强 `paper audit` 的样本成熟、右截尾、R 倍数、`RECLAIM_PENDING_SET=104` 到 audit 样本 78 的 reconciliation、opportunity funnel 和数据链路一致性要求。
+- 改动：更新 `TODO.md`，将 7/16 后续工作拆成阶段检查、audit 补强、shadow replay、旧窗口增强版复核和正式 A/B 决策五项任务。
+- 改动：更新 `2026-07-06-abtest-plan.md`，追加 2026-07-08 修订口径，明确正式 A/B 之前先做 `entry_reclaim_confirm_1bar` 与 `relative_strength_gate` 的 shadow replay，且不修改 live paper 配置。
+- 改动：保存 `.gpt-review/current_packet.md`、`.gpt-review/gpt_review.md` 与 `.gpt-review/codex_response.md`，保留本轮 GPT 评审包、GPT 要点摘要和 Codex 采纳记录。
+- 影响：仅文档和计划变更，不修改 `settings.toml`、策略代码、数据库或 paper 状态。
+- 验证：检查新增计划文件存在；`git diff -- config/settings.toml` 为空；本次未运行代码测试。
+- Git：计划提交 `Add audit shadow replay plan`。
+
 ### 00:22:33 +08:00 - 记录 7 月 6 日 A/B 实验计划
 - 类型：文档 / TODO / Git
 - 改动：新增 `2026-07-06-abtest-plan.md`，记录 7/2 验收后、7/7 `paper audit` 后的工作背景，明确下一轮 A/B 方向优先围绕 `entry_reclaim_confirm_1bar` 和 `relative_strength_gate`，但必须等 2026-07-16 左右新窗口 audit 后再决定是否执行。

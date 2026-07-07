@@ -414,3 +414,29 @@ retest
 ```text
 先解释亏损来源，再设计单变量实验；先 A/B 验证，再考虑写入默认配置。
 ```
+
+## 9. 2026-07-08 GPT 复核后的修订口径
+
+本节覆盖前文中“等 2026-07-16 左右再跑一次 paper audit 后决定 A/B”的旧表述。
+
+2026-07-16 不再视为自动生成最终策略结论的日期，而是视为阶段检查点。
+
+执行口径调整为：
+
+- 若 2026-07-16 当天成熟样本足够，生成 formal audit；
+- 若多数 opportunity 仍缺少足够后验 4h K 线，生成 interim report；
+- 若采用 42 根 4h K 线作为 opportunity 后验成熟窗口，则 7 月 16 日只能完整分类约 7 月 9 日及以前产生的机会；
+- 若要完整评估截至 7 月 16 日的机会，应等到约 7 月 23 日之后；
+- `avoided_loser` 与 `missed_winner` 不能只按次数比较，必须补 R 倍数或反事实 PnL；
+- 正式 A/B 之前，先做 `entry_reclaim_confirm_1bar` 与 `relative_strength_gate` 的 shadow replay；
+- shadow replay 只用于诊断优先级，不修改 live paper 配置，不作为最终 confirmatory evidence。
+
+正式 A/B 的优先级改为条件触发：
+
+| 证据结构 | 下一步 |
+|---|---|
+| 假 reclaim 主导，1-bar replay 明显过滤 false entries | 先测 `entry_reclaim_confirm_1bar` |
+| 弱币选择主导，RS 能区分 winners / losers | 先测 `relative_strength_gate` |
+| 市场整体缺机会，候选池也弱 | 继续观察，不急于改策略 |
+| `missed_profit_R > avoided_loss_R` 且成熟样本足够 | 单独复查 `RECLAIM_PENDING` / `RISK_OFF` |
+| 数据链路异常 | 先 fix，策略结论作废 |
