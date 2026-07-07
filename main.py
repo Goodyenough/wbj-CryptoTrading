@@ -32,6 +32,7 @@ from crypto_trading_system.paper_db import (
     export_paper_db,
     load_paper_db_events,
 )
+from crypto_trading_system.paper_audit import write_paper_audit_report
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
     build_experiment_index,
@@ -390,6 +391,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     paper_report = paper_subparsers.add_parser("report", help="Write a paper trading report.")
     paper_report.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+
+    paper_audit = paper_subparsers.add_parser(
+        "audit",
+        help="Write BTC/ETH benchmark, opportunity audit, and entered-trade review.",
+    )
+    paper_audit.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_audit.add_argument("--start-date", required=True, help="Beijing start date, e.g. 2026-06-19.")
+    paper_audit.add_argument("--end-date", required=True, help="Beijing end date, e.g. 2026-07-02.")
+    paper_audit.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper_summary = paper_subparsers.add_parser("db-summary", help="Summarize runs, plans, events, and snapshots.")
     paper_summary.add_argument("--limit", type=int, default=10, help="Maximum recent and failed runs to show.")
@@ -978,6 +988,21 @@ def main() -> None:
 
         if args.paper_command == "report":
             _, report_paths = generate_paper_report(settings, account_name=args.account)
+            for path in report_paths:
+                print(f"report={path}")
+
+        if args.paper_command == "audit":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            _, report_paths = write_paper_audit_report(
+                settings,
+                account_name=args.account,
+                start_date=args.start_date,
+                end_date=args.end_date,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("paper_audit=completed")
             for path in report_paths:
                 print(f"report={path}")
 

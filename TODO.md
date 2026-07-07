@@ -124,9 +124,9 @@
 ## 2026-07-02 后两周观察路线
 
 - [ ] 冻结当前 `settings.toml`，继续 daily + 4h 至少观察 2 周；除非出现明确红线，不修改策略参数或 paper 状态机。
-- [ ] 新增 opportunity audit 报告：按独立 `plan_id` / `symbol` 统计 `avoided_losers`、`missed_winners`、`false_entries`，尤其不要只按 `RECLAIM_PENDING` 事件次数判断。
-- [ ] 补 BTC/ETH 正式窗口基准：每个验收窗口输出 BTC/ETH 收益、最大回撤和趋势状态，用于判断策略空仓或亏损是否由市场环境解释。
-- [ ] 逐笔复盘 8 笔 entered trades：记录入场原因、入场时 `market_regime`、最大浮盈 R、是否接近 TP1、失败原因，并归因为选币、入场、止损、退出或市场问题。
+- [x] 新增 opportunity audit 报告：按独立 `plan_id` / `symbol` 统计 `avoided_losers`、`missed_winners`、`false_entries`，尤其不要只按 `RECLAIM_PENDING` 事件次数判断。
+- [x] 补 BTC/ETH 正式窗口基准：每个验收窗口输出 BTC/ETH 收益、最大回撤和趋势状态，用于判断策略空仓或亏损是否由市场环境解释。
+- [x] 逐笔复盘 8 笔 entered trades：记录入场原因、入场时 `market_regime`、最大浮盈 R、是否接近 TP1、失败原因，并归因为选币、入场、止损、退出或市场问题。
 - [ ] 两周后按证据决定下一步实验方向：`missed_winners` 多则复测 `RECLAIM_PENDING`/`RISK_OFF`，entered trades 多数止损则优先改入场，大浮盈回落则优先改退出，BTC/ETH 大涨但策略不参与则检查选币和进攻模式。
 
 ## 运维待办

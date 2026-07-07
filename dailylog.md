@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-07-07
+
+### 23:56:13 +08:00 - 新增 paper opportunity audit 报告
+- 类型：代码 / 报告 / 测试 / TODO / Git
+- 改动：新增 `python main.py paper audit --account demo --start-date ... --end-date ...`，生成 BTC/ETH 正式窗口基准、`RECLAIM_PENDING`/`WATCH_ONLY`/`REJECT` opportunity audit，以及 entered trades 逐笔复盘。
+- 改动：新增 `src/crypto_trading_system/paper_audit.py` 和 `tests/test_paper_audit.py`；更新 `TODO.md`，将 opportunity audit、BTC/ETH 基准和 8 笔 entered trades 复盘标记完成。
+- 结果：生成 `reports/2026-07-07/paper_opportunity_audit_2026-06-19_2026-07-02_demo_v1.md`；正式窗口 BTC -2.13%、ETH -0.49%，整体偏横盘；opportunity 分类为 `avoided_loser=25`、`missed_winner=12`、`false_entry=7`、`neutral_or_unknown=34`；entered trade verdict 为 `review_selection_and_entry`。
+- 影响：不修改 `settings.toml`、不改策略参数、不补跑 paper 状态；命令只生成审查报告，按需补齐 K 线缓存但不提交本地数据库。
+- 验证：`python tests\test_paper_audit.py` 通过；`python -m compileall main.py src tests` 通过；`python main.py paper audit --account demo --start-date 2026-06-19 --end-date 2026-07-02 --no-obsidian` 成功；`git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add paper opportunity audit report`。
+
 ## 2026-07-02
 
 ### 23:45:17 +08:00 - 记录 7 月 2 日后两周观察路线
