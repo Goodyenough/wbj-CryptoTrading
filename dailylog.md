@@ -15,6 +15,17 @@
 
 ## 2026-07-08
 
+### 17:14:04 +08:00 - 增加 relative strength shadow replay
+- 类型：代码 / 报告 / 测试 / TODO / Git
+- 改动：扩展 `src/crypto_trading_system/paper_shadow_replay.py`，新增 `relative_strength_gate` variant，用信号后约 24 小时内标的 4h 收盘收益相对 BTC/ETH 平均收益的差值做离线过滤诊断。
+- 改动：`python main.py paper shadow-replay --variant relative_strength_gate` 现在会输出 symbol return、benchmark return 和 relative strength，过滤弱相对强度样本后再标记 `filtered_loser`、`missed_winner`、`filtered_unknown` 或 `kept_by_relative_strength`。
+- 改动：更新 `tests/test_paper_shadow_replay.py`，新增弱相对强度且 baseline 为 stop-first 时应分类为 `filtered_loser` 的测试。
+- 改动：生成旧窗口报告 `reports/2026-07-08/paper_shadow_replay_relative_strength_gate_2026-06-19_2026-07-02_demo_v1.md`；结果显示 opportunities=71、baseline_entries=61、variant_entries=27、filtered_loser=13、missed_winner=4、kept_by_relative_strength=29。
+- 改动：更新 `TODO.md`，将 `relative_strength_gate` shadow replay MVP 标记完成。
+- 影响：本次仍是离线诊断能力和审查报告，不修改 `settings.toml`、paper plans、events、snapshots 或 live paper 状态机。
+- 验证：已运行 `python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-replay --account demo --start-date 2026-06-19 --end-date 2026-07-02 --variant relative_strength_gate --no-obsidian`；确认 `git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add relative strength shadow replay`。
+
 ### 17:09:21 +08:00 - 增加 entry reclaim shadow replay
 - 类型：代码 / 报告 / 测试 / TODO / Git
 - 改动：新增 `src/crypto_trading_system/paper_shadow_replay.py`，实现 `entry_reclaim_confirm_1bar` 离线 shadow replay，用旧窗口 opportunity audit 样本重放“首次 4h 收盘站回 entry_high 后，再等下一根 4h 确认”的入场假设。

@@ -14,6 +14,7 @@ from crypto_trading_system.config import load_settings
 from crypto_trading_system.database import connect_db
 from crypto_trading_system.paper_shadow_replay import (
     build_entry_reclaim_confirm_1bar_shadow,
+    build_relative_strength_gate_shadow,
     render_shadow_replay_report,
 )
 from crypto_trading_system.storage import init_db
@@ -104,6 +105,41 @@ def test_shadow_replay_report_contains_summary_sections() -> None:
     assert "## Replay Details" in text
 
 
+def test_relative_strength_gate_filters_weak_stop_first_path() -> None:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        settings = _settings(Path(tmp))
+        _seed_reclaim_plan(settings.output.database_path)
+        original = shadow_module.fetch_klines_cached
+
+        def fake_fetch(_settings, symbol, *_args, **_kwargs):
+            if symbol == "TESTUSDT":
+                return _FakeFetchResult(
+                    [
+                        _kline(0, 100, 106, 99, 106),
+                        _kline(1, 106, 107, 89, 100),
+                    ]
+                )
+            return _FakeFetchResult(
+                [
+                    _kline(0, 100, 101, 99, 100),
+                    _kline(1, 100, 103, 99, 102),
+                ]
+            )
+
+        shadow_module.fetch_klines_cached = fake_fetch
+        try:
+            rows = build_relative_strength_gate_shadow(settings, "demo", "2026-06-19", "2026-07-02")
+        finally:
+            shadow_module.fetch_klines_cached = original
+    assert len(rows) == 1
+    assert rows[0].baseline_first_hit == "stop_first"
+    assert rows[0].variant_first_hit == "no_variant_entry"
+    assert rows[0].decision == "filtered_loser"
+    assert rows[0].relative_strength_pct is not None
+    assert rows[0].relative_strength_pct < 0
+
+
 if __name__ == "__main__":
     test_entry_reclaim_confirm_1bar_filters_stop_first_path()
     test_shadow_replay_report_contains_summary_sections()
+    test_relative_strength_gate_filters_weak_stop_first_path()

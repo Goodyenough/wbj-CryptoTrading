@@ -412,7 +412,7 @@ def build_parser() -> argparse.ArgumentParser:
     paper_shadow.add_argument(
         "--variant",
         required=True,
-        choices=["entry_reclaim_confirm_1bar"],
+        choices=["entry_reclaim_confirm_1bar", "relative_strength_gate"],
         help="Shadow replay variant.",
     )
     paper_shadow.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")

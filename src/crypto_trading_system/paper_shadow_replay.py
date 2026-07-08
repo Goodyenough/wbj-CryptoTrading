@@ -45,6 +45,9 @@ class ShadowReplayRow:
     variant_mfe_r: float | None
     decision: str
     explanation: str
+    symbol_return_pct: float | None = None
+    benchmark_return_pct: float | None = None
+    relative_strength_pct: float | None = None
 
 
 def _kline_time(kline: list) -> datetime:
@@ -93,6 +96,32 @@ def _first_hit_after_entry(
             return "near_tp1_first", mfe_r
     mfe_r = None if risk is None or max_high is None else (max_high - entry_price) / risk
     return "open_unknown", mfe_r
+
+
+def _return_pct_from_path(klines: list[list], bars: int) -> float | None:
+    if len(klines) < 2:
+        return None
+    end_index = min(bars, len(klines) - 1)
+    start = float(klines[0][4])
+    end = float(klines[end_index][4])
+    if start == 0:
+        return None
+    return ((end / start) - 1.0) * 100.0
+
+
+def _benchmark_return_pct(settings: Settings, start_time: str, end_utc: datetime, bars: int) -> float | None:
+    values: list[float] = []
+    for symbol in ("BTCUSDT", "ETHUSDT"):
+        try:
+            path = _fetch_closed_4h_path(settings, symbol, start_time, end_utc)
+        except Exception:  # noqa: BLE001 - replay report should continue with partial data.
+            path = []
+        value = _return_pct_from_path(path, bars)
+        if value is not None:
+            values.append(value)
+    if not values:
+        return None
+    return sum(values) / len(values)
 
 
 def _entry_reclaim_confirm_1bar_row(settings: Settings, opportunity: OpportunityRow, end_utc: datetime) -> ShadowReplayRow:
@@ -234,6 +263,71 @@ def _entry_reclaim_confirm_1bar_row(settings: Settings, opportunity: Opportunity
     )
 
 
+def _relative_strength_gate_row(
+    settings: Settings,
+    opportunity: OpportunityRow,
+    end_utc: datetime,
+    *,
+    bars: int = 6,
+    min_relative_strength_pct: float = 0.0,
+) -> ShadowReplayRow:
+    baseline = _entry_reclaim_confirm_1bar_row(settings, opportunity, end_utc)
+    if baseline.decision == "data_gap":
+        return baseline
+    try:
+        symbol_path = _fetch_closed_4h_path(settings, opportunity.symbol, opportunity.first_time, end_utc)
+    except Exception:  # noqa: BLE001 - replay report should classify this opportunity as data_gap.
+        symbol_path = []
+    symbol_return = _return_pct_from_path(symbol_path, bars)
+    benchmark_return = _benchmark_return_pct(settings, opportunity.first_time, end_utc, bars)
+    if symbol_return is None or benchmark_return is None:
+        return ShadowReplayRow(
+            **{**baseline.__dict__, "decision": "data_gap", "explanation": "relative strength data unavailable"},
+        )
+    relative_strength = symbol_return - benchmark_return
+    if relative_strength >= min_relative_strength_pct:
+        return ShadowReplayRow(
+            **{
+                **baseline.__dict__,
+                "variant_entry_time": baseline.baseline_entry_time,
+                "variant_entry_price": baseline.baseline_entry_price,
+                "variant_first_hit": baseline.baseline_first_hit,
+                "variant_mfe_r": baseline.baseline_mfe_r,
+                "decision": "kept_by_relative_strength",
+                "explanation": "symbol outperformed BTC/ETH benchmark during the confirmation window",
+                "symbol_return_pct": symbol_return,
+                "benchmark_return_pct": benchmark_return,
+                "relative_strength_pct": relative_strength,
+            },
+        )
+    if baseline.baseline_first_hit == "stop_first":
+        decision = "filtered_loser"
+        explanation = "relative strength gate would avoid a baseline stop-first path"
+    elif baseline.baseline_first_hit in {"near_tp1_first", "tp1_first"}:
+        decision = "missed_winner"
+        explanation = "relative strength gate would skip a baseline near-TP1/TP1 path"
+    elif baseline.baseline_first_hit == "no_baseline_entry":
+        decision = "no_baseline_entry"
+        explanation = "price never closed back above entry_high"
+    else:
+        decision = "filtered_unknown"
+        explanation = "relative strength gate would skip an inconclusive baseline path"
+    return ShadowReplayRow(
+        **{
+            **baseline.__dict__,
+            "variant_entry_time": None,
+            "variant_entry_price": None,
+            "variant_first_hit": "no_variant_entry",
+            "variant_mfe_r": None,
+            "decision": decision,
+            "explanation": explanation,
+            "symbol_return_pct": symbol_return,
+            "benchmark_return_pct": benchmark_return,
+            "relative_strength_pct": relative_strength,
+        },
+    )
+
+
 def build_entry_reclaim_confirm_1bar_shadow(
     settings: Settings,
     account: str,
@@ -251,6 +345,26 @@ def build_entry_reclaim_confirm_1bar_shadow(
             continue
         seen.add(key)
         rows.append(_entry_reclaim_confirm_1bar_row(settings, opportunity, end_utc))
+    return rows
+
+
+def build_relative_strength_gate_shadow(
+    settings: Settings,
+    account: str,
+    start_date: str,
+    end_date: str,
+) -> list[ShadowReplayRow]:
+    _start_utc, end_utc = _parse_window(start_date, end_date)
+    opportunities = build_reclaim_opportunities(settings, account, start_date, end_date)
+    opportunities += build_scan_candidate_opportunities(settings, start_date, end_date)
+    rows: list[ShadowReplayRow] = []
+    seen: set[str] = set()
+    for opportunity in opportunities:
+        key = f"{opportunity.source}:{opportunity.plan_id}"
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append(_relative_strength_gate_row(settings, opportunity, end_utc))
     return rows
 
 
@@ -295,6 +409,7 @@ def render_shadow_replay_report(
         f"- improved_path: {decision_counts.get('improved_path', 0)}",
         f"- worse_path: {decision_counts.get('worse_path', 0)}",
         f"- delayed_entry: {decision_counts.get('delayed_entry', 0)}",
+        f"- kept_by_relative_strength: {decision_counts.get('kept_by_relative_strength', 0)}",
         "",
         "## Decision Counts",
         "",
@@ -309,8 +424,8 @@ def render_shadow_replay_report(
         "",
         "## Replay Details",
         "",
-        "| Source | Symbol | ID | First Time | Baseline Entry | Variant Entry | Baseline Hit | Variant Hit | Baseline MFE_R | Variant MFE_R | Decision | Explanation |",
-        "|---|---|---|---|---|---|---|---|---:|---:|---|---|",
+        "| Source | Symbol | ID | First Time | Baseline Entry | Variant Entry | Baseline Hit | Variant Hit | Baseline MFE_R | Variant MFE_R | Symbol Ret | Benchmark Ret | RS | Decision | Explanation |",
+        "|---|---|---|---|---|---|---|---|---:|---:|---:|---:|---:|---|---|",
     ])
     for row in rows:
         lines.append(
@@ -318,7 +433,8 @@ def render_shadow_replay_report(
             f"{_local_timestamp(row.baseline_entry_time or '')} @ {_fmt(row.baseline_entry_price, 6)} | "
             f"{_local_timestamp(row.variant_entry_time or '')} @ {_fmt(row.variant_entry_price, 6)} | "
             f"{row.baseline_first_hit} | {row.variant_first_hit} | {_fmt(row.baseline_mfe_r, 2)} | "
-            f"{_fmt(row.variant_mfe_r, 2)} | {row.decision} | {row.explanation} |"
+            f"{_fmt(row.variant_mfe_r, 2)} | {_pct(row.symbol_return_pct)} | {_pct(row.benchmark_return_pct)} | "
+            f"{_pct(row.relative_strength_pct)} | {row.decision} | {row.explanation} |"
         )
     lines.extend([
         "",
@@ -332,6 +448,8 @@ def render_shadow_replay_report(
                 "baseline_entries": baseline_entries,
                 "variant_entries": variant_entries,
                 "decisions": dict(decision_counts),
+                "relative_strength_window_bars": 6 if variant == "relative_strength_gate" else None,
+                "relative_strength_min_pct": 0.0 if variant == "relative_strength_gate" else None,
             },
             ensure_ascii=False,
             indent=2,
@@ -350,9 +468,12 @@ def write_shadow_replay_report(
     variant: str,
 ) -> tuple[str, list[Path]]:
     account = account_name or settings.paper.account_name
-    if variant != "entry_reclaim_confirm_1bar":
+    if variant == "entry_reclaim_confirm_1bar":
+        rows = build_entry_reclaim_confirm_1bar_shadow(settings, account, start_date, end_date)
+    elif variant == "relative_strength_gate":
+        rows = build_relative_strength_gate_shadow(settings, account, start_date, end_date)
+    else:
         raise ValueError(f"unsupported shadow replay variant: {variant}")
-    rows = build_entry_reclaim_confirm_1bar_shadow(settings, account, start_date, end_date)
     now = _local_now()
     report_dir = settings.output.reports_dir / now.strftime("%Y-%m-%d")
     obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / now.strftime("%Y-%m-%d")
