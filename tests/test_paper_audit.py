@@ -14,6 +14,7 @@ from crypto_trading_system.database import connect_db
 from crypto_trading_system.paper_audit import (
     build_opportunity_funnel,
     build_benchmark_rows,
+    build_data_link_health,
     build_entered_trade_rows,
     build_opportunity_reconciliation,
     build_reclaim_opportunities,
@@ -243,6 +244,35 @@ def test_opportunity_funnel_counts_scan_actions_and_entered_plans() -> None:
     assert by_stage["stopped_plans"].count == 1
 
 
+def test_data_link_health_counts_expected_runs_and_config_hash_stability() -> None:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        settings = _settings(Path(tmp))
+        _seed_base(settings.output.database_path)
+        with connect_db(settings.output.database_path) as connection:
+            connection.execute(
+                """
+                INSERT INTO runs(run_id, run_type, started_at, finished_at, status, config_hash, created_at)
+                VALUES ('daily1', 'daily_full', '2026-06-19T12:00:00Z', '2026-06-19T12:01:00Z', 'success', 'hash1', '2026-06-19T12:00:00Z')
+                """
+            )
+            for idx, hour in enumerate([0, 4, 8, 12, 15], start=1):
+                timestamp = f"2026-06-19T{hour:02d}:10:00Z"
+                connection.execute(
+                    """
+                    INSERT INTO runs(run_id, run_type, started_at, finished_at, status, config_hash, created_at)
+                    VALUES (?, 'paper_4h_update', ?, ?, 'success', 'hash1', ?)
+                    """,
+                    (f"paper4h{idx}", timestamp, timestamp, timestamp),
+                )
+        health = build_data_link_health(settings, "demo", "2026-06-19", "2026-06-19")
+    assert health.daily.expected_runs == 1
+    assert health.daily.success_runs == 1
+    assert health.paper_4h.expected_runs == 5
+    assert health.paper_4h.success_runs == 5
+    assert health.config_hash_stable is True
+    assert health.verdict == "pass"
+
+
 def test_entered_trade_review_calculates_r_and_entry_issue() -> None:
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
         settings = _settings(Path(tmp))
@@ -283,6 +313,7 @@ def test_report_contains_core_sections() -> None:
         entered_trades=[],
     )
     assert "## BTC/ETH Benchmark" in text
+    assert "## Data Link Health" in text
     assert "## Opportunity Audit Summary" in text
     assert "### Opportunity Maturity" in text
     assert "### Opportunity Funnel" in text
@@ -298,5 +329,6 @@ if __name__ == "__main__":
     test_reclaim_pending_marks_right_censored_when_path_is_short_and_inconclusive()
     test_opportunity_reconciliation_counts_raw_and_deduped_reclaim_events()
     test_opportunity_funnel_counts_scan_actions_and_entered_plans()
+    test_data_link_health_counts_expected_runs_and_config_hash_stability()
     test_entered_trade_review_calculates_r_and_entry_issue()
     test_report_contains_core_sections()

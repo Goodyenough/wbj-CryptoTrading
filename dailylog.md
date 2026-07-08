@@ -15,6 +15,16 @@
 
 ## 2026-07-08
 
+### 17:03:18 +08:00 - 增加 paper audit 数据链路一致性检查
+- 类型：代码 / 报告 / 测试 / TODO / Git
+- 改动：扩展 `src/crypto_trading_system/paper_audit.py`，新增 `RunTypeHealth`、`DataLinkHealth` 和 `build_data_link_health`，在 `paper audit` 中输出 daily/4h 预期次数、实际次数、成功/失败/运行中、成功率、最新运行时间、config hash 稳定性、stale running、重复事件和不可能事件顺序。
+- 改动：更新 `tests/test_paper_audit.py`，新增 data link health 测试，覆盖单日 daily/4h 预期运行数、成功率、config hash 稳定和 verdict。
+- 改动：生成 `reports/2026-07-08/paper_opportunity_audit_2026-06-19_2026-07-02_demo_v5.md`；旧窗口 Data Link Health 显示 daily_full 14/14 成功、paper_4h_update 70 次中 69 成功 1 失败、config hash 稳定、stale running=0、duplicate_events=0、impossible_event_order=0，整体 `partial_pass`。
+- 改动：更新 `TODO.md`，将 `paper audit` 补强任务标记完成，剩余 7/16 前重点转向 shadow replay。
+- 影响：不修改 `settings.toml`、live paper 状态机或数据库结构；仅增强离线审查报告。
+- 验证：`python tests\test_paper_audit.py` 通过；`python -m compileall main.py src tests` 通过；`python main.py paper audit --account demo --start-date 2026-06-19 --end-date 2026-07-02 --no-obsidian` 成功；`git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add paper audit data link health`。
+
 ### 16:58:24 +08:00 - 增加 paper audit opportunity funnel
 - 类型：代码 / 报告 / 测试 / TODO / Git
 - 改动：扩展 `src/crypto_trading_system/paper_audit.py`，新增 `FunnelRow` 和 `build_opportunity_funnel`，在 `paper audit` 报告中输出 scan candidates、BUY_CANDIDATE、WATCH_ONLY、REJECT、RISK_OFF blocked、RECLAIM_PENDING、entered、TP1 和 stopped 的转化路径。

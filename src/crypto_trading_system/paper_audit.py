@@ -83,6 +83,31 @@ class FunnelRow:
 
 
 @dataclass(frozen=True)
+class RunTypeHealth:
+    run_type: str
+    expected_runs: int
+    observed_runs: int
+    success_runs: int
+    failed_runs: int
+    running_runs: int
+    success_rate_pct: float | None
+    latest_started_at: str
+
+
+@dataclass(frozen=True)
+class DataLinkHealth:
+    daily: RunTypeHealth
+    paper_4h: RunTypeHealth
+    config_hashes: list[str]
+    config_hash_stable: bool
+    stale_running_runs: int
+    duplicate_events: int
+    impossible_event_order: int
+    verdict: str
+    note: str
+
+
+@dataclass(frozen=True)
 class EnteredTradeRow:
     symbol: str
     plan_id: str
@@ -548,6 +573,115 @@ def _rate(numerator: int, denominator: int) -> float | None:
     return numerator / denominator * 100.0
 
 
+def _window_days(start_date: str, end_date: str) -> int:
+    return (date.fromisoformat(end_date) - date.fromisoformat(start_date)).days + 1
+
+
+def _build_run_type_health(rows: list[sqlite3.Row], run_type: str, expected_runs: int) -> RunTypeHealth:
+    matching = [row for row in rows if str(row["run_type"]) == run_type]
+    success = sum(1 for row in matching if str(row["status"]) == "success")
+    failed = sum(1 for row in matching if str(row["status"]) == "failed")
+    running = sum(1 for row in matching if str(row["status"]) == "running")
+    latest = max((str(row["started_at"]) for row in matching), default="n/a")
+    return RunTypeHealth(
+        run_type=run_type,
+        expected_runs=expected_runs,
+        observed_runs=len(matching),
+        success_runs=success,
+        failed_runs=failed,
+        running_runs=running,
+        success_rate_pct=_rate(success, expected_runs),
+        latest_started_at=latest,
+    )
+
+
+def build_data_link_health(settings: Settings, account: str, start_date: str, end_date: str) -> DataLinkHealth:
+    start_utc, end_utc = _parse_window(start_date, end_date)
+    start_text = _iso_z(start_utc)
+    end_text = _iso_z(end_utc)
+    days = _window_days(start_date, end_date)
+    with connect_db(settings.output.database_path) as connection:
+        run_rows = connection.execute(
+            """
+            SELECT *
+            FROM runs
+            WHERE started_at >= ? AND started_at <= ?
+              AND run_type IN ('daily_full', 'paper_4h_update')
+            ORDER BY started_at
+            """,
+            (start_text, end_text),
+        ).fetchall()
+        config_hashes = sorted(
+            {
+                str(row["config_hash"])
+                for row in run_rows
+                if "config_hash" in row.keys() and row["config_hash"]
+            }
+        )
+        stale_running = connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM runs
+            WHERE status = 'running'
+              AND started_at <= ?
+            """,
+            (_iso_z(_local_now().astimezone(timezone.utc) - timedelta(hours=2)),),
+        ).fetchone()["count"]
+        duplicate_events = connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM (
+                SELECT plan_id, event_type, event_time, COUNT(*) AS n
+                FROM paper_events
+                WHERE event_time >= ? AND event_time <= ?
+                GROUP BY plan_id, event_type, event_time
+                HAVING n > 1
+            )
+            """,
+            (start_text, end_text),
+        ).fetchone()["count"]
+        impossible_order = connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM paper_events entered
+            JOIN paper_events terminal
+              ON terminal.plan_id = entered.plan_id
+             AND terminal.event_time < entered.event_time
+            JOIN paper_plans p ON p.plan_id = entered.plan_id
+            WHERE p.account_name = ?
+              AND entered.event_time >= ? AND entered.event_time <= ?
+              AND entered.event_type IN ('ENTERED', 'RECLAIM_CONFIRMED_ENTERED')
+              AND terminal.event_type IN ('STOPPED', 'INVALIDATED', 'EXPIRED', 'ARCHIVED')
+            """,
+            (account, start_text, end_text),
+        ).fetchone()["count"]
+
+    daily = _build_run_type_health(run_rows, "daily_full", days)
+    paper_4h = _build_run_type_health(run_rows, "paper_4h_update", days * 5)
+    config_hash_stable = len(config_hashes) <= 1
+    if not config_hash_stable or int(stale_running) > 0 or int(duplicate_events) > 0 or int(impossible_order) > 0:
+        verdict = "fix"
+    elif daily.success_runs < daily.expected_runs or paper_4h.failed_runs > 0:
+        verdict = "partial_pass"
+    else:
+        verdict = "pass"
+    note = (
+        "expected paper_4h runs assume five scheduled updates per Beijing day "
+        "(00:10, 04:10, 08:10, 12:10, 16:10)"
+    )
+    return DataLinkHealth(
+        daily=daily,
+        paper_4h=paper_4h,
+        config_hashes=config_hashes,
+        config_hash_stable=config_hash_stable,
+        stale_running_runs=int(stale_running),
+        duplicate_events=int(duplicate_events),
+        impossible_event_order=int(impossible_order),
+        verdict=verdict,
+        note=note,
+    )
+
+
 def build_opportunity_funnel(
     settings: Settings,
     account: str,
@@ -819,6 +953,7 @@ def render_paper_audit_report(
     entered_trades: list[EnteredTradeRow],
     reconciliation: OpportunityReconciliation | None = None,
     funnel: list[FunnelRow] | None = None,
+    data_link: DataLinkHealth | None = None,
 ) -> str:
     now = _local_now()
     opportunity_counts = Counter(row.classification for row in opportunities)
@@ -854,13 +989,41 @@ def render_paper_audit_report(
         f"- mature_opportunities: {maturity_counts.get('mature', 0)}",
         f"- right_censored_opportunities: {maturity_counts.get('right_censored', 0)}",
         f"- defense_net_R: {defense_net_r:.2f}",
+        f"- data_link_verdict: {data_link.verdict if data_link else 'not_checked'}",
         "- next_action: keep current settings while the next window collects more entered/TP1/reclaim evidence.",
+        "",
+        "## Data Link Health",
+        "",
+        "| Run Type | Expected | Observed | Success | Failed | Running | Success Rate | Latest Started |",
+        "|---|---:|---:|---:|---:|---:|---:|---|",
+    ]
+    if data_link:
+        for row in [data_link.daily, data_link.paper_4h]:
+            lines.append(
+                f"| {row.run_type} | {row.expected_runs} | {row.observed_runs} | {row.success_runs} | "
+                f"{row.failed_runs} | {row.running_runs} | {_pct(row.success_rate_pct)} | {_local_timestamp(row.latest_started_at)} |"
+            )
+        lines.extend([
+            "",
+            "| Check | Value |",
+            "|---|---|",
+            f"| verdict | {data_link.verdict} |",
+            f"| config_hash_stable | {str(data_link.config_hash_stable).lower()} |",
+            f"| config_hashes | {', '.join(data_link.config_hashes) if data_link.config_hashes else 'n/a'} |",
+            f"| stale_running_runs | {data_link.stale_running_runs} |",
+            f"| duplicate_events | {data_link.duplicate_events} |",
+            f"| impossible_event_order | {data_link.impossible_event_order} |",
+            f"| note | {data_link.note} |",
+        ])
+    else:
+        lines.append("| n/a | 0 | 0 | 0 | 0 | 0 | n/a | n/a |")
+    lines.extend([
         "",
         "## BTC/ETH Benchmark",
         "",
         "| Symbol | Status | Start | End | Return | High Return | Max Drawdown | Trend | Note |",
         "|---|---|---:|---:|---:|---:|---:|---|---|",
-    ]
+    ])
     for row in benchmarks:
         lines.append(
             f"| `{row.symbol}` | {row.status} | {_fmt(row.start_price, 2)} | {_fmt(row.end_price, 2)} | "
@@ -1071,6 +1234,7 @@ def write_paper_audit_report(
         end_date,
         opportunities=opportunities,
     )
+    data_link = build_data_link_health(settings, account, start_date, end_date)
 
     now = _local_now()
     report_dir = settings.output.reports_dir / now.strftime("%Y-%m-%d")
@@ -1088,6 +1252,7 @@ def write_paper_audit_report(
         entered_trades=entered,
         reconciliation=reconciliation,
         funnel=funnel,
+        data_link=data_link,
     )
     paths: list[Path] = []
     for directory in [report_dir, obsidian_dir]:
