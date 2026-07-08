@@ -269,13 +269,33 @@ def render_paper_checkpoint_report(checkpoint: PaperCheckpoint, report_version: 
     return "\n".join(lines) + "\n"
 
 
+def checkpoint_summary_lines(checkpoint: PaperCheckpoint) -> list[str]:
+    maturity_counts = _counter(checkpoint.opportunities, "maturity_status")
+    right_censored = maturity_counts.get("right_censored", 0)
+    right_censored_ratio = 0.0 if not checkpoint.opportunities else right_censored / len(checkpoint.opportunities)
+    return [
+        f"verdict={checkpoint.decision.verdict}",
+        f"reason={checkpoint.decision.reason}",
+        f"data_link_verdict={checkpoint.data_link.verdict}",
+        f"config_hash_stable={str(checkpoint.data_link.config_hash_stable).lower()}",
+        f"daily_success={checkpoint.data_link.daily.success_runs}/{checkpoint.data_link.daily.expected_runs}",
+        f"paper_4h_success={checkpoint.data_link.paper_4h.success_runs}/{checkpoint.data_link.paper_4h.expected_runs}",
+        f"opportunities={len(checkpoint.opportunities)}",
+        f"mature={maturity_counts.get('mature', 0)}",
+        f"right_censored={right_censored}",
+        f"right_censored_ratio={right_censored_ratio:.1%}",
+        f"entered_trades={len(checkpoint.entered_trades)}",
+        f"next_action={checkpoint.decision.next_action}",
+    ]
+
+
 def write_paper_checkpoint_report(
     settings: Settings,
     *,
     account_name: str | None,
     start_date: str,
     end_date: str,
-) -> tuple[str, list[Path]]:
+) -> tuple[PaperCheckpoint, list[Path]]:
     account = account_name or settings.paper.account_name
     checkpoint = build_paper_checkpoint(settings, account, start_date, end_date)
     now = _local_now()
@@ -293,4 +313,4 @@ def write_paper_checkpoint_report(
         out = directory / filename
         out.write_text(text, encoding="utf-8")
         paths.append(out)
-    return text, paths
+    return checkpoint, paths

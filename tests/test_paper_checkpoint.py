@@ -8,7 +8,12 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system.paper_audit import DataLinkHealth, OpportunityRow, RunTypeHealth
-from crypto_trading_system.paper_checkpoint import PaperCheckpoint, decide_checkpoint, render_paper_checkpoint_report
+from crypto_trading_system.paper_checkpoint import (
+    PaperCheckpoint,
+    checkpoint_summary_lines,
+    decide_checkpoint,
+    render_paper_checkpoint_report,
+)
 
 
 def _run_type(run_type: str) -> RunTypeHealth:
@@ -100,8 +105,29 @@ def test_checkpoint_report_contains_gates_and_next_commands() -> None:
     assert "relative_strength_gate" in text
 
 
+def test_checkpoint_summary_lines_expose_cli_gate_values() -> None:
+    opportunities = [_opportunity() for _ in range(20)]
+    checkpoint = PaperCheckpoint(
+        account="demo",
+        start_date="2026-07-03",
+        end_date="2026-07-16",
+        data_link=_data_link(),
+        opportunities=opportunities,
+        entered_trades=[],
+        entry_reclaim_shadow=[],
+        relative_strength_shadow=[],
+        decision=decide_checkpoint(_data_link(), opportunities),
+    )
+    lines = checkpoint_summary_lines(checkpoint)
+    assert "verdict=formal_audit_ready" in lines
+    assert "mature=20" in lines
+    assert "right_censored_ratio=0.0%" in lines
+    assert any(line.startswith("next_action=") for line in lines)
+
+
 if __name__ == "__main__":
     test_checkpoint_decision_ready_when_data_and_samples_are_mature()
     test_checkpoint_decision_interim_on_config_hash_drift()
     test_checkpoint_decision_waits_when_right_censored_ratio_is_high()
     test_checkpoint_report_contains_gates_and_next_commands()
+    test_checkpoint_summary_lines_expose_cli_gate_values()

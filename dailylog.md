@@ -15,6 +15,17 @@
 
 ## 2026-07-08
 
+### 17:23:41 +08:00 - 增强 paper checkpoint 终端摘要
+- 类型：代码 / 报告 / 测试 / 文档 / Git
+- 改动：`python main.py paper checkpoint ...` 现在除写 Markdown 报告外，会直接在终端输出 `verdict`、`data_link_verdict`、`config_hash_stable`、daily/4h 成功数、opportunities、mature、right_censored_ratio、entered_trades 和 `next_action`。
+- 改动：新增 `checkpoint_summary_lines`，让 CLI 摘要逻辑集中在 `src/crypto_trading_system/paper_checkpoint.py`，避免 `main.py` 中散落计数规则。
+- 改动：更新 `tests/test_paper_checkpoint.py`，覆盖终端摘要必须暴露 verdict、成熟样本、右截尾比例和 next action。
+- 改动：更新 `2026-07-16-paper-checkpoint-runbook.md`，说明 checkpoint 命令会直接输出关键字段，若终端摘要与报告不一致，应以报告正文和 `Raw Summary` 为准并暂停 formal audit。
+- 改动：生成旧窗口烟测报告 `reports/2026-07-08/paper_checkpoint_2026-06-19_2026-07-02_demo_v2.md`，终端输出显示 `verdict=formal_audit_ready`、`data_link_verdict=partial_pass`、`mature=51`、`right_censored_ratio=34.6%`。
+- 影响：不修改 `settings.toml`、策略参数、数据库结构或 paper 状态；仅增强 7/16 执行时的人机反馈。
+- 验证：已运行 `python tests\test_paper_checkpoint.py`、`python -m compileall main.py src tests`、`python main.py paper checkpoint --account demo --start-date 2026-06-19 --end-date 2026-07-02 --no-obsidian`；确认 `git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Print paper checkpoint summary`。
+
 ### 17:21:02 +08:00 - 准备 7 月 16 日 paper checkpoint 执行手册
 - 类型：文档 / TODO / Git
 - 改动：新增 `2026-07-16-paper-checkpoint-runbook.md`，把 2026-07-16 当天的执行顺序固化为检查工作区与 `settings.toml`、运行 `paper checkpoint`、按 verdict 分流、必要时运行 formal audit 与两个 shadow replay。

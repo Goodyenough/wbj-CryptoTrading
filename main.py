@@ -33,7 +33,7 @@ from crypto_trading_system.paper_db import (
     load_paper_db_events,
 )
 from crypto_trading_system.paper_audit import write_paper_audit_report
-from crypto_trading_system.paper_checkpoint import write_paper_checkpoint_report
+from crypto_trading_system.paper_checkpoint import checkpoint_summary_lines, write_paper_checkpoint_report
 from crypto_trading_system.paper_shadow_replay import write_shadow_replay_report
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
@@ -1052,7 +1052,7 @@ def main() -> None:
             original_obsidian = settings.output.obsidian_dir
             if args.no_obsidian:
                 settings.output.obsidian_dir = None
-            _, report_paths = write_paper_checkpoint_report(
+            checkpoint, report_paths = write_paper_checkpoint_report(
                 settings,
                 account_name=args.account,
                 start_date=args.start_date,
@@ -1060,6 +1060,8 @@ def main() -> None:
             )
             settings.output.obsidian_dir = original_obsidian
             print("paper_checkpoint=completed")
+            for line in checkpoint_summary_lines(checkpoint):
+                print(line)
             for path in report_paths:
                 print(f"report={path}")
 

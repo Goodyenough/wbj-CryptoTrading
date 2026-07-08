@@ -57,6 +57,8 @@ python main.py paper checkpoint --account demo --start-date 2026-07-03 --end-dat
 - `right_censored_ratio`
 - `entered_trades`
 
+命令也会在终端直接输出上述关键字段；若终端摘要与报告不一致，以报告正文和 `Raw Summary` 为准，并停止 formal audit 先排查。
+
 ## Step 3: 根据 checkpoint verdict 分流
 
 ### A. `formal_audit_ready`
