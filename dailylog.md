@@ -15,6 +15,16 @@
 
 ## 2026-07-08
 
+### 16:58:24 +08:00 - 增加 paper audit opportunity funnel
+- 类型：代码 / 报告 / 测试 / TODO / Git
+- 改动：扩展 `src/crypto_trading_system/paper_audit.py`，新增 `FunnelRow` 和 `build_opportunity_funnel`，在 `paper audit` 报告中输出 scan candidates、BUY_CANDIDATE、WATCH_ONLY、REJECT、RISK_OFF blocked、RECLAIM_PENDING、entered、TP1 和 stopped 的转化路径。
+- 改动：更新 `tests/test_paper_audit.py`，新增 funnel 单元测试，覆盖 scan action 分布、RISK_OFF blocked、entered plans 和 stopped plans 统计。
+- 改动：生成 `reports/2026-07-08/paper_opportunity_audit_2026-06-19_2026-07-02_demo_v4.md`；旧窗口 funnel 显示 scanned_candidates=70、buy_candidates=0、watch_only_candidates=47、reject_candidates=23、risk_off_blocked_candidates=70、reclaim_pending_plans=1、entered_plans=0。
+- 改动：更新 `TODO.md`，标记 `paper audit` 的 opportunity funnel 已完成，剩余补强项为数据链路一致性检查。
+- 影响：不修改 `settings.toml`、live paper 状态机或数据库结构；仅增强离线审查报告。
+- 验证：`python tests\test_paper_audit.py` 通过；`python -m compileall main.py src tests` 通过；`python main.py paper audit --account demo --start-date 2026-06-19 --end-date 2026-07-02 --no-obsidian` 成功；`git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add paper audit opportunity funnel`。
+
 ### 00:57:15 +08:00 - 增强 paper audit 成熟样本与 R 倍数口径
 - 类型：代码 / 报告 / 测试 / TODO / Git
 - 改动：扩展 `src/crypto_trading_system/paper_audit.py`，为 opportunity audit 增加 `maturity_status`、`right_censored`、`classification_final`、`observation_bars`、`mfe_r`、`mae_r`、`counterfactual_pnl_r`、`first_hit` 与 R 倍数汇总。

@@ -72,6 +72,17 @@ class OpportunityReconciliation:
 
 
 @dataclass(frozen=True)
+class FunnelRow:
+    stage: str
+    count: int
+    mature_count: int
+    right_censored_count: int
+    conversion_rate_pct: float | None
+    dedupe_key: str
+    note: str
+
+
+@dataclass(frozen=True)
 class EnteredTradeRow:
     symbol: str
     plan_id: str
@@ -531,6 +542,136 @@ def build_opportunity_reconciliation(
     )
 
 
+def _rate(numerator: int, denominator: int) -> float | None:
+    if denominator <= 0:
+        return None
+    return numerator / denominator * 100.0
+
+
+def build_opportunity_funnel(
+    settings: Settings,
+    account: str,
+    start_date: str,
+    end_date: str,
+    *,
+    opportunities: list[OpportunityRow],
+) -> list[FunnelRow]:
+    start_utc, end_utc = _parse_window(start_date, end_date)
+    start_text = _iso_z(start_utc)
+    end_text = _iso_z(end_utc)
+    maturity_counts = Counter(row.maturity_status for row in opportunities)
+    with connect_db(settings.output.database_path) as connection:
+        scanned = connection.execute(
+            """
+            SELECT COUNT(DISTINCT c.scan_id || ':' || c.symbol) AS count
+            FROM scan_candidates c
+            JOIN market_scans m ON m.scan_id = c.scan_id
+            WHERE m.scan_time >= ? AND m.scan_time <= ?
+            """,
+            (start_text, end_text),
+        ).fetchone()["count"]
+        action_rows = connection.execute(
+            """
+            SELECT c.action, COUNT(DISTINCT c.scan_id || ':' || c.symbol) AS count
+            FROM scan_candidates c
+            JOIN market_scans m ON m.scan_id = c.scan_id
+            WHERE m.scan_time >= ? AND m.scan_time <= ?
+            GROUP BY c.action
+            """,
+            (start_text, end_text),
+        ).fetchall()
+        action_counts = {str(row["action"]): int(row["count"]) for row in action_rows}
+        risk_off_blocked = connection.execute(
+            """
+            SELECT COUNT(DISTINCT c.scan_id || ':' || c.symbol) AS count
+            FROM scan_candidates c
+            JOIN market_scans m ON m.scan_id = c.scan_id
+            WHERE m.scan_time >= ? AND m.scan_time <= ?
+              AND (
+                UPPER(COALESCE(c.market_regime, '')) = 'RISK_OFF'
+                OR LOWER(COALESCE(c.reason, '')) LIKE '%risk_off%'
+                OR LOWER(COALESCE(c.payload_json, '')) LIKE '%risk_off%'
+              )
+              AND c.action IN ('WATCH_ONLY', 'REJECT')
+            """,
+            (start_text, end_text),
+        ).fetchone()["count"]
+        reclaim_pending = connection.execute(
+            """
+            SELECT COUNT(DISTINCT e.plan_id) AS count
+            FROM paper_events e
+            JOIN paper_plans p ON p.plan_id = e.plan_id
+            WHERE p.account_name = ?
+              AND e.event_type IN ('RECLAIM_PENDING', 'RECLAIM_PENDING_SET')
+              AND e.event_time >= ? AND e.event_time <= ?
+            """,
+            (account, start_text, end_text),
+        ).fetchone()["count"]
+        reclaim_confirmed = connection.execute(
+            """
+            SELECT COUNT(DISTINCT e.plan_id) AS count
+            FROM paper_events e
+            JOIN paper_plans p ON p.plan_id = e.plan_id
+            WHERE p.account_name = ?
+              AND e.event_type IN ('RECLAIM_CONFIRMED_ENTERED', 'ENTERED')
+              AND e.event_time >= ? AND e.event_time <= ?
+            """,
+            (account, start_text, end_text),
+        ).fetchone()["count"]
+        entered = connection.execute(
+            """
+            SELECT COUNT(DISTINCT plan_id) AS count
+            FROM paper_plans
+            WHERE account_name = ?
+              AND entered_at_utc IS NOT NULL
+              AND entered_at_utc >= ? AND entered_at_utc <= ?
+            """,
+            (account, start_text, end_text),
+        ).fetchone()["count"]
+        terminal_rows = connection.execute(
+            """
+            SELECT status, COUNT(DISTINCT plan_id) AS count
+            FROM paper_plans
+            WHERE account_name = ?
+              AND entered_at_utc IS NOT NULL
+              AND entered_at_utc >= ? AND entered_at_utc <= ?
+              AND status IN ('STOPPED', 'CLOSED', 'ARCHIVED', 'INVALIDATED')
+            GROUP BY status
+            """,
+            (account, start_text, end_text),
+        ).fetchall()
+        terminal_counts = {str(row["status"]): int(row["count"]) for row in terminal_rows}
+        tp1 = connection.execute(
+            """
+            SELECT COUNT(DISTINCT plan_id) AS count
+            FROM paper_plans
+            WHERE account_name = ?
+              AND entered_at_utc IS NOT NULL
+              AND entered_at_utc >= ? AND entered_at_utc <= ?
+              AND tp1_hit_at_utc IS NOT NULL
+            """,
+            (account, start_text, end_text),
+        ).fetchone()["count"]
+
+    scanned_count = int(scanned or 0)
+    buy_count = action_counts.get("BUY_CANDIDATE", 0)
+    watch_count = action_counts.get("WATCH_ONLY", 0)
+    reject_count = action_counts.get("REJECT", 0)
+    rows = [
+        FunnelRow("scanned_candidates", scanned_count, 0, 0, None, "scan_id+symbol", "all scan candidates in the window"),
+        FunnelRow("buy_candidates", buy_count, 0, 0, _rate(buy_count, scanned_count), "scan_id+symbol", "candidates allowed to become plans"),
+        FunnelRow("watch_only_candidates", watch_count, 0, 0, _rate(watch_count, scanned_count), "scan_id+symbol", "defensive or lower-confidence candidates"),
+        FunnelRow("reject_candidates", reject_count, 0, 0, _rate(reject_count, scanned_count), "scan_id+symbol", "rejected scan candidates"),
+        FunnelRow("risk_off_blocked_candidates", int(risk_off_blocked or 0), 0, 0, _rate(int(risk_off_blocked or 0), scanned_count), "scan_id+symbol", "WATCH_ONLY/REJECT candidates tied to RISK_OFF evidence"),
+        FunnelRow("reclaim_pending_plans", int(reclaim_pending or 0), maturity_counts.get("mature", 0), maturity_counts.get("right_censored", 0), _rate(int(reclaim_pending or 0), buy_count), "plan_id", "deduped plans with reclaim pending events"),
+        FunnelRow("reclaim_confirmed_or_entered_events", int(reclaim_confirmed or 0), 0, 0, _rate(int(reclaim_confirmed or 0), int(reclaim_pending or 0)), "plan_id", "plans with ENTERED or RECLAIM_CONFIRMED_ENTERED events"),
+        FunnelRow("entered_plans", int(entered or 0), 0, 0, _rate(int(entered or 0), buy_count), "plan_id", "paper plans that actually entered during the window"),
+        FunnelRow("tp1_hit_plans", int(tp1 or 0), 0, 0, _rate(int(tp1 or 0), int(entered or 0)), "plan_id", "entered plans that reached TP1"),
+        FunnelRow("stopped_plans", terminal_counts.get("STOPPED", 0), 0, 0, _rate(terminal_counts.get("STOPPED", 0), int(entered or 0)), "plan_id", "entered plans currently marked STOPPED"),
+    ]
+    return rows
+
+
 def _classify_entered_trade(
     *,
     status: str,
@@ -677,6 +818,7 @@ def render_paper_audit_report(
     opportunities: list[OpportunityRow],
     entered_trades: list[EnteredTradeRow],
     reconciliation: OpportunityReconciliation | None = None,
+    funnel: list[FunnelRow] | None = None,
 ) -> str:
     now = _local_now()
     opportunity_counts = Counter(row.classification for row in opportunities)
@@ -742,6 +884,21 @@ def render_paper_audit_report(
     ])
     for label in ["mature", "right_censored", "open_unknown", "data_gap"]:
         lines.append(f"| {label} | {maturity_counts.get(label, 0)} |")
+    lines.extend([
+        "",
+        "### Opportunity Funnel",
+        "",
+        "| Stage | Count | Conversion | Mature | Right Censored | Dedupe Key | Note |",
+        "|---|---:|---:|---:|---:|---|---|",
+    ])
+    if funnel:
+        for row in funnel:
+            lines.append(
+                f"| {row.stage} | {row.count} | {_pct(row.conversion_rate_pct)} | "
+                f"{row.mature_count} | {row.right_censored_count} | {row.dedupe_key} | {row.note} |"
+            )
+    else:
+        lines.append("| n/a | 0 | n/a | 0 | 0 | n/a | funnel unavailable |")
     lines.extend([
         "",
         "### Reclaim Reconciliation",
@@ -907,6 +1064,13 @@ def write_paper_audit_report(
         scan_rows=scan_opportunities,
         false_entries=false_entries,
     )
+    funnel = build_opportunity_funnel(
+        settings,
+        account,
+        start_date,
+        end_date,
+        opportunities=opportunities,
+    )
 
     now = _local_now()
     report_dir = settings.output.reports_dir / now.strftime("%Y-%m-%d")
@@ -923,6 +1087,7 @@ def write_paper_audit_report(
         opportunities=opportunities,
         entered_trades=entered,
         reconciliation=reconciliation,
+        funnel=funnel,
     )
     paths: list[Path] = []
     for directory in [report_dir, obsidian_dir]:

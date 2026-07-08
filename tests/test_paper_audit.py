@@ -12,6 +12,7 @@ from crypto_trading_system import paper_audit as audit_module
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.database import connect_db
 from crypto_trading_system.paper_audit import (
+    build_opportunity_funnel,
     build_benchmark_rows,
     build_entered_trade_rows,
     build_opportunity_reconciliation,
@@ -196,6 +197,52 @@ def test_opportunity_reconciliation_counts_raw_and_deduped_reclaim_events() -> N
     assert reconciliation.final_classified_opportunities == 1
 
 
+def test_opportunity_funnel_counts_scan_actions_and_entered_plans() -> None:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        settings = _settings(Path(tmp))
+        _seed_base(settings.output.database_path)
+        _seed_plan(settings.output.database_path, status="STOPPED", entered=True)
+        with connect_db(settings.output.database_path) as connection:
+            connection.execute(
+                """
+                INSERT INTO scan_runs(scan_id, timestamp_utc, source, filters, limitations_json)
+                VALUES ('scan1', '2026-06-19T00:00:00Z', 'test', '{}', '[]')
+                """
+            )
+            connection.execute(
+                """
+                INSERT INTO market_scans(scan_id, run_id, scan_time, config_hash, report_path, created_at)
+                VALUES ('scan1', 'run1', '2026-06-19T00:00:00Z', 'hash', NULL, '2026-06-19T00:00:00Z')
+                """
+            )
+            connection.execute(
+                """
+                INSERT INTO scan_candidates(
+                    scan_id, symbol, rank, base_asset, verdict, score, action,
+                    price, entry_low, entry_high, stop, tp1, reason, payload_json, created_at
+                )
+                VALUES ('scan1', 'TESTUSDT', 1, 'TEST', 'candidate', 80, 'BUY_CANDIDATE', 100, 100, 105, 90, 125, 'ok', '{}', '2026-06-19T00:00:00Z')
+                """
+            )
+            connection.execute(
+                """
+                INSERT INTO scan_candidates(
+                    scan_id, symbol, rank, base_asset, verdict, score, action,
+                    price, entry_low, entry_high, stop, tp1, reason, payload_json, created_at
+                )
+                VALUES ('scan1', 'WEAKUSDT', 2, 'WEAK', 'watch', 50, 'WATCH_ONLY', 50, 50, 55, 45, 65, 'risk_off weak market', '{"market_regime":"RISK_OFF"}', '2026-06-19T00:00:00Z')
+                """
+            )
+        rows = build_opportunity_funnel(settings, "demo", "2026-06-19", "2026-07-02", opportunities=[])
+    by_stage = {row.stage: row for row in rows}
+    assert by_stage["scanned_candidates"].count == 2
+    assert by_stage["buy_candidates"].count == 1
+    assert by_stage["watch_only_candidates"].count == 1
+    assert by_stage["risk_off_blocked_candidates"].count == 1
+    assert by_stage["entered_plans"].count == 1
+    assert by_stage["stopped_plans"].count == 1
+
+
 def test_entered_trade_review_calculates_r_and_entry_issue() -> None:
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
         settings = _settings(Path(tmp))
@@ -238,6 +285,7 @@ def test_report_contains_core_sections() -> None:
     assert "## BTC/ETH Benchmark" in text
     assert "## Opportunity Audit Summary" in text
     assert "### Opportunity Maturity" in text
+    assert "### Opportunity Funnel" in text
     assert "### Reclaim Reconciliation" in text
     assert "### Counterfactual R Summary" in text
     assert "## Entered Trades Review" in text
@@ -249,5 +297,6 @@ if __name__ == "__main__":
     test_reclaim_pending_classifies_missed_winner()
     test_reclaim_pending_marks_right_censored_when_path_is_short_and_inconclusive()
     test_opportunity_reconciliation_counts_raw_and_deduped_reclaim_events()
+    test_opportunity_funnel_counts_scan_actions_and_entered_plans()
     test_entered_trade_review_calculates_r_and_entry_issue()
     test_report_contains_core_sections()
