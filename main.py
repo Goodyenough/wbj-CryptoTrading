@@ -411,6 +411,11 @@ def build_parser() -> argparse.ArgumentParser:
     paper_checkpoint.add_argument("--start-date", required=True, help="Beijing start date, e.g. 2026-07-03.")
     paper_checkpoint.add_argument("--end-date", required=True, help="Beijing end date, e.g. 2026-07-16.")
     paper_checkpoint.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    paper_checkpoint.add_argument(
+        "--fail-on-not-ready",
+        action="store_true",
+        help="Exit with code 2 unless verdict is formal_audit_ready.",
+    )
 
     paper_shadow = paper_subparsers.add_parser(
         "shadow-replay",
@@ -1064,6 +1069,8 @@ def main() -> None:
                 print(line)
             for path in report_paths:
                 print(f"report={path}")
+            if args.fail_on_not_ready and checkpoint.decision.verdict != "formal_audit_ready":
+                sys.exit(2)
 
         if args.paper_command == "db-summary":
             print(json.dumps(build_paper_db_summary(settings.output.database_path, args.limit), ensure_ascii=False, indent=2))

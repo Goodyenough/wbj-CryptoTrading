@@ -15,6 +15,14 @@
 
 ## 2026-07-08
 
+### 17:25:15 +08:00 - 增加 checkpoint 严格退出码
+- 类型：代码 / 文档 / 测试 / Git
+- 改动：`python main.py paper checkpoint ...` 新增 `--fail-on-not-ready`，只有 `verdict=formal_audit_ready` 时返回 0，其他 verdict 返回 2，便于 2026-07-16 当天用脚本或 PowerShell 自动分流。
+- 改动：更新 `2026-07-16-paper-checkpoint-runbook.md`，补充严格模式命令和退出码含义。
+- 影响：默认 checkpoint 行为不变；不修改 `settings.toml`、策略参数、数据库结构或 paper 状态。
+- 验证：已运行 `python tests\test_paper_checkpoint.py`、`python -m compileall main.py src tests`、旧窗口 `python main.py paper checkpoint --account demo --start-date 2026-06-19 --end-date 2026-07-02 --no-obsidian --fail-on-not-ready`，返回 `exit_code=0`；确认 `git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add checkpoint strict exit mode`。
+
 ### 17:23:41 +08:00 - 增强 paper checkpoint 终端摘要
 - 类型：代码 / 报告 / 测试 / 文档 / Git
 - 改动：`python main.py paper checkpoint ...` 现在除写 Markdown 报告外，会直接在终端输出 `verdict`、`data_link_verdict`、`config_hash_stable`、daily/4h 成功数、opportunities、mature、right_censored_ratio、entered_trades 和 `next_action`。

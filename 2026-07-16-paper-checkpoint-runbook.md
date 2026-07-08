@@ -46,6 +46,14 @@ git diff -- config/settings.toml
 python main.py paper checkpoint --account demo --start-date 2026-07-03 --end-date 2026-07-16
 ```
 
+如需让脚本或 PowerShell 直接用退出码判断是否可以进入 formal audit，可使用严格模式：
+
+```powershell
+python main.py paper checkpoint --account demo --start-date 2026-07-03 --end-date 2026-07-16 --fail-on-not-ready
+```
+
+严格模式下，只有 `verdict=formal_audit_ready` 返回 0；其他 verdict 返回 2。
+
 先读 checkpoint 报告中的：
 
 - `verdict`
