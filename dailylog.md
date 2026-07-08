@@ -15,6 +15,18 @@
 
 ## 2026-07-08
 
+### 17:18:33 +08:00 - 增加 paper checkpoint 阶段检查命令
+- 类型：代码 / 报告 / 测试 / TODO / Git
+- 改动：新增 `src/crypto_trading_system/paper_checkpoint.py`，实现 `python main.py paper checkpoint --account demo --start-date ... --end-date ...`，用于在 2026-07-16 先判断观察窗口是否适合进入 formal audit。
+- 改动：checkpoint 报告汇总 data link gate、config hash 稳定性、成熟样本数、右截尾比例、entered trades 数量、opportunity 分类，以及 `entry_reclaim_confirm_1bar` / `relative_strength_gate` 两个 shadow replay 摘要。
+- 改动：`main.py` 新增 `paper checkpoint` 子命令，支持 `--no-obsidian`；命令只读数据库和 K 线缓存，只写 Markdown 报告，不修改 `settings.toml`、paper plans、events、snapshots 或 paper 状态机。
+- 改动：新增 `tests/test_paper_checkpoint.py`，覆盖 formal audit ready、config hash drift 降级、右截尾过高等待更多样本，以及报告关键小节和下一步命令。
+- 改动：生成旧窗口烟测报告 `reports/2026-07-08/paper_checkpoint_2026-06-19_2026-07-02_demo_v1.md`；旧窗口 verdict=`formal_audit_ready`，data_link=`partial_pass`，mature=51，right_censored_ratio=34.6%，config_hash 稳定。
+- 改动：更新 `TODO.md`，将 2026-07-16 阶段检查入口明确为 `python main.py paper checkpoint --account demo --start-date 2026-07-03 --end-date 2026-07-16`。
+- 影响：本次只是把 7/16 检查口径固化为命令和报告，不改变策略配置，不启动 A/B，不改 live paper 行为。
+- 验证：已运行 `python tests\test_paper_checkpoint.py`、`python tests\test_paper_audit.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper checkpoint --account demo --start-date 2026-06-19 --end-date 2026-07-02 --no-obsidian`；确认 `git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add paper checkpoint command`。
+
 ### 17:14:04 +08:00 - 增加 relative strength shadow replay
 - 类型：代码 / 报告 / 测试 / TODO / Git
 - 改动：扩展 `src/crypto_trading_system/paper_shadow_replay.py`，新增 `relative_strength_gate` variant，用信号后约 24 小时内标的 4h 收盘收益相对 BTC/ETH 平均收益的差值做离线过滤诊断。
