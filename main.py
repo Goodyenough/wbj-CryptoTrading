@@ -33,6 +33,7 @@ from crypto_trading_system.paper_db import (
     load_paper_db_events,
 )
 from crypto_trading_system.paper_audit import write_paper_audit_report
+from crypto_trading_system.paper_shadow_replay import write_shadow_replay_report
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
     build_experiment_index,
@@ -400,6 +401,21 @@ def build_parser() -> argparse.ArgumentParser:
     paper_audit.add_argument("--start-date", required=True, help="Beijing start date, e.g. 2026-06-19.")
     paper_audit.add_argument("--end-date", required=True, help="Beijing end date, e.g. 2026-07-02.")
     paper_audit.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+
+    paper_shadow = paper_subparsers.add_parser(
+        "shadow-replay",
+        help="Run an offline paper-trading shadow replay without changing paper state.",
+    )
+    paper_shadow.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_shadow.add_argument("--start-date", required=True, help="Beijing start date, e.g. 2026-06-19.")
+    paper_shadow.add_argument("--end-date", required=True, help="Beijing end date, e.g. 2026-07-02.")
+    paper_shadow.add_argument(
+        "--variant",
+        required=True,
+        choices=["entry_reclaim_confirm_1bar"],
+        help="Shadow replay variant.",
+    )
+    paper_shadow.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper_summary = paper_subparsers.add_parser("db-summary", help="Summarize runs, plans, events, and snapshots.")
     paper_summary.add_argument("--limit", type=int, default=10, help="Maximum recent and failed runs to show.")
@@ -1003,6 +1019,22 @@ def main() -> None:
             )
             settings.output.obsidian_dir = original_obsidian
             print("paper_audit=completed")
+            for path in report_paths:
+                print(f"report={path}")
+
+        if args.paper_command == "shadow-replay":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            _, report_paths = write_shadow_replay_report(
+                settings,
+                account_name=args.account,
+                start_date=args.start_date,
+                end_date=args.end_date,
+                variant=args.variant,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("paper_shadow_replay=completed")
             for path in report_paths:
                 print(f"report={path}")
 

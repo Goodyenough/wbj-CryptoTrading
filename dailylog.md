@@ -15,6 +15,17 @@
 
 ## 2026-07-08
 
+### 17:09:21 +08:00 - 增加 entry reclaim shadow replay
+- 类型：代码 / 报告 / 测试 / TODO / Git
+- 改动：新增 `src/crypto_trading_system/paper_shadow_replay.py`，实现 `entry_reclaim_confirm_1bar` 离线 shadow replay，用旧窗口 opportunity audit 样本重放“首次 4h 收盘站回 entry_high 后，再等下一根 4h 确认”的入场假设。
+- 改动：`main.py` 新增 `python main.py paper shadow-replay --account demo --start-date ... --end-date ... --variant entry_reclaim_confirm_1bar [--no-obsidian]`，命令只生成报告，不修改 `settings.toml`、paper plans、events、snapshots 或数据库状态。
+- 改动：新增 `tests/test_paper_shadow_replay.py`，覆盖确认入场会过滤 stop-first 路径、跳过 near-TP1 路径会标记 `missed_winner`、报告包含 Summary/Decision Counts/Raw Summary。
+- 改动：生成旧窗口报告 `reports/2026-07-08/paper_shadow_replay_entry_reclaim_confirm_1bar_2026-06-19_2026-07-02_demo_v2.md`；结果显示 opportunities=71、baseline_entries=61、variant_entries=36、filtered_loser=11、missed_winner=3、delayed_entry=36。
+- 改动：更新 `TODO.md`，将 `entry_reclaim_confirm_1bar` shadow replay MVP 标记完成，保留 `relative_strength_gate` shadow replay 待完成。
+- 影响：本次只是离线诊断能力和审查报告，不部署新策略，不改变 live paper 配置或状态机。
+- 验证：已运行 `python tests\test_paper_shadow_replay.py`、`python tests\test_paper_audit.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-replay --account demo --start-date 2026-06-19 --end-date 2026-07-02 --variant entry_reclaim_confirm_1bar --no-obsidian`；确认 `git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add entry reclaim shadow replay`。
+
 ### 17:03:18 +08:00 - 增加 paper audit 数据链路一致性检查
 - 类型：代码 / 报告 / 测试 / TODO / Git
 - 改动：扩展 `src/crypto_trading_system/paper_audit.py`，新增 `RunTypeHealth`、`DataLinkHealth` 和 `build_data_link_health`，在 `paper audit` 中输出 daily/4h 预期次数、实际次数、成功/失败/运行中、成功率、最新运行时间、config hash 稳定性、stale running、重复事件和不可能事件顺序。
