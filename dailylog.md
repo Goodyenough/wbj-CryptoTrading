@@ -15,6 +15,17 @@
 
 ## 2026-07-08
 
+### 17:28:08 +08:00 - 增加 7 月 16 日 checkpoint review 一键脚本
+- 类型：脚本 / 文档 / TODO / 报告 / Git
+- 改动：新增 `scripts/run_paper_checkpoint_review.ps1`，用于 2026-07-16 手动执行阶段检查；脚本先确认 `config/settings.toml` 无 diff，再运行 `paper checkpoint --fail-on-not-ready`。
+- 改动：脚本只有在 checkpoint 返回 `formal_audit_ready` 时，才继续运行 `paper audit`、`entry_reclaim_confirm_1bar` shadow replay 和 `relative_strength_gate` shadow replay；若 checkpoint 不 ready，直接停止并返回 exit code 2。
+- 改动：脚本支持 `-CheckpointOnly` 和 `-NoObsidian`，便于只跑 gate 或只写项目报告目录。
+- 改动：更新 `2026-07-16-paper-checkpoint-runbook.md`，将一键脚本作为推荐入口，同时保留手动分步命令。
+- 改动：更新 `TODO.md`，记录 2026-07-16 一键执行脚本已准备完成。
+- 影响：脚本只生成诊断报告，不修改 `settings.toml`、策略参数、数据库结构或 paper 状态；formal audit 之后仍需人工读报告再决定是否设计 A/B。
+- 验证：已运行 PowerShell 语法解析、旧窗口 `.\scripts\run_paper_checkpoint_review.ps1 -Account demo -StartDate 2026-06-19 -EndDate 2026-07-02 -NoObsidian -CheckpointOnly`，返回 `exit_code=0` 并生成 `reports/2026-07-08/paper_checkpoint_2026-06-19_2026-07-02_demo_v6.md`；已运行 `python tests\test_paper_checkpoint.py`、`python -m compileall main.py src tests`；确认 `git diff -- config/settings.toml` 为空。
+- Git：计划提交 `Add paper checkpoint review script`。
+
 ### 17:25:15 +08:00 - 增加 checkpoint 严格退出码
 - 类型：代码 / 文档 / 测试 / Git
 - 改动：`python main.py paper checkpoint ...` 新增 `--fail-on-not-ready`，只有 `verdict=formal_audit_ready` 时返回 0，其他 verdict 返回 2，便于 2026-07-16 当天用脚本或 PowerShell 自动分流。

@@ -42,6 +42,20 @@ git diff -- config/settings.toml
 
 ## Step 2: 运行 checkpoint
 
+推荐先用一键脚本执行完整流程。该脚本会先检查 `settings.toml` 是否无 diff，再运行 checkpoint 严格模式；只有 `formal_audit_ready` 时才继续生成 formal audit 和两个 shadow replay：
+
+```powershell
+.\scripts\run_paper_checkpoint_review.ps1 -Account demo -StartDate 2026-07-03 -EndDate 2026-07-16
+```
+
+若只想运行 checkpoint，不自动生成后续审查报告：
+
+```powershell
+.\scripts\run_paper_checkpoint_review.ps1 -Account demo -StartDate 2026-07-03 -EndDate 2026-07-16 -CheckpointOnly
+```
+
+也可以手动分步执行：
+
 ```powershell
 python main.py paper checkpoint --account demo --start-date 2026-07-03 --end-date 2026-07-16
 ```

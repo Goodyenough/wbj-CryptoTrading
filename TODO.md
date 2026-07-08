@@ -132,6 +132,7 @@
 - [x] 完成 `entry_reclaim_confirm_1bar` shadow replay MVP：新增 `python main.py paper shadow-replay --variant entry_reclaim_confirm_1bar`，旧窗口报告生成至 `reports/2026-07-08/paper_shadow_replay_entry_reclaim_confirm_1bar_2026-06-19_2026-07-02_demo_v2.md`；仅离线诊断，不修改 live paper 配置。
 - [x] 完成 `relative_strength_gate` shadow replay MVP：新增 `python main.py paper shadow-replay --variant relative_strength_gate`，旧窗口报告生成至 `reports/2026-07-08/paper_shadow_replay_relative_strength_gate_2026-06-19_2026-07-02_demo_v1.md`；仅离线诊断，不修改 live paper 配置。
 - [x] 准备 2026-07-16 阶段检查 runbook：新增 `2026-07-16-paper-checkpoint-runbook.md`，明确 checkpoint、formal audit、shadow replay、interim report 分流和禁止启动 A/B 的红线。
+- [x] 准备 2026-07-16 一键执行脚本：新增 `scripts/run_paper_checkpoint_review.ps1`，先检查 `settings.toml` 无 diff，再运行 checkpoint 严格模式；只有 `formal_audit_ready` 才继续生成 audit 和两个 shadow replay。
 - [x] 用增强版 audit 先复核 2026-06-19 -> 2026-07-02 旧窗口，确认新字段能解释旧报告中的 `avoided_loser=25`、`missed_winner=12`、`false_entry=7` 和 `neutral_or_unknown=34`；生成 `reports/2026-07-08/paper_opportunity_audit_2026-06-19_2026-07-02_demo_v2.md`。
 - [ ] 2026-07-16 阶段检查后，再根据 shadow replay 与成熟 audit 决定是否启动 `2026-07-06-abtest-plan.md` 中的正式 A/B；在此之前不修改 `settings.toml`。
 - [ ] 两周后按证据决定下一步实验方向：`missed_winners` 多则复测 `RECLAIM_PENDING`/`RISK_OFF`，entered trades 多数止损则优先改入场，大浮盈回落则优先改退出，BTC/ETH 大涨但策略不参与则检查选币和进攻模式。
