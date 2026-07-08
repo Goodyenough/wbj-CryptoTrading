@@ -15,6 +15,15 @@
 
 ## 2026-07-08
 
+### 17:21:02 +08:00 - 准备 7 月 16 日 paper checkpoint 执行手册
+- 类型：文档 / TODO / Git
+- 改动：新增 `2026-07-16-paper-checkpoint-runbook.md`，把 2026-07-16 当天的执行顺序固化为检查工作区与 `settings.toml`、运行 `paper checkpoint`、按 verdict 分流、必要时运行 formal audit 与两个 shadow replay。
+- 改动：runbook 明确 `formal_audit_ready`、`wait_for_more_data`、`interim_report_required` 三种分支，以及不得启动正式 A/B 的红线。
+- 改动：更新 `TODO.md`，记录 2026-07-16 阶段检查 runbook 已准备完成。
+- 影响：仅新增执行文档，不修改策略配置、代码逻辑、数据库或 paper 状态。
+- 验证：确认 `git diff -- config/settings.toml` 为空；检查 runbook 包含 checkpoint 命令、formal audit 命令、shadow replay 命令和禁止事项。
+- Git：计划提交 `Add July 16 checkpoint runbook`。
+
 ### 17:18:33 +08:00 - 增加 paper checkpoint 阶段检查命令
 - 类型：代码 / 报告 / 测试 / TODO / Git
 - 改动：新增 `src/crypto_trading_system/paper_checkpoint.py`，实现 `python main.py paper checkpoint --account demo --start-date ... --end-date ...`，用于在 2026-07-16 先判断观察窗口是否适合进入 formal audit。
