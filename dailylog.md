@@ -15,6 +15,14 @@
 
 ## 2026-07-14
 
+### 00:16:52 +08:00 - 编写 GPT 评审新手说明书
+- 类型：文档 / Git
+- 改动：新增 `2026-07-14-crypto-trading-beginner-manual.md`，将 GPT 进场方案评审改写为面向加密货币交易新手的说明书。
+- 改动：重点解释 `RISK_OFF`、`BUY_CANDIDATE`、`WAIT_PULLBACK`、`entry_reclaim_confirm_1bar`、`MACD histogram`、`relative strength`、`ATR`、`R multiple`、`MFE`、`MAE`、`TP1`、`filtered_loser`、`missed_winner` 等英文变量和交易术语。
+- 影响：仅新增解释性文档，不修改策略代码、`config/settings.toml`、数据库或 paper 状态机。
+- 验证：人工核对说明书覆盖评审中的核心结论、风险点、变量含义和三项离线实验建议；未运行代码测试，因为本次仅为文档变更。
+- Git：本次提交 `Write beginner trading review manual`。
+
 ### 00:08:00 +08:00 - 归档 GPT 进场方案评审并修订实验计划
 - 类型：文档 / TODO / 计划
 - 改动：将用户提供的 GPT 评审保存为 `.gpt-review/gpt_review.md` 并复制到 `.gpt-review/history/`；新增 `.gpt-review/codex_response.md`，逐条记录采纳、部分采纳、暂缓和未解决分歧。
