@@ -13,6 +13,18 @@
 - Git：
 ```
 
+## 2026-07-14
+
+### 00:08:00 +08:00 - 归档 GPT 进场方案评审并修订实验计划
+- 类型：文档 / TODO / 计划
+- 改动：将用户提供的 GPT 评审保存为 `.gpt-review/gpt_review.md` 并复制到 `.gpt-review/history/`；新增 `.gpt-review/codex_response.md`，逐条记录采纳、部分采纳、暂缓和未解决分歧。
+- 改动：新增 `.gpt-review/revised_plan.md`，把下一步进场研究调整为 `reclaim_quality_matrix`、`momentum_pullback_definition_ab`、`relative_strength_soft_gate` 三个离线实验，并明确 checkpoint 前不修改 live/paper。
+- 改动：更新 `TODO.md`，加入 GPT 评审后形成的可执行任务：分层归因、R 倍数经济指标、ATR 标准化、固定 opportunity set 和三个离线实验。
+- 改动：更新 `开发计划.md`，记录 GPT 复审结论和下一优先级变化。
+- 影响：仅整理评审和实验计划，不修改 `settings.toml`、交易策略代码、数据库或 paper 状态机。
+- 验证：已读取 GPT 评审附件并保存归档；人工核对修订版方案与 GPT 结论一致。
+- Git：待提交。
+
 ## 2026-07-08
 
 ### 17:28:08 +08:00 - 增加 7 月 16 日 checkpoint review 一键脚本

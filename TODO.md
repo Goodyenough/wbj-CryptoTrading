@@ -136,6 +136,13 @@
 - [x] 用增强版 audit 先复核 2026-06-19 -> 2026-07-02 旧窗口，确认新字段能解释旧报告中的 `avoided_loser=25`、`missed_winner=12`、`false_entry=7` 和 `neutral_or_unknown=34`；生成 `reports/2026-07-08/paper_opportunity_audit_2026-06-19_2026-07-02_demo_v2.md`。
 - [ ] 2026-07-16 阶段检查后，再根据 shadow replay 与成熟 audit 决定是否启动 `2026-07-06-abtest-plan.md` 中的正式 A/B；在此之前不修改 `settings.toml`。
 - [ ] 两周后按证据决定下一步实验方向：`missed_winners` 多则复测 `RECLAIM_PENDING`/`RISK_OFF`，entered trades 多数止损则优先改入场，大浮盈回落则优先改退出，BTC/ETH 大涨但策略不参与则检查选币和进攻模式。
+- [ ] GPT 进场方案评审后补强 shadow replay 统计口径：按 scanner、entry trigger、regime、exit 分层，并输出 R multiple、总 R、平均 R、中位数 R、MFE、MAE、最大回撤、最大连续亏损、TP1 命中率、stop-first 比例、missed winner 总 R、filtered loser 避免总 R。
+- [ ] GPT 进场方案评审后补充 ATR 标准化字段：`distance_to_support / ATR`、`reclaim_margin / ATR`、`stop_distance / ATR`、`pullback_from_recent_high / ATR`，先用于离线报告，不直接改 live/paper。
+- [ ] GPT 进场方案评审后固定 shadow experiment 的 opportunity set：保存候选生成时间、K 线截止时间、symbol、regime、scanner inputs、baseline entry plan、variant 决策和固定观察窗口，避免 variant 重扫导致样本不可比。
+- [ ] 设计并实现 `reclaim_quality_matrix` 离线实验：对比当前 4h close reclaim、`entry_reclaim_confirm_1bar`、ATR reclaim 强度和 reclaim K 线质量；在 baseline entries 达到足够样本前只输出 `retest / sample_insufficient`。
+- [ ] 设计并实现 `momentum_pullback_definition_ab` 离线实验：对比当前 `24h > 0 && 7d > 0`、允许 24h 小幅为负、recent high 回撤 ATR 倍数、中期趋势 + ATR 回踩区间；保持 reclaim 层不变。
+- [ ] 设计并实现 `relative_strength_soft_gate` 离线实验：相对强度先作为 score 调整、风险标签或仅 `RISK_OFF` 硬过滤验证，分别用 BTC、ETH、等权 alt 篮子作为 benchmark 分开报告。
+- [ ] 暂不把 MACD 升级为 `macd_hist_4h > 0` 硬门槛；如研究 MACD，仅做 histogram 斜率、连续恶化、reclaim 时改善等离线变体。
 
 ## 运维待办
 
