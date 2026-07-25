@@ -34,6 +34,7 @@ from crypto_trading_system.paper_db import (
 )
 from crypto_trading_system.paper_audit import write_paper_audit_report
 from crypto_trading_system.paper_checkpoint import checkpoint_summary_lines, write_paper_checkpoint_report
+from crypto_trading_system.paper_shadow_experiments import EXPERIMENTS, write_shadow_experiment_report
 from crypto_trading_system.paper_shadow_replay import write_shadow_replay_report
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
@@ -431,6 +432,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Shadow replay variant.",
     )
     paper_shadow.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+
+    paper_shadow_experiment = paper_subparsers.add_parser(
+        "shadow-experiment",
+        help="Run a fixed-opportunity-set offline paper experiment without changing paper state.",
+    )
+    paper_shadow_experiment.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_shadow_experiment.add_argument("--start-date", required=True, help="Beijing start date, e.g. 2026-07-03.")
+    paper_shadow_experiment.add_argument("--end-date", required=True, help="Beijing end date, e.g. 2026-07-25.")
+    paper_shadow_experiment.add_argument(
+        "--experiment",
+        required=True,
+        choices=sorted(EXPERIMENTS),
+        help="Offline shadow experiment name.",
+    )
+    paper_shadow_experiment.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper_summary = paper_subparsers.add_parser("db-summary", help="Summarize runs, plans, events, and snapshots.")
     paper_summary.add_argument("--limit", type=int, default=10, help="Maximum recent and failed runs to show.")
@@ -1050,6 +1066,22 @@ def main() -> None:
             )
             settings.output.obsidian_dir = original_obsidian
             print("paper_shadow_replay=completed")
+            for path in report_paths:
+                print(f"report={path}")
+
+        if args.paper_command == "shadow-experiment":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            _, report_paths = write_shadow_experiment_report(
+                settings,
+                account_name=args.account,
+                start_date=args.start_date,
+                end_date=args.end_date,
+                experiment=args.experiment,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("paper_shadow_experiment=completed")
             for path in report_paths:
                 print(f"report={path}")
 

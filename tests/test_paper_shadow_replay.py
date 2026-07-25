@@ -17,6 +17,13 @@ from crypto_trading_system.paper_shadow_replay import (
     build_relative_strength_gate_shadow,
     render_shadow_replay_report,
 )
+from crypto_trading_system.paper_audit import OpportunityRow
+from crypto_trading_system.paper_shadow_experiments import (
+    ExperimentDecisionRow,
+    OpportunitySet,
+    _outcome_from_opportunity,
+    render_shadow_experiment_report,
+)
 from crypto_trading_system.storage import init_db
 
 
@@ -139,7 +146,66 @@ def test_relative_strength_gate_filters_weak_stop_first_path() -> None:
     assert rows[0].relative_strength_pct < 0
 
 
+def test_shadow_experiment_report_uses_fixed_set_and_negative_missed_winner_r() -> None:
+    opportunity = OpportunityRow(
+        source="WATCH_ONLY",
+        symbol="TESTUSDT",
+        plan_id="scan1:TESTUSDT",
+        first_time="2026-07-03T12:00:00Z",
+        reason="test",
+        entry=100.0,
+        entry_low=98.0,
+        stop=90.0,
+        tp1=120.0,
+        max_price_after=119.0,
+        min_price_after=95.0,
+        reclaimed=True,
+        hit_tp1=False,
+        hit_stop=False,
+        classification="missed_winner",
+        explanation="test",
+        maturity_status="mature",
+        classification_final=True,
+        mfe_r=1.9,
+        counterfactual_pnl_r=1.9,
+        first_hit="near_tp1_first",
+        opportunity_set_key="WATCH_ONLY:scan1:TESTUSDT",
+    )
+    outcome, pnl_r = _outcome_from_opportunity(opportunity, accepted=False)
+    assert outcome == "missed_winner"
+    assert pnl_r == -1.9
+    text = render_shadow_experiment_report(
+        account="demo",
+        start_date="2026-07-03",
+        end_date="2026-07-25",
+        experiment="relative_strength_soft_gate",
+        report_version=1,
+        opportunity_set=OpportunitySet("demo", "2026-07-03", "2026-07-25", [opportunity], "abc123"),
+        rows=[
+            ExperimentDecisionRow(
+                experiment="relative_strength_soft_gate",
+                variant="test_variant",
+                symbol="TESTUSDT",
+                opportunity_key="WATCH_ONLY:scan1:TESTUSDT",
+                source="WATCH_ONLY",
+                first_time="2026-07-03T12:00:00Z",
+                market_regime="RISK_OFF",
+                accepted=False,
+                outcome=outcome,
+                pnl_r=pnl_r,
+                mfe_r=1.9,
+                mae_r=-0.1,
+                reason="test",
+            )
+        ],
+        opportunity_set_path=Path("opportunity_set.json"),
+    )
+    assert "opportunity_set_hash: abc123" in text
+    assert "| test_variant | 1 | 0 | 1 | 0 | 0 | 0 | 1 | -1.90 |" in text
+
+
 if __name__ == "__main__":
     test_entry_reclaim_confirm_1bar_filters_stop_first_path()
     test_shadow_replay_report_contains_summary_sections()
     test_relative_strength_gate_filters_weak_stop_first_path()
+    test_shadow_experiment_report_uses_fixed_set_and_negative_missed_winner_r()

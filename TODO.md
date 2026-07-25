@@ -135,13 +135,13 @@
 - [x] 准备 2026-07-16 一键执行脚本：新增 `scripts/run_paper_checkpoint_review.ps1`，先检查 `settings.toml` 无 diff，再运行 checkpoint 严格模式；只有 `formal_audit_ready` 才继续生成 audit 和两个 shadow replay。
 - [x] 用增强版 audit 先复核 2026-06-19 -> 2026-07-02 旧窗口，确认新字段能解释旧报告中的 `avoided_loser=25`、`missed_winner=12`、`false_entry=7` 和 `neutral_or_unknown=34`；生成 `reports/2026-07-08/paper_opportunity_audit_2026-06-19_2026-07-02_demo_v2.md`。
 - [x] 2026-07-16 阶段检查后决策：暂不启动 `2026-07-06-abtest-plan.md` 中的正式 A/B，也不修改 `settings.toml`；formal audit 显示 `defense_net_R=-24.35`、`missed_winner=11`、`avoided_loser=7`、`false_entry=7`，说明需要先补强离线归因和 opportunity set，而不是直接部署新过滤器。
-- [ ] 两周后按证据决定下一步实验方向：`missed_winners` 多则复测 `RECLAIM_PENDING`/`RISK_OFF`，entered trades 多数止损则优先改入场，大浮盈回落则优先改退出，BTC/ETH 大涨但策略不参与则检查选币和进攻模式。
-- [ ] GPT 进场方案评审后补强 shadow replay 统计口径：按 scanner、entry trigger、regime、exit 分层，并输出 R multiple、总 R、平均 R、中位数 R、MFE、MAE、最大回撤、最大连续亏损、TP1 命中率、stop-first 比例、missed winner 总 R、filtered loser 避免总 R。
-- [ ] GPT 进场方案评审后补充 ATR 标准化字段：`distance_to_support / ATR`、`reclaim_margin / ATR`、`stop_distance / ATR`、`pullback_from_recent_high / ATR`，先用于离线报告，不直接改 live/paper。
-- [ ] GPT 进场方案评审后固定 shadow experiment 的 opportunity set：保存候选生成时间、K 线截止时间、symbol、regime、scanner inputs、baseline entry plan、variant 决策和固定观察窗口，避免 variant 重扫导致样本不可比。
-- [ ] 设计并实现 `reclaim_quality_matrix` 离线实验：对比当前 4h close reclaim、`entry_reclaim_confirm_1bar`、ATR reclaim 强度和 reclaim K 线质量；在 baseline entries 达到足够样本前只输出 `retest / sample_insufficient`。
-- [ ] 设计并实现 `momentum_pullback_definition_ab` 离线实验：对比当前 `24h > 0 && 7d > 0`、允许 24h 小幅为负、recent high 回撤 ATR 倍数、中期趋势 + ATR 回踩区间；保持 reclaim 层不变。
-- [ ] 设计并实现 `relative_strength_soft_gate` 离线实验：相对强度先作为 score 调整、风险标签或仅 `RISK_OFF` 硬过滤验证，分别用 BTC、ETH、等权 alt 篮子作为 benchmark 分开报告。
+- [x] 两周后按证据决定下一步实验方向：已补跑 `2026-07-03 -> 2026-07-25` 扩展窗口，`right_censored_ratio` 从 40.0% 降至 21.6%，formal audit 结论为 `review_entry_quality`，下一步优先研究入场/动量/相对强度，不改退出规则。
+- [x] GPT 进场方案评审后补强 shadow replay 统计口径：`paper shadow-replay` 已新增 R 汇总、TP1/near-TP1 rate、stop-first rate、source 分层、baseline first-hit 分层和 decision/source 分层；扩展窗口报告已生成至 `reports/2026-07-25/`。
+- [x] GPT 进场方案评审后补充 ATR 标准化字段：`OpportunityRow` 已补 `distance_to_support_atr`、`reclaim_margin_atr`、`stop_distance_atr`、`pullback_from_recent_high_atr`，先用于离线报告，不直接改 live/paper。
+- [x] GPT 进场方案评审后固定 shadow experiment 的 opportunity set：新增 `paper shadow-experiment`，每次写出固定 JSON 样本和 `opportunity_set_hash`；首轮三个实验均使用 `9468fbe1bab35767`。
+- [x] 设计并实现 `reclaim_quality_matrix` 离线实验：首轮扩展窗口报告 `paper_shadow_experiment_reclaim_quality_matrix_2026-07-03_2026-07-25_demo_v2.md`，结论 `retest`；`confirm_1bar` 错过 4 个 winner，`atr_reclaim_0_25` 和 `quality_close` 暂更稳但仍不能部署。
+- [x] 设计并实现 `momentum_pullback_definition_ab` 离线实验：首轮扩展窗口报告 `paper_shadow_experiment_momentum_pullback_definition_ab_2026-07-03_2026-07-25_demo_v2.md`，结论 `retest`；`trend_support_atr_pullback` 的 missed winner 最少且 Total Decision R 为正，优先后续复测。
+- [x] 设计并实现 `relative_strength_soft_gate` 离线实验：首轮扩展窗口报告 `paper_shadow_experiment_relative_strength_soft_gate_2026-07-03_2026-07-25_demo_v3.md`，结论 `retest`；`btc_eth_soft_minus_0_5` 错过赢家最少，`btc_eth_hard_0` 过滤亏损最多，需继续跨窗口复测。
 - [ ] 暂不把 MACD 升级为 `macd_hist_4h > 0` 硬门槛；如研究 MACD，仅做 histogram 斜率、连续恶化、reclaim 时改善等离线变体。
 
 ## 运维待办

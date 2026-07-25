@@ -132,7 +132,7 @@ def _entry_reclaim_confirm_1bar_row(settings: Settings, opportunity: Opportunity
             source=opportunity.source,
             first_time=opportunity.first_time,
             entry_high=None,
-            entry_low=None,
+            entry_low=opportunity.entry_low,
             stop=opportunity.stop,
             tp1=opportunity.tp1,
             baseline_entry_time=None,
@@ -160,7 +160,7 @@ def _entry_reclaim_confirm_1bar_row(settings: Settings, opportunity: Opportunity
             source=opportunity.source,
             first_time=opportunity.first_time,
             entry_high=opportunity.entry,
-            entry_low=None,
+            entry_low=opportunity.entry_low,
             stop=opportunity.stop,
             tp1=opportunity.tp1,
             baseline_entry_time=None,
@@ -190,8 +190,6 @@ def _entry_reclaim_confirm_1bar_row(settings: Settings, opportunity: Opportunity
         confirm_kline = klines[baseline_index + 1]
         confirm_close = float(confirm_kline[4])
         confirm_low = float(confirm_kline[3])
-        # In legacy plan rows entry_low is not available in OpportunityRow; use stop-safe confirmation
-        # here and keep entry_low explicit as n/a in the report.
         if confirm_close >= float(opportunity.entry) and (opportunity.stop is None or confirm_low > float(opportunity.stop)):
             variant_index = baseline_index + 1
 
@@ -211,7 +209,7 @@ def _entry_reclaim_confirm_1bar_row(settings: Settings, opportunity: Opportunity
             source=opportunity.source,
             first_time=opportunity.first_time,
             entry_high=opportunity.entry,
-            entry_low=None,
+            entry_low=opportunity.entry_low,
             stop=opportunity.stop,
             tp1=opportunity.tp1,
             baseline_entry_time=_iso_z(_kline_time(baseline_kline)),
@@ -247,7 +245,7 @@ def _entry_reclaim_confirm_1bar_row(settings: Settings, opportunity: Opportunity
         source=opportunity.source,
         first_time=opportunity.first_time,
         entry_high=opportunity.entry,
-        entry_low=None,
+        entry_low=opportunity.entry_low,
         stop=opportunity.stop,
         tp1=opportunity.tp1,
         baseline_entry_time=_iso_z(_kline_time(baseline_kline)),
@@ -368,6 +366,73 @@ def build_relative_strength_gate_shadow(
     return rows
 
 
+def _sum_defined(values: list[float | None]) -> float | None:
+    defined = [value for value in values if value is not None]
+    if not defined:
+        return None
+    return sum(defined)
+
+
+def _avg_defined(values: list[float | None]) -> float | None:
+    defined = [value for value in values if value is not None]
+    if not defined:
+        return None
+    return sum(defined) / len(defined)
+
+
+def _median_defined(values: list[float | None]) -> float | None:
+    defined = sorted(value for value in values if value is not None)
+    if not defined:
+        return None
+    mid = len(defined) // 2
+    if len(defined) % 2:
+        return defined[mid]
+    return (defined[mid - 1] + defined[mid]) / 2
+
+
+def _r_summary(rows: list[ShadowReplayRow]) -> dict[str, object]:
+    baseline_mfe = [row.baseline_mfe_r for row in rows]
+    variant_mfe = [row.variant_mfe_r for row in rows]
+    filtered_loser_r = [
+        abs(row.baseline_mfe_r or 0.0) if row.baseline_first_hit == "stop_first" else None
+        for row in rows
+        if row.decision == "filtered_loser"
+    ]
+    missed_winner_r = [
+        row.baseline_mfe_r
+        for row in rows
+        if row.decision == "missed_winner"
+    ]
+    return {
+        "baseline_mfe_total_R": _sum_defined(baseline_mfe),
+        "baseline_mfe_avg_R": _avg_defined(baseline_mfe),
+        "baseline_mfe_median_R": _median_defined(baseline_mfe),
+        "variant_mfe_total_R": _sum_defined(variant_mfe),
+        "variant_mfe_avg_R": _avg_defined(variant_mfe),
+        "variant_mfe_median_R": _median_defined(variant_mfe),
+        "filtered_loser_count": len([row for row in rows if row.decision == "filtered_loser"]),
+        "filtered_loser_avoided_stop_R": len([row for row in rows if row.decision == "filtered_loser"]),
+        "missed_winner_total_R": _sum_defined(missed_winner_r),
+        "missed_winner_avg_R": _avg_defined(missed_winner_r),
+        "tp1_or_near_tp1_rate_pct": None if not rows else (
+            sum(1 for row in rows if row.baseline_first_hit in {"near_tp1_first", "tp1_first"}) / len(rows) * 100.0
+        ),
+        "stop_first_rate_pct": None if not rows else (
+            sum(1 for row in rows if row.baseline_first_hit == "stop_first") / len(rows) * 100.0
+        ),
+    }
+
+
+def _counter_by(rows: list[ShadowReplayRow], key: str) -> Counter[str]:
+    if key == "source":
+        return Counter(row.source for row in rows)
+    if key == "baseline_hit":
+        return Counter(row.baseline_first_hit for row in rows)
+    if key == "decision_source":
+        return Counter(f"{row.decision} / {row.source}" for row in rows)
+    return Counter()
+
+
 def render_shadow_replay_report(
     *,
     account: str,
@@ -379,6 +444,7 @@ def render_shadow_replay_report(
 ) -> str:
     now = _local_now()
     decision_counts = Counter(row.decision for row in rows)
+    r_summary = _r_summary(rows)
     baseline_entries = sum(1 for row in rows if row.baseline_entry_time)
     variant_entries = sum(1 for row in rows if row.variant_entry_time)
     lines = [
@@ -410,6 +476,12 @@ def render_shadow_replay_report(
         f"- worse_path: {decision_counts.get('worse_path', 0)}",
         f"- delayed_entry: {decision_counts.get('delayed_entry', 0)}",
         f"- kept_by_relative_strength: {decision_counts.get('kept_by_relative_strength', 0)}",
+        f"- missed_winner_total_R: {_fmt(r_summary['missed_winner_total_R'], 2)}",
+        f"- filtered_loser_avoided_stop_R: {_fmt(r_summary['filtered_loser_avoided_stop_R'], 2)}",
+        f"- baseline_mfe_avg_R: {_fmt(r_summary['baseline_mfe_avg_R'], 2)}",
+        f"- variant_mfe_avg_R: {_fmt(r_summary['variant_mfe_avg_R'], 2)}",
+        f"- baseline_stop_first_rate: {_pct(r_summary['stop_first_rate_pct'])}",
+        f"- baseline_tp1_or_near_tp1_rate: {_pct(r_summary['tp1_or_near_tp1_rate_pct'])}",
         "",
         "## Decision Counts",
         "",
@@ -422,14 +494,50 @@ def render_shadow_replay_report(
         lines.append("| n/a | 0 |")
     lines.extend([
         "",
+        "## Stratified Counts",
+        "",
+        "### By Source",
+        "",
+        "| Source | Count |",
+        "|---|---:|",
+    ])
+    for label, count in _counter_by(rows, "source").most_common():
+        lines.append(f"| {label} | {count} |")
+    if not rows:
+        lines.append("| n/a | 0 |")
+    lines.extend([
+        "",
+        "### By Baseline First Hit",
+        "",
+        "| Baseline First Hit | Count |",
+        "|---|---:|",
+    ])
+    for label, count in _counter_by(rows, "baseline_hit").most_common():
+        lines.append(f"| {label} | {count} |")
+    if not rows:
+        lines.append("| n/a | 0 |")
+    lines.extend([
+        "",
+        "### Decision By Source",
+        "",
+        "| Decision / Source | Count |",
+        "|---|---:|",
+    ])
+    for label, count in _counter_by(rows, "decision_source").most_common():
+        lines.append(f"| {label} | {count} |")
+    if not rows:
+        lines.append("| n/a | 0 |")
+    lines.extend([
+        "",
         "## Replay Details",
         "",
-        "| Source | Symbol | ID | First Time | Baseline Entry | Variant Entry | Baseline Hit | Variant Hit | Baseline MFE_R | Variant MFE_R | Symbol Ret | Benchmark Ret | RS | Decision | Explanation |",
-        "|---|---|---|---|---|---|---|---|---:|---:|---:|---:|---:|---|---|",
+        "| Source | Symbol | ID | First Time | Entry Low | Entry High | Baseline Entry | Variant Entry | Baseline Hit | Variant Hit | Baseline MFE_R | Variant MFE_R | Symbol Ret | Benchmark Ret | RS | Decision | Explanation |",
+        "|---|---|---|---|---:|---:|---|---|---|---|---:|---:|---:|---:|---:|---|---|",
     ])
     for row in rows:
         lines.append(
             f"| {row.source} | `{row.symbol}` | `{row.opportunity_id}` | {_local_timestamp(row.first_time)} | "
+            f"{_fmt(row.entry_low, 6)} | {_fmt(row.entry_high, 6)} | "
             f"{_local_timestamp(row.baseline_entry_time or '')} @ {_fmt(row.baseline_entry_price, 6)} | "
             f"{_local_timestamp(row.variant_entry_time or '')} @ {_fmt(row.variant_entry_price, 6)} | "
             f"{row.baseline_first_hit} | {row.variant_first_hit} | {_fmt(row.baseline_mfe_r, 2)} | "
@@ -448,6 +556,10 @@ def render_shadow_replay_report(
                 "baseline_entries": baseline_entries,
                 "variant_entries": variant_entries,
                 "decisions": dict(decision_counts),
+                "r_summary": r_summary,
+                "by_source": dict(_counter_by(rows, "source")),
+                "by_baseline_first_hit": dict(_counter_by(rows, "baseline_hit")),
+                "decision_by_source": dict(_counter_by(rows, "decision_source")),
                 "relative_strength_window_bars": 6 if variant == "relative_strength_gate" else None,
                 "relative_strength_min_pct": 0.0 if variant == "relative_strength_gate" else None,
             },

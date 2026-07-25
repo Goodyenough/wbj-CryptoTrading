@@ -15,6 +15,16 @@
 
 ## 2026-07-25
 
+### 23:40:48 +08:00 - 实现并运行三项 fixed opportunity shadow experiment
+- 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：扩展 `OpportunityRow`，新增 `entry_low`、`market_regime`、`scanner_action`、`scanner_score`、`atr_4h`、`support_level`、`recent_high_4h_36`、`pct_24h/pct_3d/pct_7d`、`distance_to_support_atr`、`reclaim_margin_atr`、`stop_distance_atr`、`pullback_from_recent_high_atr` 和 `opportunity_set_key`。
+- 改动：新增 `src/crypto_trading_system/paper_shadow_experiments.py` 和 CLI `python main.py paper shadow-experiment --experiment ...`，固定 opportunity set 并输出 JSON 样本与 `opportunity_set_hash`。
+- 改动：补强 `paper shadow-replay` 输出 R 汇总、TP1/near-TP1 rate、stop-first rate、source 分层、baseline first-hit 分层和 decision/source 分层。
+- 改动：补跑 `2026-07-03 -> 2026-07-25` checkpoint/audit，`right_censored_ratio` 从 40.0% 降到 21.6%；运行 `reclaim_quality_matrix`、`momentum_pullback_definition_ab`、`relative_strength_soft_gate` 三个离线实验，三者均使用 `opportunity_set_hash=9468fbe1bab35767`。
+- 影响：仅新增离线诊断命令和报告；不修改 `config/settings.toml`、live paper 状态机、数据库结构或默认策略参数。
+- 验证：已运行 `python tests\test_paper_checkpoint.py`、`python tests\test_paper_shadow_replay.py`、`python tests\test_paper_audit.py`、`python -m compileall main.py src tests`；三项实验均生成报告并返回 `verdict=retest`。
+- Git：本提交 `Add fixed opportunity shadow experiments`。
+
 ### 23:08:28 +08:00 - 补跑 7 月 16 日 paper checkpoint review
 - 类型：报告 / TODO / 计划 / Git
 - 改动：运行 `.\scripts\run_paper_checkpoint_review.ps1 -Account demo -StartDate 2026-07-03 -EndDate 2026-07-16 -NoObsidian`，生成 `paper_checkpoint`、`paper_opportunity_audit`、`entry_reclaim_confirm_1bar` shadow replay 和 `relative_strength_gate` shadow replay 四份正式窗口审查报告。

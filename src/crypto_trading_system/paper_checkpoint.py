@@ -53,6 +53,7 @@ def _false_entry_opportunities(entered: list[EnteredTradeRow]) -> list[Opportuni
             first_time=row.entered_at,
             reason=row.reason,
             entry=row.entry_price,
+            entry_low=row.entry_price,
             stop=row.stop,
             tp1=row.tp1,
             max_price_after=row.max_price_after,
@@ -72,6 +73,9 @@ def _false_entry_opportunities(entered: list[EnteredTradeRow]) -> list[Opportuni
             counterfactual_pnl_r=-1.0 if row.status == "STOPPED" else None,
             first_hit="stop_first" if row.status == "STOPPED" else "none",
             time_to_first_hit_bars=None,
+            market_regime=row.market_regime,
+            scanner_action="ENTERED",
+            opportunity_set_key=f"ENTERED_TRADE:{row.plan_id}",
         )
         for row in entered
         if row.attribution in {"entry_issue", "selection_issue", "market_issue"} and row.status == "STOPPED"

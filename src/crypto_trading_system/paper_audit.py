@@ -37,6 +37,7 @@ class OpportunityRow:
     first_time: str
     reason: str
     entry: float | None
+    entry_low: float | None
     stop: float | None
     tp1: float | None
     max_price_after: float | None
@@ -56,6 +57,20 @@ class OpportunityRow:
     counterfactual_pnl_r: float | None = None
     first_hit: str = "none"
     time_to_first_hit_bars: int | None = None
+    market_regime: str = "n/a"
+    scanner_action: str = "n/a"
+    scanner_score: float | None = None
+    atr_4h: float | None = None
+    support_level: float | None = None
+    recent_high_4h_36: float | None = None
+    pct_24h: float | None = None
+    pct_3d: float | None = None
+    pct_7d: float | None = None
+    distance_to_support_atr: float | None = None
+    stop_distance_atr: float | None = None
+    pullback_from_recent_high_atr: float | None = None
+    reclaim_margin_atr: float | None = None
+    opportunity_set_key: str = ""
 
 
 @dataclass(frozen=True)
@@ -196,6 +211,69 @@ def _risk(entry: float | None, stop: float | None) -> float | None:
         return None
     risk = entry - stop
     return risk if risk > 0 else None
+
+
+def _float_or_none(value: object) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _payload_float(payload: dict[str, object], key: str) -> float | None:
+    return _float_or_none(payload.get(key))
+
+
+def _standardized_fields(
+    *,
+    entry_high: float | None,
+    entry_low: float | None,
+    stop: float | None,
+    payload: dict[str, object] | None = None,
+) -> dict[str, float | None]:
+    payload = payload or {}
+    atr_4h = _payload_float(payload, "atr_4h")
+    support = _payload_float(payload, "support_level")
+    recent_high = _payload_float(payload, "recent_high_4h_36")
+    price = _payload_float(payload, "price")
+    entry_mid = None
+    if entry_high is not None and entry_low is not None:
+        entry_mid = (entry_high + entry_low) / 2
+    elif entry_high is not None:
+        entry_mid = entry_high
+    if atr_4h is None or atr_4h <= 0:
+        return {
+            "atr_4h": atr_4h,
+            "support_level": support,
+            "recent_high_4h_36": recent_high,
+            "distance_to_support_atr": None,
+            "stop_distance_atr": None,
+            "pullback_from_recent_high_atr": None,
+            "reclaim_margin_atr": None,
+        }
+    distance_to_support_atr = None
+    if entry_mid is not None and support is not None:
+        distance_to_support_atr = (entry_mid - support) / atr_4h
+    stop_distance_atr = None
+    if entry_mid is not None and stop is not None:
+        stop_distance_atr = (entry_mid - stop) / atr_4h
+    pullback_from_recent_high_atr = None
+    if price is not None and recent_high is not None:
+        pullback_from_recent_high_atr = (recent_high - price) / atr_4h
+    reclaim_margin_atr = None
+    if price is not None and entry_high is not None:
+        reclaim_margin_atr = (price - entry_high) / atr_4h
+    return {
+        "atr_4h": atr_4h,
+        "support_level": support,
+        "recent_high_4h_36": recent_high,
+        "distance_to_support_atr": distance_to_support_atr,
+        "stop_distance_atr": stop_distance_atr,
+        "pullback_from_recent_high_atr": pullback_from_recent_high_atr,
+        "reclaim_margin_atr": reclaim_margin_atr,
+    }
 
 
 def _opportunity_path_stats(
@@ -402,8 +480,20 @@ def build_reclaim_opportunities(settings: Settings, account: str, start_date: st
             max_price = max(prices) if prices else None
             min_price = min(prices) if prices else None
             entry = row["entry_high"]
+            entry_low = row["entry_low"]
             stop = row["stop_current"] if row["stop_current"] is not None else row["stop_initial"]
             tp1 = row["tp1"]
+            raw_payload = row["raw_json"] if "raw_json" in row.keys() else None
+            try:
+                payload = json.loads(str(raw_payload or "{}"))
+            except json.JSONDecodeError:
+                payload = {}
+            standardized = _standardized_fields(
+                entry_high=_float_or_none(entry),
+                entry_low=_float_or_none(entry_low),
+                stop=_float_or_none(stop),
+                payload=payload,
+            )
             classification, reclaimed, hit_tp1, hit_stop, explanation = _classify_opportunity(
                 entry=None if entry is None else float(entry),
                 stop=None if stop is None else float(stop),
@@ -426,6 +516,7 @@ def build_reclaim_opportunities(settings: Settings, account: str, start_date: st
                     first_time=str(row["event_time"]),
                     reason=str(row["event_reason"] or row["created_reason"] or _json_text(row, "raw_json") or ""),
                     entry=None if entry is None else float(entry),
+                    entry_low=None if entry_low is None else float(entry_low),
                     stop=None if stop is None else float(stop),
                     tp1=None if tp1 is None else float(tp1),
                     max_price_after=max_price,
@@ -436,6 +527,14 @@ def build_reclaim_opportunities(settings: Settings, account: str, start_date: st
                     classification=classification,
                     explanation=explanation,
                     **stats,
+                    market_regime=str(row["market_regime"] or "n/a"),
+                    scanner_action="BUY_CANDIDATE",
+                    scanner_score=_payload_float(payload, "score"),
+                    pct_24h=_payload_float(payload, "pct_24h"),
+                    pct_3d=_payload_float(payload, "pct_3d"),
+                    pct_7d=_payload_float(payload, "pct_7d"),
+                    opportunity_set_key=f"RECLAIM_PENDING:{plan_id}",
+                    **standardized,
                 )
             )
     return output
@@ -465,8 +564,19 @@ def build_scan_candidate_opportunities(settings: Settings, start_date: str, end_
                 continue
             seen.add(key)
             entry = row["entry_high"] if row["entry_high"] is not None else row["price"]
+            entry_low = row["entry_low"]
             stop = row["stop"]
             tp1 = row["tp1"]
+            try:
+                payload = json.loads(str(row["payload_json"] or "{}"))
+            except json.JSONDecodeError:
+                payload = {}
+            standardized = _standardized_fields(
+                entry_high=_float_or_none(entry),
+                entry_low=_float_or_none(entry_low),
+                stop=_float_or_none(stop),
+                payload=payload,
+            )
             try:
                 fetched = fetch_klines_cached(
                     settings,
@@ -503,6 +613,7 @@ def build_scan_candidate_opportunities(settings: Settings, start_date: str, end_
                     first_time=str(row["scan_time"]),
                     reason=str(row["reason"] or _json_text(row, "raw_json") or ""),
                     entry=None if entry is None else float(entry),
+                    entry_low=None if entry_low is None else float(entry_low),
                     stop=None if stop is None else float(stop),
                     tp1=None if tp1 is None else float(tp1),
                     max_price_after=max_price,
@@ -513,6 +624,14 @@ def build_scan_candidate_opportunities(settings: Settings, start_date: str, end_
                     classification=classification,
                     explanation=explanation,
                     **stats,
+                    market_regime=str(row["market_regime"] or "n/a"),
+                    scanner_action=str(row["action"] or "n/a"),
+                    scanner_score=None if row["score"] is None else float(row["score"]),
+                    pct_24h=_payload_float(payload, "pct_24h"),
+                    pct_3d=_payload_float(payload, "pct_3d"),
+                    pct_7d=_payload_float(payload, "pct_7d"),
+                    opportunity_set_key=f"{row['action']}:{row['scan_id']}:{row['symbol']}",
+                    **standardized,
                 )
             )
     return output
@@ -1194,6 +1313,7 @@ def write_paper_audit_report(
             first_time=row.entered_at,
             reason=row.reason,
             entry=row.entry_price,
+            entry_low=row.entry_price,
             stop=row.stop,
             tp1=row.tp1,
             max_price_after=row.max_price_after,
@@ -1213,6 +1333,9 @@ def write_paper_audit_report(
             counterfactual_pnl_r=-1.0 if row.status == "STOPPED" else None,
             first_hit="stop_first" if row.status == "STOPPED" else "none",
             time_to_first_hit_bars=None,
+            market_regime=row.market_regime,
+            scanner_action="ENTERED",
+            opportunity_set_key=f"ENTERED_TRADE:{row.plan_id}",
         )
         for row in entered
         if row.attribution in {"entry_issue", "selection_issue", "market_issue"} and row.status == "STOPPED"

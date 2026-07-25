@@ -51,6 +51,7 @@ def _opportunity(status: str = "mature") -> OpportunityRow:
         first_time="2026-07-03T12:00:00Z",
         reason="test",
         entry=100.0,
+        entry_low=98.0,
         stop=90.0,
         tp1=120.0,
         max_price_after=110.0,
