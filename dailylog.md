@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-07-26
+
+### 00:08:32 +08:00 - 新增项目现状与方向 Canvas
+- 类型：文档 / Canvas / Git
+- 改动：新增 `项目现状与方向.canvas`，基于 `dailylog.md`、`TODO.md`、`开发计划.md` 和 Obsidian 实验日志，整理当前工程进展、关键实验结论、TODO 方向和后续需要补充记录的字段。
+- 影响：提供一个 Obsidian Canvas 总览入口，方便快速看清当前阶段、已验证规则、`retest`/`reject_candidate` 方向、下一轮正式 A/B 优先级，以及原始日志来源。
+- 验证：已运行 `python -m json.tool 项目现状与方向.canvas`，确认 Canvas JSON 可解析；本次未运行交易回测或代码测试。
+- Git：本次提交 `Create project status canvas`。
+
 ## 2026-07-25
 
 ### 23:55:00 +08:00 - 跨窗口复核三项 fixed opportunity shadow experiment

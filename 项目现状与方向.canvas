@@ -1,0 +1,331 @@
+{
+  "nodes": [
+    {
+      "id": "0f1a2b3c4d5e6f70",
+      "type": "group",
+      "x": -520,
+      "y": -360,
+      "width": 2180,
+      "height": 1700,
+      "label": "CryptoTradingSystem 当前情况与方向总览",
+      "color": "5"
+    },
+    {
+      "id": "1a2b3c4d5e6f7081",
+      "type": "text",
+      "x": -460,
+      "y": -300,
+      "width": 520,
+      "height": 300,
+      "color": "4",
+      "text": "# 当前结论\n\n系统已经从 MVP 进入“模拟盘观察 + 离线归因 + 单变量 A/B”阶段。\n\n当前不应直接修改 `settings.toml` 或叠加多个新过滤器。\n\n下一轮正式 A/B 优先只做一个维度：`relative_strength_soft_gate` 的 `btc_eth_soft_minus_0_5`。"
+    },
+    {
+      "id": "2b3c4d5e6f708192",
+      "type": "text",
+      "x": 120,
+      "y": -300,
+      "width": 520,
+      "height": 300,
+      "color": "3",
+      "text": "# 核心问题\n\n模拟盘与审计显示：\n\n- 胜率偏低、止损率偏高。\n- 防守规则存在机会成本：`missed_winner` 高于 `avoided_loser`。\n- 主要短板更像入场质量、动量和相对强度，而不是退出规则。\n- 部分结论受右截尾、样本成熟度和数据链路 `partial_pass` 影响。"
+    },
+    {
+      "id": "3c4d5e6f708192a3",
+      "type": "text",
+      "x": 700,
+      "y": -300,
+      "width": 520,
+      "height": 300,
+      "color": "6",
+      "text": "# 资料来源\n\n- `dailylog.md`：工程改动与验证记录。\n- `TODO.md`：当前行动清单。\n- `开发计划.md`：阶段、模块状态、路线判断。\n- Obsidian 实验日志：A/B、回测、paper 观察与结论。\n\n本 Canvas 是摘要索引，不替代原始日志。"
+    },
+    {
+      "id": "4d5e6f708192a3b4",
+      "type": "file",
+      "x": 1280,
+      "y": -300,
+      "width": 300,
+      "height": 150,
+      "file": "dailylog.md",
+      "color": "5"
+    },
+    {
+      "id": "5e6f708192a3b4c5",
+      "type": "file",
+      "x": 1280,
+      "y": -120,
+      "width": 300,
+      "height": 150,
+      "file": "TODO.md",
+      "color": "3"
+    },
+    {
+      "id": "6f708192a3b4c5d6",
+      "type": "file",
+      "x": 1280,
+      "y": 60,
+      "width": 300,
+      "height": 150,
+      "file": "开发计划.md",
+      "color": "6"
+    },
+    {
+      "id": "708192a3b4c5d6e7",
+      "type": "group",
+      "x": -480,
+      "y": 80,
+      "width": 660,
+      "height": 1040,
+      "label": "工程进展时间线",
+      "color": "4"
+    },
+    {
+      "id": "8192a3b4c5d6e7f8",
+      "type": "text",
+      "x": -440,
+      "y": 140,
+      "width": 580,
+      "height": 180,
+      "text": "## 2026-06-03\n\n项目初始化、报告入 Git、dailylog、数据交叉验证、doctor 命令和扫描进度输出完成。系统具备扫盘、报告和基础运维可观测性。"
+    },
+    {
+      "id": "92a3b4c5d6e7f809",
+      "type": "text",
+      "x": -440,
+      "y": 360,
+      "width": 580,
+      "height": 180,
+      "text": "## 2026-06-06\n\n回测基础设施、回测引擎、A/B runner、Universe Snapshot 和 Dynamic Universe Backtest MVP 完成。选币参数开始具备可复现实验口径。"
+    },
+    {
+      "id": "a3b4c5d6e7f8091a",
+      "type": "text",
+      "x": -440,
+      "y": 580,
+      "width": 580,
+      "height": 190,
+      "text": "## 2026-06-08 至 2026-06-11\n\nDynamic universe A/B 扩大；固定 `SymbolMaster`；`risk_off_no_core_entry_reclaim` 与 TP1 EMA trailing 组合达到 `candidate_keep_review`；sensitive 组合进入模拟盘观察。"
+    },
+    {
+      "id": "b4c5d6e7f8091a2b",
+      "type": "text",
+      "x": -440,
+      "y": 810,
+      "width": 580,
+      "height": 240,
+      "text": "## 2026-06-13 至 2026-06-18\n\nSQLite 主数据层、daily/4h run health、observation dashboard、paper checkpoint runbook 和 4h 计划任务准备完成。固定 42 根持仓时间过滤进入 keep review 候选，但条件式 42 根被 `reject_candidate`。"
+    },
+    {
+      "id": "c5d6e7f8091a2b3c",
+      "type": "text",
+      "x": -440,
+      "y": 1090,
+      "width": 580,
+      "height": 250,
+      "text": "## 2026-07-02 至 2026-07-25\n\n补跑 paper checkpoint、formal audit、shadow replay 和 fixed opportunity shadow experiment。结论从“直接部署过滤器”转为“先补强离线归因，再做单变量正式 A/B”。"
+    },
+    {
+      "id": "d6e7f8091a2b3c4d",
+      "type": "group",
+      "x": 260,
+      "y": 80,
+      "width": 680,
+      "height": 1040,
+      "label": "实验结论矩阵",
+      "color": "6"
+    },
+    {
+      "id": "e7f8091a2b3c4d5e",
+      "type": "text",
+      "x": 300,
+      "y": 140,
+      "width": 600,
+      "height": 210,
+      "color": "4",
+      "text": "## 候选保留 / keep review\n\n- `risk_off_no_core_entry_reclaim`：两段非重叠 walk-forward 样本充足且转正，首次达到 keep review。\n- `risk_off_no_core_entry_reclaim_ema_stop`：三项组合两段 PF、净收益、MDD 全面改善，已用于 sensitive 观察。\n- 固定 `max_holding_42x4h_no_tp1`：多阈值复测中 42 根最平衡，仍需 paper 观察后决策。"
+    },
+    {
+      "id": "f8091a2b3c4d5e6f",
+      "type": "text",
+      "x": 300,
+      "y": 390,
+      "width": 600,
+      "height": 220,
+      "color": "3",
+      "text": "## retest\n\n- `liquidity_50m`：稳定减亏但策略仍负收益。\n- `risk_off_no_core_top_n_3`：减亏但近端仍负。\n- `entry_reclaim_close`：近端 `RISK_ON` 明显转正，但早期样本不足。\n- `large_cap_only_risk_off`：两段方向相反。\n- `relative_strength_soft_gate`、`reclaim_quality_matrix`、`momentum_pullback_definition_ab`：离线 shadow 结论仍需复测。"
+    },
+    {
+      "id": "091a2b3c4d5e6f70",
+      "type": "text",
+      "x": 300,
+      "y": 650,
+      "width": 600,
+      "height": 190,
+      "color": "1",
+      "text": "## reject / 不部署\n\n- `daily_trend_required`：近端显著恶化，`reject_candidate`。\n- `tp1_breakeven_stop`：简单保本止损让 `RISK_ON` 更差，`reject_candidate`。\n- 条件式 42 根退出：三窗口中两段变差，且 MDD 均更高，`reject_candidate`。"
+    },
+    {
+      "id": "1b2c3d4e5f607182",
+      "type": "text",
+      "x": 300,
+      "y": 880,
+      "width": 600,
+      "height": 170,
+      "color": "5",
+      "text": "## Paper / Shadow 观察\n\n2026-07-25 扩展窗口后，`right_censored_ratio` 降至 21.6%，formal audit 结论为 `review_entry_quality`。下一步优先研究入场质量、动量和相对强度，不改退出规则。"
+    },
+    {
+      "id": "2c3d4e5f60718293",
+      "type": "group",
+      "x": 1020,
+      "y": 280,
+      "width": 580,
+      "height": 840,
+      "label": "当前 TODO 与下一步",
+      "color": "3"
+    },
+    {
+      "id": "3d4e5f60718293a4",
+      "type": "text",
+      "x": 1060,
+      "y": 340,
+      "width": 500,
+      "height": 210,
+      "color": "3",
+      "text": "## 最高优先级\n\n- 正式 A/B 只选择一个维度：优先 `relative_strength_soft_gate` / `btc_eth_soft_minus_0_5`。\n- 保持 `settings.toml` 冻结。\n- 不一次叠加多个 entry 过滤器。\n- 继续跨窗口复核固定 opportunity shadow experiment。"
+    },
+    {
+      "id": "4e5f60718293a4b5",
+      "type": "text",
+      "x": 1060,
+      "y": 590,
+      "width": 500,
+      "height": 210,
+      "text": "## 策略待办\n\n- 三段式历史结构。\n- 趋势相关高波动惩罚。\n- 更严格追高规则。\n- 固定 42 根退出是否写入默认配置。\n- 如研究 MACD，只做离线变体，不直接做硬门槛。"
+    },
+    {
+      "id": "5f60718293a4b5c6",
+      "type": "text",
+      "x": 1060,
+      "y": 840,
+      "width": 500,
+      "height": 220,
+      "text": "## 工程待办\n\n- 历史/退市币 symbol master，降低幸存者偏差。\n- 更大 dynamic-universe A/B，减少 `source-limit` 影响。\n- 市场环境、牛熊、震荡、暴跌、周末分层统计。\n- A/B 报告写入 Obsidian。\n- Dashboard、提醒、实盘前权限隔离仍在 P1/P2 队列。"
+    },
+    {
+      "id": "60718293a4b5c6d7",
+      "type": "group",
+      "x": -480,
+      "y": 1180,
+      "width": 2080,
+      "height": 420,
+      "label": "为了让后续 Canvas 更清楚，建议补充记录字段",
+      "color": "2"
+    },
+    {
+      "id": "718293a4b5c6d7e8",
+      "type": "text",
+      "x": -440,
+      "y": 1240,
+      "width": 620,
+      "height": 280,
+      "color": "2",
+      "text": "## 每次实验建议固定记录\n\n- 实验状态：`candidate_keep_review` / `retest` / `reject_candidate` / `deployed`。\n- 是否已进入默认配置，生效 commit 与生效时间。\n- baseline/variant 的 config hash、symbol master hash、opportunity set hash。\n- 是否为单变量实验，哪些字段保持冻结。\n- 样本成熟度、右截尾比例、数据链路 verdict。"
+    },
+    {
+      "id": "8293a4b5c6d7e8f9",
+      "type": "text",
+      "x": 220,
+      "y": 1240,
+      "width": 620,
+      "height": 280,
+      "color": "2",
+      "text": "## 每次 paper 观察建议固定记录\n\n- 每个 plan 的最终归因：selection / entry / stop / exit / market / data。\n- 反事实 R：missed winner、avoided loser、false entry 的 R 加权影响。\n- `RECLAIM_PENDING` 后续真实结果。\n- TP1/near-TP1/stop-first 路径。\n- 是否影响已有 WATCHING/ENTERED 存量计划。"
+    },
+    {
+      "id": "93a4b5c6d7e8f90a",
+      "type": "text",
+      "x": 880,
+      "y": 1240,
+      "width": 620,
+      "height": 280,
+      "color": "2",
+      "text": "## 每次方向决策建议固定记录\n\n- 为什么现在不做某个看似合理的方向。\n- 下一轮只改哪一个维度。\n- 决策红线：什么结果会 keep、revert 或继续 retest。\n- 观察窗口起止日期和是否重叠。\n- 预期执行命令与报告输出路径。"
+    }
+  ],
+  "edges": [
+    {
+      "id": "a4b5c6d7e8f90a1b",
+      "fromNode": "4d5e6f708192a3b4",
+      "fromSide": "left",
+      "toNode": "708192a3b4c5d6e7",
+      "toSide": "right",
+      "toEnd": "arrow",
+      "label": "工程记录"
+    },
+    {
+      "id": "b5c6d7e8f90a1b2c",
+      "fromNode": "5e6f708192a3b4c5",
+      "fromSide": "left",
+      "toNode": "2c3d4e5f60718293",
+      "toSide": "right",
+      "toEnd": "arrow",
+      "label": "待办来源"
+    },
+    {
+      "id": "c6d7e8f90a1b2c3d",
+      "fromNode": "6f708192a3b4c5d6",
+      "fromSide": "left",
+      "toNode": "1a2b3c4d5e6f7081",
+      "toSide": "right",
+      "toEnd": "arrow",
+      "label": "阶段判断"
+    },
+    {
+      "id": "d7e8f90a1b2c3d4e",
+      "fromNode": "1a2b3c4d5e6f7081",
+      "fromSide": "bottom",
+      "toNode": "3d4e5f60718293a4",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "下一步"
+    },
+    {
+      "id": "e8f90a1b2c3d4e5f",
+      "fromNode": "2b3c4d5e6f708192",
+      "fromSide": "bottom",
+      "toNode": "1b2c3d4e5f607182",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "证据"
+    },
+    {
+      "id": "f90a1b2c3d4e5f60",
+      "fromNode": "1b2c3d4e5f607182",
+      "fromSide": "right",
+      "toNode": "3d4e5f60718293a4",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "正式 A/B"
+    },
+    {
+      "id": "0a1b2c3d4e5f6071",
+      "fromNode": "e7f8091a2b3c4d5e",
+      "fromSide": "right",
+      "toNode": "4e5f60718293a4b5",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "keep review 后续"
+    },
+    {
+      "id": "1c2d3e4f50617283",
+      "fromNode": "3d4e5f60718293a4",
+      "fromSide": "bottom",
+      "toNode": "60718293a4b5c6d7",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "补充记录"
+    }
+  ]
+}
