@@ -15,6 +15,15 @@
 
 ## 2026-07-26
 
+### 00:38:00 +08:00 - 注册并运行 relative strength soft gate 正式 A/B
+- 类型：代码 / 配置 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增 `analysis.relative_strength_soft_gate_enabled` 与 `analysis.relative_strength_min_pct` 的 loader 默认值；注册 `relative_strength_soft_gate_btc_eth_minus_0_5` 实验，仅在 A/B variant 中启用相对 BTC/ETH 24h 平均收益的软门槛。
+- 改动：在 scanner 与 dynamic-universe backtest replay 中接入相对强度降级逻辑：当候选币 `24h% - BTC/ETH平均24h% < -0.5` 时，将 `BUY_CANDIDATE` 降级为 `WATCH_ONLY`。
+- 改动：用固定 `reports/2026-06-09/dynamic_master_full.json` 跑两段非重叠 walk-forward：`2024-07-01 -> 2025-06-01`、`2025-06-01 -> 2026-06-01`，生成 A/B 与 summary 报告至 `reports/2026-07-26/`。
+- 影响：默认配置行为不变，`settings.toml` 保持冻结；正式 A/B 结论仍为 `retest`，不部署新规则。
+- 验证：已运行 `python tests\test_abtest.py`、`python tests\test_replay.py`、`python tests\test_abtest_walk_forward.py`、`python -m compileall main.py src tests`；walk-forward 两段样本均充足且无重叠。
+- Git：本次提交 `Add relative strength soft gate abtest`。
+
 ### 00:08:32 +08:00 - 新增项目现状与方向 Canvas
 - 类型：文档 / Canvas / Git
 - 改动：新增 `项目现状与方向.canvas`，基于 `dailylog.md`、`TODO.md`、`开发计划.md` 和 Obsidian 实验日志，整理当前工程进展、关键实验结论、TODO 方向和后续需要补充记录的字段。

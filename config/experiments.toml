@@ -111,6 +111,15 @@ dimension = "daily_trend"
 [daily_trend_required.overrides.analysis]
 daily_trend_required = true
 
+[relative_strength_soft_gate_btc_eth_minus_0_5]
+enabled = true
+description = "Soft gate BUY_CANDIDATE entries when 24h return underperforms the BTC/ETH average by more than 0.5 percentage points."
+dimension = "relative_strength"
+
+[relative_strength_soft_gate_btc_eth_minus_0_5.overrides.analysis]
+relative_strength_soft_gate_enabled = true
+relative_strength_min_pct = -0.5
+
 [risk_off_no_core_entry_reclaim_ema_stop_daily_trend]
 enabled = true
 description = "Combine RISK_OFF core-buy pause, 4h entry reclaim confirmation, TP1 EMA20 trailing stop, and daily trend confirmation (only applies in RISK_ON)."

@@ -40,6 +40,25 @@ def _validation_pool_size(settings: Settings, candidate_count: int) -> int:
     return min(candidate_count, pool_target)
 
 
+def _apply_relative_strength_soft_gate(
+    action: str,
+    verdict: str,
+    symbol_pct_24h: float,
+    benchmark_pct_24h: float | None,
+    enabled: bool,
+    min_relative_strength_pct: float,
+) -> tuple[str, str, float | None]:
+    relative_strength_pct = None if benchmark_pct_24h is None else symbol_pct_24h - benchmark_pct_24h
+    if (
+        enabled
+        and action == "BUY_CANDIDATE"
+        and relative_strength_pct is not None
+        and relative_strength_pct < min_relative_strength_pct
+    ):
+        return "WATCH_ONLY", "只观察", relative_strength_pct
+    return action, verdict, relative_strength_pct
+
+
 def _rank_final_candidates(candidates: list[TradeCandidate], top_n: int) -> list[TradeCandidate]:
     sorted_candidates = sorted(candidates, key=_action_sort_key)
     return [
@@ -153,6 +172,9 @@ def _analyze_ticker(
     high_volatility_range_pct: float = 35.0,
     high_volatility_penalty: float = 6.0,
     daily_trend_required: bool = False,
+    relative_strength_soft_gate_enabled: bool = False,
+    relative_strength_min_pct: float = -0.5,
+    benchmark_pct_24h: float | None = None,
     precomputed_indicators: dict | None = None,
 ) -> TradeCandidate | None:
     closes_1h = _quote_closes(k1h)
@@ -283,6 +305,14 @@ def _analyze_ticker(
     if market_regime_risk and action == "BUY_CANDIDATE":
         action = "WATCH_ONLY"
         verdict = "只观察"
+    action, verdict, relative_strength_pct = _apply_relative_strength_soft_gate(
+        action,
+        verdict,
+        ticker.pct_24h,
+        benchmark_pct_24h,
+        relative_strength_soft_gate_enabled,
+        relative_strength_min_pct,
+    )
 
     risks: list[str] = []
     if distance_to_support > 8:
@@ -301,6 +331,14 @@ def _analyze_ticker(
         risks.append("24h 动量未确认")
     if pct_7d is not None and pct_7d <= 0:
         risks.append("7d 趋势未确认")
+    if (
+        relative_strength_soft_gate_enabled
+        and relative_strength_pct is not None
+        and relative_strength_pct < relative_strength_min_pct
+    ):
+        risks.append(
+            f"24h 相对 BTC/ETH 强度 {relative_strength_pct:.2f} pct points，低于门槛 {relative_strength_min_pct:.2f}"
+        )
     if not risks:
         risks.append("主要风险是大盘同步回撤")
 
@@ -457,6 +495,13 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
     market_regime = _detect_market_regime(client, settings, limitations, progress)
     market_regime_allows_buy = True if market_regime is None else market_regime.allows_alt_buy
     market_regime_status = None if market_regime is None else market_regime.status
+    ticker_by_symbol = {ticker.symbol: ticker for ticker in raw_tickers}
+    benchmark_returns = [
+        ticker_by_symbol[symbol].pct_24h
+        for symbol in ("BTCUSDT", "ETHUSDT")
+        if symbol in ticker_by_symbol
+    ]
+    benchmark_pct_24h = sum(benchmark_returns) / len(benchmark_returns) if benchmark_returns else None
 
     total = len(raw_tickers)
     for index, ticker in enumerate(raw_tickers, start=1):
@@ -483,6 +528,9 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
                 high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
                 high_volatility_penalty=settings.analysis.high_volatility_penalty,
                 daily_trend_required=settings.analysis.daily_trend_required,
+                relative_strength_soft_gate_enabled=settings.analysis.relative_strength_soft_gate_enabled,
+                relative_strength_min_pct=settings.analysis.relative_strength_min_pct,
+                benchmark_pct_24h=benchmark_pct_24h,
             )
             if candidate is not None:
                 candidates.append(candidate)

@@ -15,6 +15,7 @@ from ..ticker_utils import reconstruct_ticker
 from ..trade_state import step_trade
 from ..indicators import ema as _ema
 from ..indicators import ema_series as _ema_series, ema_step as _ema_step
+from ..indicators import percent_change
 from .costs import entry_fill, stop_exit_fill, target_exit_fill
 from .history import KlineQualityIssue, batch_load_klines_cached, fetch_klines_cached, interval_ms
 from .universe import (
@@ -37,6 +38,23 @@ def _listing_date_allows(
     if master is None:
         return True
     return listing_date_allows_analysis(master.listing_dates, symbol, bar_close_ms, min_history_days)
+
+
+def _benchmark_pct_24h(
+    klines_by_symbol: dict[str, dict[str, list[list]]],
+    bar_close_ms: int,
+) -> float | None:
+    returns: list[float] = []
+    for symbol in ("BTCUSDT", "ETHUSDT"):
+        k1h = _closed_slice(klines_by_symbol.get(symbol, {}).get("1h", []), "1h", bar_close_ms)
+        if len(k1h) < 25:
+            continue
+        previous = float(k1h[-25][4])
+        current = float(k1h[-1][4])
+        pct = percent_change(previous, current)
+        if pct is not None:
+            returns.append(pct)
+    return sum(returns) / len(returns) if returns else None
 
 
 @dataclass
@@ -705,6 +723,7 @@ def run_backtest_replay(
             )
             market_regime_allows_buy = market_regime.allows_alt_buy
             market_regime_status = market_regime.status
+        benchmark_pct_24h = _benchmark_pct_24h(klines_by_symbol, bar_close_ms)
         unavailable = {item.paper.symbol for item in all_trades if item.paper.status in {"WATCHING", "ENTERED", "TP1_HIT"}}
         candidate_pool: list[TradeCandidate] = []
         analysis_symbols = symbols
@@ -796,6 +815,9 @@ def run_backtest_replay(
                 high_volatility_range_pct=settings.analysis.high_volatility_range_pct,
                 high_volatility_penalty=settings.analysis.high_volatility_penalty,
                 daily_trend_required=settings.analysis.daily_trend_required,
+                relative_strength_soft_gate_enabled=settings.analysis.relative_strength_soft_gate_enabled,
+                relative_strength_min_pct=settings.analysis.relative_strength_min_pct,
+                benchmark_pct_24h=benchmark_pct_24h,
                 precomputed_indicators=cached,
             )
             if candidate is not None and candidate.action == "BUY_CANDIDATE":

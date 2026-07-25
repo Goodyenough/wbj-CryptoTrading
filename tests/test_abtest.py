@@ -36,6 +36,19 @@ def test_daily_trend_experiment_is_runnable() -> None:
     ]
 
 
+def test_relative_strength_soft_gate_experiment_is_runnable() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.relative_strength_soft_gate_enabled = False
+    definition = load_experiment("relative_strength_soft_gate_btc_eth_minus_0_5", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert settings.analysis.relative_strength_soft_gate_enabled is False
+    assert variant.analysis.relative_strength_soft_gate_enabled is True
+    assert variant.analysis.relative_strength_min_pct == -0.5
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.relative_strength_soft_gate_enabled", False, True)
+    ]
+
+
 def test_apply_overrides_does_not_mutate_baseline() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")
@@ -325,25 +338,6 @@ def test_dynamic_abtest_accepts_prebuilt_symbol_master() -> None:
     assert calls["masters"] == [prebuilt_master, prebuilt_master]
 
 
-if __name__ == "__main__":
-    test_load_unknown_experiment_reports_available_names()
-    test_daily_trend_experiment_is_runnable()
-    test_apply_overrides_does_not_mutate_baseline()
-    test_regime_override_can_disable_core_risk_off_buys()
-    test_capacity_override_can_reduce_top_n()
-    test_combined_override_can_change_regime_and_capacity()
-    test_entry_timing_override_can_require_reclaim_close()
-    test_combined_regime_entry_override_can_pause_and_reclaim()
-    test_exit_timing_override_can_move_stop_to_breakeven()
-    test_exit_timing_override_can_enable_ema_trailing_stop()
-    test_holding_time_override_can_force_timeout_exit()
-    test_conditional_holding_time_override_sets_both_fields()
-    test_fixed_vs_conditional_42_bar_experiment_changes_one_variable()
-    test_override_paths_are_dimension_scoped()
-    test_dynamic_abtest_reuses_one_symbol_master()
-    test_dynamic_abtest_accepts_prebuilt_symbol_master()
-
-
 def test_large_cap_only_risk_off_experiment_loads() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     settings.analysis.risk_off_core_buy_enabled = False
@@ -378,7 +372,10 @@ def test_large_cap_exempt_in_risk_off_but_altcoin_not() -> None:
     # Minimal klines: 200 daily bars so history filter passes, 120 4h bars, 168 1h bars
     # Each bar: [open_ms, open, high, low, close, volume]
     def _bars(n: int, price: float = 1.0) -> list[list]:
-        return [[i * 3_600_000, price, price * 1.01, price * 0.99, price, 1_000_000] for i in range(n)]
+        return [
+            [i * 3_600_000, price, price * 1.01, price * 0.99, price, 1_000_000, 0, 1_000_000, 1000]
+            for i in range(n)
+        ]
 
     k1d = _bars(200, price=1.0)
     k4h = _bars(120, price=1.0)
@@ -414,4 +411,55 @@ def test_large_cap_exempt_in_risk_off_but_altcoin_not() -> None:
         assert result_ada.action != "BUY_CANDIDATE", (
             f"ADAUSDT should be blocked in RISK_OFF but got action={result_ada.action}"
         )
+
+
+def test_relative_strength_soft_gate_downgrades_weak_buy_candidate() -> None:
+    from crypto_trading_system.scanner import _apply_relative_strength_soft_gate
+
+    action, verdict, relative_strength = _apply_relative_strength_soft_gate(
+        "BUY_CANDIDATE",
+        "可考虑",
+        symbol_pct_24h=1.0,
+        benchmark_pct_24h=2.0,
+        enabled=True,
+        min_relative_strength_pct=-0.5,
+    )
+    assert action == "WATCH_ONLY"
+    assert verdict == "只观察"
+    assert relative_strength == -1.0
+
+    strong_action, strong_verdict, strong_relative_strength = _apply_relative_strength_soft_gate(
+        "BUY_CANDIDATE",
+        "可考虑",
+        symbol_pct_24h=1.7,
+        benchmark_pct_24h=2.0,
+        enabled=True,
+        min_relative_strength_pct=-0.5,
+    )
+    assert strong_action == "BUY_CANDIDATE"
+    assert strong_verdict == "可考虑"
+    assert strong_relative_strength == -0.30000000000000004
+
+
+if __name__ == "__main__":
+    test_load_unknown_experiment_reports_available_names()
+    test_daily_trend_experiment_is_runnable()
+    test_relative_strength_soft_gate_experiment_is_runnable()
+    test_apply_overrides_does_not_mutate_baseline()
+    test_regime_override_can_disable_core_risk_off_buys()
+    test_capacity_override_can_reduce_top_n()
+    test_combined_override_can_change_regime_and_capacity()
+    test_entry_timing_override_can_require_reclaim_close()
+    test_combined_regime_entry_override_can_pause_and_reclaim()
+    test_exit_timing_override_can_move_stop_to_breakeven()
+    test_exit_timing_override_can_enable_ema_trailing_stop()
+    test_holding_time_override_can_force_timeout_exit()
+    test_conditional_holding_time_override_sets_both_fields()
+    test_fixed_vs_conditional_42_bar_experiment_changes_one_variable()
+    test_override_paths_are_dimension_scoped()
+    test_dynamic_abtest_reuses_one_symbol_master()
+    test_dynamic_abtest_accepts_prebuilt_symbol_master()
+    test_large_cap_only_risk_off_experiment_loads()
+    test_large_cap_exempt_in_risk_off_but_altcoin_not()
+    test_relative_strength_soft_gate_downgrades_weak_buy_candidate()
     print("test_abtest=passed")
