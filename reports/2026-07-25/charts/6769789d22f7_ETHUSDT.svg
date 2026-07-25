@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="460" viewBox="0 0 960 460">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="70" y="22" font-family="Arial" font-size="16" font-weight="700">ETHUSDT 4h evidence chart</text>
+<rect x="70" y="35" width="680" height="330" fill="#fafafa" stroke="#dddddd"/>
+<line x1="70" y1="35.00" x2="750" y2="35.00" stroke="#eeeeee"/>
+<text x="8" y="39.00" font-family="Arial" font-size="11" fill="#555">2,034.66</text>
+<line x1="70" y1="117.50" x2="750" y2="117.50" stroke="#eeeeee"/>
+<text x="8" y="121.50" font-family="Arial" font-size="11" fill="#555">1,978.81</text>
+<line x1="70" y1="200.00" x2="750" y2="200.00" stroke="#eeeeee"/>
+<text x="8" y="204.00" font-family="Arial" font-size="11" fill="#555">1,922.96</text>
+<line x1="70" y1="282.50" x2="750" y2="282.50" stroke="#eeeeee"/>
+<text x="8" y="286.50" font-family="Arial" font-size="11" fill="#555">1,867.11</text>
+<line x1="70" y1="365.00" x2="750" y2="365.00" stroke="#eeeeee"/>
+<text x="8" y="369.00" font-family="Arial" font-size="11" fill="#555">1,811.27</text>
+<line x1="79.44" y1="272.55" x2="79.44" y2="305.26" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="74.16" y="276.89" width="10.58" height="12.62" fill="#dc2626" opacity="0.82"/>
+<line x1="98.33" y1="267.85" x2="98.33" y2="297.44" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="93.04" y="274.94" width="10.58" height="14.57" fill="#16a34a" opacity="0.82"/>
+<line x1="117.22" y1="246.17" x2="117.22" y2="289.94" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="111.93" y="263.55" width="10.58" height="11.37" fill="#16a34a" opacity="0.82"/>
+<line x1="136.11" y1="263.48" x2="136.11" y2="317.92" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="130.82" y="263.55" width="10.58" height="23.62" fill="#dc2626" opacity="0.82"/>
+<line x1="155.00" y1="239.09" x2="155.00" y2="301.42" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="149.71" y="243.97" width="10.58" height="43.21" fill="#16a34a" opacity="0.82"/>
+<line x1="173.89" y1="226.65" x2="173.89" y2="302.39" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="168.60" y="230.46" width="10.58" height="13.49" fill="#16a34a" opacity="0.82"/>
+<line x1="192.78" y1="207.09" x2="192.78" y2="248.59" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="187.49" y="230.46" width="10.58" height="5.73" fill="#dc2626" opacity="0.82"/>
+<line x1="211.67" y1="222.72" x2="211.67" y2="242.19" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="206.38" y="226.87" width="10.58" height="9.32" fill="#16a34a" opacity="0.82"/>
+<line x1="230.56" y1="191.72" x2="230.56" y2="232.83" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="225.27" y="194.40" width="10.58" height="32.47" fill="#16a34a" opacity="0.82"/>
+<line x1="249.44" y1="174.46" x2="249.44" y2="201.70" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="244.16" y="183.58" width="10.58" height="10.84" fill="#16a34a" opacity="0.82"/>
+<line x1="268.33" y1="155.63" x2="268.33" y2="195.54" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="263.04" y="181.20" width="10.58" height="2.39" fill="#16a34a" opacity="0.82"/>
+<line x1="287.22" y1="167.10" x2="287.22" y2="199.41" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="281.93" y="181.20" width="10.58" height="5.73" fill="#dc2626" opacity="0.82"/>
+<line x1="306.11" y1="181.69" x2="306.11" y2="211.76" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="300.82" y="186.93" width="10.58" height="12.44" fill="#dc2626" opacity="0.82"/>
+<line x1="325.00" y1="186.65" x2="325.00" y2="209.29" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="319.71" y="189.47" width="10.58" height="9.91" fill="#16a34a" opacity="0.82"/>
+<line x1="343.89" y1="167.92" x2="343.89" y2="194.39" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="338.60" y="189.47" width="10.58" height="1.95" fill="#dc2626" opacity="0.82"/>
+<line x1="362.78" y1="175.72" x2="362.78" y2="218.14" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="357.49" y="191.43" width="10.58" height="21.15" fill="#dc2626" opacity="0.82"/>
+<line x1="381.67" y1="184.26" x2="381.67" y2="213.12" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="376.38" y="193.64" width="10.58" height="18.97" fill="#16a34a" opacity="0.82"/>
+<line x1="400.56" y1="151.31" x2="400.56" y2="214.33" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="395.27" y="170.35" width="10.58" height="23.30" fill="#16a34a" opacity="0.82"/>
+<line x1="419.44" y1="150.53" x2="419.44" y2="202.90" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="414.16" y="170.34" width="10.58" height="26.46" fill="#dc2626" opacity="0.82"/>
+<line x1="438.33" y1="175.27" x2="438.33" y2="200.02" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="433.04" y="183.32" width="10.58" height="13.46" fill="#16a34a" opacity="0.82"/>
+<line x1="457.22" y1="172.61" x2="457.22" y2="207.97" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="451.93" y="183.31" width="10.58" height="20.25" fill="#dc2626" opacity="0.82"/>
+<line x1="476.11" y1="191.54" x2="476.11" y2="215.31" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="470.82" y="203.55" width="10.58" height="7.25" fill="#dc2626" opacity="0.82"/>
+<line x1="495.00" y1="187.15" x2="495.00" y2="212.59" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="489.71" y="195.45" width="10.58" height="15.35" fill="#16a34a" opacity="0.82"/>
+<line x1="513.89" y1="192.57" x2="513.89" y2="259.06" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="508.60" y="195.47" width="10.58" height="45.50" fill="#dc2626" opacity="0.82"/>
+<line x1="532.78" y1="240.70" x2="532.78" y2="279.06" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="527.49" y="240.97" width="10.58" height="28.92" fill="#dc2626" opacity="0.82"/>
+<line x1="551.67" y1="250.04" x2="551.67" y2="271.99" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="546.38" y="265.86" width="10.58" height="4.05" fill="#16a34a" opacity="0.82"/>
+<line x1="570.56" y1="261.69" x2="570.56" y2="293.50" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="565.27" y="262.48" width="10.58" height="3.38" fill="#16a34a" opacity="0.82"/>
+<line x1="589.44" y1="219.44" x2="589.44" y2="273.10" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="584.16" y="239.86" width="10.58" height="22.62" fill="#16a34a" opacity="0.82"/>
+<line x1="608.33" y1="239.77" x2="608.33" y2="268.33" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="603.04" y="239.86" width="10.58" height="17.80" fill="#dc2626" opacity="0.82"/>
+<line x1="627.22" y1="254.47" x2="627.22" y2="310.60" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="621.93" y="257.66" width="10.58" height="32.68" fill="#dc2626" opacity="0.82"/>
+<line x1="646.11" y1="283.02" x2="646.11" y2="302.61" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="640.82" y="287.35" width="10.58" height="2.97" fill="#16a34a" opacity="0.82"/>
+<line x1="665.00" y1="284.41" x2="665.00" y2="297.49" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="659.71" y="287.34" width="10.58" height="3.55" fill="#dc2626" opacity="0.82"/>
+<line x1="683.89" y1="286.08" x2="683.89" y2="299.02" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="678.60" y="290.88" width="10.58" height="3.99" fill="#dc2626" opacity="0.82"/>
+<line x1="702.78" y1="288.64" x2="702.78" y2="300.97" stroke="#dc2626" stroke-width="1.4"/>
+<rect x="697.49" y="294.87" width="10.58" height="4.02" fill="#dc2626" opacity="0.82"/>
+<line x1="721.67" y1="292.88" x2="721.67" y2="305.98" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="716.38" y="296.33" width="10.58" height="2.54" fill="#16a34a" opacity="0.82"/>
+<line x1="740.56" y1="295.33" x2="740.56" y2="296.39" stroke="#16a34a" stroke-width="1.4"/>
+<rect x="735.27" y="295.34" width="10.58" height="1.50" fill="#16a34a" opacity="0.82"/>
+<line x1="70" y1="305.14" x2="750" y2="305.14" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="760" y="309.14" font-family="Arial" font-size="12" fill="#2563eb">Entry low 1,851.79</text>
+<line x1="70" y1="290.88" x2="750" y2="290.88" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="760" y="294.88" font-family="Arial" font-size="12" fill="#2563eb">Entry high 1,861.44</text>
+<line x1="70" y1="351.55" x2="750" y2="351.55" stroke="#dc2626" stroke-width="1.5"/>
+<text x="760" y="355.55" font-family="Arial" font-size="12" fill="#dc2626">Stop 1,820.37</text>
+<line x1="70" y1="164.98" x2="750" y2="164.98" stroke="#16a34a" stroke-width="1.5"/>
+<text x="760" y="168.98" font-family="Arial" font-size="12" fill="#16a34a">TP1 1,946.67</text>
+<line x1="70" y1="49.95" x2="750" y2="49.95" stroke="#15803d" stroke-width="1.5"/>
+<text x="760" y="53.95" font-family="Arial" font-size="12" fill="#15803d">TP2 2,024.53</text>
+<line x1="70" y1="295.34" x2="750" y2="295.34" stroke="#111827" stroke-width="1.5" stroke-dasharray="2 3"/>
+<text x="760" y="299.34" font-family="Arial" font-size="12" fill="#111827">Last 1,858.42</text>
+<text x="70" y="393" font-family="Arial" font-size="12" fill="#555">Candles: latest 36 x 4h Binance klines. Lines show entry zone, stop, TP1, TP2, and latest close.</text>
+<text x="70" y="415" font-family="Arial" font-size="12" fill="#555">This chart is generated from locally fetched OHLCV, so you can compare it with Binance or TradingView manually.</text>
+</svg>

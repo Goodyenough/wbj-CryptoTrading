@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-07-25
+
+### 23:08:28 +08:00 - 补跑 7 月 16 日 paper checkpoint review
+- 类型：报告 / TODO / 计划 / Git
+- 改动：运行 `.\scripts\run_paper_checkpoint_review.ps1 -Account demo -StartDate 2026-07-03 -EndDate 2026-07-16 -NoObsidian`，生成 `paper_checkpoint`、`paper_opportunity_audit`、`entry_reclaim_confirm_1bar` shadow replay 和 `relative_strength_gate` shadow replay 四份正式窗口审查报告。
+- 改动：同步纳入 2026-07-14 至 2026-07-25 自动生成的 daily、4h、dashboard、scan 和 charts 报告。
+- 改动：更新 `TODO.md` 和 `开发计划.md`，记录 checkpoint 已完成，结论为不启动正式 A/B、不修改 `settings.toml`，下一步继续补强离线归因口径并推进 `reclaim_quality_matrix`、`momentum_pullback_definition_ab`、`relative_strength_soft_gate`。
+- 影响：仅生成和归档诊断报告，不修改策略代码、`config/settings.toml`、数据库结构或 paper 状态机。
+- 验证：checkpoint 返回 `verdict=formal_audit_ready`、`config_hash_stable=true`、`data_link_verdict=partial_pass`、`daily_success=11/14`、`paper_4h_success=56/70`、`mature=36`、`right_censored_ratio=40.0%`；formal audit 显示 `defense_net_R=-24.35`，应继续观察而非直接改参数。
+- Git：本提交 `Add July paper checkpoint review reports`。
+
 ## 2026-07-14
 
 ### 00:16:52 +08:00 - 编写 GPT 评审新手说明书
