@@ -15,6 +15,14 @@
 
 ## 2026-07-25
 
+### 23:55:00 +08:00 - 跨窗口复核三项 fixed opportunity shadow experiment
+- 类型：报告 / 实验日志 / TODO / 计划 / Git
+- 改动：补跑 `2026-06-19 -> 2026-07-02` 与 `2026-07-17 -> 2026-07-25` 的 `paper checkpoint` 和三项 `paper shadow-experiment`，新增跨窗口复核报告 `reports/2026-07-25/paper_shadow_experiment_cross_window_review_2026-07-25_v1.md`。
+- 改动：确认旧窗口 `right_censored_ratio=34.6%` 可用于比较，扩展窗口 `2026-07-03 -> 2026-07-25` 为主证据，近期窗口 `right_censored_ratio=44.0%` 只能作为 interim direction check。
+- 影响：仅新增和归档诊断报告、实验日志与计划结论；不修改 `config/settings.toml`、策略代码、数据库结构或 paper 状态机。
+- 验证：已运行 2 个 checkpoint 与 6 个 shadow experiment；复核三项实验的 Variant Summary，结论均保持 `retest`。
+- Git：本次提交 `Add cross-window shadow experiment review`。
+
 ### 23:40:48 +08:00 - 实现并运行三项 fixed opportunity shadow experiment
 - 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：扩展 `OpportunityRow`，新增 `entry_low`、`market_regime`、`scanner_action`、`scanner_score`、`atr_4h`、`support_level`、`recent_high_4h_36`、`pct_24h/pct_3d/pct_7d`、`distance_to_support_atr`、`reclaim_margin_atr`、`stop_distance_atr`、`pullback_from_recent_high_atr` 和 `opportunity_set_key`。

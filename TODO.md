@@ -142,6 +142,8 @@
 - [x] 设计并实现 `reclaim_quality_matrix` 离线实验：首轮扩展窗口报告 `paper_shadow_experiment_reclaim_quality_matrix_2026-07-03_2026-07-25_demo_v2.md`，结论 `retest`；`confirm_1bar` 错过 4 个 winner，`atr_reclaim_0_25` 和 `quality_close` 暂更稳但仍不能部署。
 - [x] 设计并实现 `momentum_pullback_definition_ab` 离线实验：首轮扩展窗口报告 `paper_shadow_experiment_momentum_pullback_definition_ab_2026-07-03_2026-07-25_demo_v2.md`，结论 `retest`；`trend_support_atr_pullback` 的 missed winner 最少且 Total Decision R 为正，优先后续复测。
 - [x] 设计并实现 `relative_strength_soft_gate` 离线实验：首轮扩展窗口报告 `paper_shadow_experiment_relative_strength_soft_gate_2026-07-03_2026-07-25_demo_v3.md`，结论 `retest`；`btc_eth_soft_minus_0_5` 错过赢家最少，`btc_eth_hard_0` 过滤亏损最多，需继续跨窗口复测。
+- [x] 跨窗口复核三项 fixed opportunity shadow experiment：已补跑 `2026-06-19 -> 2026-07-02` 与 `2026-07-17 -> 2026-07-25`，并汇总到 `reports/2026-07-25/paper_shadow_experiment_cross_window_review_2026-07-25_v1.md`；结论仍为 `retest`，优先级暂定 `btc_eth_soft_minus_0_5`、`atr_reclaim_0_25`、`trend_support_atr_pullback`。
+- [ ] 下一轮正式 A/B 只选择一个维度先做：优先设计 `relative_strength_soft_gate` 的 `btc_eth_soft_minus_0_5` dynamic-universe A/B；保持 `settings.toml` 冻结，避免一次叠加多个 entry 过滤器。
 - [ ] 暂不把 MACD 升级为 `macd_hist_4h > 0` 硬门槛；如研究 MACD，仅做 histogram 斜率、连续恶化、reclaim 时改善等离线变体。
 
 ## 运维待办
