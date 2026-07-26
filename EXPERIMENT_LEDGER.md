@@ -1,6 +1,6 @@
 # CryptoTradingSystem 实验账本
 
-更新时间：2026-07-26 19:08 +08:00
+更新时间：2026-07-26 23:16 +08:00
 
 ## 1. 账本规则
 
@@ -34,7 +34,7 @@
 | Regime 阈值 BTC -3%、ETH -5%、要求两者趋势 | 已部署 | 当前 `settings.toml` 已采用 sensitive 阈值 | 决策 |
 | `max_holding_bars_without_tp1=42` | 未部署 | 回测候选，但需 paper 观察后 keep review | 决策：暂不部署 |
 | `relative_strength_soft_gate_enabled=true` | 未部署 | 7 月 26 日阈值敏感性仍为 `retest` | 决策：暂不部署 |
-| `entry_reclaim_min_atr_enabled=true` | 未部署 | `atr_reclaim_0_35` 进入 `candidate_keep_review_but_path_dependent`：改善主要来自 variant-only 新增赢家，近端窗口路径依赖较强 | 决策：暂不部署 |
+| `entry_reclaim_min_atr_enabled=true` | 未部署 | `atr_reclaim_0_35` 人工路径复盘后降为 `retest_path_dependent`：新增赢家与错过赢家都存在高质量样本，且结果强受仓位容量路径影响 | 决策：暂不部署 |
 
 ## 3. 实验汇总表
 
@@ -66,7 +66,7 @@
 | `relative_strength_soft_gate_btc_eth_minus_0_5` | 正式 A/B 验证相对强度 soft gate | `relative_strength_min_pct=-0.5` | 2024-07-01 -> 2026-06-01 | 两段 PF/净收益/Sharpe 改善，但早期 MDD 16.59% -> 18.96% | `retest` | MDD 恶化来源未完全消除 |
 | `relative_strength` 阈值敏感性 | -1.0、-0.5、0.0 哪个更稳 | 阈值 | 2024-07-01 -> 2026-06-01 | -0.5 最平衡；-1.0 近端退化；0.0 早期 MDD 最差 | `retest` | 该家族暂不部署 |
 | `atr_reclaim_0_25` | reclaim 超过 `entry_high + 0.25 ATR` 是否提高入场质量 | `entry_reclaim_min_atr` | 2024-07-01 -> 2026-06-01 | 两段净收益、PF、Sharpe、胜率改善；早期 MDD 16.59% -> 19.21% | `retest` | 需做 0.10/0.15/0.35 同维度敏感性 |
-| `atr_reclaim` 阈值敏感性 | 0.10、0.15、0.25、0.35 哪个 reclaim margin 更稳 | `entry_reclaim_min_atr` | 2024-07-01 -> 2026-06-01 | 0.10/0.15 近端净收益和 PF 退化；0.35 两段净收益、PF、MDD 均改善；交易级归因显示共同交易小幅变差，主要改善来自 variant-only 新增赢家 | `candidate_keep_review_but_path_dependent` for `atr_reclaim_0_35` | 近端窗口 top3 正贡献超过净改善本身，不能部署 |
+| `atr_reclaim` 阈值敏感性 | 0.10、0.15、0.25、0.35 哪个 reclaim margin 更稳 | `entry_reclaim_min_atr` | 2024-07-01 -> 2026-06-01 | 0.10/0.15 近端净收益和 PF 退化；0.35 两段净收益、PF、MDD 均改善；交易级归因和人工路径复盘显示改善主要来自 variant-only 新增赢家与容量路径 | `retest_path_dependent` for `atr_reclaim_0_35` | 不能证明 0.35 ATR 是稳定入场质量优势 |
 
 ## 4. 事实 / 观察 / 假设 / 决策拆分
 
@@ -79,6 +79,7 @@
 - `reports/2026-07-26/atr_reclaim_0_25_formal_ab_review_2026-07-26_v1.md` 记录 `atr_reclaim_0_25` 两段 PF/净收益改善，但早期 MDD 恶化。
 - `reports/2026-07-26/atr_reclaim_threshold_sensitivity_2026-07-26_v1.md` 记录 `atr_reclaim_0_35` 两段净收益、PF、MDD 均改善，并进入 `candidate_keep_review`。
 - `reports/2026-07-26/atr_reclaim_0_35_trade_attribution_review_2026-07-26_v1.md` 记录交易级归因：合并后 common trade delta 为 `-43.72 USDT`，removed baseline-only 贡献 `+594.76 USDT`，added variant-only 贡献 `+3184.11 USDT`；近端窗口 top3 正贡献占该窗口净改善 `167.7%`，说明存在路径依赖。
+- `reports/2026-07-26/atr_reclaim_0_35_path_replay_review_2026-07-26_v1.md` 记录 10 笔关键路径复盘：5 笔 variant-only 赢家 reclaim margin 均超过 `0.35 ATR`，但 5 笔 missed baseline winners 同样全是 TP2 赢家；CFX/ENA/ADA 等机会出现时 baseline 多数已达到 `max_active_positions=5`，说明收益强受容量路径影响。
 - `reports/2026-07-26/relative_strength_soft_gate_threshold_sensitivity_2026-07-26_v1.md` 记录相对强度阈值家族全部仍为 `retest`。
 
 ### 观察
@@ -86,7 +87,7 @@
 - 弱市开仓限制、4h reclaim 入场确认、TP1 后 EMA trailing 的组合比早期 baseline 更稳。
 - `max_holding=42` 对未触发 TP1 的停滞交易有清理价值，但固定版与条件版的比较显示条件版不稳。
 - 相对强度 soft gate 能改善 PF/净收益，但没有解决早期 MDD 问题。
-- ATR reclaim 门槛能改变成交集合；`0.35` 当前最强，但交易级证据显示优势主要来自 variant-only 新增赢家，而不是 common trades 普遍变好，近端窗口存在路径驱动风险。
+- ATR reclaim 门槛能改变成交集合；`0.35` 当前最强，但人工路径复盘显示优势强受组合容量和机会排序影响，不能证明是稳定的单变量入场质量优势。
 
 ### 假设
 
@@ -95,14 +96,14 @@
 - 4h 收盘重新站回入场区间可以过滤一部分接飞刀交易。
 - TP1 后立即保本过于僵硬，EMA20 trailing 更能适应趋势波动。
 - 相对 BTC/ETH 明显弱的币，即使绝对涨幅为正，也可能不是优先买入对象。
-- ATR reclaim 的最佳阈值可能高于 0.25；更强 reclaim margin 可能过滤掉弱确认并引入更强的重新入场机会，但该优势需要通过人工复盘 top variant-only winners / missed baseline winners 验证，不应直接部署。
+- ATR reclaim 的最佳阈值可能高于 0.25，但当前证据更像“路径换仓 + 容量释放”而不是纯粹质量提升；下一步假设应转向容量与机会排序，而不是继续调 ATR reclaim。
 
 ### 决策
 
 - 继续暂停新增复杂度，先完成系统理解和实验账本。
 - 不部署 `relative_strength_soft_gate`。
 - 不部署 `atr_reclaim_0_25`。
-- 不部署 `atr_reclaim_0_35`；交易级归因后保留为 `candidate_keep_review_but_path_dependent`，下一步只做人工路径复盘，不叠加新过滤器。
+- 不部署 `atr_reclaim_0_35`；人工路径复盘后降级为 `retest_path_dependent`，下一步做 `capacity_and_opportunity_order_review` 非参数复核，不叠加新过滤器。
 - 不部署 `max_holding_bars_conditional=true`。
 - `max_holding_bars_without_tp1=42` 仅保留为候选，等待模拟盘/人工复核。
 - 后续任何实验必须先提交实验卡片并获得用户批准。

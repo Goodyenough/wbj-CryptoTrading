@@ -15,6 +15,15 @@
 
 ## 2026-07-26
 
+### 23:16:56 +08:00 - 完成 atr_reclaim_0_35 关键交易路径复盘
+- 类型：报告 / 实验日志 / TODO / 计划 / Git
+- 改动：新增 `reports/2026-07-26/atr_reclaim_0_35_path_replay_review_2026-07-26_v1.md`，人工复盘近端窗口 5 笔 variant-only 大赢家与 5 笔 missed baseline 大赢家。
+- 改动：更新 `EXPERIMENT_LEDGER.md`、`TODO.md`、`SYSTEM_OVERVIEW.md`、`开发计划.md` 和 Obsidian 实验日志，将 `atr_reclaim_0_35` 从 `candidate_keep_review_but_path_dependent` 下调为 `retest_path_dependent`。
+- 原因：验证 `0.35 ATR` reclaim 改善是否来自广泛过滤亏损，还是来自组合容量、候选排序与少数路径事件。
+- 影响：不部署、不修改 `config/settings.toml`，下一步转向 `capacity_and_opportunity_order_review` 非参数复核。
+- 验证：基于 `data/crypto_trading.db` 的 `backtest_trades` 与 `kline_cache` 复盘入场后 MFE/MAE、TP1/TP2 路径、机会状态和 active position 数；确认 `config/settings.toml` 无 diff。
+- Git：本次计划提交 `Review ATR reclaim path dependence`。
+
 ### 19:08:04 +08:00 - 完成 atr_reclaim_0_35 交易级归因复核
 - 类型：报告 / 实验日志 / TODO / 计划 / Git
 - 改动：新增 `reports/2026-07-26/atr_reclaim_0_35_trade_attribution_review_2026-07-26_v1.md`，按 common、baseline-only、variant-only 拆分 `atr_reclaim_0_35` 的交易级贡献，并复核两段 MDD timing。
