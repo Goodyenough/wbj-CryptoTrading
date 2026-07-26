@@ -2,54 +2,63 @@
 
 ## 总体判断
 
-采纳 GPT 的主结论：当前进场框架不需要推倒重来，但下一轮不能直接修改 live/paper 策略；应先补强离线实验口径，再按 checkpoint -> shadow replay -> formal audit 的流程推进。
+采纳 GPT 的核心评审：原方向正确，但不能原样执行。下一步不直接做 `slot_replacement_quality_review`，而是改成分阶段诊断路线：
 
-GPT 对“问题归因必须分层”的提醒是本轮最有价值的意见。近期模拟盘弱势同时受 `RISK_OFF`、候选质量、入场触发、退出路径和样本右截尾影响，不能只看最终盈亏就归因到 MACD 或 reclaim。
+```text
+signal_fill_timing_audit
+-> blocked_entry_event_export
+-> replay_consistency_audit
+-> stale_slot_continuation_review
+-> blocked_candidate_vs_stale_slot_review
+-> shadow replacement experiment
+```
+
+当前继续冻结 `config/settings.toml`，不部署 `atr_reclaim_0_35`，不提高 `max_active_positions`，不修改 score 排序。
 
 ## 接受的意见
 
-- 接受：不把 MACD 简单升级为 `histogram > 0` 硬门槛。当前 EMA、24h/7d 正动量与 MACD 正负值高度相关，硬门槛可能只是减少交易数，并不一定增加独立信息。
-- 接受：优先扩展 `entry_reclaim_confirm_1bar`，但必须同时记录 R multiple、MFE、MAE、延迟成交价格、RR 变化、missed winner 的 R 成本和 filtered loser 的 R 收益。
-- 接受：相对强度暂不做全市场硬 gate，先作为 soft gate、score 调整或风险标签验证，尤其在 `RISK_OFF` 下分层观察。
-- 接受：将固定百分比支撑距离补充为 ATR 标准化口径，例如 `distance_to_support / ATR`、reclaim 幅度 / ATR、stop distance / ATR。
-- 接受：所有下一步 shadow experiment 必须固定 opportunity set，避免不同 variant 因重扫、行情快照或数据状态不同导致不可比。
-- 接受：结果必须按 scanner、entry trigger、regime、exit 四层拆分，并按 `RISK_OFF` / 非 `RISK_OFF` 分层报告。
-- 接受：不因近期亏损在 2026-07-16 checkpoint 前直接切换策略。
+- 增加 `signal_fill_timing_audit` 作为第 0 步，先确认 reclaim 信号、容量判断、成交价格和同根 K 线 exit/entry 顺序。
+- 删除“可合理视为 entry-ready”的模糊表述，blocked event 必须来自确定状态机条件。
+- 先导出 `blocked_entry_event_export`，再做 replay 一致性审计，不能用关键案例复原直接支持 replacement 结论。
+- 将 `stale_slot_continuation_review` 独立出来，先回答旧仓达到 42 bars 后继续持有是否还有边际价值。
+- 统一 `42 bars = 168h`，把 `240h+` 仅作为长期占槽观察口径。
+- V1 replacement eligibility 仅限 pre-TP1 stale slots；post-TP1 slots 只作为描述和对照。
+- 预先定义替换对象，禁止把事后最差 slot 当作策略证据；oracle 只能作为理论上限。
+- 同一时点多个 entry-ready candidates 只取现有排序下第一个真正因容量被拒绝的候选作为主事件。
+- baseline 必须先验证为 canonical baseline；variant 仅做机制敏感性，不能合并扩大样本量。
+- V1 使用轻量但明确的成本口径，输出 gross/net、额外换仓成本、滑点敏感性和 top1/top3 concentration。
 
 ## 部分接受的意见
 
-- 部分接受：`WAIT_PULLBACK` 保留 shadow path。当前代码和报告是否已经完整保存 `WAIT_PULLBACK` 后续路径还需要核对；先列入后续工程任务，不纳入第一批必须完成实验。
-- 部分接受：成交量确认。GPT 建议先记录 reclaim bar 成交量特征，不直接做硬门槛；这个方向合理，但优先级低于 reclaim 质量、动量回踩定义和相对强度 soft gate。
-- 部分接受：`RISK_OFF` 下拆成 scanner shadow、defensive shadow replay、formal paper execution 三条数据链。概念采纳，但是否新建 defensive paper sleeve 需要等 checkpoint 和风险预算决定。
+- 成本模型：接受必须纳入摩擦成本，但 V1 不做复杂实盘撮合模型，只使用当前 backtest 费用口径和低/中/高滑点敏感性。
+- 分层变量：接受 GPT 建议进一步收敛。V1 主分层只保留 age、pre/post TP1、event-time unrealized R、regime、large-cap/altcoin；score、ATR reclaim、relative strength、momentum 暂作描述字段。
+- 42 bars 主期限：接受以既有 42-bar 候选假设作为优先口径，但执行前先只看事件数量和分布，不查看 outcome，再确认最终主期限和敏感性期限。
 
 ## 拒绝的意见及原因
 
-暂无明确拒绝。GPT 的建议基本符合当前项目“先验证、后部署”的纪律。
+无明确拒绝项。GPT 的主要意见与项目当前研究纪律一致。
 
 ## 暂缓的意见及验证条件
 
-- 暂缓 MACD 背离：定义自由度高，容易过拟合；除非 MACD slope / deterioration 实验显示明显价值，否则不进入近期实验。
-- 暂缓成交量硬确认：不同币种、市值和交易时段差异较大，先记录特征，不设硬门槛。
-- 暂缓正式导入 `WAIT_PULLBACK`：会同时改变候选池和入场机制，破坏当前 checkpoint 可比性。
-- 暂缓修改 `settings.toml`：至少等 2026-07-16 checkpoint 后，基于成熟 audit 和 shadow replay 决定。
+- 是否推进完整 shadow replacement experiment：暂缓。只有 `stale_slot_continuation_review` 和 `blocked_candidate_vs_stale_slot_review` 均显示成本后、去极值后、跨月份和跨 regime 仍有稳定优势，才进入。
+- 是否重跑 canonical baseline：暂缓到 `signal_fill_timing_audit` 和 baseline 一致性检查后决定。如果现有 baseline run 与当前默认配置不一致，则重跑。
 
 ## 已对方案作出的修改
 
-- 将下一轮进场研究目标从“是否启用某个过滤器”改为“先补齐可归因实验框架”。
-- 将下一轮实验优先级确定为：
-  1. `reclaim_quality_matrix`
-  2. `momentum_pullback_definition_ab`
-  3. `relative_strength_soft_gate`
-- 明确 MACD 近期只做辅助变体测试，不做默认硬门槛。
-- 明确所有实验必须输出经济价值指标，而不是只输出 filtered loser / missed winner 计数。
-- 明确所有实验必须分层报告 `RISK_OFF` 与非 `RISK_OFF`。
+- 已将 `.gpt-review/revised_plan.md` 替换为容量与换仓研究新版计划。
+- 已将 TODO 下一步从单一 `slot_replacement_quality_review` 拆成 5 个诊断任务。
+- 已更新 `EXPERIMENT_LEDGER.md`、`SYSTEM_OVERVIEW.md` 和 `开发计划.md`，记录新的分阶段路线。
 
 ## 仍未解决的分歧
 
-- `RISK_OFF` 下是否完全停止 formal paper 新增 alt 计划，还是保留极低风险 defensive paper sleeve，需要结合 2026-07-16 checkpoint 的成熟样本和风险预算决定。
-- `relative_strength_soft_gate` 使用 BTC、ETH 还是等权市场篮子作为 benchmark，不能提前固定，需要作为实验维度分别报告。
-- 固定 `distance_to_support <= 4%` 到底整体过紧还是过松，目前只能确认“跨币种不可比”，还不能确认替代阈值。
+无方向性分歧。剩余问题是执行口径必须严格化，尤其是：
+
+- signal / decision / fill timing；
+- canonical baseline 是否一致；
+- blocked event 是否可重复导出；
+- replacement pairing 是否完全事前可执行；
+- 成本后优势是否仍存在。
 
 ## 是否建议再进行一轮 GPT 复审
 
-暂不需要。当前 GPT 评审已经给出可执行的实验路线。下一轮应先把修订版方案落实为具体工程任务或 checkpoint 后的实验计划；只有在实现方案或实验结果出来后，才值得再让 GPT 复审。
+暂不需要。新版计划已经吸收关键意见。建议先执行 `signal_fill_timing_audit`，若发现回放时点口径存在重大问题，再整理新的复审包。

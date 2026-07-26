@@ -1,172 +1,300 @@
-# 进场方案改进修订版
+# 容量与换仓研究新版计划
+
+更新时间：2026-07-26 23:59 +08:00
 
 ## 结论
 
-当前进场框架保留，不在 2026-07-16 paper checkpoint 前修改 `settings.toml`、live paper 状态机或默认导入规则。
+下一步研究方向仍然成立，但不再直接执行 `slot_replacement_quality_review`。
 
-下一阶段目标不是立刻启用 `entry_reclaim_confirm_1bar`、`relative_strength_gate` 或 MACD 硬过滤，而是先把离线实验升级为可归因、可比较、可用 R 倍数判断经济价值的实验框架。
+新版路线改为：
 
-## 当前策略保留项
+```text
+signal_fill_timing_audit
+-> blocked_entry_event_export
+-> replay_consistency_audit
+-> stale_slot_continuation_review
+-> blocked_candidate_vs_stale_slot_review
+-> shadow replacement experiment
+```
 
-- 继续使用当前多因子扫描：EMA 趋势、24h/7d 动量、RSI、成交量、支撑距离、ATR、market regime、数据质量。
-- MACD 继续保持辅助评分项，暂不升级为 `histogram > 0` 硬门槛。
-- 模拟盘继续只导入 `BUY_CANDIDATE`。
-- 保留 `entry_reclaim_close_enabled = true` 的 4h close reclaim 基础规则。
-- 不正式导入 `WAIT_PULLBACK`。
-- 不在 checkpoint 前直接启用任何 shadow replay 变体。
+前五步都是诊断，不是策略部署依据。只有诊断证据通过后，才允许设计完整 shadow replacement experiment。当前继续冻结 `config/settings.toml`，不部署 `atr_reclaim_0_35`，不提高 `max_active_positions`，不修改 score 排序，也不把 replacement 写入 paper/live 状态机。
 
-## 下一步必须补强的实验口径
+## 背景
 
-所有 entry 相关 shadow replay 和 A/B 必须补充以下字段或报告维度：
+`atr_reclaim_0_35` 在两段 dynamic-universe A/B 中表面指标改善，但交易级归因和关键路径复盘显示：
 
-- scanner action、raw score、是否被 data quality 降级；
-- market regime，尤其 `RISK_OFF` / 非 `RISK_OFF` 分层；
-- 是否触及入口区、是否 reclaim、是否因 variant 延迟或过滤；
-- baseline 与 variant 的假设成交价、成交时间、entry zone、stop、TP1、TP2；
-- R multiple、总 R、平均 R、中位数 R；
-- TP1 命中率、stop-first 比例、time exit 比例；
-- MFE、MAE、最大连续亏损、最大回撤；
-- missed winner 的总 R 成本；
-- filtered loser 避免的总 R；
-- 延迟入场造成的价格滑移和 RR 变化；
-- `distance_to_support / ATR`、reclaim 幅度 / ATR、stop distance / ATR；
-- fixed opportunity set 标识，避免不同 variant 使用不同样本。
+- 改善主要来自 variant-only 新增赢家，而不是 common trades 普遍变好。
+- 近端窗口少数赢家对净改善贡献很高，路径依赖明显。
+- 部分赢家出现时 opposite run 已达到 `max_active_positions=5`。
+- missed baseline winners 也包含高质量 TP2 交易。
 
-## 实验一：`reclaim_quality_matrix`
+随后 `capacity_and_opportunity_order_review` 进一步确认：
 
-### 目的
+- baseline 满仓占 28.0% 的 4h bars，variant 满仓占 30.3%。
+- 两组都有长期负 R 占槽问题。
+- blocker 质量混合，不能直接推出提高仓位数或改变排序会改善。
 
-判断当前单根 4h close reclaim 是否足够，以及 1bar confirm、ATR reclaim 强度、reclaim K 线质量中哪一类信息真正改善经济结果。
+因此，研究问题从“继续调入场阈值”转为“满仓时旧仓是否值得继续占槽，新机会是否有可执行的替换价值”。
 
-### 对照组
+## 已采纳 GPT 评审意见
 
-当前规则：`entry_reclaim_close_enabled = true`，即触及入口区后要求最近已收盘 4h close >= `entry_high`。
+### 1. 增加第 0 步：`signal_fill_timing_audit`
 
-### 变体
+在导出 blocked event 前，必须先审计回放时间轴：
 
-- Variant A：`entry_reclaim_confirm_1bar`，reclaim 后再等 1 根 4h 确认。
-- Variant B：不额外等待，但要求 reclaim close 超过 `entry_high` 的幅度达到最小 ATR 比例。
-- Variant C：不额外等待，但要求 reclaim K 线收盘位于自身 high-low 区间上部。
+- reclaim 信号在哪根 4h K 线完成确认。
+- 容量判断发生在信号确认前还是确认后。
+- 成交使用本根 close、下一根 open，还是其他价格。
+- 同一根 K 线上 exit 与 entry 的处理顺序。
+- replay 与原 backtest 是否使用完全相同的顺序。
 
-初期不叠加成交量硬门槛，避免一次改变多个维度。
+原因：如果 signal / decision / fill 的时间顺序不可靠，后续 blocked event、active slot snapshot 和 replacement 标签都会建立在错误时点上。
 
-### 样本要求
+### 2. 先导出可审计的 blocked event
 
-- 先复用现有 paper opportunities。
-- 后续至少扩展到 baseline entries >= 150；若短期达不到，至少覆盖 8-12 周，并明确标注样本不足。
-- 必须覆盖 `RISK_OFF` 和非 `RISK_OFF` 两类环境，分层报告。
+`blocked_entry_event_export` 的目标不是得出策略结论，而是生成可重复、可审计的事件表。
 
-### keep 标准
+每个事件至少记录：
 
-- 至少两个时间分段中，期望 R 不劣于 baseline。
-- 总 R、最大回撤或最大连续亏损有实质改善。
-- 交易保留率不低于 baseline 的约 55%-65%。
-- 改善不依赖单个极端赢家或单一 regime。
+- unique event id
+- run id / commit / config hash / universe id
+- `signal_time`
+- `decision_time`
+- `fill_time`
+- `block_reason`
+- candidate rank
+- active count before decision
+- candidate snapshot
+- all active slots snapshot
 
-### revert 标准
+模糊表述“可合理视为 entry-ready”删除。事件必须来自确定的状态机条件。
 
-- 期望 R 下降。
-- missed winner 的 R 成本高于 filtered loser 的 R 改善。
-- 交易数大幅下降但回撤无明显改善。
-- 结果只在单一短窗口成立。
+### 3. 增加 replay 一致性审计
 
-## 实验二：`momentum_pullback_definition_ab`
+在计算 future outcome 前，必须先证明导出器与原 run 一致：
 
-### 目的
+- 实际进入交易集合一致。
+- 入场时间一致。
+- 排序一致。
+- 每根 K 线 active position 数量一致。
+- block reason 可重复。
 
-验证当前 `24h > 0` 且 `7d > 0` 是否导致买在反弹末端，并寻找更贴近“优质回踩”的可回测定义。
+如果不能通过一致性审计，历史 blocked event 分析只能作为案例复盘，不能作为 replacement 诊断证据。
 
-### 对照组
+### 4. `stale_slot_continuation_review` 独立于 blocked event
 
-当前 `BUY_CANDIDATE` 正动量硬门槛。
+`stale_slot_continuation_review` 先回答旧仓自身问题：
 
-### 变体
+> 所有 pre-TP1 仓位达到 42 根 4h K 线后，继续持有的边际价值如何？
 
-- Variant A：允许 24h 小幅为负，但要求 7d 趋势仍为正。
-- Variant B：取消 24h 绝对正负要求，改用从 recent high 回撤的 ATR 倍数。
-- Variant C：要求中期趋势为正，同时回踩深度落在预设 ATR 区间。
+它不应只限于发生 blocked candidate 的时点。这样可以区分：
 
-所有 variant 保持 reclaim 规则不变，避免同时改变动量层和入场确认层。
+- 旧仓是否已经失去价值。
+- 新机会是否确实更好。
 
-### 样本要求
+可能出现“旧仓很差，但新机会也很差”的情况。此时可能支持 time exit 继续研究，但不支持 replacement。
 
-- 使用历史 dynamic universe replay，而不只限于当前 paper candidates。
-- 覆盖上涨、震荡、下跌三个市场阶段。
-- 按 large-cap、mid-cap、高波动 alt 分层报告。
-- 每个 variant 至少 100-150 个可比较入场机会。
+### 5. 统一 42 bars 与 240h 口径
 
-### keep 标准
+- `42 bars = 168h`：候选 time-exit 或 stale 判定口径。
+- `240h+ = 60 bars`：长期占槽观察口径。
 
-- 在不明显扩大 stop-first 比例的情况下提高期望 R。
-- TP1 命中率或 MFE 稳定改善。
-- 没有显著增加逆势抄底样本。
-- 多个市场阶段方向一致。
+后续报告不得混写 `42 bars / 240h`。
 
-## 实验三：`relative_strength_soft_gate`
+如果使用 42 bars 作为主期限，必须说明它来自既有候选假设，而不是在当前窗口中重新挑选出的最优期限。由于 `2025-06-01 -> 2026-06-01` 已被多轮研究查看，也不能把该窗口称为完全独立 confirmatory holdout。
 
-### 目的
+### 6. V1 replacement eligibility 只允许 pre-TP1 stale slots
 
-验证相对强度是否提供独立于 EMA/MACD/24h 动量的信息增量，并决定它适合作为评分项、风险标签、`RISK_OFF` 专用 gate，还是暂不使用。
+V1 中：
 
-### 对照组
+- pre-TP1 stale slots 可以成为 replacement 对象。
+- post-TP1 slots 只作为描述和对照。
+- post-TP1 slots 暂不进入主要替换规则。
 
-当前不使用相对强度的扫描与入场规则。
+原因：TP1 后仓位可能已经有 realized R、剩余风险下降、EMA trailing 激活或剩余数量变化，和完整未减仓仓位不可直接公平比较。
 
-### 变体
+### 7. 预先定义替换哪个旧仓
 
-- Variant A：相对强度只加减 score。
-- Variant B：低相对强度只标记风险，不禁止入场。
-- Variant C：仅在 `RISK_OFF` 下将低相对强度设为硬过滤。
+禁止使用“新机会优于至少一个 active slot”作为主证据。该表述存在 oracle 风险。
 
-### benchmark
+主规则候选：
 
-BTC、ETH、等权 alt 市场篮子分别报告，不提前固定唯一 benchmark。
+- 替换最老的、未触发 TP1、age >= 42 bars 的仓位。
 
-### keep 标准
+敏感性规则：
 
-- 弱相对强度组在多个时间分段内持续表现差。
-- soft gate 改善期望 R 或回撤。
-- 交易保留率合理。
-- 结论不高度依赖单一 benchmark。
+- 在符合 age >= 42 bars 且 pre-TP1 的仓位中，替换 event-time unrealized R 最低者。
 
-## MACD 处理
+事后最差 slot 只能作为 `oracle_upper_bound`，不得作为策略证据。
 
-近期不做 `macd_hist_4h > 0` 硬门槛上线。
+### 8. 同一时点多个候选归一
 
-可作为低优先级离线变体测试：
+如果同一决策时点有多个 entry-ready candidates：
 
-- 保持正 histogram 加分；
-- histogram 连续恶化时降级或风险标记；
-- histogram 为负但连续两根改善时允许候选保留；
-- reclaim 时 histogram 是否高于前一根。
+- 主样本只采用现有排序 `(-score, created_index, symbol)` 下第一个真正因 `max_active_positions` 被拒绝的候选。
+- 其他候选记录在附属表。
+- 不把同一时点多个候选全部计为独立主样本。
 
-暂不做 MACD 背离实验，避免定义自由度过高。
+统计单位是 unique blocked-candidate event，不是 candidate-slot pair。
 
-## `RISK_OFF` 处理
+### 9. baseline 证据层级
 
-不为了收集样本而扩大 formal paper 风险暴露。
+baseline 是主证据，但必须先确认它是 canonical baseline：
 
-下一阶段将数据链分为：
+- commit 是否匹配当前研究口径。
+- config hash 是否匹配当前默认配置。
+- universe 构造是否固定。
+- 数据范围是否完整。
+- 当前默认规则是否一致。
 
-- scanner shadow candidates：始终保存候选和指标；
-- defensive shadow replay：在 `RISK_OFF` 下验证更严格规则；
-- formal paper execution：继续遵守当前 regime 限制，或在 checkpoint 后按风险预算单独决定。
+如果不一致，应重跑冻结后的 canonical baseline。`atr_reclaim_0_35` variant 只能作为机制敏感性样本，不能与 baseline 合并提高样本量。
+
+### 10. 成本模型采用轻量但明确的 V1
+
+V1 不建立复杂撮合模型，但必须报告：
+
+- gross replacement delta
+- 当前 backtest 手续费口径下的 net delta
+- 卖出旧仓 + 买入新仓的额外成本
+- 低/中/高滑点敏感性
+- replacement 次数/月
+- top1/top3 事件贡献
+- 去掉 top1/top3 后结果
+
+## 阶段计划
+
+### Stage 0：`signal_fill_timing_audit`
+
+目标：确认当前 replay 的信号、决策和成交时间轴没有前视或不一致。
+
+输出：
+
+- 当前 entry reclaim 的 `signal_time` / `decision_time` / `fill_time` 说明。
+- 同根 K 线 exit / entry 顺序说明。
+- 是否需要改写或补充 replay 事件记录。
+
+通过标准：
+
+- 能清楚说明每个价格和状态判断来自哪个时间点。
+- 若发现本根 close 确认与本根 close 成交存在不可接受前视，则先修正回测口径，再继续后续阶段。
+
+### Stage 1：`blocked_entry_event_export`
+
+目标：导出完整、可重复的 capacity-blocked event 表。
+
+通过标准：
+
+- 每个 blocked event 有唯一 ID。
+- `block_reason=max_active_positions` 与其他阻塞原因分离。
+- candidate 和 active slots 快照完整。
+- 重复运行结果一致。
+
+### Stage 2：`replay_consistency_audit`
+
+目标：确认 blocked event export 与原 backtest run 行为一致。
+
+通过标准：
+
+- entered trades、entry time、active count path 与原 run 对齐。
+- 候选排序与 replay 源码一致。
+- 若不一致，先修导出器，不进入 outcome 分析。
+
+### Stage 3：`stale_slot_continuation_review`
+
+目标：独立评估 pre-TP1 仓位达到 42 bars 后继续持有的边际价值。
+
+主样本：
+
+- canonical baseline 中所有 pre-TP1 且 age 达到 42 bars 的仓位。
+
+主标签：
+
+- `forward_R_42_from_stale_time`
+- `first_hit_outcome_after_stale_time`
+- MFE / MAE after stale time
+
+辅助标签：
+
+- `forward_R_24`
+- `forward_R_60`
+- eventual R
+- censored 标记
+
+判定：
+
+- 如果 stale continuation 明显为负，支持继续研究 time exit 或 replacement。
+- 如果 stale continuation 不差，则 replacement 研究优先级下降。
+
+### Stage 4：`blocked_candidate_vs_stale_slot_review`
+
+目标：在真实 capacity-blocked event 中，比较 entry-ready candidate 与按事前规则选出的 stale slot。
+
+主规则：
+
+- candidate：排序第一且确认为 `block_reason=max_active_positions` 的 entry-ready candidate。
+- slot：最老的 pre-TP1 且 age >= 42 bars 的 active slot。
+
+主标签：
+
+- `net_replacement_delta_R_42`
+
+敏感性：
+
+- `net_replacement_delta_R_24`
+- `net_replacement_delta_R_60`
+- lowest-unrealized-R eligible slot
+- `oracle_upper_bound`
+
+稳健性输出：
+
+- median
+- 20% trimmed mean
+- positive-event ratio
+- top1/top3 contribution
+- top1/top3 removal
+- month leave-one-out
+- symbol / regime / large-cap vs altcoin 分层
+- gross vs net-of-cost
+- censored ratio
+
+判定：
+
+- 只能输出诊断 verdict。
+- 最多进入 `retest_replacement_candidate`。
+- 不允许直接 keep 或部署。
+
+### Stage 5：shadow replacement experiment
+
+只有 Stage 3 和 Stage 4 都显示稳定、成本后仍存在的 replacement edge，才允许设计完整状态机 shadow experiment。
+
+shadow experiment 需要回答：
+
+- replacement 是否改善完整组合收益。
+- 是否降低或扩大 MDD。
+- 是否增加止损率。
+- 是否提高换手、手续费和滑点暴露。
+- 是否改变后续机会链。
 
 ## 暂不做的事
 
-- 不直接启用 `entry_reclaim_confirm_1bar`。
-- 不直接启用 `relative_strength_gate` 硬门槛。
-- 不把 MACD 正值设为硬门槛。
-- 不正式导入 `WAIT_PULLBACK`。
-- 不直接删除 24h/7d 正动量门槛。
-- 不把成交量确认设为硬门槛。
+- 不部署 `atr_reclaim_0_35`。
+- 不提高 `max_active_positions`。
+- 不修改 scanner score。
+- 不把 replacement 写入 paper/live 状态机。
+- 不把 post-TP1 slots 放入 V1 replacement eligibility。
+- 不把 oracle upper bound 当作策略证据。
+- 不把 baseline 和 variant 合并成一个统计总体。
+- 不继续调 ATR reclaim、RSI、MACD 或 relative strength 过滤器，直到容量/时点问题厘清。
 
-## 下一步执行顺序
+## 下一步直接执行
 
-1. 等 2026-07-16 checkpoint review，确认窗口是否 `formal_audit_ready`。
-2. 若 checkpoint ready，先生成 formal audit 和现有两个 shadow replay。
-3. 在现有 shadow replay 基础上补齐 R multiple、MFE/MAE、regime 分层、ATR 标准化和 fixed opportunity set。
-4. 优先实现 `reclaim_quality_matrix`。
-5. 第二优先实现 `momentum_pullback_definition_ab`。
-6. 第三优先实现 `relative_strength_soft_gate`。
-7. 所有结果写入实验日志，并按 keep / revert / retest 输出明确结论。
+1. 写 `signal_fill_timing_audit` 实验卡片或诊断卡片。
+2. 阅读 `src/crypto_trading_system/backtest/replay.py` 中 entry reclaim、capacity check、exit/entry 顺序和 fill price 逻辑。
+3. 生成 `reports/YYYY-MM-DD/signal_fill_timing_audit_YYYY-MM-DD_v1.md`。
+4. 若 timing 审计通过，再设计 `blocked_entry_event_export`。
+
+## 当前决策
+
+`修改后可以执行`。
+
+执行前仍需保持配置冻结。任何诊断完成后，都必须先更新实验日志和项目文档，再决定是否进入下一阶段。

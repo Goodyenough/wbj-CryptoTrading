@@ -15,6 +15,15 @@
 
 ## 2026-07-26
 
+### 23:59:40 +08:00 - 写入 GPT 二次评审后的新版研究计划
+- 类型：文档 / TODO / 计划 / Git
+- 改动：重写 `.gpt-review/revised_plan.md`，将下一步路线从单一 `slot_replacement_quality_review` 收紧为 `signal_fill_timing_audit -> blocked_entry_event_export -> replay_consistency_audit -> stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review`。
+- 改动：更新 `.gpt-review/codex_response.md`，记录 GPT 意见的接受、部分接受、暂缓和方案修改；同步更新 `TODO.md`、`EXPERIMENT_LEDGER.md`、`SYSTEM_OVERVIEW.md` 和 `开发计划.md`。
+- 原因：GPT 二次评审指出执行时点、blocked event 标签、post-TP1 eligibility、多候选归一和 canonical baseline 必须先收紧，避免 replacement 研究出现前视或 oracle 风险。
+- 影响：仅更新研究计划和项目台账；不修改 `config/settings.toml`，不部署 `atr_reclaim_0_35`，不修改仓位上限或 score 排序。
+- 验证：人工核对新版计划包含第 0 步时点审计、事件导出、一致性审计、旧仓续持复核和换仓复核；确认 `config/settings.toml` 无 diff。
+- Git：本次计划提交 `Revise replacement research plan after GPT review`。
+
 ### 23:59:00 +08:00 - 生成下一步方向 GPT 评审包
 - 类型：文档 / GPT 评审 / Git
 - 改动：更新 `.gpt-review/current_packet.md`，并新增 `.gpt-review/history/20260726-235900_packet.md`，将 `slot_replacement_quality_review` 下一步方向整理为自包含 GPT 评审包。

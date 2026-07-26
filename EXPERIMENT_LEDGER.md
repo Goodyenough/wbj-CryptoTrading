@@ -106,7 +106,7 @@
 - 不部署 `relative_strength_soft_gate`。
 - 不部署 `atr_reclaim_0_25`。
 - 不部署 `atr_reclaim_0_35`；人工路径复盘后降级为 `retest_path_dependent`，容量复核后仍不修改 `max_active_positions` 或 score 排序。
-- 下一步若继续研究容量，只做 `slot_replacement_quality_review` 诊断，先验证换仓质量，不新增生产过滤器。
+- 下一步若继续研究容量，按 `signal_fill_timing_audit -> blocked_entry_event_export -> replay_consistency_audit -> stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review` 分阶段推进；先审计时点和事件标签，再验证旧仓续持价值和换仓价值，不新增生产过滤器。
 - 不部署 `max_holding_bars_conditional=true`。
 - `max_holding_bars_without_tp1=42` 仅保留为候选，等待模拟盘/人工复核。
 - 后续任何实验必须先提交实验卡片并获得用户批准。
