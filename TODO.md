@@ -145,7 +145,8 @@
 - [x] 跨窗口复核三项 fixed opportunity shadow experiment：已补跑 `2026-06-19 -> 2026-07-02` 与 `2026-07-17 -> 2026-07-25`，并汇总到 `reports/2026-07-25/paper_shadow_experiment_cross_window_review_2026-07-25_v1.md`；结论仍为 `retest`，优先级暂定 `btc_eth_soft_minus_0_5`、`atr_reclaim_0_25`、`trend_support_atr_pullback`。
 - [x] 下一轮正式 A/B 只选择一个维度先做：已注册并运行 `relative_strength_soft_gate_btc_eth_minus_0_5` dynamic-universe A/B；两段非重叠窗口净收益、PF、Sharpe 和止损率均改善，但早期窗口 MDD 16.59% -> 18.96% 恶化，结论 `retest`，不部署。
 - [x] 复核 `relative_strength_soft_gate_btc_eth_minus_0_5` 的早期窗口 MDD 恶化来源：variant-only trades 净贡献 +565.32，但 11 月 winner cluster 抬高权益峰值后，12 月、1 月和 5 月新增止损簇扩大 peak-to-trough；结论仍为 `retest`。
-- [ ] 设计 `relative_strength_soft_gate` 阈值敏感性 A/B：同一维度只改阈值，优先测试 `-1.0` 与 `0.0`，观察能否保留两段 PF/净收益改善，同时降低早期窗口 MDD。
+- [x] 设计并运行 `relative_strength_soft_gate` 阈值敏感性 A/B：`-1.0` 近端窗口退化，`0.0` 近端最强但早期 MDD 最差，`-0.5` 仍最平衡但不能 keep；结论 `retest`，不部署。
+- [ ] 下一轮正式单变量 A/B 转向 `reclaim_quality_matrix / atr_reclaim_0_25`：先注册 dynamic-universe A/B 维度，避免叠加相对强度门槛，验证它是否能在两段窗口降低 MDD 或改善 PF/净收益。
 - [ ] 暂不把 MACD 升级为 `macd_hist_4h > 0` 硬门槛；如研究 MACD，仅做 histogram 斜率、连续恶化、reclaim 时改善等离线变体。
 
 ## 运维待办

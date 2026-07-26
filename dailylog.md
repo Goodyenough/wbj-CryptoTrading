@@ -15,6 +15,14 @@
 
 ## 2026-07-26
 
+### 12:20:00 +08:00 - 完成 relative strength soft gate 阈值敏感性 A/B
+- 类型：代码 / 配置 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增 `relative_strength_soft_gate_btc_eth_minus_1_0` 与 `relative_strength_soft_gate_btc_eth_0_0` 两个同维度实验定义，并补充 A/B override 测试。
+- 改动：使用固定 `reports/2026-06-09/dynamic_master_full.json` 跑两段非重叠 dynamic-universe walk-forward，新增阈值敏感性汇总报告 `reports/2026-07-26/relative_strength_soft_gate_threshold_sensitivity_2026-07-26_v1.md`。
+- 影响：`settings.toml` 保持无 diff；相对强度门槛仍为 `retest`，不部署。`-0.5` 仍是该家族最平衡阈值，但早期窗口 MDD 未解决。
+- 验证：已运行 `python tests\test_abtest.py`、`python -m compileall main.py src tests`；两组 walk-forward 均完成并生成 summary。
+- Git：本次提交 `Add relative strength threshold sensitivity`。
+
 ### 00:55:00 +08:00 - 复核 relative strength soft gate 早期窗口 MDD 恶化来源
 - 类型：报告 / 实验日志 / TODO / 计划 / Git
 - 改动：新增 `reports/2026-07-26/relative_strength_soft_gate_mdd_review_2026-07-26_v1.md`，解析 `2024-07-01 -> 2025-06-01` baseline/variant 已结束交易表，比较 variant-only、baseline-only 与 common trades。

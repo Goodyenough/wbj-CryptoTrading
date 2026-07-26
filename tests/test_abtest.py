@@ -49,6 +49,29 @@ def test_relative_strength_soft_gate_experiment_is_runnable() -> None:
     ]
 
 
+def test_relative_strength_threshold_sensitivity_experiments_are_runnable() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    settings.analysis.relative_strength_soft_gate_enabled = False
+
+    loose = load_experiment("relative_strength_soft_gate_btc_eth_minus_1_0", ROOT / "config" / "experiments.toml")
+    loose_variant, loose_changes = apply_experiment_overrides(settings, loose)
+    assert loose_variant.analysis.relative_strength_soft_gate_enabled is True
+    assert loose_variant.analysis.relative_strength_min_pct == -1.0
+    assert [(change.path, change.old_value, change.new_value) for change in loose_changes] == [
+        ("analysis.relative_strength_soft_gate_enabled", False, True),
+        ("analysis.relative_strength_min_pct", -0.5, -1.0),
+    ]
+
+    hard = load_experiment("relative_strength_soft_gate_btc_eth_0_0", ROOT / "config" / "experiments.toml")
+    hard_variant, hard_changes = apply_experiment_overrides(settings, hard)
+    assert hard_variant.analysis.relative_strength_soft_gate_enabled is True
+    assert hard_variant.analysis.relative_strength_min_pct == 0.0
+    assert [(change.path, change.old_value, change.new_value) for change in hard_changes] == [
+        ("analysis.relative_strength_soft_gate_enabled", False, True),
+        ("analysis.relative_strength_min_pct", -0.5, 0.0),
+    ]
+
+
 def test_apply_overrides_does_not_mutate_baseline() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     definition = load_experiment("history_250", ROOT / "config" / "experiments.toml")
@@ -445,6 +468,7 @@ if __name__ == "__main__":
     test_load_unknown_experiment_reports_available_names()
     test_daily_trend_experiment_is_runnable()
     test_relative_strength_soft_gate_experiment_is_runnable()
+    test_relative_strength_threshold_sensitivity_experiments_are_runnable()
     test_apply_overrides_does_not_mutate_baseline()
     test_regime_override_can_disable_core_risk_off_buys()
     test_capacity_override_can_reduce_top_n()
