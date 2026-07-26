@@ -1,0 +1,142 @@
+# CryptoTradingSystem 实验账本
+
+更新时间：2026-07-26 18:00 +08:00
+
+## 1. 账本规则
+
+本账本只记录实验回答了什么问题，以及结论处于什么证据等级。以后新增实验前必须先写实验卡片；实验结束后再更新本账本。
+
+证据等级定义：
+
+| 等级 | 含义 |
+|---|---|
+| 事实 | 报告或代码中直接可见的结果、配置、样本数量、指标 |
+| 观察 | 某个参数在当前窗口中表现更好或更差 |
+| 假设 | 对观察的解释，尚未被独立证明 |
+| 决策 | 是否部署、保留为候选、否定或继续复测 |
+
+默认纪律：
+
+- `retest` 不是 keep。
+- `candidate_keep_review` 不是自动部署。
+- 只因为净收益提高，不允许修改 `config/settings.toml`。
+- 未经用户明确批准，实验完成后不修改生产配置。
+
+## 2. 当前默认生产策略变更记录
+
+| 规则 | 当前状态 | 依据 | 证据等级 |
+|---|---|---|---|
+| 数据质量过滤，非 `DATA_OK` 买入候选降级 | 已部署 | scan、paper、backtest 路径均接入 | 决策 |
+| `min_history_days=180` | 已部署 | 历史长度过滤已写入默认配置 | 决策 |
+| `risk_off_core_buy_enabled=false` | 已部署 | 弱市核心币也暂停新开仓 | 决策 |
+| `entry_reclaim_close_enabled=true` | 已部署 | 入场确认已成为默认模拟盘路径 | 决策 |
+| `tp1_ema_trailing_stop_enabled=true` | 已部署 | TP1 后 EMA20 trailing 已补齐到 paper 和 backtest | 决策 |
+| Regime 阈值 BTC -3%、ETH -5%、要求两者趋势 | 已部署 | 当前 `settings.toml` 已采用 sensitive 阈值 | 决策 |
+| `max_holding_bars_without_tp1=42` | 未部署 | 回测候选，但需 paper 观察后 keep review | 决策：暂不部署 |
+| `relative_strength_soft_gate_enabled=true` | 未部署 | 7 月 26 日阈值敏感性仍为 `retest` | 决策：暂不部署 |
+| `entry_reclaim_min_atr_enabled=true` | 未部署 | `atr_reclaim_0_25` 正式 A/B 为 `retest` | 决策：暂不部署 |
+
+## 3. 实验汇总表
+
+| 实验 | 要回答的问题 | 唯一变量 | 样本范围 | 核心结果 | 当前结论 | 局限 |
+|---|---|---|---|---|---|---|
+| `history_250` / `history_365` | 更长历史长度是否提高选币质量 | `analysis.min_history_days` | 2025-01-01 起多个 dynamic universe 窗口 | `history_365` 部分窗口改善，但跨段不稳定 | `retest`，不 keep | 早期样本不足，历史长度与新币机会存在冲突 |
+| `pump_chase_strict` | 更严格追高惩罚是否减少高位接盘 | 追高阈值和惩罚 | 2025-01-01 -> 2025-09-01 等 | 未形成稳定优势 | `retest` | 单窗口证据不足 |
+| `liquidity_50m` | 更高流动性门槛是否减少噪音交易 | 成交额 30m -> 50m，交易数 30k -> 50k | 多个 dynamic universe / fixed master 窗口 | 多次方向改善，但早期/部分窗口样本不足或仍为负收益 | `retest` | 不能证明流动性阈值是独立优势来源 |
+| `risk_off_no_core_buy` | RISK_OFF 下是否连 BTC/ETH 也应暂停新开仓 | `risk_off_core_buy_enabled` | 2025-01-01 -> 2025-09-01 | RISK_OFF 亏损减少，但 RISK_ON 仍弱 | `retest` | 需要与入场质量规则组合 |
+| `top_n_3` | 降低每次候选容量是否减少拥挤开仓 | `market.top_n=3` | 2025-01-01 -> 2025-09-01 | RISK_ON 亏损减少，但不能独立转正 | `retest` | 可能只是降低暴露，不是提高胜率 |
+| `risk_off_no_core_top_n_3` | 弱市暂停核心币 + 降低容量是否互补 | regime + capacity 组合 | 2025-01-01 -> 2026-06-01 两段 | 亏损减少，近端仍为负收益 | `retest` | 组合实验，归因不如单变量清晰 |
+| `entry_reclaim_close` | 入场前等待 4h 收盘站回 `entry_high` 是否减少接飞刀 | `entry_reclaim_close_enabled` | 2025-01-01 -> 2026-06-01 | 近端窗口转正，早期样本不足 | `retest`，后续已进入组合策略 | 早期 RISK_ON 仍弱 |
+| `risk_off_no_core_entry_reclaim` | 弱市暂停开仓与入场确认能否互补 | regime + entry 组合 | 2024-07-01 -> 2026-06-01 | 两个充分窗口净收益、PF、MDD 均改善 | `candidate_keep_review` | 组合规则，需要人工确认机制合理性 |
+| `tp1_breakeven_stop` | TP1 后立即保本是否保护利润 | `tp1_move_stop_to_breakeven_enabled` | 2025-01-01 -> 2025-09-01 | PF、净收益、止损率恶化 | `reject_candidate` | 噪音止损增加 |
+| `tp1_ema20_trailing_stop` | TP1 后 EMA20 trailing 是否优于立即保本 | `tp1_ema_trailing_stop_enabled` | 2024-07-01 -> 2025-09-01 | 两段方向改善，但近端绝对值仍弱 | `retest`，后续进入组合策略 | TP2 rate 下降、副作用需复核 |
+| `risk_off_no_core_entry_reclaim_ema_stop` | regime + reclaim + EMA trailing 是否形成稳定组合 | 三项组合 | 2024-07-01 -> 2026-06-01 | 两段净收益、PF、MDD 全面改善 | `candidate_keep_review`，后续成为 sensitive 默认主线 | 组合策略仍需 paper 验证 |
+| `daily_trend_required` | 日线趋势硬门槛是否提高质量 | `daily_trend_required=true` | 2024-07-01 -> 2026-06-01 等 | 近端止损率和净收益恶化 | `reject_candidate` | 可能导致更高位置追入 |
+| `regime_sensitive` | 更严格 BTC/ETH regime 阈值是否更好 | BTC/ETH 跌幅阈值和趋势要求 | 2024-07-01 -> 2026-06-01 | 作为组合的一部分有效，单独仍需 retest | `retest` / 已进入默认组合 | 单独贡献未完全隔离 |
+| 市值分层 large-cap vs altcoin | 收益/风险是否由 altcoin 拖累 | SymbolMaster 分层 | 2024-07-01 -> 2026-06-01 | large-cap 两段为正；altcoin 熊市拖累明显 | `candidate_keep_review` | 分层发现不等于组合规则可部署 |
+| `large_cap_only_risk_off` | RISK_OFF 只允许 BTC/ETH/BNB/SOL 是否更好 | `risk_off_large_cap_buy_enabled=true` | 2024-07-01 -> 2026-06-01 | 两段方向相反，近端拖累 | `retest` / 不 keep | 与单独 large-cap 回测结论不一致 |
+| `max_holding_18/30/42x4h_no_tp1` | 未触发 TP1 的持仓等待多久仍值得 | `max_holding_bars_without_tp1` | 2024-07-01 -> 2026-06-01 | 三阈值均改善，42 根最平衡 | `candidate_keep_review` | 可能牺牲少数延迟启动赢家 |
+| `risk_off_no_core_entry_reclaim_ema_stop_sensitive_max_holding_42` | 在当前 sensitive 组合上叠加固定 42 根退出是否继续改善 | `max_holding_bars_without_tp1=42` | 2024-07-01 -> 2026-06-01 | PF、Sharpe、净收益改善；早期 MDD 恶化 | `retest` | 不能直接部署，需 paper 后复核 |
+| `max_holding_42x4h_conditional` | 42 根后按 EMA/entry 条件退出是否优于无时间退出 | 42 根 + conditional | 2024-07-01 -> 2026-06-01 | 两段改善但不能回答是否优于固定 42 | `retest` | 比较对象不够严格 |
+| `max_holding_42_fixed_vs_conditional_sensitive` | 条件式 42 是否优于固定 42 | `max_holding_bars_conditional` | 2023-07-01 -> 2026-06-01 三窗口 | 条件版 2/3 窗口变差，3/3 MDD 更高 | `reject_candidate` | 固定 42 仍可作为候选 |
+| Paper checkpoint / formal audit | 三周模拟盘是否足以支持改 live/paper 规则 | 只审计，不改配置 | 2026-06-19 -> 2026-07-25 | 7 月 25 日 extended window `formal_audit_ready`，但结论是先研究 entry 质量 | 不改配置 | right-censored 和机会成本仍明显 |
+| `reclaim_quality_matrix` shadow | RECLAIM_PENDING 后是否需要更强确认 | 离线 reclaim 变体 | 2026-06-19 -> 2026-07-25 | `atr_reclaim_0_25` 是最佳候选之一 | `retest` | shadow 不是正式 dynamic A/B |
+| `momentum_pullback_definition_ab` shadow | 当前动量/回调定义是否过松 | 离线动量/回调定义 | 2026-06-19 -> 2026-07-25 | `trend_support_atr_pullback` 表现最好但仍不可部署 | `retest` | 短窗口重叠、右截尾 |
+| `relative_strength_soft_gate` shadow | 相对 BTC/ETH 弱势是否应过滤或降级 | 相对强度门槛 | 2026-06-19 -> 2026-07-25 | `btc_eth_soft_minus_0_5` 最佳候选 | `retest` | 需要正式 A/B |
+| `relative_strength_soft_gate_btc_eth_minus_0_5` | 正式 A/B 验证相对强度 soft gate | `relative_strength_min_pct=-0.5` | 2024-07-01 -> 2026-06-01 | 两段 PF/净收益/Sharpe 改善，但早期 MDD 16.59% -> 18.96% | `retest` | MDD 恶化来源未完全消除 |
+| `relative_strength` 阈值敏感性 | -1.0、-0.5、0.0 哪个更稳 | 阈值 | 2024-07-01 -> 2026-06-01 | -0.5 最平衡；-1.0 近端退化；0.0 早期 MDD 最差 | `retest` | 该家族暂不部署 |
+| `atr_reclaim_0_25` | reclaim 超过 `entry_high + 0.25 ATR` 是否提高入场质量 | `entry_reclaim_min_atr` | 2024-07-01 -> 2026-06-01 | 两段净收益、PF、Sharpe、胜率改善；早期 MDD 16.59% -> 19.21% | `retest` | 需做 0.10/0.15/0.35 同维度敏感性 |
+
+## 4. 事实 / 观察 / 假设 / 决策拆分
+
+### 事实
+
+- 当前默认配置已启用 `entry_reclaim_close_enabled=true`、`tp1_ema_trailing_stop_enabled=true`、`risk_off_core_buy_enabled=false`。
+- 当前默认配置未启用 `relative_strength_soft_gate_enabled`、`entry_reclaim_min_atr_enabled`、`max_holding_bars_without_tp1`。
+- A/B runner 会对实验 override 路径做白名单限制。
+- A/B 自动结论不会直接给 `keep`，样本不足时保持 `retest`。
+- `reports/2026-07-26/atr_reclaim_0_25_formal_ab_review_2026-07-26_v1.md` 记录 `atr_reclaim_0_25` 两段 PF/净收益改善，但早期 MDD 恶化。
+- `reports/2026-07-26/relative_strength_soft_gate_threshold_sensitivity_2026-07-26_v1.md` 记录相对强度阈值家族全部仍为 `retest`。
+
+### 观察
+
+- 弱市开仓限制、4h reclaim 入场确认、TP1 后 EMA trailing 的组合比早期 baseline 更稳。
+- `max_holding=42` 对未触发 TP1 的停滞交易有清理价值，但固定版与条件版的比较显示条件版不稳。
+- 相对强度 soft gate 能改善 PF/净收益，但没有解决早期 MDD 问题。
+- ATR reclaim 门槛能提升平均交易质量，但可能推迟入场并带来路径风险。
+
+### 假设
+
+- 长时间未触发 TP1 的交易，大概率已经失去趋势延续优势。
+- 弱市中即便 BTC/ETH 也可能不适合作为新开仓对象。
+- 4h 收盘重新站回入场区间可以过滤一部分接飞刀交易。
+- TP1 后立即保本过于僵硬，EMA20 trailing 更能适应趋势波动。
+- 相对 BTC/ETH 明显弱的币，即使绝对涨幅为正，也可能不是优先买入对象。
+- ATR reclaim 的最佳阈值可能低于 0.25，或者该机制本身会增加追入风险。
+
+### 决策
+
+- 继续暂停新增复杂度，先完成系统理解和实验账本。
+- 不部署 `relative_strength_soft_gate`。
+- 不部署 `atr_reclaim_0_25`。
+- 不部署 `max_holding_bars_conditional=true`。
+- `max_holding_bars_without_tp1=42` 仅保留为候选，等待模拟盘/人工复核。
+- 后续任何实验必须先提交实验卡片并获得用户批准。
+
+## 5. 实验卡片模板
+
+```markdown
+# 实验卡片
+
+## 1. 本实验要回答的问题
+用一句话说明。
+
+## 2. 为什么现在需要做
+它与当前系统的哪个问题有关。
+
+## 3. 核心假设
+如果假设成立，预计会看到什么结果。
+
+## 4. 实验变量
+本次只改变什么参数。
+
+## 5. 固定条件
+哪些内容必须保持不变。
+
+## 6. 评价指标
+主要指标：
+次要指标：
+风险指标：
+
+## 7. 判定标准
+什么结果支持假设；
+什么结果否定假设；
+什么结果属于证据不足。
+
+## 8. 可能风险
+样本不足、过拟合、数据泄漏、少数极端交易驱动等。
+
+## 9. 实验完成后是否允许修改生产配置
+默认：不允许。
+```
+

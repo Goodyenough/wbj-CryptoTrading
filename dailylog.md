@@ -15,6 +15,16 @@
 
 ## 2026-07-26
 
+### 17:10:55 +08:00 - 生成系统审计文档并暂停新增实验
+- 类型：文档 / 规则 / 计划 / Git
+- 改动：新增 `SYSTEM_OVERVIEW.md`，整理当前系统目标、策略假设、模块职责、默认配置、数据流和关键风险。
+- 改动：新增 `EXPERIMENT_LEDGER.md`，按“事实 / 观察 / 假设 / 决策”拆分既有实验结论，明确 `relative_strength_soft_gate`、`atr_reclaim_0_25`、`max_holding_42` 等仍为候选或 `retest`，不得直接部署。
+- 改动：新增 `RESEARCH_ROADMAP.md`，将当前阶段调整为“暂停新增优化，先做理解和盘点”，并列出后续实验必须先经实验卡片审批。
+- 改动：更新 `AGENTS.md`，加入 Research Discipline 硬规则，要求新实验前说明全局目标、唯一问题、路线位置、判定标准，并禁止仅因回测净收益改善就修改默认配置。
+- 原因：当前系统复杂度已经上升，需要先恢复可解释性和研究纪律，避免继续叠加参数导致无法判断优化、过拟合或补丁式修补。
+- 验证：已检查 Git diff；本次未运行回测或代码测试，因为只做文档和流程规则变更。
+- Git：本次提交 `Document system audit and research roadmap`。
+
 ### 15:45:00 +08:00 - 注册并运行 atr_reclaim_0_25 正式 A/B
 - 类型：代码 / 配置 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增默认关闭的 `analysis.entry_reclaim_min_atr_enabled` 与 `analysis.entry_reclaim_min_atr`，并注册 `atr_reclaim_0_25` 实验；默认 `settings.toml` 不变。

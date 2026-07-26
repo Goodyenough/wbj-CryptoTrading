@@ -2,6 +2,17 @@
 
 These rules apply to the entire CryptoTradingSystem workspace.
 
+## Research Discipline
+
+- Pause new parameter experiments when the strategy becomes hard to explain end to end. Prefer system mapping, experiment ledgers, and owner-level explanations before adding more rules.
+- Before proposing any new experiment, parameter adjustment, or strategy modification, first state the current system-level goal, the single question being tested, where that question fits in the research roadmap, and the difference between facts, observations, hypotheses, and decisions.
+- Every experiment proposal must include approval criteria: what would support the hypothesis, what would reject it, and what would count as insufficient evidence.
+- Never recommend changing default production configuration only because a backtest net return improved.
+- After an experiment, explain the result in two layers before detailed metrics: a non-technical explanation and then the technical evidence.
+- Unless the user explicitly approves, do not modify production strategy settings after an experiment.
+- After each experiment, update the experiment ledger and current strategy documentation.
+- If the project owner cannot explain a change in plain language, prioritize clarification and documentation over adding strategy complexity.
+
 ## Change Logging And Commits
 
 - After every code change, update `dailylog.md` with a Beijing time timestamp and a concise record of what changed, why it changed, how it was verified, and the related Git commit.
