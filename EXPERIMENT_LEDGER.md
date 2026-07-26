@@ -80,6 +80,7 @@
 - `reports/2026-07-26/atr_reclaim_threshold_sensitivity_2026-07-26_v1.md` 记录 `atr_reclaim_0_35` 两段净收益、PF、MDD 均改善，并进入 `candidate_keep_review`。
 - `reports/2026-07-26/atr_reclaim_0_35_trade_attribution_review_2026-07-26_v1.md` 记录交易级归因：合并后 common trade delta 为 `-43.72 USDT`，removed baseline-only 贡献 `+594.76 USDT`，added variant-only 贡献 `+3184.11 USDT`；近端窗口 top3 正贡献占该窗口净改善 `167.7%`，说明存在路径依赖。
 - `reports/2026-07-26/atr_reclaim_0_35_path_replay_review_2026-07-26_v1.md` 记录 10 笔关键路径复盘：5 笔 variant-only 赢家 reclaim margin 均超过 `0.35 ATR`，但 5 笔 missed baseline winners 同样全是 TP2 赢家；CFX/ENA/ADA 等机会出现时 baseline 多数已达到 `max_active_positions=5`，说明收益强受容量路径影响。
+- `reports/2026-07-26/capacity_and_opportunity_order_review_2026-07-26_v1.md` 记录容量与机会排序复核：baseline 满仓 28.0% 的 4h bars，variant 满仓 30.3%；两组都有长期负 R 占槽问题，但关键 missed winners 的 blocker 质量混合，结论为 `retest_capacity_real_but_not_actionable`。
 - `reports/2026-07-26/relative_strength_soft_gate_threshold_sensitivity_2026-07-26_v1.md` 记录相对强度阈值家族全部仍为 `retest`。
 
 ### 观察
@@ -96,14 +97,16 @@
 - 4h 收盘重新站回入场区间可以过滤一部分接飞刀交易。
 - TP1 后立即保本过于僵硬，EMA20 trailing 更能适应趋势波动。
 - 相对 BTC/ETH 明显弱的币，即使绝对涨幅为正，也可能不是优先买入对象。
-- ATR reclaim 的最佳阈值可能高于 0.25，但当前证据更像“路径换仓 + 容量释放”而不是纯粹质量提升；下一步假设应转向容量与机会排序，而不是继续调 ATR reclaim。
+- ATR reclaim 的最佳阈值可能高于 0.25，但当前证据更像“路径换仓 + 容量释放”而不是纯粹质量提升；容量与机会排序复核确认约束真实存在，但尚不足以直接改仓位上限或排序。
+- 满仓时真正需要验证的是换仓质量：新机会是否稳定优于当前占槽仓位，而不是简单提高 `max_active_positions`。
 
 ### 决策
 
 - 继续暂停新增复杂度，先完成系统理解和实验账本。
 - 不部署 `relative_strength_soft_gate`。
 - 不部署 `atr_reclaim_0_25`。
-- 不部署 `atr_reclaim_0_35`；人工路径复盘后降级为 `retest_path_dependent`，下一步做 `capacity_and_opportunity_order_review` 非参数复核，不叠加新过滤器。
+- 不部署 `atr_reclaim_0_35`；人工路径复盘后降级为 `retest_path_dependent`，容量复核后仍不修改 `max_active_positions` 或 score 排序。
+- 下一步若继续研究容量，只做 `slot_replacement_quality_review` 诊断，先验证换仓质量，不新增生产过滤器。
 - 不部署 `max_holding_bars_conditional=true`。
 - `max_holding_bars_without_tp1=42` 仅保留为候选，等待模拟盘/人工复核。
 - 后续任何实验必须先提交实验卡片并获得用户批准。

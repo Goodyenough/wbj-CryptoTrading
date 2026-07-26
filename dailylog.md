@@ -15,6 +15,15 @@
 
 ## 2026-07-26
 
+### 23:48:30 +08:00 - 完成 capacity_and_opportunity_order_review
+- 类型：报告 / 实验日志 / TODO / 计划 / Git
+- 改动：新增 `reports/2026-07-26/capacity_and_opportunity_order_review_2026-07-26_v1.md`，复核 `max_active_positions=5`、score 排序和关键机会出现时的 active slot 质量。
+- 改动：更新 `EXPERIMENT_LEDGER.md`、`TODO.md`、`SYSTEM_OVERVIEW.md`、`开发计划.md` 和 Obsidian 实验日志，记录 `retest_capacity_real_but_not_actionable` 结论。
+- 原因：承接 `atr_reclaim_0_35` 路径复盘，判断改善是否主要来自容量释放和机会排序，而不是 ATR reclaim 单变量质量。
+- 影响：确认容量约束真实存在，但证据混合；不修改 `config/settings.toml`，不提高 `max_active_positions`，不调整 score 排序。
+- 验证：基于 `data/crypto_trading.db` 的 `backtest_trades` 复原关键事件 active positions、满仓 4h bar 占比和长持仓负 R 占槽统计；确认 `config/settings.toml` 无 diff。
+- Git：本次计划提交 `Review capacity and opportunity ordering`。
+
 ### 23:16:56 +08:00 - 完成 atr_reclaim_0_35 关键交易路径复盘
 - 类型：报告 / 实验日志 / TODO / 计划 / Git
 - 改动：新增 `reports/2026-07-26/atr_reclaim_0_35_path_replay_review_2026-07-26_v1.md`，人工复盘近端窗口 5 笔 variant-only 大赢家与 5 笔 missed baseline 大赢家。

@@ -37,7 +37,8 @@
 - [x] 做 `atr_reclaim_0_25` 同维度阈值敏感性：`0.10`、`0.15` 近端退化，`0.35` 两段净收益/PF/MDD 均改善并进入 `candidate_keep_review`。
 - [x] 复核 `atr_reclaim_0_35` 的交易级归因：改善主要来自 variant-only 新增赢家而非 common trades 普遍变好；早期窗口不算单一赢家驱动，近端窗口路径依赖较强，结论为 `candidate_keep_review_but_path_dependent`，暂不部署。
 - [x] 人工复盘 `atr_reclaim_0_35` 近端关键赢家/错过赢家路径：variant-only 赢家 reclaim margin 均超过 0.35 ATR，但 baseline 错过的 TP2 赢家也质量不差，且结果强受 `max_active_positions=5` 容量路径影响；状态降为 `retest_path_dependent`。
-- [ ] 做 `capacity_and_opportunity_order_review` 非参数复核：检查 `max_active_positions=5` 和候选排序是否让高质量机会被低质量长持仓占用，不改配置、不新增过滤器。
+- [x] 做 `capacity_and_opportunity_order_review` 非参数复核：容量约束真实存在，部分赢家确实被长持仓/低质量仓位占用路径影响，但证据混合，不能据此修改 `max_active_positions` 或 score 排序。
+- [ ] 定义 `slot_replacement_quality_review` 诊断：当组合满仓且新机会 entry-ready 时，比较新机会与现有仓位的 age、unrealized R、TP1 状态、score 和后续 R，先验证换仓质量再考虑实验。
 - [ ] 测试更靠近 `entry_low` 的入场方式，而不是默认按 `entry_high` 附近成交。
 - [ ] 要求 RSI 出现恢复，例如从 45-55 区间重新向上。
 - [ ] 拒绝主要由放量下跌驱动的形态。

@@ -120,4 +120,4 @@ flowchart TD
 1. 用 `risk_off_core_buy_enabled=false` 限制弱市开仓。
 2. 用 `entry_reclaim_close_enabled=true` 避免首次触碰入场区间就接入。
 3. 用 `tp1_ema_trailing_stop_enabled=true` 替代简单 TP1 后保本。
-4. 继续研究但尚未部署：`max_holding_bars_without_tp1=42`、`relative_strength_soft_gate`、`entry_reclaim_min_atr=0.35`；其中 `atr_reclaim_0_35` 已降为 `retest_path_dependent`，下一步应复核容量与机会排序，而不是部署 ATR 门槛。
+4. 继续研究但尚未部署：`max_holding_bars_without_tp1=42`、`relative_strength_soft_gate`、`entry_reclaim_min_atr=0.35`；其中 `atr_reclaim_0_35` 已降为 `retest_path_dependent`，容量复核显示满仓和长持仓确实影响路径，但证据不足以修改仓位上限或排序。
