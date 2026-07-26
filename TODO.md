@@ -39,8 +39,8 @@
 - [x] 人工复盘 `atr_reclaim_0_35` 近端关键赢家/错过赢家路径：variant-only 赢家 reclaim margin 均超过 0.35 ATR，但 baseline 错过的 TP2 赢家也质量不差，且结果强受 `max_active_positions=5` 容量路径影响；状态降为 `retest_path_dependent`。
 - [x] 做 `capacity_and_opportunity_order_review` 非参数复核：容量约束真实存在，部分赢家确实被长持仓/低质量仓位占用路径影响，但证据混合，不能据此修改 `max_active_positions` 或 score 排序。
 - [x] 做 `signal_fill_timing_audit`：审计 entry reclaim 的 `signal_time` / `decision_time` / `fill_time`、同根 K 线 exit/entry 顺序和 fill price 口径；结论 `timing_audit_warn_same_bar_ambiguity`，Stage 1 必须显式记录 same-bar ambiguity。
-- [ ] 设计 `blocked_entry_event_export`：导出唯一 blocked event、`block_reason=max_active_positions`、candidate rank、active slots snapshot、`fill_time_assumption`、`active_snapshot_after_exits`、`same_bar_entry_exit_possible` 和 `same_bar_entry_tp1_possible`，并要求重复运行一致。
-- [ ] 做 `replay_consistency_audit`：确认 blocked event export 与 canonical baseline 的 entered trades、entry time、active count path 和候选排序一致。
+- [x] 完成 `blocked_entry_event_export`：导出唯一 blocked event、`block_reason=max_active_positions`、candidate rank、active slots snapshot、`fill_time_assumption`、`active_snapshot_after_exits`、`same_bar_entry_exit_possible` 和 `same_bar_entry_tp1_possible`；canonical run `110c51eef593` 复跑导出 512 个事件，`replay_entered_trades=58` 与 source 一致。
+- [ ] 做 `replay_consistency_audit`：确认 blocked event export 与 canonical baseline 的 entered trades、entry time、active count path、候选排序和 blocked event 重复运行一致；未通过前不计算 replacement future outcome。
 - [ ] 做 `stale_slot_continuation_review`：独立评估 pre-TP1 仓位达到 42 bars 后继续持有的边际价值，统一 `42 bars = 168h` 口径。
 - [ ] 做 `blocked_candidate_vs_stale_slot_review`：只比较排序第一的 capacity-blocked candidate 与事前规则选出的 pre-TP1 stale slot，post-TP1 仅作对照，oracle 仅作上限。
 - [ ] 测试更靠近 `entry_low` 的入场方式，而不是默认按 `entry_high` 附近成交。

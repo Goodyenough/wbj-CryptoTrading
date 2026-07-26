@@ -15,6 +15,16 @@
 
 ## 2026-07-27
 
+### 00:21:48 +08:00 - 完成 blocked_entry_event_export Stage 1
+- 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增只读研究命令 `python main.py research blocked-entry-event-export --run-id ...`，在 replay 中记录 `block_reason=max_active_positions` 的 blocked entry event，并导出 Markdown 与 JSON sidecar。
+- 改动：事件 schema 显式记录 `fill_time_assumption`、`active_snapshot_after_exits`、`same_bar_entry_exit_possible`、`same_bar_entry_tp1_possible`、candidate rank、active slots snapshot 和候选入场价格/风险字段。
+- 改动：按仓库规则随本次提交纳入 `reports/` 下已生成的当日 00:10 paper update/dashboard 报告；这些报告来自例行 paper 4h 输出，不改变本次研究结论。
+- 结果：对 canonical source run `110c51eef593` 复跑得到 `replay_run_id=ed682b4a5531`，`replay_entered_trades=58` 与 source entered trades 一致；导出 `blocked_entry_events=512`，其中 `same_bar_entry_exit_possible_events=0`、`same_bar_entry_tp1_possible_events=2`。
+- 影响：仅新增诊断导出能力和报告；不修改 `config/settings.toml`，不保存新的 backtest run 到数据库，不部署 `atr_reclaim_0_35`，不提高 `max_active_positions`。
+- 验证：已运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests`、`python main.py research blocked-entry-event-export --run-id 110c51eef593 --reports-date 2026-07-27 --no-obsidian`；确认 `config/settings.toml` 无 diff。
+- Git：本次计划提交 `Add blocked entry event export`。
+
 ### 00:06:06 +08:00 - 完成 signal_fill_timing_audit Stage 0
 - 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增只读研究命令 `python main.py research signal-fill-timing-audit --run-id ...`，用于审计 replay 的 `signal_time`、`decision_time`、`fill_time`、exit/entry 顺序和 same-bar ambiguity。

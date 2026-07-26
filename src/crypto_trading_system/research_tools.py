@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 import inspect
 import json
@@ -41,6 +41,31 @@ class SignalFillTimingAudit:
     blocked_notes_persisted: int
     verdict: str
     reason: str
+
+
+@dataclass(frozen=True)
+class BlockedEntryEventExport:
+    source_run_id: str
+    replay_run_id: str
+    report_date: str
+    start_utc: str
+    end_utc: str
+    source_commit_hash: str
+    source_symbols_count: int
+    replay_symbols_count: int
+    source_entered_trades: int
+    replay_entered_trades: int
+    dynamic_universe_mode: bool
+    max_universe_symbols: int | None
+    max_active_positions: int | None
+    event_count: int
+    same_bar_entry_exit_possible_events: int
+    same_bar_entry_tp1_possible_events: int
+    events_by_month: dict[str, int]
+    events_by_symbol_top: list[tuple[str, int]]
+    verdict: str
+    reason: str
+    events: list[dict]
 
 
 def _local_now() -> datetime:
@@ -729,7 +754,8 @@ def build_signal_fill_timing_audit(
         "watching.sort(key=lambda item: (-item.score, item.created_index, item.paper.symbol))",
         "_entry_reclaim_close_satisfied(",
         "raw_entry = item.paper.entry_high",
-        "if len(_active_positions(all_trades)) >= settings.backtest.max_active_positions:",
+        "active_before_decision = _active_positions(all_trades)",
+        "if len(active_before_decision) >= settings.backtest.max_active_positions:",
     ]
     source_complete = all(_source_contains(replay_source, needle) for needle in required_needles)
     same_call_entry_then_risk = _source_contains(step_source, 'if trade.status == "WATCHING":') and _source_contains(
@@ -921,6 +947,301 @@ def write_signal_fill_timing_audit_report(
         path.write_text(text, encoding="utf-8")
         paths.append(path)
     return audit, paths
+
+
+def _apply_backtest_config_snapshot(settings: Settings, config: dict) -> Settings:
+    import copy
+
+    replay_settings = copy.deepcopy(settings)
+    for section_name in ("analysis", "backtest"):
+        section = config.get(section_name, {})
+        if not isinstance(section, dict):
+            continue
+        target = getattr(replay_settings, section_name)
+        for key, value in section.items():
+            if hasattr(target, key):
+                setattr(target, key, value)
+    market_top_n = config.get("market_top_n")
+    if market_top_n is not None:
+        replay_settings.market.top_n = int(market_top_n)
+    return replay_settings
+
+
+def _source_run_row(settings: Settings, run_id: str) -> sqlite3.Row:
+    with connect_db(settings.output.database_path) as connection:
+        row = connection.execute("SELECT * FROM backtest_runs WHERE run_id = ?", (run_id,)).fetchone()
+    if row is None:
+        raise ValueError(f"backtest run_id not found: {run_id}")
+    return row
+
+
+def _source_entered_trades(settings: Settings, run_id: str) -> int:
+    with connect_db(settings.output.database_path) as connection:
+        row = connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM backtest_trades
+            WHERE run_id = ? AND entered_at_utc IS NOT NULL
+            """,
+            (run_id,),
+        ).fetchone()
+    return int(row["count"]) if row is not None else 0
+
+
+def _stored_symbol_master(source_run_id: str, created_at_utc: str, symbols: list[str]) -> SymbolMaster:
+    return SymbolMaster(
+        source=f"stored backtest run {source_run_id}",
+        created_at_utc=created_at_utc,
+        symbols=symbols,
+        source_limit=None,
+        source_limit_applied=False,
+        filters="stored symbols from source backtest run; listing_dates unavailable",
+        listing_dates=None,
+    )
+
+
+def _blocked_event_dicts(result) -> list[dict]:
+    return [asdict(event) for event in result.blocked_entry_events]
+
+
+def _events_by_month(events: list[dict]) -> dict[str, int]:
+    counts: Counter = Counter()
+    for event in events:
+        month = str(event["decision_time_utc"])[:7]
+        counts[month] += 1
+    return dict(sorted(counts.items()))
+
+
+def _top_event_symbols(events: list[dict], limit: int = 10) -> list[tuple[str, int]]:
+    counts: Counter = Counter(str(event["symbol"]) for event in events)
+    return counts.most_common(limit)
+
+
+def build_blocked_entry_event_export(
+    settings: Settings,
+    run_id: str,
+    *,
+    report_date: str | None = None,
+    progress=None,
+) -> BlockedEntryEventExport:
+    from .backtest.replay import run_backtest_replay
+
+    run = _source_run_row(settings, run_id)
+    config = json.loads(run["config_json"] or "{}")
+    symbols = [str(symbol).replace("/", "").upper() for symbol in json.loads(run["symbols_json"] or "[]")]
+    if not symbols:
+        raise ValueError(f"backtest run_id has no stored symbols: {run_id}")
+    replay_settings = _apply_backtest_config_snapshot(settings, config)
+    dynamic_mode = bool(config.get("dynamic_universe_mode"))
+    dynamic_summary = config.get("dynamic_universe_summary", {})
+    if not isinstance(dynamic_summary, dict):
+        dynamic_summary = {}
+    max_symbols = _as_int(dynamic_summary.get("max_symbols"))
+    dynamic_master = _stored_symbol_master(run_id, str(run["created_at_utc"]), symbols) if dynamic_mode else None
+
+    result = run_backtest_replay(
+        replay_settings,
+        symbols,
+        str(run["start_utc"]),
+        str(run["end_utc"]),
+        allow_data_gaps=True if dynamic_mode else False,
+        dynamic_universe_mode=dynamic_mode,
+        dynamic_symbol_master=dynamic_master,
+        max_universe_symbols=max_symbols,
+        progress=progress,
+    )
+    events = _blocked_event_dicts(result)
+    event_count = len(events)
+    replay_entered = sum(1 for trade in result.trades if trade.entered_at_utc is not None)
+    same_bar_exit = sum(1 for event in events if event["same_bar_entry_exit_possible"])
+    same_bar_tp1 = sum(1 for event in events if event["same_bar_entry_tp1_possible"])
+    if event_count > 0:
+        verdict = "blocked_events_exported"
+        reason = (
+            "Replay instrumentation exported max-active blocked-entry events with candidate timing, capacity "
+            "snapshot, and same-bar ambiguity flags; use this as input for replay consistency audit."
+        )
+    else:
+        verdict = "blocked_events_empty_review_needed"
+        reason = (
+            "The instrumented replay produced no max-active blocked-entry events; before moving to replacement "
+            "logic, verify replay consistency against the source run."
+        )
+
+    return BlockedEntryEventExport(
+        source_run_id=run_id,
+        replay_run_id=result.run_id,
+        report_date=report_date or _local_now().strftime("%Y-%m-%d"),
+        start_utc=str(run["start_utc"]),
+        end_utc=str(run["end_utc"]),
+        source_commit_hash=str(run["commit_hash"]),
+        source_symbols_count=len(symbols),
+        replay_symbols_count=len(result.symbols),
+        source_entered_trades=_source_entered_trades(settings, run_id),
+        replay_entered_trades=replay_entered,
+        dynamic_universe_mode=dynamic_mode,
+        max_universe_symbols=max_symbols,
+        max_active_positions=replay_settings.backtest.max_active_positions,
+        event_count=event_count,
+        same_bar_entry_exit_possible_events=same_bar_exit,
+        same_bar_entry_tp1_possible_events=same_bar_tp1,
+        events_by_month=_events_by_month(events),
+        events_by_symbol_top=_top_event_symbols(events),
+        verdict=verdict,
+        reason=reason,
+        events=events,
+    )
+
+
+def render_blocked_entry_event_export(export: BlockedEntryEventExport, *, json_filename: str | None = None) -> str:
+    now = _local_now()
+    lines = [
+        "---",
+        f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - blocked-entry-event-export",
+        "experiment: blocked_entry_event_export",
+        f"source_run_id: {export.source_run_id}",
+        f"replay_run_id: {export.replay_run_id}",
+        f"verdict: {export.verdict}",
+        "---",
+        "",
+        "# blocked_entry_event_export",
+        "",
+        "## Plain-language conclusion",
+        "",
+        export.reason,
+        "",
+        "This report is diagnostic only. It does not change `config/settings.toml`, backtest behavior, paper state, strategy defaults, or saved backtest rows.",
+        "",
+        "## Scope",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| source_run_id | `{export.source_run_id}` |",
+        f"| replay_run_id | `{export.replay_run_id}` |",
+        f"| window | `{export.start_utc}` -> `{export.end_utc}` |",
+        f"| source_commit_hash | `{export.source_commit_hash}` |",
+        f"| source_symbols | {export.source_symbols_count} |",
+        f"| replay_symbols | {export.replay_symbols_count} |",
+        f"| dynamic_universe_mode | {str(export.dynamic_universe_mode).lower()} |",
+        f"| max_universe_symbols | {_fmt_optional(export.max_universe_symbols)} |",
+        f"| max_active_positions | {_fmt_optional(export.max_active_positions)} |",
+        "",
+        "## Event Summary",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| blocked_entry_events | {export.event_count} |",
+        f"| source_entered_trades | {export.source_entered_trades} |",
+        f"| replay_entered_trades | {export.replay_entered_trades} |",
+        f"| same_bar_entry_exit_possible_events | {export.same_bar_entry_exit_possible_events} |",
+        f"| same_bar_entry_tp1_possible_events | {export.same_bar_entry_tp1_possible_events} |",
+    ]
+    if json_filename:
+        lines.append(f"| events_json | `{json_filename}` |")
+    lines.extend(
+        [
+            "",
+            "## Event Schema",
+            "",
+            "Each event records a candidate that already passed entry-zone touch, reclaim, sizing, cash, and notional gates, but was rejected by `max_active_positions`.",
+            "",
+            "- `fill_time_assumption`: how the replay models the would-be fill for the blocked candidate.",
+            "- `active_snapshot_after_exits`: active positions after same-bar exits/time exits were processed and before the candidate decision.",
+            "- `same_bar_entry_exit_possible`: whether the blocked candidate's same bar also touched its stop.",
+            "- `same_bar_entry_tp1_possible`: whether the blocked candidate's same bar also touched TP1.",
+            "- `candidate_rank`: order among WATCHING plans after sorting by `(-score, created_index, symbol)`.",
+            "",
+            "## Events By Month",
+            "",
+            "| Month | Events |",
+            "|---|---:|",
+        ]
+    )
+    if export.events_by_month:
+        for month, count in export.events_by_month.items():
+            lines.append(f"| {month} | {count} |")
+    else:
+        lines.append("| n/a | 0 |")
+    lines.extend(["", "## Top Symbols", "", "| Symbol | Events |", "|---|---:|"])
+    if export.events_by_symbol_top:
+        for symbol, count in export.events_by_symbol_top:
+            lines.append(f"| `{symbol}` | {count} |")
+    else:
+        lines.append("| n/a | 0 |")
+
+    lines.extend(
+        [
+            "",
+            "## First Events",
+            "",
+            "| # | Time | Symbol | Rank | Active | Same-bar stop | Same-bar TP1 | Active symbols |",
+            "|---:|---|---|---:|---:|---|---|---|",
+        ]
+    )
+    for index, event in enumerate(export.events[:20], start=1):
+        active_symbols = ", ".join(str(slot["symbol"]) for slot in event["active_snapshot_after_exits"])
+        lines.append(
+            f"| {index} | `{event['decision_time_utc']}` | `{event['symbol']}` | "
+            f"{event['candidate_rank']} | {event['active_count_before_decision']} | "
+            f"{str(event['same_bar_entry_exit_possible']).lower()} | "
+            f"{str(event['same_bar_entry_tp1_possible']).lower()} | {active_symbols or 'n/a'} |"
+        )
+    if not export.events:
+        lines.append("| n/a | n/a | n/a | 0 | 0 | false | false | n/a |")
+    lines.extend(
+        [
+            "",
+            "## Decision",
+            "",
+            f"`{export.verdict}`",
+            "",
+            "## Next Action",
+            "",
+            "Run `replay_consistency_audit` before interpreting replacement value. The next check should confirm whether the instrumented replay reproduces the source run closely enough to use these blocked events.",
+            "",
+            "## Raw Summary",
+            "",
+            "```json",
+            json.dumps(asdict(export), ensure_ascii=False, indent=2),
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_blocked_entry_event_export_report(
+    settings: Settings,
+    run_id: str,
+    *,
+    report_date: str | None = None,
+    progress=None,
+) -> tuple[BlockedEntryEventExport, list[Path], Path]:
+    date_text = report_date or _local_now().strftime("%Y-%m-%d")
+    export = build_blocked_entry_event_export(settings, run_id, report_date=date_text, progress=progress)
+    report_dir = settings.output.reports_dir / date_text
+    obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
+    prefix = f"blocked_entry_event_export_{date_text}"
+    version = next_report_version([report_dir, obsidian_dir], prefix)
+    filename = versioned_markdown_filename(prefix, version)
+    json_filename = filename.replace(".md", ".json")
+    text = render_blocked_entry_event_export(export, json_filename=json_filename)
+    paths: list[Path] = []
+    for directory in [report_dir, obsidian_dir]:
+        if directory is None:
+            continue
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / filename
+        path.write_text(text, encoding="utf-8")
+        paths.append(path)
+    report_dir.mkdir(parents=True, exist_ok=True)
+    json_path = report_dir / json_filename
+    json_path.write_text(json.dumps(asdict(export), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return export, paths, json_path
 
 
 def generate_observation_dashboard(

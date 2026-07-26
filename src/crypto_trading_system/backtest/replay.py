@@ -102,6 +102,53 @@ class EquityPoint:
 
 
 @dataclass
+class ActiveSlotSnapshot:
+    trade_id: str
+    symbol: str
+    status: str
+    entered_at_utc: str | None
+    tp1_hit_at_utc: str | None
+    score: float
+    entry_price: float | None
+    stop_loss: float
+    quantity: float | None
+    cash_risk: float | None
+    unrealized_pnl: float
+    realized_pnl: float
+    holding_bars: int | None
+
+
+@dataclass
+class BlockedEntryEvent:
+    event_id: str
+    run_id: str
+    symbol: str
+    trade_id: str
+    signal_time_utc: str
+    decision_time_utc: str
+    fill_time_assumption: str
+    block_reason: str
+    candidate_rank: int
+    active_count_before_decision: int
+    active_snapshot_after_exits: list[ActiveSlotSnapshot]
+    candidate_score: float
+    candidate_created_at_utc: str
+    candidate_entry_low: float
+    candidate_entry_high: float
+    candidate_stop_loss: float
+    candidate_take_profit_1: float
+    candidate_take_profit_2: float
+    candidate_raw_entry: float
+    candidate_entry_price_filled: float
+    candidate_cash_risk: float
+    equity_before_decision: float
+    cash_before_decision: float
+    same_bar_entry_exit_possible: bool
+    same_bar_entry_tp1_possible: bool
+    intrabar_policy: str
+
+
+@dataclass
 class BacktestResult:
     run_id: str
     symbols: list[str]
@@ -120,6 +167,7 @@ class BacktestResult:
     universe_snapshot: dict | None = None
     universe_type: str = "manual"
     dynamic_universe_summary: dict | None = None
+    blocked_entry_events: list[BlockedEntryEvent] = field(default_factory=list)
 
 
 @dataclass
@@ -201,6 +249,24 @@ def _active_risk(trades: list[_SimTrade]) -> float:
         if item.paper.quantity and item.paper.entry_price:
             risk += max(item.paper.entry_price - item.paper.stop_loss, 0) * item.paper.quantity
     return risk
+
+
+def _active_slot_snapshot(item: _SimTrade, bar_close_ms: int, primary_interval: str) -> ActiveSlotSnapshot:
+    return ActiveSlotSnapshot(
+        trade_id=item.record.trade_id,
+        symbol=item.paper.symbol,
+        status=item.paper.status,
+        entered_at_utc=item.paper.entered_at_utc,
+        tp1_hit_at_utc=item.paper.tp1_hit_at_utc,
+        score=item.score,
+        entry_price=item.paper.entry_price,
+        stop_loss=item.paper.stop_loss,
+        quantity=item.paper.quantity,
+        cash_risk=item.paper.cash_risk,
+        unrealized_pnl=item.paper.unrealized_pnl,
+        realized_pnl=item.paper.realized_pnl,
+        holding_bars=_holding_bars_since_entry(item.paper, bar_close_ms, primary_interval),
+    )
 
 
 def _entry_reclaim_close_satisfied(
@@ -484,6 +550,7 @@ def run_backtest_replay(
             raise ValueError(f"BTCUSDT {primary_interval} data quality failed: {'; '.join(btc_errors[:3])}")
     cash = settings.backtest.initial_equity
     all_trades: list[_SimTrade] = []
+    blocked_entry_events: list[BlockedEntryEvent] = []
     equity_curve: list[EquityPoint] = []
     kline_4h_by_open = {
         symbol: {int(kline[0]): kline for kline in per_interval["4h"]}
@@ -675,8 +742,42 @@ def run_backtest_replay(
                 item.record.notes = "Skipped entry: insufficient cash."
                 continue
             item.paper.cash_risk = max(entry_preview.filled_price - item.paper.stop_loss, 0) * qty
-            if len(_active_positions(all_trades)) >= settings.backtest.max_active_positions:
+            active_before_decision = _active_positions(all_trades)
+            if len(active_before_decision) >= settings.backtest.max_active_positions:
                 item.record.notes = "Skipped entry: max active positions reached."
+                blocked_entry_events.append(
+                    BlockedEntryEvent(
+                        event_id=uuid.uuid4().hex[:12],
+                        run_id=run_id,
+                        symbol=item.paper.symbol,
+                        trade_id=item.record.trade_id,
+                        signal_time_utc=bar_time,
+                        decision_time_utc=bar_time,
+                        fill_time_assumption="same_bar_entry_high_plus_slippage_after_reclaim_close",
+                        block_reason="max_active_positions",
+                        candidate_rank=watching.index(item) + 1,
+                        active_count_before_decision=len(active_before_decision),
+                        active_snapshot_after_exits=[
+                            _active_slot_snapshot(active_item, bar_close_ms, primary_interval)
+                            for active_item in active_before_decision
+                        ],
+                        candidate_score=item.score,
+                        candidate_created_at_utc=item.paper.created_at_utc,
+                        candidate_entry_low=item.paper.entry_low,
+                        candidate_entry_high=item.paper.entry_high,
+                        candidate_stop_loss=item.paper.stop_loss,
+                        candidate_take_profit_1=item.paper.take_profit_1,
+                        candidate_take_profit_2=item.paper.take_profit_2,
+                        candidate_raw_entry=raw_entry,
+                        candidate_entry_price_filled=entry_preview.filled_price,
+                        candidate_cash_risk=item.paper.cash_risk,
+                        equity_before_decision=equity,
+                        cash_before_decision=cash,
+                        same_bar_entry_exit_possible=low <= item.paper.stop_loss,
+                        same_bar_entry_tp1_possible=high >= item.paper.take_profit_1,
+                        intrabar_policy=intrabar_policy,
+                    )
+                )
                 continue
             active_risk_after = _active_risk(all_trades) + item.paper.cash_risk
             if active_risk_after > equity * settings.backtest.total_active_risk_pct:
@@ -928,4 +1029,5 @@ def run_backtest_replay(
         universe_snapshot=universe_snapshot,
         universe_type="dynamic" if dynamic_universe_mode else ("snapshot" if universe_mode else "manual"),
         dynamic_universe_summary=dynamic_universe_summary,
+        blocked_entry_events=blocked_entry_events,
     )

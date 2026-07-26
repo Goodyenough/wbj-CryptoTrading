@@ -10,7 +10,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system.research_tools import (  # noqa: E402
+    BlockedEntryEventExport,
     build_signal_fill_timing_audit,
+    render_blocked_entry_event_export,
     write_signal_fill_timing_audit_report,
 )
 
@@ -190,6 +192,86 @@ def test_signal_fill_timing_audit_missing_run_raises(tmp_path: Path) -> None:
         raise AssertionError("expected missing run to raise ValueError")
 
 
+def test_render_blocked_entry_event_export_includes_required_fields() -> None:
+    export = BlockedEntryEventExport(
+        source_run_id="source1",
+        replay_run_id="replay1",
+        report_date="2026-07-27",
+        start_utc="2025-06-01T00:00:00+00:00",
+        end_utc="2026-06-01T00:00:00+00:00",
+        source_commit_hash="abc123",
+        source_symbols_count=2,
+        replay_symbols_count=2,
+        source_entered_trades=1,
+        replay_entered_trades=1,
+        dynamic_universe_mode=True,
+        max_universe_symbols=50,
+        max_active_positions=5,
+        event_count=1,
+        same_bar_entry_exit_possible_events=1,
+        same_bar_entry_tp1_possible_events=0,
+        events_by_month={"2025-07": 1},
+        events_by_symbol_top=[("ETHUSDT", 1)],
+        verdict="blocked_events_exported",
+        reason="test reason",
+        events=[
+            {
+                "event_id": "event1",
+                "run_id": "replay1",
+                "symbol": "ETHUSDT",
+                "trade_id": "trade1",
+                "signal_time_utc": "2025-07-01T04:00:00+00:00",
+                "decision_time_utc": "2025-07-01T04:00:00+00:00",
+                "fill_time_assumption": "same_bar_entry_high_plus_slippage_after_reclaim_close",
+                "block_reason": "max_active_positions",
+                "candidate_rank": 3,
+                "active_count_before_decision": 5,
+                "active_snapshot_after_exits": [
+                    {
+                        "trade_id": "active1",
+                        "symbol": "BTCUSDT",
+                        "status": "ENTERED",
+                        "entered_at_utc": "2025-06-30T00:00:00+00:00",
+                        "tp1_hit_at_utc": None,
+                        "score": 80.0,
+                        "entry_price": 100.0,
+                        "stop_loss": 90.0,
+                        "quantity": 1.0,
+                        "cash_risk": 10.0,
+                        "unrealized_pnl": 1.0,
+                        "realized_pnl": 0.0,
+                        "holding_bars": 7,
+                    }
+                ],
+                "candidate_score": 70.0,
+                "candidate_created_at_utc": "2025-07-01T00:00:00+00:00",
+                "candidate_entry_low": 10.0,
+                "candidate_entry_high": 11.0,
+                "candidate_stop_loss": 9.0,
+                "candidate_take_profit_1": 13.0,
+                "candidate_take_profit_2": 15.0,
+                "candidate_raw_entry": 11.0,
+                "candidate_entry_price_filled": 11.01,
+                "candidate_cash_risk": 100.0,
+                "equity_before_decision": 10000.0,
+                "cash_before_decision": 5000.0,
+                "same_bar_entry_exit_possible": True,
+                "same_bar_entry_tp1_possible": False,
+                "intrabar_policy": "stop_first",
+            }
+        ],
+    )
+
+    text = render_blocked_entry_event_export(export, json_filename="events.json")
+
+    assert "# blocked_entry_event_export" in text
+    assert "fill_time_assumption" in text
+    assert "active_snapshot_after_exits" in text
+    assert "same_bar_entry_exit_possible" in text
+    assert "same_bar_entry_tp1_possible" in text
+    assert "`events.json`" in text
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -198,3 +280,4 @@ if __name__ == "__main__":
         test_signal_fill_timing_audit_reports_same_bar_warning(root / "audit")
         test_write_signal_fill_timing_audit_report_includes_required_sections(root / "write")
         test_signal_fill_timing_audit_missing_run_raises(root / "missing")
+        test_render_blocked_entry_event_export_includes_required_fields()

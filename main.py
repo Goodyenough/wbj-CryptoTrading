@@ -41,6 +41,7 @@ from crypto_trading_system.research_tools import (
     build_experiment_index,
     generate_observation_dashboard,
     split_symbol_master_by_cap,
+    write_blocked_entry_event_export_report,
     write_signal_fill_timing_audit_report,
 )
 from crypto_trading_system.scanner import run_market_scan
@@ -386,6 +387,13 @@ def build_parser() -> argparse.ArgumentParser:
     signal_timing.add_argument("--run-id", required=True, help="Backtest run_id to audit.")
     signal_timing.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
     signal_timing.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    blocked_export = research_subparsers.add_parser(
+        "blocked-entry-event-export",
+        help="Replay a stored backtest and export max-active blocked entry events.",
+    )
+    blocked_export.add_argument("--run-id", required=True, help="Backtest run_id to instrument.")
+    blocked_export.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
+    blocked_export.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
@@ -1018,6 +1026,28 @@ def main() -> None:
             print(f"reason={audit.reason}")
             for path in paths:
                 print(f"report={path}")
+        if args.research_command == "blocked-entry-event-export":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            export, paths, json_path = write_blocked_entry_event_export_report(
+                settings,
+                run_id=args.run_id,
+                report_date=args.reports_date,
+                progress=_progress,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("blocked_entry_event_export=completed")
+            print(f"source_run_id={export.source_run_id}")
+            print(f"replay_run_id={export.replay_run_id}")
+            print(f"verdict={export.verdict}")
+            print(f"events={export.event_count}")
+            print(f"replay_entered_trades={export.replay_entered_trades}")
+            print(f"same_bar_entry_exit_possible_events={export.same_bar_entry_exit_possible_events}")
+            print(f"same_bar_entry_tp1_possible_events={export.same_bar_entry_tp1_possible_events}")
+            for path in paths:
+                print(f"report={path}")
+            print(f"events_json={json_path}")
 
     if args.command == "paper":
         init_db(settings.output.database_path)
