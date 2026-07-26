@@ -356,3 +356,35 @@ shadow experiment 需要回答：
 2. 主样本只看 canonical baseline 中所有 pre-TP1 且 age 达到 `42 bars = 168h` 的 active slots。
 3. 输出 stale time 后的 `forward_R_24`、`forward_R_42`、`forward_R_60`、eventual R、MFE/MAE、first-hit outcome 和 censored 标记。
 4. 该阶段仍只判断旧仓继续占槽是否有价值，不比较 blocked candidate，不计算 replacement outcome。
+
+## 2026-07-27 Stage 3 执行进展
+
+### Stage 3：`stale_slot_continuation_review`
+
+状态：已完成。
+输出：
+- 报告：`reports/2026-07-27/stale_slot_continuation_review_2026-07-27_v1.md`
+
+核心事实：
+- source run：`110c51eef593`
+- replay run：`8e24e6bda89b`
+- stale threshold：`42 bars = 168h`
+- total entered trades：`58`
+- eligible pre-TP1 stale slots：`26`
+- excluded TP1 before stale：`13`
+- excluded closed before stale：`19`
+- right censored：`1`
+- `forward_R_24_mean=-0.282`
+- `forward_R_42_mean=-0.132`
+- `forward_R_60_mean=-0.191`
+- `eventual_continuation_R_mean=-0.129`
+- first-hit outcome：stop `15`、tp1 `10`、not_hit_by_end `1`
+
+结论：`stale_slot_continuation_weak_retest`。旧仓达到 42 根 4h K 线后继续占槽的平均增量 R 为负，支持继续做 replacement 诊断，但不支持部署、不支持提高 `max_active_positions`、不支持直接修改生产状态机。
+
+下一步直接执行：
+1. 设计并实现 `blocked_candidate_vs_stale_slot_review`。
+2. 每个真实 `max_active_positions` blocked event 只取排序第一的 blocked candidate。
+3. stale slot 只能按事前规则从该 event 的 `active_snapshot_after_exits` 中选择 pre-TP1 且 `holding_bars >= 42` 的旧仓。
+4. 输出 candidate 与 stale slot 的 forward R / first-hit / same-bar ambiguity 对比；post-TP1 仅作对照，oracle 只作上限。
+5. 仍然不修改 `settings.toml`，不部署 replacement。

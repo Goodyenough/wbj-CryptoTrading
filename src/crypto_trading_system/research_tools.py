@@ -100,6 +100,62 @@ class ReplayConsistencyAudit:
     blocked_event_mismatch_examples: list[dict]
 
 
+@dataclass(frozen=True)
+class StaleSlotObservation:
+    trade_id: str
+    symbol: str
+    entered_at_utc: str
+    stale_time_utc: str
+    closed_at_utc: str | None
+    tp1_hit_at_utc: str | None
+    final_status: str
+    entry_price: float
+    stop_loss: float
+    take_profit_1: float
+    stale_close: float
+    risk_per_unit: float
+    forward_r_24: float | None
+    forward_r_42: float | None
+    forward_r_60: float | None
+    eventual_continuation_r: float | None
+    mfe_r_after_stale: float | None
+    mae_r_after_stale: float | None
+    first_hit_outcome_after_stale: str
+    first_hit_time_utc: str | None
+    right_censored: bool
+    horizon_24_censored: bool
+    horizon_42_censored: bool
+    horizon_60_censored: bool
+
+
+@dataclass(frozen=True)
+class StaleSlotContinuationReview:
+    source_run_id: str
+    replay_run_id: str
+    report_date: str
+    start_utc: str
+    end_utc: str
+    source_commit_hash: str
+    stale_bars: int
+    stale_hours: int
+    total_entered_trades: int
+    eligible_pre_tp1_stale_slots: int
+    excluded_tp1_before_stale: int
+    excluded_closed_before_stale: int
+    excluded_insufficient_price_data: int
+    right_censored_count: int
+    first_hit_outcomes: dict[str, int]
+    forward_r_24_summary: dict[str, float | int | None]
+    forward_r_42_summary: dict[str, float | int | None]
+    forward_r_60_summary: dict[str, float | int | None]
+    eventual_continuation_r_summary: dict[str, float | int | None]
+    mfe_r_summary: dict[str, float | int | None]
+    mae_r_summary: dict[str, float | int | None]
+    verdict: str
+    reason: str
+    observations: list[StaleSlotObservation]
+
+
 def _local_now() -> datetime:
     return datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=8), name="CST"))
 
@@ -1630,6 +1686,463 @@ def write_replay_consistency_audit_report(
         path.write_text(text, encoding="utf-8")
         paths.append(path)
     return audit, paths
+
+
+def _ms_from_iso(value: str) -> int:
+    return int(_parse_utc(value).timestamp() * 1000)
+
+
+def _iso_from_ms(value: int) -> str:
+    return datetime.fromtimestamp(value / 1000, tz=timezone.utc).isoformat(timespec="seconds")
+
+
+def _kline_close_ms(kline: list, step_ms: int) -> int:
+    return int(kline[0]) + step_ms
+
+
+def _kline_by_close_ms(klines: list[list], step_ms: int) -> dict[int, list]:
+    return {_kline_close_ms(kline, step_ms): kline for kline in klines}
+
+
+def _summary(values: list[float | None]) -> dict[str, float | int | None]:
+    clean = sorted(float(value) for value in values if value is not None)
+    if not clean:
+        return {"n": 0, "mean": None, "median": None, "positive_pct": None, "min": None, "max": None}
+    n = len(clean)
+    mid = n // 2
+    median = clean[mid] if n % 2 else (clean[mid - 1] + clean[mid]) / 2
+    return {
+        "n": n,
+        "mean": sum(clean) / n,
+        "median": median,
+        "positive_pct": sum(1 for value in clean if value > 0) / n * 100,
+        "min": clean[0],
+        "max": clean[-1],
+    }
+
+
+def _fmt_summary_value(value: float | int | None) -> str:
+    if value is None:
+        return "n/a"
+    if isinstance(value, int):
+        return str(value)
+    return f"{value:.3f}"
+
+
+def _close_or_exit_continuation_r(
+    trade: dict,
+    by_close: dict[int, list],
+    *,
+    stale_ms: int,
+    target_ms: int,
+    stale_close: float,
+    risk_per_unit: float,
+) -> tuple[float | None, bool]:
+    closed_at = trade.get("closed_at_utc")
+    closed_ms = None if closed_at is None else _ms_from_iso(str(closed_at))
+    if closed_ms is not None and closed_ms <= target_ms and trade.get("exit_price_filled") is not None:
+        return (float(trade["exit_price_filled"]) - stale_close) / risk_per_unit, False
+    kline = by_close.get(target_ms)
+    if kline is None:
+        return None, True
+    return (float(kline[4]) - stale_close) / risk_per_unit, False
+
+
+def _eventual_continuation_r(
+    trade: dict,
+    klines_after_stale: list[list],
+    *,
+    stale_close: float,
+    risk_per_unit: float,
+) -> tuple[float | None, bool]:
+    if trade.get("closed_at_utc") is not None and trade.get("exit_price_filled") is not None:
+        return (float(trade["exit_price_filled"]) - stale_close) / risk_per_unit, False
+    if not klines_after_stale:
+        return None, True
+    return (float(klines_after_stale[-1][4]) - stale_close) / risk_per_unit, True
+
+
+def _first_hit_after_stale(
+    klines_after_stale: list[list],
+    *,
+    stop_loss: float,
+    take_profit_1: float,
+    step_ms: int,
+    intrabar_policy: str,
+) -> tuple[str, str | None]:
+    for kline in klines_after_stale:
+        close_ms = _kline_close_ms(kline, step_ms)
+        high = float(kline[2])
+        low = float(kline[3])
+        stop_hit = low <= stop_loss
+        tp1_hit = high >= take_profit_1
+        if stop_hit and tp1_hit:
+            return ("stop_first_same_bar" if intrabar_policy == "stop_first" else "tp1_first_same_bar"), _iso_from_ms(close_ms)
+        if stop_hit:
+            return "stop", _iso_from_ms(close_ms)
+        if tp1_hit:
+            return "tp1", _iso_from_ms(close_ms)
+    return "not_hit_by_end", None
+
+
+def _stale_observation_from_trade(
+    trade: dict,
+    klines: list[list],
+    *,
+    stale_bars: int,
+    step_ms: int,
+    end_ms: int,
+    intrabar_policy: str,
+) -> tuple[StaleSlotObservation | None, str | None]:
+    entered_at = trade.get("entered_at_utc")
+    entry_price = trade.get("entry_price_filled")
+    stop_loss = trade.get("stop_loss")
+    take_profit_1 = trade.get("take_profit_1")
+    if entered_at is None or entry_price is None or stop_loss is None or take_profit_1 is None:
+        return None, "insufficient_trade_fields"
+    entered_ms = _ms_from_iso(str(entered_at))
+    stale_ms = entered_ms + stale_bars * step_ms
+    if stale_ms > end_ms:
+        return None, "insufficient_price_data"
+    tp1_at = trade.get("tp1_hit_at_utc")
+    if tp1_at is not None and _ms_from_iso(str(tp1_at)) <= stale_ms:
+        return None, "tp1_before_stale"
+    closed_at = trade.get("closed_at_utc")
+    if closed_at is not None and _ms_from_iso(str(closed_at)) <= stale_ms:
+        return None, "closed_before_stale"
+    entry = float(entry_price)
+    stop = float(stop_loss)
+    tp1 = float(take_profit_1)
+    risk_per_unit = entry - stop
+    if risk_per_unit <= 0:
+        return None, "insufficient_trade_fields"
+    by_close = _kline_by_close_ms(klines, step_ms)
+    stale_kline = by_close.get(stale_ms)
+    if stale_kline is None:
+        return None, "insufficient_price_data"
+    stale_close = float(stale_kline[4])
+    terminal_ms = end_ms
+    if closed_at is not None:
+        terminal_ms = min(terminal_ms, _ms_from_iso(str(closed_at)))
+    klines_after_stale = [
+        kline
+        for kline in klines
+        if stale_ms < _kline_close_ms(kline, step_ms) <= terminal_ms
+    ]
+    forward_24, horizon_24_censored = _close_or_exit_continuation_r(
+        trade,
+        by_close,
+        stale_ms=stale_ms,
+        target_ms=stale_ms + 24 * step_ms,
+        stale_close=stale_close,
+        risk_per_unit=risk_per_unit,
+    )
+    forward_42, horizon_42_censored = _close_or_exit_continuation_r(
+        trade,
+        by_close,
+        stale_ms=stale_ms,
+        target_ms=stale_ms + 42 * step_ms,
+        stale_close=stale_close,
+        risk_per_unit=risk_per_unit,
+    )
+    forward_60, horizon_60_censored = _close_or_exit_continuation_r(
+        trade,
+        by_close,
+        stale_ms=stale_ms,
+        target_ms=stale_ms + 60 * step_ms,
+        stale_close=stale_close,
+        risk_per_unit=risk_per_unit,
+    )
+    eventual_r, right_censored = _eventual_continuation_r(
+        trade,
+        klines_after_stale,
+        stale_close=stale_close,
+        risk_per_unit=risk_per_unit,
+    )
+    if klines_after_stale:
+        mfe_r = (max(float(kline[2]) for kline in klines_after_stale) - stale_close) / risk_per_unit
+        mae_r = (min(float(kline[3]) for kline in klines_after_stale) - stale_close) / risk_per_unit
+    else:
+        mfe_r = None
+        mae_r = None
+    first_hit, first_hit_time = _first_hit_after_stale(
+        klines_after_stale,
+        stop_loss=stop,
+        take_profit_1=tp1,
+        step_ms=step_ms,
+        intrabar_policy=intrabar_policy,
+    )
+    return (
+        StaleSlotObservation(
+            trade_id=str(trade.get("trade_id", "")),
+            symbol=str(trade.get("symbol", "")),
+            entered_at_utc=str(entered_at),
+            stale_time_utc=_iso_from_ms(stale_ms),
+            closed_at_utc=None if closed_at is None else str(closed_at),
+            tp1_hit_at_utc=None if tp1_at is None else str(tp1_at),
+            final_status=str(trade.get("status", "")),
+            entry_price=entry,
+            stop_loss=stop,
+            take_profit_1=tp1,
+            stale_close=stale_close,
+            risk_per_unit=risk_per_unit,
+            forward_r_24=forward_24,
+            forward_r_42=forward_42,
+            forward_r_60=forward_60,
+            eventual_continuation_r=eventual_r,
+            mfe_r_after_stale=mfe_r,
+            mae_r_after_stale=mae_r,
+            first_hit_outcome_after_stale=first_hit,
+            first_hit_time_utc=first_hit_time,
+            right_censored=right_censored,
+            horizon_24_censored=horizon_24_censored,
+            horizon_42_censored=horizon_42_censored,
+            horizon_60_censored=horizon_60_censored,
+        ),
+        None,
+    )
+
+
+def build_stale_slot_continuation_review(
+    settings: Settings,
+    run_id: str,
+    *,
+    stale_bars: int = 42,
+    report_date: str | None = None,
+    progress=None,
+) -> StaleSlotContinuationReview:
+    from .backtest.history import batch_load_klines_cached, interval_ms
+
+    run = _source_run_row(settings, run_id)
+    result, replay_settings, symbols, _dynamic_mode, _max_symbols = _replay_source_run(settings, run, progress=progress)
+    step_ms = interval_ms(replay_settings.backtest.primary_interval)
+    start_ms = _ms_from_iso(str(run["start_utc"]))
+    end_ms = _ms_from_iso(str(run["end_utc"]))
+    klines_by_symbol = batch_load_klines_cached(
+        replay_settings,
+        symbols,
+        [replay_settings.backtest.primary_interval],
+        start_ms,
+        end_ms,
+    )
+    replay_trades = _trade_dicts_from_result(result)
+    entered = _entered_trades(replay_trades)
+    observations: list[StaleSlotObservation] = []
+    exclusion_counts: Counter = Counter()
+    interval = replay_settings.backtest.primary_interval
+    for trade in entered:
+        symbol = str(trade.get("symbol", ""))
+        klines = klines_by_symbol.get(symbol, {}).get(interval, [])
+        observation, exclusion = _stale_observation_from_trade(
+            trade,
+            klines,
+            stale_bars=stale_bars,
+            step_ms=step_ms,
+            end_ms=end_ms,
+            intrabar_policy=replay_settings.backtest.intrabar_policy,
+        )
+        if observation is not None:
+            observations.append(observation)
+        elif exclusion is not None:
+            exclusion_counts[exclusion] += 1
+
+    first_hit_outcomes = dict(sorted(Counter(obs.first_hit_outcome_after_stale for obs in observations).items()))
+    right_censored_count = sum(1 for obs in observations if obs.right_censored)
+    eventual_summary = _summary([obs.eventual_continuation_r for obs in observations])
+    forward_42_summary = _summary([obs.forward_r_42 for obs in observations])
+    if not observations:
+        verdict = "stale_slot_sample_empty"
+        reason = "No entered trades reached the pre-TP1 stale threshold, so the old-slot continuation value cannot be estimated from this run."
+    elif int(eventual_summary["n"] or 0) < 10:
+        verdict = "stale_slot_sample_thin_retest"
+        reason = "Pre-TP1 stale slots exist, but the sample is too small for a stable continuation judgment; treat this as a diagnostic snapshot."
+    elif float(eventual_summary["mean"] or 0.0) < 0 and float(forward_42_summary["mean"] or 0.0) < 0:
+        verdict = "stale_slot_continuation_weak_retest"
+        reason = "Pre-TP1 stale slots show negative average continuation after the stale time, supporting further capacity replacement research but not deployment."
+    else:
+        verdict = "stale_slot_continuation_not_weak"
+        reason = "Pre-TP1 stale slots do not show broadly negative continuation value; replacement research priority should be reduced unless blocked-candidate evidence is very strong."
+
+    return StaleSlotContinuationReview(
+        source_run_id=run_id,
+        replay_run_id=result.run_id,
+        report_date=report_date or _local_now().strftime("%Y-%m-%d"),
+        start_utc=str(run["start_utc"]),
+        end_utc=str(run["end_utc"]),
+        source_commit_hash=str(run["commit_hash"]),
+        stale_bars=stale_bars,
+        stale_hours=int(stale_bars * step_ms / 60 / 60 / 1000),
+        total_entered_trades=len(entered),
+        eligible_pre_tp1_stale_slots=len(observations),
+        excluded_tp1_before_stale=int(exclusion_counts["tp1_before_stale"]),
+        excluded_closed_before_stale=int(exclusion_counts["closed_before_stale"]),
+        excluded_insufficient_price_data=int(exclusion_counts["insufficient_price_data"] + exclusion_counts["insufficient_trade_fields"]),
+        right_censored_count=right_censored_count,
+        first_hit_outcomes=first_hit_outcomes,
+        forward_r_24_summary=_summary([obs.forward_r_24 for obs in observations]),
+        forward_r_42_summary=forward_42_summary,
+        forward_r_60_summary=_summary([obs.forward_r_60 for obs in observations]),
+        eventual_continuation_r_summary=eventual_summary,
+        mfe_r_summary=_summary([obs.mfe_r_after_stale for obs in observations]),
+        mae_r_summary=_summary([obs.mae_r_after_stale for obs in observations]),
+        verdict=verdict,
+        reason=reason,
+        observations=observations,
+    )
+
+
+def render_stale_slot_continuation_review(review: StaleSlotContinuationReview) -> str:
+    now = _local_now()
+    lines = [
+        "---",
+        f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - stale-slot-continuation-review",
+        "experiment: stale_slot_continuation_review",
+        f"source_run_id: {review.source_run_id}",
+        f"replay_run_id: {review.replay_run_id}",
+        f"verdict: {review.verdict}",
+        "---",
+        "",
+        "# stale_slot_continuation_review",
+        "",
+        "## Plain-language conclusion",
+        "",
+        review.reason,
+        "",
+        "This report is diagnostic only. It does not compare blocked candidates, does not calculate replacement outcome, and does not change `config/settings.toml`, backtest behavior, paper state, strategy defaults, or saved backtest rows.",
+        "",
+        "## Scope",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| source_run_id | `{review.source_run_id}` |",
+        f"| replay_run_id | `{review.replay_run_id}` |",
+        f"| window | `{review.start_utc}` -> `{review.end_utc}` |",
+        f"| source_commit_hash | `{review.source_commit_hash}` |",
+        f"| stale_threshold | {review.stale_bars} bars = {review.stale_hours}h |",
+        "",
+        "## Sample Definition",
+        "",
+        "A slot is included only if it was an entered position that reached the stale threshold while still pre-TP1 and still open. `forward_R_*` is incremental R from the stale-time close, not whole-trade R.",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| total_entered_trades | {review.total_entered_trades} |",
+        f"| eligible_pre_tp1_stale_slots | {review.eligible_pre_tp1_stale_slots} |",
+        f"| excluded_tp1_before_stale | {review.excluded_tp1_before_stale} |",
+        f"| excluded_closed_before_stale | {review.excluded_closed_before_stale} |",
+        f"| excluded_insufficient_price_data | {review.excluded_insufficient_price_data} |",
+        f"| right_censored_count | {review.right_censored_count} |",
+        "",
+        "## Continuation R Summary",
+        "",
+        "| Metric | n | mean | median | positive_pct | min | max |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    for label, summary in [
+        ("forward_R_24", review.forward_r_24_summary),
+        ("forward_R_42", review.forward_r_42_summary),
+        ("forward_R_60", review.forward_r_60_summary),
+        ("eventual_continuation_R", review.eventual_continuation_r_summary),
+        ("MFE_R_after_stale", review.mfe_r_summary),
+        ("MAE_R_after_stale", review.mae_r_summary),
+    ]:
+        lines.append(
+            f"| {label} | {_fmt_summary_value(summary['n'])} | {_fmt_summary_value(summary['mean'])} | "
+            f"{_fmt_summary_value(summary['median'])} | {_fmt_summary_value(summary['positive_pct'])} | "
+            f"{_fmt_summary_value(summary['min'])} | {_fmt_summary_value(summary['max'])} |"
+        )
+    lines.extend(["", "## First Hit After Stale", "", "| Outcome | Count |", "|---|---:|"])
+    if review.first_hit_outcomes:
+        for outcome, count in review.first_hit_outcomes.items():
+            lines.append(f"| `{outcome}` | {count} |")
+    else:
+        lines.append("| n/a | 0 |")
+    lines.extend(
+        [
+            "",
+            "## First Observations",
+            "",
+            "| # | Symbol | Stale Time | Status | forward_R_42 | eventual_R | MFE_R | MAE_R | First Hit | Censored |",
+            "|---:|---|---|---|---:|---:|---:|---:|---|---|",
+        ]
+    )
+    for index, obs in enumerate(review.observations[:30], start=1):
+        lines.append(
+            f"| {index} | `{obs.symbol}` | `{obs.stale_time_utc}` | `{obs.final_status}` | "
+            f"{_fmt_summary_value(obs.forward_r_42)} | {_fmt_summary_value(obs.eventual_continuation_r)} | "
+            f"{_fmt_summary_value(obs.mfe_r_after_stale)} | {_fmt_summary_value(obs.mae_r_after_stale)} | "
+            f"`{obs.first_hit_outcome_after_stale}` | {str(obs.right_censored).lower()} |"
+        )
+    if not review.observations:
+        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | false |")
+    lines.extend(
+        [
+            "",
+            "## Decision",
+            "",
+            f"`{review.verdict}`",
+            "",
+            "## Next Action",
+            "",
+        ]
+    )
+    if review.verdict == "stale_slot_continuation_weak_retest":
+        lines.append("Proceed to `blocked_candidate_vs_stale_slot_review`, still as a diagnostic comparison only. Do not change `max_active_positions` or deploy replacement logic.")
+    elif review.verdict == "stale_slot_continuation_not_weak":
+        lines.append("Do not prioritize replacement until stronger blocked-candidate evidence exists; document why old-slot continuation is not broadly weak.")
+    elif review.verdict == "stale_slot_sample_thin_retest":
+        lines.append("Retest on broader or walk-forward windows before using stale-slot continuation as a capacity decision input.")
+    else:
+        lines.append("Stop this branch for the current run because no eligible stale slots were observed.")
+    lines.extend(
+        [
+            "",
+            "## Raw Summary",
+            "",
+            "```json",
+            json.dumps(asdict(review), ensure_ascii=False, indent=2),
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_stale_slot_continuation_review_report(
+    settings: Settings,
+    run_id: str,
+    *,
+    stale_bars: int = 42,
+    report_date: str | None = None,
+    progress=None,
+) -> tuple[StaleSlotContinuationReview, list[Path]]:
+    date_text = report_date or _local_now().strftime("%Y-%m-%d")
+    review = build_stale_slot_continuation_review(
+        settings,
+        run_id,
+        stale_bars=stale_bars,
+        report_date=date_text,
+        progress=progress,
+    )
+    text = render_stale_slot_continuation_review(review)
+    report_dir = settings.output.reports_dir / date_text
+    obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
+    prefix = f"stale_slot_continuation_review_{date_text}"
+    version = next_report_version([report_dir, obsidian_dir], prefix)
+    filename = versioned_markdown_filename(prefix, version)
+    paths: list[Path] = []
+    for directory in [report_dir, obsidian_dir]:
+        if directory is None:
+            continue
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / filename
+        path.write_text(text, encoding="utf-8")
+        paths.append(path)
+    return review, paths
 
 
 def generate_observation_dashboard(

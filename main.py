@@ -44,6 +44,7 @@ from crypto_trading_system.research_tools import (
     write_blocked_entry_event_export_report,
     write_replay_consistency_audit_report,
     write_signal_fill_timing_audit_report,
+    write_stale_slot_continuation_review_report,
 )
 from crypto_trading_system.scanner import run_market_scan
 from crypto_trading_system.storage import init_db, save_scan_result, update_market_scan_report_path
@@ -407,6 +408,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     replay_consistency.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
     replay_consistency.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    stale_slot = research_subparsers.add_parser(
+        "stale-slot-continuation-review",
+        help="Review continuation value of pre-TP1 active slots after a stale holding threshold.",
+    )
+    stale_slot.add_argument("--run-id", required=True, help="Source backtest run_id to replay.")
+    stale_slot.add_argument("--stale-bars", type=int, default=42, help="Pre-TP1 stale threshold in primary bars.")
+    stale_slot.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
+    stale_slot.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
@@ -1082,6 +1091,29 @@ def main() -> None:
             print(f"open_plan_path_mismatches={audit.open_plan_path_mismatches}")
             print(f"blocked_event_signature_mismatches={audit.blocked_event_signature_mismatches}")
             print(f"final_equity_delta={audit.final_equity_delta:.10f}")
+            for path in paths:
+                print(f"report={path}")
+        if args.research_command == "stale-slot-continuation-review":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            review, paths = write_stale_slot_continuation_review_report(
+                settings,
+                run_id=args.run_id,
+                stale_bars=args.stale_bars,
+                report_date=args.reports_date,
+                progress=_progress,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("stale_slot_continuation_review=completed")
+            print(f"source_run_id={review.source_run_id}")
+            print(f"replay_run_id={review.replay_run_id}")
+            print(f"verdict={review.verdict}")
+            print(f"stale_bars={review.stale_bars}")
+            print(f"eligible_pre_tp1_stale_slots={review.eligible_pre_tp1_stale_slots}")
+            print(f"right_censored_count={review.right_censored_count}")
+            print(f"forward_r_42_mean={review.forward_r_42_summary['mean']}")
+            print(f"eventual_continuation_r_mean={review.eventual_continuation_r_summary['mean']}")
             for path in paths:
                 print(f"report={path}")
 

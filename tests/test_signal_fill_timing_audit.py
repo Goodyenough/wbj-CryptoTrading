@@ -12,9 +12,12 @@ sys.path.insert(0, str(ROOT / "src"))
 from crypto_trading_system.research_tools import (  # noqa: E402
     BlockedEntryEventExport,
     ReplayConsistencyAudit,
+    StaleSlotContinuationReview,
+    StaleSlotObservation,
     build_signal_fill_timing_audit,
     render_blocked_entry_event_export,
     render_replay_consistency_audit,
+    render_stale_slot_continuation_review,
     write_signal_fill_timing_audit_report,
 )
 
@@ -316,6 +319,70 @@ def test_render_replay_consistency_audit_includes_limits_and_next_action() -> No
     assert "Proceed to `stale_slot_continuation_review`" in text
 
 
+def test_render_stale_slot_continuation_review_defines_scope_and_next_action() -> None:
+    observation = StaleSlotObservation(
+        trade_id="trade1",
+        symbol="ETHUSDT",
+        entered_at_utc="2025-07-01T00:00:00+00:00",
+        stale_time_utc="2025-07-08T00:00:00+00:00",
+        closed_at_utc="2025-07-12T00:00:00+00:00",
+        tp1_hit_at_utc=None,
+        final_status="STOPPED",
+        entry_price=100.0,
+        stop_loss=90.0,
+        take_profit_1=115.0,
+        stale_close=98.0,
+        risk_per_unit=10.0,
+        forward_r_24=-0.2,
+        forward_r_42=-0.5,
+        forward_r_60=-0.8,
+        eventual_continuation_r=-0.9,
+        mfe_r_after_stale=0.3,
+        mae_r_after_stale=-1.0,
+        first_hit_outcome_after_stale="stop",
+        first_hit_time_utc="2025-07-12T00:00:00+00:00",
+        right_censored=False,
+        horizon_24_censored=False,
+        horizon_42_censored=False,
+        horizon_60_censored=False,
+    )
+    review = StaleSlotContinuationReview(
+        source_run_id="source1",
+        replay_run_id="replay1",
+        report_date="2026-07-27",
+        start_utc="2025-06-01T00:00:00+00:00",
+        end_utc="2026-06-01T00:00:00+00:00",
+        source_commit_hash="abc123",
+        stale_bars=42,
+        stale_hours=168,
+        total_entered_trades=58,
+        eligible_pre_tp1_stale_slots=1,
+        excluded_tp1_before_stale=10,
+        excluded_closed_before_stale=20,
+        excluded_insufficient_price_data=0,
+        right_censored_count=0,
+        first_hit_outcomes={"stop": 1},
+        forward_r_24_summary={"n": 1, "mean": -0.2, "median": -0.2, "positive_pct": 0.0, "min": -0.2, "max": -0.2},
+        forward_r_42_summary={"n": 1, "mean": -0.5, "median": -0.5, "positive_pct": 0.0, "min": -0.5, "max": -0.5},
+        forward_r_60_summary={"n": 1, "mean": -0.8, "median": -0.8, "positive_pct": 0.0, "min": -0.8, "max": -0.8},
+        eventual_continuation_r_summary={"n": 1, "mean": -0.9, "median": -0.9, "positive_pct": 0.0, "min": -0.9, "max": -0.9},
+        mfe_r_summary={"n": 1, "mean": 0.3, "median": 0.3, "positive_pct": 100.0, "min": 0.3, "max": 0.3},
+        mae_r_summary={"n": 1, "mean": -1.0, "median": -1.0, "positive_pct": 0.0, "min": -1.0, "max": -1.0},
+        verdict="stale_slot_continuation_weak_retest",
+        reason="test reason",
+        observations=[observation],
+    )
+
+    text = render_stale_slot_continuation_review(review)
+
+    assert "# stale_slot_continuation_review" in text
+    assert "does not compare blocked candidates" in text
+    assert "42 bars = 168h" in text
+    assert "forward_R_42" in text
+    assert "first_hit_outcome_after_stale" in text or "First Hit After Stale" in text
+    assert "Proceed to `blocked_candidate_vs_stale_slot_review`" in text
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -326,3 +393,4 @@ if __name__ == "__main__":
         test_signal_fill_timing_audit_missing_run_raises(root / "missing")
         test_render_blocked_entry_event_export_includes_required_fields()
         test_render_replay_consistency_audit_includes_limits_and_next_action()
+        test_render_stale_slot_continuation_review_defines_scope_and_next_action()

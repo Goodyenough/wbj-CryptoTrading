@@ -84,6 +84,7 @@
 - `reports/2026-07-27/signal_fill_timing_audit_2026-07-27_v1.md` 记录 replay 时点审计：active exits 先于 WATCHING entries，WATCHING 按 `(-score, created_index, symbol)` 排序，reclaim 用当前 4h close 判断，entry raw price 为 `entry_high`；结论 `timing_audit_warn_same_bar_ambiguity`，后续 blocked event export 必须显式记录 same-bar ambiguity。
 - `reports/2026-07-27/blocked_entry_event_export_2026-07-27_v1.md` 与 `reports/2026-07-27/blocked_entry_event_export_2026-07-27_v1.json` 记录 Stage 1 blocked event export：source run `110c51eef593` 复跑为 `ed682b4a5531`，source/replay entered trades 均为 58，导出 `blocked_entry_events=512`；`same_bar_entry_exit_possible_events=0`、`same_bar_entry_tp1_possible_events=2`。该结果只是事件样本导出完成，不构成 replacement edge 证据。
 - `reports/2026-07-27/replay_consistency_audit_2026-07-27_v1.md` 记录 Stage 2 replay consistency audit：source run `110c51eef593` 复跑为 `1e3cbb13c14a`，trades `389 -> 389`，entered trades `58 -> 58`，active/open-plan path 2190 点 mismatch 均为 0，final equity delta 为 0，blocked event repeat `512 -> 512` 且 signature mismatch 为 0；结论 `replay_consistency_pass_with_ordering_limit`，候选排序因 source 未直接持久化，只能通过源码 marker 与重复事件签名间接验证。
+- `reports/2026-07-27/stale_slot_continuation_review_2026-07-27_v1.md` 记录 Stage 3 stale slot continuation review：source run `110c51eef593` 复跑为 `8e24e6bda89b`，总 entered trades 58，pre-TP1 且达到 `42 bars = 168h` 的合格 stale slots 为 26，`right_censored_count=1`。继续持有增量 R：`forward_R_24_mean=-0.282`、`forward_R_42_mean=-0.132`、`forward_R_60_mean=-0.191`、`eventual_continuation_R_mean=-0.129`；first-hit outcome 为 stop 15、tp1 10、not_hit_by_end 1。结论 `stale_slot_continuation_weak_retest`，支持继续做 replacement 诊断，但不部署、不修改仓位上限。
 - `reports/2026-07-26/relative_strength_soft_gate_threshold_sensitivity_2026-07-26_v1.md` 记录相对强度阈值家族全部仍为 `retest`。
 
 ### 观察
@@ -109,7 +110,7 @@
 - 不部署 `relative_strength_soft_gate`。
 - 不部署 `atr_reclaim_0_25`。
 - 不部署 `atr_reclaim_0_35`；人工路径复盘后降级为 `retest_path_dependent`，容量复核后仍不修改 `max_active_positions` 或 score 排序。
-- 下一步若继续研究容量，`signal_fill_timing_audit`、`blocked_entry_event_export` 与 `replay_consistency_audit` 已完成；继续推进 `stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review`。先独立评估 pre-TP1 stale slots 达到 42 bars 后继续持有的边际价值，不直接计算 replacement outcome，不新增生产过滤器。
+- 下一步若继续研究容量，`signal_fill_timing_audit`、`blocked_entry_event_export`、`replay_consistency_audit` 与 `stale_slot_continuation_review` 已完成；继续推进 `blocked_candidate_vs_stale_slot_review`。只比较真实 capacity-blocked event 中排序第一的 candidate 与事前规则选出的 pre-TP1 stale slot，post-TP1 仅作对照，oracle 仅作上限，不新增生产过滤器。
 - 不部署 `max_holding_bars_conditional=true`。
 - `max_holding_bars_without_tp1=42` 仅保留为候选，等待模拟盘/人工复核。
 - 后续任何实验必须先提交实验卡片并获得用户批准。

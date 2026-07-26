@@ -15,6 +15,15 @@
 
 ## 2026-07-27
 
+### 00:50:26 +08:00 - 完成 stale_slot_continuation_review Stage 3
+- 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增只读研究命令 `python main.py research stale-slot-continuation-review --run-id ... --stale-bars 42`，实现 `StaleSlotContinuationReview`、报告渲染和测试；生成 `reports/2026-07-27/stale_slot_continuation_review_2026-07-27_v1.md`。
+- 原因：在比较 blocked candidate 前，先独立确认 pre-TP1 旧仓达到 `42 bars = 168h` 后继续占槽是否仍有边际价值。
+- 结果：26 个合格 stale slots，`forward_R_42_mean=-0.132`，`eventual_continuation_R_mean=-0.129`，first-hit outcome 为 stop 15、tp1 10、not_hit_by_end 1；结论 `stale_slot_continuation_weak_retest`。
+- 影响：支持进入 `blocked_candidate_vs_stale_slot_review`，但不部署、不修改 `config/settings.toml`、不提高 `max_active_positions`、不写入 replacement 状态机。
+- 验证：已运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests`、`python main.py research stale-slot-continuation-review --run-id 110c51eef593 --stale-bars 42 --reports-date 2026-07-27 --no-obsidian`；确认 `config/settings.toml` 与 `data/crypto_trading.db` 无 diff。
+- Git：本次计划提交 `Add stale slot continuation review`。
+
 ### 00:36:01 +08:00 - 完成 replay_consistency_audit Stage 2
 - 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增只读研究命令 `python main.py research replay-consistency-audit --run-id ... --blocked-events-json ...`，用于对比 source run 与 instrumented replay 的交易集合、active path、final equity 和 blocked event 重复签名。
