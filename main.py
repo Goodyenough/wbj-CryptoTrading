@@ -41,6 +41,7 @@ from crypto_trading_system.research_tools import (
     build_experiment_index,
     generate_observation_dashboard,
     split_symbol_master_by_cap,
+    write_signal_fill_timing_audit_report,
 )
 from crypto_trading_system.scanner import run_market_scan
 from crypto_trading_system.storage import init_db, save_scan_result, update_market_scan_report_path
@@ -375,6 +376,16 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Write only to the project reports directory.",
     )
+
+    research = subparsers.add_parser("research", help="Run read-only research diagnostics.")
+    research_subparsers = research.add_subparsers(dest="research_command", required=True)
+    signal_timing = research_subparsers.add_parser(
+        "signal-fill-timing-audit",
+        help="Audit replay signal, decision, fill, and same-bar execution timing.",
+    )
+    signal_timing.add_argument("--run-id", required=True, help="Backtest run_id to audit.")
+    signal_timing.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
+    signal_timing.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
@@ -990,6 +1001,23 @@ def main() -> None:
         print("observation_dashboard=completed")
         for path in paths:
             print(f"report={path}")
+
+    if args.command == "research":
+        if args.research_command == "signal-fill-timing-audit":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            audit, paths = write_signal_fill_timing_audit_report(
+                settings,
+                run_id=args.run_id,
+                report_date=args.reports_date,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("signal_fill_timing_audit=completed")
+            print(f"verdict={audit.verdict}")
+            print(f"reason={audit.reason}")
+            for path in paths:
+                print(f"report={path}")
 
     if args.command == "paper":
         init_db(settings.output.database_path)

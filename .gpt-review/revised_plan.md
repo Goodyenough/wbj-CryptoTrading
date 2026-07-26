@@ -167,6 +167,8 @@ V1 不建立复杂撮合模型，但必须报告：
 
 目标：确认当前 replay 的信号、决策和成交时间轴没有前视或不一致。
 
+状态：已完成。报告 `reports/2026-07-27/signal_fill_timing_audit_2026-07-27_v1.md` 给出 `timing_audit_warn_same_bar_ambiguity`。
+
 输出：
 
 - 当前 entry reclaim 的 `signal_time` / `decision_time` / `fill_time` 说明。
@@ -187,6 +189,7 @@ V1 不建立复杂撮合模型，但必须报告：
 - 每个 blocked event 有唯一 ID。
 - `block_reason=max_active_positions` 与其他阻塞原因分离。
 - candidate 和 active slots 快照完整。
+- 必须记录 `fill_time_assumption`、`active_snapshot_after_exits`、`same_bar_entry_exit_possible` 和 `same_bar_entry_tp1_possible`。
 - 重复运行结果一致。
 
 ### Stage 2：`replay_consistency_audit`
@@ -288,10 +291,10 @@ shadow experiment 需要回答：
 
 ## 下一步直接执行
 
-1. 写 `signal_fill_timing_audit` 实验卡片或诊断卡片。
-2. 阅读 `src/crypto_trading_system/backtest/replay.py` 中 entry reclaim、capacity check、exit/entry 顺序和 fill price 逻辑。
-3. 生成 `reports/YYYY-MM-DD/signal_fill_timing_audit_YYYY-MM-DD_v1.md`。
-4. 若 timing 审计通过，再设计 `blocked_entry_event_export`。
+1. 设计 `blocked_entry_event_export` 的事件 schema 和导出入口。
+2. 事件必须只记录确定状态机条件下的 `block_reason=max_active_positions`。
+3. 事件快照必须在同根 active exits/time exits 处理之后生成。
+4. 导出器实现后先跑 `replay_consistency_audit`，再计算任何 future outcome。
 
 ## 当前决策
 

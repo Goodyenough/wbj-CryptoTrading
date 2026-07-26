@@ -1,6 +1,6 @@
 # CryptoTradingSystem 实验账本
 
-更新时间：2026-07-26 23:16 +08:00
+更新时间：2026-07-27 00:06 +08:00
 
 ## 1. 账本规则
 
@@ -81,6 +81,7 @@
 - `reports/2026-07-26/atr_reclaim_0_35_trade_attribution_review_2026-07-26_v1.md` 记录交易级归因：合并后 common trade delta 为 `-43.72 USDT`，removed baseline-only 贡献 `+594.76 USDT`，added variant-only 贡献 `+3184.11 USDT`；近端窗口 top3 正贡献占该窗口净改善 `167.7%`，说明存在路径依赖。
 - `reports/2026-07-26/atr_reclaim_0_35_path_replay_review_2026-07-26_v1.md` 记录 10 笔关键路径复盘：5 笔 variant-only 赢家 reclaim margin 均超过 `0.35 ATR`，但 5 笔 missed baseline winners 同样全是 TP2 赢家；CFX/ENA/ADA 等机会出现时 baseline 多数已达到 `max_active_positions=5`，说明收益强受容量路径影响。
 - `reports/2026-07-26/capacity_and_opportunity_order_review_2026-07-26_v1.md` 记录容量与机会排序复核：baseline 满仓 28.0% 的 4h bars，variant 满仓 30.3%；两组都有长期负 R 占槽问题，但关键 missed winners 的 blocker 质量混合，结论为 `retest_capacity_real_but_not_actionable`。
+- `reports/2026-07-27/signal_fill_timing_audit_2026-07-27_v1.md` 记录 replay 时点审计：active exits 先于 WATCHING entries，WATCHING 按 `(-score, created_index, symbol)` 排序，reclaim 用当前 4h close 判断，entry raw price 为 `entry_high`；结论 `timing_audit_warn_same_bar_ambiguity`，后续 blocked event export 必须显式记录 same-bar ambiguity。
 - `reports/2026-07-26/relative_strength_soft_gate_threshold_sensitivity_2026-07-26_v1.md` 记录相对强度阈值家族全部仍为 `retest`。
 
 ### 观察
@@ -106,7 +107,7 @@
 - 不部署 `relative_strength_soft_gate`。
 - 不部署 `atr_reclaim_0_25`。
 - 不部署 `atr_reclaim_0_35`；人工路径复盘后降级为 `retest_path_dependent`，容量复核后仍不修改 `max_active_positions` 或 score 排序。
-- 下一步若继续研究容量，按 `signal_fill_timing_audit -> blocked_entry_event_export -> replay_consistency_audit -> stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review` 分阶段推进；先审计时点和事件标签，再验证旧仓续持价值和换仓价值，不新增生产过滤器。
+- 下一步若继续研究容量，`signal_fill_timing_audit` 已完成且结论为 `timing_audit_warn_same_bar_ambiguity`；继续推进 `blocked_entry_event_export -> replay_consistency_audit -> stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review`，先记录 same-bar 风险字段和事件标签，再验证旧仓续持价值和换仓价值，不新增生产过滤器。
 - 不部署 `max_holding_bars_conditional=true`。
 - `max_holding_bars_without_tp1=42` 仅保留为候选，等待模拟盘/人工复核。
 - 后续任何实验必须先提交实验卡片并获得用户批准。

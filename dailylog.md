@@ -13,6 +13,17 @@
 - Git：
 ```
 
+## 2026-07-27
+
+### 00:06:06 +08:00 - 完成 signal_fill_timing_audit Stage 0
+- 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增只读研究命令 `python main.py research signal-fill-timing-audit --run-id ...`，用于审计 replay 的 `signal_time`、`decision_time`、`fill_time`、exit/entry 顺序和 same-bar ambiguity。
+- 改动：新增 `tests/test_signal_fill_timing_audit.py`，生成 `reports/2026-07-27/signal_fill_timing_audit_2026-07-27_v1.md`，并同步更新 `TODO.md`、`EXPERIMENT_LEDGER.md`、`SYSTEM_OVERVIEW.md`、`开发计划.md`、`.gpt-review/revised_plan.md` 和 Obsidian 实验日志。
+- 原因：执行 GPT 评审后的全盘计划第 0 步，先确认回测时点口径可信，再进入 `blocked_entry_event_export`。
+- 影响：结论为 `timing_audit_warn_same_bar_ambiguity`；不修改 `config/settings.toml`，不改变 replay 行为，不部署任何策略规则。Stage 1 必须显式记录 `fill_time_assumption`、`active_snapshot_after_exits` 和 same-bar ambiguity 字段。
+- 验证：已运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests`、`python main.py research signal-fill-timing-audit --run-id 110c51eef593 --reports-date 2026-07-27 --no-obsidian`；确认 `config/settings.toml` 无 diff。
+- Git：本次计划提交 `Add signal fill timing audit`。
+
 ## 2026-07-26
 
 ### 23:59:40 +08:00 - 写入 GPT 二次评审后的新版研究计划

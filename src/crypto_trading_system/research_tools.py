@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+import inspect
 import json
 from pathlib import Path
 import sqlite3
@@ -15,6 +16,31 @@ from .report_versions import next_report_version, versioned_markdown_filename
 
 
 LARGE_CAP_SYMBOLS = ("BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT")
+
+
+@dataclass(frozen=True)
+class SignalFillTimingAudit:
+    run_id: str
+    report_date: str
+    start_utc: str
+    end_utc: str
+    commit_hash: str
+    symbols_count: int
+    entry_reclaim_close_enabled: bool | None
+    entry_reclaim_min_atr_enabled: bool | None
+    entry_reclaim_min_atr: float | None
+    max_active_positions: int | None
+    intrabar_policy: str | None
+    maker_fee_bps: float | None
+    taker_fee_bps: float | None
+    entry_slippage_bps: float | None
+    stop_slippage_bps: float | None
+    entered_trades: int
+    same_bar_entry_and_exit_trades: int
+    same_bar_entry_and_tp1_trades: int
+    blocked_notes_persisted: int
+    verdict: str
+    reason: str
 
 
 def _local_now() -> datetime:
@@ -601,6 +627,300 @@ def _fmt_optional(value: object, digits: int = 2) -> str:
     if isinstance(value, float):
         return f"{value:.{digits}f}"
     return str(value)
+
+
+def _nested_get(data: dict, path: tuple[str, ...]) -> object | None:
+    current: object = data
+    for key in path:
+        if not isinstance(current, dict) or key not in current:
+            return None
+        current = current[key]
+    return current
+
+
+def _as_bool(value: object | None) -> bool | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        lowered = value.lower()
+        if lowered in {"true", "1", "yes"}:
+            return True
+        if lowered in {"false", "0", "no"}:
+            return False
+    return None
+
+
+def _as_float(value: object | None) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _as_int(value: object | None) -> int | None:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _source_contains(source: str, needle: str) -> bool:
+    return needle in source
+
+
+def _source_line(source: str, needle: str) -> str:
+    for line in source.splitlines():
+        if needle in line:
+            return line.strip()
+    return "not found"
+
+
+def build_signal_fill_timing_audit(
+    settings: Settings,
+    run_id: str,
+    *,
+    report_date: str | None = None,
+) -> SignalFillTimingAudit:
+    from .backtest import replay as replay_module
+    from .trade_state import step_trade
+
+    connection = connect_db(settings.output.database_path)
+    try:
+        run = connection.execute("SELECT * FROM backtest_runs WHERE run_id = ?", (run_id,)).fetchone()
+        if run is None:
+            raise ValueError(f"backtest run_id not found: {run_id}")
+        trade_rows = connection.execute("SELECT * FROM backtest_trades WHERE run_id = ?", (run_id,)).fetchall()
+    finally:
+        connection.close()
+
+    config = json.loads(run["config_json"] or "{}")
+    symbols = json.loads(run["symbols_json"] or "[]")
+    entered = [row for row in trade_rows if row["entered_at_utc"]]
+    same_bar_entry_and_exit = [
+        row
+        for row in entered
+        if row["closed_at_utc"] is not None and row["closed_at_utc"] == row["entered_at_utc"]
+    ]
+    same_bar_entry_and_tp1 = 0
+    blocked_notes = 0
+    for row in trade_rows:
+        payload = json.loads(row["payload_json"] or "{}")
+        if "max active positions" in str(payload.get("notes", "")).lower():
+            blocked_notes += 1
+        for event in payload.get("events", []):
+            if (
+                isinstance(event, dict)
+                and event.get("event_type") == "TP1_HIT"
+                and row["entered_at_utc"] is not None
+                and event.get("event_time_utc") == row["entered_at_utc"]
+            ):
+                same_bar_entry_and_tp1 += 1
+
+    replay_source = inspect.getsource(replay_module)
+    step_source = inspect.getsource(step_trade)
+    required_needles = [
+        "# First advance exits for active positions, then process existing condition plans.",
+        "watching.sort(key=lambda item: (-item.score, item.created_index, item.paper.symbol))",
+        "_entry_reclaim_close_satisfied(",
+        "raw_entry = item.paper.entry_high",
+        "if len(_active_positions(all_trades)) >= settings.backtest.max_active_positions:",
+    ]
+    source_complete = all(_source_contains(replay_source, needle) for needle in required_needles)
+    same_call_entry_then_risk = _source_contains(step_source, 'if trade.status == "WATCHING":') and _source_contains(
+        step_source,
+        'if trade.status in {"ENTERED", "TP1_HIT"}',
+    )
+
+    if not source_complete:
+        verdict = "timing_audit_blocked"
+        reason = "replay source did not contain all expected timing/order markers; audit cannot verify behavior."
+    elif same_call_entry_then_risk:
+        verdict = "timing_audit_warn_same_bar_ambiguity"
+        reason = (
+            "replay order is inspectable, but WATCHING entry and same-bar stop/TP evaluation can occur in one "
+            "step_trade call; later capacity diagnostics must explicitly account for same-bar ambiguity."
+        )
+    else:
+        verdict = "timing_audit_pass"
+        reason = "replay order and fill assumptions are inspectable and no same-call entry/exit ambiguity was detected."
+
+    backtest_cfg = config.get("backtest", {}) if isinstance(config.get("backtest", {}), dict) else {}
+    analysis_cfg = config.get("analysis", {}) if isinstance(config.get("analysis", {}), dict) else {}
+    return SignalFillTimingAudit(
+        run_id=run_id,
+        report_date=report_date or _local_now().strftime("%Y-%m-%d"),
+        start_utc=str(run["start_utc"]),
+        end_utc=str(run["end_utc"]),
+        commit_hash=str(run["commit_hash"]),
+        symbols_count=len(symbols),
+        entry_reclaim_close_enabled=_as_bool(analysis_cfg.get("entry_reclaim_close_enabled")),
+        entry_reclaim_min_atr_enabled=_as_bool(analysis_cfg.get("entry_reclaim_min_atr_enabled")),
+        entry_reclaim_min_atr=_as_float(analysis_cfg.get("entry_reclaim_min_atr")),
+        max_active_positions=_as_int(backtest_cfg.get("max_active_positions")),
+        intrabar_policy=None if backtest_cfg.get("intrabar") is None else str(backtest_cfg.get("intrabar")),
+        maker_fee_bps=_as_float(backtest_cfg.get("maker_fee_bps")),
+        taker_fee_bps=_as_float(backtest_cfg.get("taker_fee_bps")),
+        entry_slippage_bps=_as_float(backtest_cfg.get("entry_slippage_bps")),
+        stop_slippage_bps=_as_float(backtest_cfg.get("stop_slippage_bps")),
+        entered_trades=len(entered),
+        same_bar_entry_and_exit_trades=len(same_bar_entry_and_exit),
+        same_bar_entry_and_tp1_trades=same_bar_entry_and_tp1,
+        blocked_notes_persisted=blocked_notes,
+        verdict=verdict,
+        reason=reason,
+    )
+
+
+def render_signal_fill_timing_audit(audit: SignalFillTimingAudit) -> str:
+    from .backtest import replay as replay_module
+    from .trade_state import step_trade
+
+    replay_source = inspect.getsource(replay_module)
+    step_source = inspect.getsource(step_trade)
+    now = _local_now()
+    lines = [
+        "---",
+        f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - timing-audit",
+        "experiment: signal_fill_timing_audit",
+        f"run_id: {audit.run_id}",
+        f"verdict: {audit.verdict}",
+        "---",
+        "",
+        "# signal_fill_timing_audit",
+        "",
+        "## Plain-language conclusion",
+        "",
+        audit.reason,
+        "",
+        "This report is diagnostic only. It does not change `config/settings.toml`, backtest behavior, paper state, or strategy defaults.",
+        "",
+        "## Scope",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| run_id | `{audit.run_id}` |",
+        f"| window | `{audit.start_utc}` -> `{audit.end_utc}` |",
+        f"| commit_hash | `{audit.commit_hash}` |",
+        f"| symbols | {audit.symbols_count} |",
+        f"| max_active_positions | {_fmt_optional(audit.max_active_positions)} |",
+        f"| intrabar_policy | `{_fmt_optional(audit.intrabar_policy)}` |",
+        "",
+        "## Timing Findings",
+        "",
+        "| Question | Current replay behavior | Risk read |",
+        "|---|---|---|",
+        "| `signal_time` | 4h reclaim is evaluated with the current bar close at `bar_time = bar_close_ms`. | Signal depends on a closed 4h candle. |",
+        "| `decision_time` | Capacity is checked after entry-zone touch, reclaim confirmation, quantity sizing, cash sizing, and notional sizing. | Blocked events must be recorded after these earlier gates pass. |",
+        "| `fill_time` | Entry raw price is `entry_high`, then `entry_fill` adds entry slippage; event time is the same `bar_time`. | Audit warning: signal confirmation and event timestamp are same-bar, while raw fill price is not explicitly next-bar open. |",
+        "| exit/entry order | Existing active positions are advanced before WATCHING plans are processed. | Capacity snapshots must be taken after same-bar active exits/time exits. |",
+        "| WATCHING order | WATCHING plans sort by `(-score, created_index, symbol)`. | Multi-candidate events must use this order for primary sample selection. |",
+        "| same-bar entry risk | `step_trade` can move a WATCHING trade to ENTERED and then evaluate ENTERED/TP1_HIT stop/TP logic in the same call. | Same-bar entry/exit or TP1 outcomes need explicit ambiguity flags. |",
+        "",
+        "## Run Evidence",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| entered_trades | {audit.entered_trades} |",
+        f"| same_bar_entry_and_exit_trades | {audit.same_bar_entry_and_exit_trades} |",
+        f"| same_bar_entry_and_tp1_trades | {audit.same_bar_entry_and_tp1_trades} |",
+        f"| persisted max-active skipped notes | {audit.blocked_notes_persisted} |",
+        "",
+        "Persisted max-active skipped notes are expected to be incomplete because later plan notes can overwrite skipped-entry attempts. Stage 1 must export blocked events directly from replay rather than infer them from final trade notes.",
+        "",
+        "## Cost And Fill Assumptions",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| maker_fee_bps | {_fmt_optional(audit.maker_fee_bps)} |",
+        f"| taker_fee_bps | {_fmt_optional(audit.taker_fee_bps)} |",
+        f"| entry_slippage_bps | {_fmt_optional(audit.entry_slippage_bps)} |",
+        f"| stop_slippage_bps | {_fmt_optional(audit.stop_slippage_bps)} |",
+        f"| entry_reclaim_close_enabled | {_fmt_optional(audit.entry_reclaim_close_enabled)} |",
+        f"| entry_reclaim_min_atr_enabled | {_fmt_optional(audit.entry_reclaim_min_atr_enabled)} |",
+        f"| entry_reclaim_min_atr | {_fmt_optional(audit.entry_reclaim_min_atr)} |",
+        "",
+        "## Source Markers",
+        "",
+        "| Behavior | Source marker |",
+        "|---|---|",
+        f"| active exits before watching entries | `{_source_line(replay_source, '# First advance exits')}` |",
+        f"| WATCHING sort order | `{_source_line(replay_source, 'watching.sort')}` |",
+        f"| reclaim check | `{_source_line(replay_source, '_entry_reclaim_close_satisfied(')}` |",
+        f"| raw entry price | `{_source_line(replay_source, 'raw_entry = item.paper.entry_high')}` |",
+        f"| capacity check | `{_source_line(replay_source, 'max_active_positions')}` |",
+        f"| same-call ENTERED evaluation | `{_source_line(step_source, 'if trade.status in {\"ENTERED\", \"TP1_HIT\"}')}` |",
+        "",
+        "## Decision",
+        "",
+        f"`{audit.verdict}`",
+        "",
+        "## Next Action",
+        "",
+    ]
+    if audit.verdict == "timing_audit_blocked":
+        lines.append("Do not implement `blocked_entry_event_export` until the replay timing markers are clarified or restored.")
+    elif audit.verdict == "timing_audit_warn_same_bar_ambiguity":
+        lines.extend(
+            [
+                "Proceed to design `blocked_entry_event_export`, but include explicit fields for same-bar ambiguity:",
+                "",
+                "- `signal_time`",
+                "- `decision_time`",
+                "- `fill_time_assumption`",
+                "- `active_snapshot_after_exits`",
+                "- `same_bar_entry_exit_possible`",
+                "- `same_bar_entry_tp1_possible`",
+            ]
+        )
+    else:
+        lines.append("Proceed to `blocked_entry_event_export` with the documented timing assumptions.")
+    lines.extend(
+        [
+            "",
+            "## Raw Summary",
+            "",
+            "```json",
+            json.dumps(audit.__dict__, ensure_ascii=False, indent=2),
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_signal_fill_timing_audit_report(
+    settings: Settings,
+    run_id: str,
+    *,
+    report_date: str | None = None,
+) -> tuple[SignalFillTimingAudit, list[Path]]:
+    date_text = report_date or _local_now().strftime("%Y-%m-%d")
+    audit = build_signal_fill_timing_audit(settings, run_id, report_date=date_text)
+    text = render_signal_fill_timing_audit(audit)
+    report_dir = settings.output.reports_dir / date_text
+    obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
+    prefix = f"signal_fill_timing_audit_{date_text}"
+    version = next_report_version([report_dir, obsidian_dir], prefix)
+    filename = versioned_markdown_filename(prefix, version)
+    paths: list[Path] = []
+    for directory in [report_dir, obsidian_dir]:
+        if directory is None:
+            continue
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / filename
+        path.write_text(text, encoding="utf-8")
+        paths.append(path)
+    return audit, paths
 
 
 def generate_observation_dashboard(
