@@ -15,6 +15,13 @@
 
 ## 2026-07-26
 
+### 17:15:30 +08:00 - 补交剩余 7 月 26 日报告文件
+- 类型：报告 / Git
+- 改动：补充提交 `reports/2026-07-26/abtest_dynamic_universe_atr_reclaim_0_10_2025-06-01_2026-06-01_v1.md` 与 `reports/2026-07-26/backtest_dynamic_universe_2025-06-01_2026-06-01_v11.md`。
+- 原因：前一轮文档提交后工作区又显示两个 `reports/` 文件未跟踪；按项目规则，生成报告应随仓库变更纳入 Git。
+- 验证：使用 `git status --short --branch` 确认未跟踪报告文件路径；未运行回测或代码测试。
+- Git：本次提交 `Add remaining July 26 generated reports`。
+
 ### 17:10:55 +08:00 - 生成系统审计文档并暂停新增实验
 - 类型：文档 / 规则 / 计划 / Git
 - 改动：新增 `SYSTEM_OVERVIEW.md`，整理当前系统目标、策略假设、模块职责、默认配置、数据流和关键风险。
