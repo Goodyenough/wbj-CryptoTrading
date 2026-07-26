@@ -147,6 +147,25 @@ def test_atr_reclaim_experiment_is_runnable() -> None:
     ]
 
 
+def test_atr_reclaim_threshold_sensitivity_experiments_are_runnable() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    thresholds = {
+        "atr_reclaim_0_10": 0.10,
+        "atr_reclaim_0_15": 0.15,
+        "atr_reclaim_0_35": 0.35,
+    }
+    for experiment_id, threshold in thresholds.items():
+        definition = load_experiment(experiment_id, ROOT / "config" / "experiments.toml")
+        variant, changes = apply_experiment_overrides(settings, definition)
+        assert variant.analysis.entry_reclaim_close_enabled is True
+        assert variant.analysis.entry_reclaim_min_atr_enabled is True
+        assert variant.analysis.entry_reclaim_min_atr == threshold
+        assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+            ("analysis.entry_reclaim_min_atr_enabled", False, True),
+            ("analysis.entry_reclaim_min_atr", 0.0, threshold),
+        ]
+
+
 def test_combined_regime_entry_override_can_pause_and_reclaim() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     settings.analysis.risk_off_core_buy_enabled = True
@@ -520,6 +539,7 @@ if __name__ == "__main__":
     test_combined_override_can_change_regime_and_capacity()
     test_entry_timing_override_can_require_reclaim_close()
     test_atr_reclaim_experiment_is_runnable()
+    test_atr_reclaim_threshold_sensitivity_experiments_are_runnable()
     test_combined_regime_entry_override_can_pause_and_reclaim()
     test_exit_timing_override_can_move_stop_to_breakeven()
     test_exit_timing_override_can_enable_ema_trailing_stop()

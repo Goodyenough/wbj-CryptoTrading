@@ -34,7 +34,8 @@
 
 - [x] 不在第一次触碰入场区间时立刻入场，要求 4h 收盘重新站回支撑；当前 `entry_reclaim_close_enabled=true` 已是默认模拟盘口径。
 - [x] 正式单变量 A/B 测试 `reclaim_quality_matrix / atr_reclaim_0_25`：两段净收益、PF、Sharpe、胜率均改善，但早期窗口 MDD 16.59% -> 19.21%，结论 `retest`，不部署。
-- [ ] 做 `atr_reclaim_0_25` 同维度阈值敏感性：优先测试 `atr_reclaim_0_10`、`atr_reclaim_0_15`、`atr_reclaim_0_35`，判断早期 MDD 恶化是阈值过严还是机制问题。
+- [x] 做 `atr_reclaim_0_25` 同维度阈值敏感性：`0.10`、`0.15` 近端退化，`0.35` 两段净收益/PF/MDD 均改善并进入 `candidate_keep_review`。
+- [ ] 复核 `atr_reclaim_0_35` 的交易级归因：比较 variant-only、baseline-only、common trades，检查收益是否来自广泛过滤亏损还是少数赢家，并复核两段 MDD timing。
 - [ ] 测试更靠近 `entry_low` 的入场方式，而不是默认按 `entry_high` 附近成交。
 - [ ] 要求 RSI 出现恢复，例如从 45-55 区间重新向上。
 - [ ] 拒绝主要由放量下跌驱动的形态。

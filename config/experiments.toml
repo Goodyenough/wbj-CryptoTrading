@@ -77,6 +77,33 @@ dimension = "entry_timing"
 entry_reclaim_min_atr_enabled = true
 entry_reclaim_min_atr = 0.25
 
+[atr_reclaim_0_10]
+enabled = true
+description = "Sensitivity test: require 4h reclaim close to exceed entry_high by at least 0.10 ATR before entering."
+dimension = "entry_timing"
+
+[atr_reclaim_0_10.overrides.analysis]
+entry_reclaim_min_atr_enabled = true
+entry_reclaim_min_atr = 0.10
+
+[atr_reclaim_0_15]
+enabled = true
+description = "Sensitivity test: require 4h reclaim close to exceed entry_high by at least 0.15 ATR before entering."
+dimension = "entry_timing"
+
+[atr_reclaim_0_15.overrides.analysis]
+entry_reclaim_min_atr_enabled = true
+entry_reclaim_min_atr = 0.15
+
+[atr_reclaim_0_35]
+enabled = true
+description = "Sensitivity test: require 4h reclaim close to exceed entry_high by at least 0.35 ATR before entering."
+dimension = "entry_timing"
+
+[atr_reclaim_0_35.overrides.analysis]
+entry_reclaim_min_atr_enabled = true
+entry_reclaim_min_atr = 0.35
+
 [risk_off_no_core_entry_reclaim]
 enabled = true
 description = "Combine RISK_OFF core-buy pause with 4h entry reclaim confirmation."

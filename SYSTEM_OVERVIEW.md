@@ -69,7 +69,7 @@ CryptoTradingSystem 当前不是自动实盘机器人，而是一个本地加密
 | TP1 后 EMA20 trailing | `tp1_ema_trailing_stop_enabled=true` |
 | Regime 阈值 | BTC 7d <= `-3%`、ETH 7d <= `-5%`，且要求两者趋势 |
 | 相对强度门槛 | 默认关闭：`relative_strength_soft_gate_enabled=false` |
-| ATR reclaim 门槛 | 默认关闭：`entry_reclaim_min_atr_enabled=false` |
+| ATR reclaim 门槛 | 默认关闭：`entry_reclaim_min_atr_enabled=false`；`atr_reclaim_0_35` 已进入 `candidate_keep_review`，但尚未部署 |
 | 最大持仓时间 | 默认未启用：`max_holding_bars_without_tp1=0` |
 | 回测成本 | maker 4 bps、taker 10 bps、entry slippage 5 bps、stop slippage 10 bps |
 | Intrabar 假设 | `stop_first` |
@@ -120,5 +120,4 @@ flowchart TD
 1. 用 `risk_off_core_buy_enabled=false` 限制弱市开仓。
 2. 用 `entry_reclaim_close_enabled=true` 避免首次触碰入场区间就接入。
 3. 用 `tp1_ema_trailing_stop_enabled=true` 替代简单 TP1 后保本。
-4. 继续研究但尚未部署：`max_holding_bars_without_tp1=42`、`relative_strength_soft_gate`、`atr_reclaim_min_atr`。
-
+4. 继续研究但尚未部署：`max_holding_bars_without_tp1=42`、`relative_strength_soft_gate`、`entry_reclaim_min_atr=0.35`。

@@ -15,6 +15,14 @@
 
 ## 2026-07-26
 
+### 18:10:00 +08:00 - 完成 ATR reclaim 阈值敏感性 A/B
+- 类型：配置 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增 `atr_reclaim_0_10`、`atr_reclaim_0_15`、`atr_reclaim_0_35` 三个同维度实验定义，并补充阈值可运行性测试。
+- 改动：使用固定 `reports/2026-06-09/dynamic_master_full.json` 跑三组两段非重叠 dynamic-universe A/B，并新增汇总复核报告 `reports/2026-07-26/atr_reclaim_threshold_sensitivity_2026-07-26_v1.md`。
+- 影响：`0.10` 与 `0.15` 近端窗口净收益/PF 退化，继续 `retest`；`0.35` 两段净收益、PF、Sharpe、MDD、stop rate 均改善，进入 `candidate_keep_review`，但暂不部署。
+- 验证：已运行 `python tests\test_abtest.py`、`python -m compileall main.py src tests`；三组 A/B 和三份 summary 均生成成功；`config/settings.toml` 保持无 diff。
+- Git：本次提交 `Add ATR reclaim threshold sensitivity`。
+
 ### 17:15:30 +08:00 - 补交剩余 7 月 26 日报告文件
 - 类型：报告 / Git
 - 改动：补充提交 `reports/2026-07-26/abtest_dynamic_universe_atr_reclaim_0_10_2025-06-01_2026-06-01_v1.md` 与 `reports/2026-07-26/backtest_dynamic_universe_2025-06-01_2026-06-01_v11.md`。
