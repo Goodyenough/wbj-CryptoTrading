@@ -42,7 +42,7 @@
 - [x] 完成 `blocked_entry_event_export`：导出唯一 blocked event、`block_reason=max_active_positions`、candidate rank、active slots snapshot、`fill_time_assumption`、`active_snapshot_after_exits`、`same_bar_entry_exit_possible` 和 `same_bar_entry_tp1_possible`；canonical run `110c51eef593` 复跑导出 512 个事件，`replay_entered_trades=58` 与 source 一致。
 - [x] 做 `replay_consistency_audit`：确认 blocked event export 与 canonical baseline 的 entered trades、entry time、active count path、候选排序和 blocked event 重复运行一致；结论 `replay_consistency_pass_with_ordering_limit`，source/replay entered trades、active path、final equity、blocked event repeat mismatch 均为 0，但候选排序只通过源码 marker + 重复事件签名间接验证。
 - [x] 做 `stale_slot_continuation_review`：独立评估 pre-TP1 仓位达到 42 bars 后继续持有的边际价值，统一 `42 bars = 168h` 口径；结论 `stale_slot_continuation_weak_retest`，26 个合格 stale slots，`forward_R_42_mean=-0.132`，`eventual_continuation_R_mean=-0.129`，支持继续诊断 replacement 但不部署。
-- [ ] 做 `blocked_candidate_vs_stale_slot_review`：只比较排序第一的 capacity-blocked candidate 与事前规则选出的 pre-TP1 stale slot，post-TP1 仅作对照，oracle 仅作上限。
+- [x] 做 `blocked_candidate_vs_stale_slot_review`：只比较排序第一的 capacity-blocked candidate 与事前规则选出的 pre-TP1 stale slot，post-TP1 仅作对照，oracle 仅作上限；结论 `replacement_edge_not_supported`，42 个合格比较事件中 `net_delta_R_42_mean=0.309` 但 median `-0.223`、positive ratio `42.9%`、20% trimmed mean 约 `0.001`，不进入 shadow replacement。
 - [ ] 测试更靠近 `entry_low` 的入场方式，而不是默认按 `entry_high` 附近成交。
 - [ ] 要求 RSI 出现恢复，例如从 45-55 区间重新向上。
 - [ ] 拒绝主要由放量下跌驱动的形态。

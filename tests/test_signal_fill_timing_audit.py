@@ -11,10 +11,13 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system.research_tools import (  # noqa: E402
     BlockedEntryEventExport,
+    BlockedCandidateVsStaleSlotEvent,
+    BlockedCandidateVsStaleSlotReview,
     ReplayConsistencyAudit,
     StaleSlotContinuationReview,
     StaleSlotObservation,
     build_signal_fill_timing_audit,
+    render_blocked_candidate_vs_stale_slot_review,
     render_blocked_entry_event_export,
     render_replay_consistency_audit,
     render_stale_slot_continuation_review,
@@ -383,6 +386,69 @@ def test_render_stale_slot_continuation_review_defines_scope_and_next_action() -
     assert "Proceed to `blocked_candidate_vs_stale_slot_review`" in text
 
 
+def test_render_blocked_candidate_vs_stale_slot_review_keeps_diagnostic_scope() -> None:
+    event = BlockedCandidateVsStaleSlotEvent(
+        event_id="event1",
+        decision_time_utc="2025-07-16T08:00:00+00:00",
+        month="2025-07",
+        candidate_symbol="ETHUSDT",
+        candidate_rank=1,
+        selected_slot_trade_id="slot1",
+        selected_slot_symbol="BTCUSDT",
+        selected_slot_holding_bars=52,
+        eligible_stale_slots=2,
+        candidate_same_bar_stop_possible=False,
+        candidate_same_bar_tp1_possible=True,
+        candidate_r_42=1.2,
+        stale_slot_r_42=-0.4,
+        net_replacement_delta_r_42=1.6,
+        net_replacement_delta_r_24=0.8,
+        net_replacement_delta_r_60=1.1,
+        lowest_unrealized_slot_delta_r_42=1.7,
+        oracle_upper_bound_delta_r_42=2.0,
+        candidate_first_hit="tp1",
+        stale_slot_first_hit="stop",
+        right_censored=False,
+    )
+    review = BlockedCandidateVsStaleSlotReview(
+        source_run_id="source1",
+        replay_run_id="replay1",
+        report_date="2026-07-27",
+        start_utc="2025-06-01T00:00:00+00:00",
+        end_utc="2026-06-01T00:00:00+00:00",
+        source_commit_hash="abc123",
+        stale_bars=42,
+        total_blocked_events=512,
+        rank1_blocked_events=46,
+        eligible_comparison_events=1,
+        rank1_without_eligible_stale_slot=45,
+        same_bar_stop_possible_events=0,
+        same_bar_tp1_possible_events=1,
+        right_censored_count=0,
+        net_delta_r_24_summary={"n": 1, "mean": 0.8, "median": 0.8, "positive_pct": 100.0, "min": 0.8, "max": 0.8},
+        net_delta_r_42_summary={"n": 1, "mean": 1.6, "median": 1.6, "positive_pct": 100.0, "min": 1.6, "max": 1.6},
+        net_delta_r_60_summary={"n": 1, "mean": 1.1, "median": 1.1, "positive_pct": 100.0, "min": 1.1, "max": 1.1},
+        lowest_unrealized_delta_r_42_summary={"n": 1, "mean": 1.7, "median": 1.7, "positive_pct": 100.0, "min": 1.7, "max": 1.7},
+        oracle_upper_bound_delta_r_42_summary={"n": 1, "mean": 2.0, "median": 2.0, "positive_pct": 100.0, "min": 2.0, "max": 2.0},
+        first_hit_pair_counts={"tp1 vs stop": 1},
+        month_leave_one_out_mean_r_42={"2025-07": None},
+        top_contribution_share_r_42={"positive_n": 1, "top1_share_pct": 100.0, "top3_share_pct": 100.0, "trimmed_mean_20pct": 1.6},
+        verdict="retest_replacement_candidate",
+        reason="test reason",
+        events=[event],
+    )
+
+    text = render_blocked_candidate_vs_stale_slot_review(review)
+
+    assert "# blocked_candidate_vs_stale_slot_review" in text
+    assert "diagnostic only" in text
+    assert "does not change `max_active_positions`" in text
+    assert "Post-TP1 slots are excluded" in text
+    assert "Oracle is reported only as an upper bound" in text
+    assert "net_replacement_delta_R_42" in text
+    assert "shadow replacement experiment" in text
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -394,3 +460,4 @@ if __name__ == "__main__":
         test_render_blocked_entry_event_export_includes_required_fields()
         test_render_replay_consistency_audit_includes_limits_and_next_action()
         test_render_stale_slot_continuation_review_defines_scope_and_next_action()
+        test_render_blocked_candidate_vs_stale_slot_review_keeps_diagnostic_scope()

@@ -156,6 +156,72 @@ class StaleSlotContinuationReview:
     observations: list[StaleSlotObservation]
 
 
+@dataclass(frozen=True)
+class ReplacementPathOutcome:
+    r_24: float | None
+    r_42: float | None
+    r_60: float | None
+    first_hit_outcome: str
+    first_hit_time_utc: str | None
+    mfe_r: float | None
+    mae_r: float | None
+    right_censored: bool
+
+
+@dataclass(frozen=True)
+class BlockedCandidateVsStaleSlotEvent:
+    event_id: str
+    decision_time_utc: str
+    month: str
+    candidate_symbol: str
+    candidate_rank: int
+    selected_slot_trade_id: str
+    selected_slot_symbol: str
+    selected_slot_holding_bars: int
+    eligible_stale_slots: int
+    candidate_same_bar_stop_possible: bool
+    candidate_same_bar_tp1_possible: bool
+    candidate_r_42: float | None
+    stale_slot_r_42: float | None
+    net_replacement_delta_r_42: float | None
+    net_replacement_delta_r_24: float | None
+    net_replacement_delta_r_60: float | None
+    lowest_unrealized_slot_delta_r_42: float | None
+    oracle_upper_bound_delta_r_42: float | None
+    candidate_first_hit: str
+    stale_slot_first_hit: str
+    right_censored: bool
+
+
+@dataclass(frozen=True)
+class BlockedCandidateVsStaleSlotReview:
+    source_run_id: str
+    replay_run_id: str
+    report_date: str
+    start_utc: str
+    end_utc: str
+    source_commit_hash: str
+    stale_bars: int
+    total_blocked_events: int
+    rank1_blocked_events: int
+    eligible_comparison_events: int
+    rank1_without_eligible_stale_slot: int
+    same_bar_stop_possible_events: int
+    same_bar_tp1_possible_events: int
+    right_censored_count: int
+    net_delta_r_24_summary: dict[str, float | int | None]
+    net_delta_r_42_summary: dict[str, float | int | None]
+    net_delta_r_60_summary: dict[str, float | int | None]
+    lowest_unrealized_delta_r_42_summary: dict[str, float | int | None]
+    oracle_upper_bound_delta_r_42_summary: dict[str, float | int | None]
+    first_hit_pair_counts: dict[str, int]
+    month_leave_one_out_mean_r_42: dict[str, float | None]
+    top_contribution_share_r_42: dict[str, float | int | None]
+    verdict: str
+    reason: str
+    events: list[BlockedCandidateVsStaleSlotEvent]
+
+
 def _local_now() -> datetime:
     return datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=8), name="CST"))
 
@@ -2132,6 +2198,577 @@ def write_stale_slot_continuation_review_report(
     report_dir = settings.output.reports_dir / date_text
     obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
     prefix = f"stale_slot_continuation_review_{date_text}"
+    version = next_report_version([report_dir, obsidian_dir], prefix)
+    filename = versioned_markdown_filename(prefix, version)
+    paths: list[Path] = []
+    for directory in [report_dir, obsidian_dir]:
+        if directory is None:
+            continue
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / filename
+        path.write_text(text, encoding="utf-8")
+        paths.append(path)
+    return review, paths
+
+
+def _outcome_to_horizon(
+    klines_after_decision: list[list],
+    *,
+    decision_ms: int,
+    horizon_bars: int,
+    reference_price: float,
+    risk_per_unit: float,
+    stop_loss: float,
+    take_profit_1: float,
+    step_ms: int,
+    intrabar_policy: str,
+) -> tuple[float | None, bool]:
+    target_ms = decision_ms + horizon_bars * step_ms
+    if risk_per_unit <= 0:
+        return None, True
+    for kline in klines_after_decision:
+        close_ms = _kline_close_ms(kline, step_ms)
+        if close_ms > target_ms:
+            break
+        high = float(kline[2])
+        low = float(kline[3])
+        stop_hit = low <= stop_loss
+        tp1_hit = high >= take_profit_1
+        if stop_hit and tp1_hit:
+            price = stop_loss if intrabar_policy == "stop_first" else take_profit_1
+            return (price - reference_price) / risk_per_unit, False
+        if stop_hit:
+            return (stop_loss - reference_price) / risk_per_unit, False
+        if tp1_hit:
+            return (take_profit_1 - reference_price) / risk_per_unit, False
+    for kline in klines_after_decision:
+        if _kline_close_ms(kline, step_ms) == target_ms:
+            return (float(kline[4]) - reference_price) / risk_per_unit, False
+    return None, True
+
+
+def _path_outcome_from_decision(
+    klines: list[list],
+    *,
+    decision_ms: int,
+    reference_price: float,
+    risk_per_unit: float,
+    stop_loss: float,
+    take_profit_1: float,
+    step_ms: int,
+    intrabar_policy: str,
+) -> ReplacementPathOutcome:
+    klines_after = [kline for kline in klines if _kline_close_ms(kline, step_ms) > decision_ms]
+    r_24, censored_24 = _outcome_to_horizon(
+        klines_after,
+        decision_ms=decision_ms,
+        horizon_bars=24,
+        reference_price=reference_price,
+        risk_per_unit=risk_per_unit,
+        stop_loss=stop_loss,
+        take_profit_1=take_profit_1,
+        step_ms=step_ms,
+        intrabar_policy=intrabar_policy,
+    )
+    r_42, censored_42 = _outcome_to_horizon(
+        klines_after,
+        decision_ms=decision_ms,
+        horizon_bars=42,
+        reference_price=reference_price,
+        risk_per_unit=risk_per_unit,
+        stop_loss=stop_loss,
+        take_profit_1=take_profit_1,
+        step_ms=step_ms,
+        intrabar_policy=intrabar_policy,
+    )
+    r_60, censored_60 = _outcome_to_horizon(
+        klines_after,
+        decision_ms=decision_ms,
+        horizon_bars=60,
+        reference_price=reference_price,
+        risk_per_unit=risk_per_unit,
+        stop_loss=stop_loss,
+        take_profit_1=take_profit_1,
+        step_ms=step_ms,
+        intrabar_policy=intrabar_policy,
+    )
+    first_hit, first_hit_time = _first_hit_after_stale(
+        klines_after,
+        stop_loss=stop_loss,
+        take_profit_1=take_profit_1,
+        step_ms=step_ms,
+        intrabar_policy=intrabar_policy,
+    )
+    if klines_after and risk_per_unit > 0:
+        mfe_r = (max(float(kline[2]) for kline in klines_after) - reference_price) / risk_per_unit
+        mae_r = (min(float(kline[3]) for kline in klines_after) - reference_price) / risk_per_unit
+    else:
+        mfe_r = None
+        mae_r = None
+    return ReplacementPathOutcome(
+        r_24=r_24,
+        r_42=r_42,
+        r_60=r_60,
+        first_hit_outcome=first_hit,
+        first_hit_time_utc=first_hit_time,
+        mfe_r=mfe_r,
+        mae_r=mae_r,
+        right_censored=censored_24 or censored_42 or censored_60,
+    )
+
+
+def _slot_unrealized_r(slot: dict) -> float:
+    cash_risk = slot.get("cash_risk")
+    if cash_risk is None or float(cash_risk) <= 0:
+        return 0.0
+    return float(slot.get("unrealized_pnl") or 0.0) / float(cash_risk)
+
+
+def _eligible_pre_tp1_stale_slots(event: dict, stale_bars: int) -> list[dict]:
+    output = []
+    for slot in event.get("active_snapshot_after_exits", []):
+        if not isinstance(slot, dict):
+            continue
+        if str(slot.get("status")) != "ENTERED":
+            continue
+        if slot.get("tp1_hit_at_utc") is not None:
+            continue
+        holding_bars = slot.get("holding_bars")
+        if holding_bars is None or int(holding_bars) < stale_bars:
+            continue
+        output.append(slot)
+    return output
+
+
+def _trade_by_id(trades: list[dict]) -> dict[str, dict]:
+    return {str(trade.get("trade_id")): trade for trade in trades if trade.get("trade_id") is not None}
+
+
+def _slot_outcome(
+    slot: dict,
+    trade_by_id: dict[str, dict],
+    klines_by_symbol: dict[str, dict[str, list[list]]],
+    *,
+    interval: str,
+    decision_ms: int,
+    step_ms: int,
+    intrabar_policy: str,
+) -> ReplacementPathOutcome | None:
+    trade = trade_by_id.get(str(slot.get("trade_id")))
+    if trade is None:
+        return None
+    symbol = str(slot.get("symbol", ""))
+    klines = klines_by_symbol.get(symbol, {}).get(interval, [])
+    by_close = _kline_by_close_ms(klines, step_ms)
+    decision_kline = by_close.get(decision_ms)
+    if decision_kline is None:
+        return None
+    entry_price = trade.get("entry_price_filled")
+    stop_loss = trade.get("stop_loss")
+    take_profit_1 = trade.get("take_profit_1")
+    if entry_price is None or stop_loss is None or take_profit_1 is None:
+        return None
+    risk_per_unit = float(entry_price) - float(stop_loss)
+    if risk_per_unit <= 0:
+        return None
+    return _path_outcome_from_decision(
+        klines,
+        decision_ms=decision_ms,
+        reference_price=float(decision_kline[4]),
+        risk_per_unit=risk_per_unit,
+        stop_loss=float(stop_loss),
+        take_profit_1=float(take_profit_1),
+        step_ms=step_ms,
+        intrabar_policy=intrabar_policy,
+    )
+
+
+def _candidate_outcome(
+    event: dict,
+    klines_by_symbol: dict[str, dict[str, list[list]]],
+    *,
+    interval: str,
+    decision_ms: int,
+    step_ms: int,
+    intrabar_policy: str,
+) -> ReplacementPathOutcome | None:
+    entry_price = event.get("candidate_entry_price_filled")
+    stop_loss = event.get("candidate_stop_loss")
+    take_profit_1 = event.get("candidate_take_profit_1")
+    if entry_price is None or stop_loss is None or take_profit_1 is None:
+        return None
+    risk_per_unit = float(entry_price) - float(stop_loss)
+    if risk_per_unit <= 0:
+        return None
+    symbol = str(event.get("symbol", ""))
+    klines = klines_by_symbol.get(symbol, {}).get(interval, [])
+    return _path_outcome_from_decision(
+        klines,
+        decision_ms=decision_ms,
+        reference_price=float(entry_price),
+        risk_per_unit=risk_per_unit,
+        stop_loss=float(stop_loss),
+        take_profit_1=float(take_profit_1),
+        step_ms=step_ms,
+        intrabar_policy=intrabar_policy,
+    )
+
+
+def _delta(candidate_r: float | None, slot_r: float | None) -> float | None:
+    if candidate_r is None or slot_r is None:
+        return None
+    return candidate_r - slot_r
+
+
+def _trimmed_mean(values: list[float], trim_pct: float = 0.2) -> float | None:
+    clean = sorted(values)
+    if not clean:
+        return None
+    trim = int(len(clean) * trim_pct)
+    trimmed = clean[trim : len(clean) - trim] if trim > 0 and len(clean) > trim * 2 else clean
+    return sum(trimmed) / len(trimmed) if trimmed else None
+
+
+def _top_contribution_share(values: list[float | None]) -> dict[str, float | int | None]:
+    clean = [float(value) for value in values if value is not None]
+    positives = sorted([value for value in clean if value > 0], reverse=True)
+    total_positive = sum(positives)
+    return {
+        "positive_n": len(positives),
+        "top1_share_pct": None if total_positive <= 0 or not positives else positives[0] / total_positive * 100,
+        "top3_share_pct": None if total_positive <= 0 or not positives else sum(positives[:3]) / total_positive * 100,
+        "trimmed_mean_20pct": _trimmed_mean(clean, 0.2),
+    }
+
+
+def _month_leave_one_out(events: list[BlockedCandidateVsStaleSlotEvent]) -> dict[str, float | None]:
+    months = sorted({event.month for event in events})
+    output: dict[str, float | None] = {}
+    for month in months:
+        values = [event.net_replacement_delta_r_42 for event in events if event.month != month]
+        output[month] = _summary(values)["mean"]
+    return output
+
+
+def build_blocked_candidate_vs_stale_slot_review(
+    settings: Settings,
+    run_id: str,
+    *,
+    stale_bars: int = 42,
+    report_date: str | None = None,
+    progress=None,
+) -> BlockedCandidateVsStaleSlotReview:
+    from .backtest.history import batch_load_klines_cached, interval_ms
+
+    run = _source_run_row(settings, run_id)
+    result, replay_settings, symbols, _dynamic_mode, _max_symbols = _replay_source_run(settings, run, progress=progress)
+    interval = replay_settings.backtest.primary_interval
+    step_ms = interval_ms(interval)
+    start_ms = _ms_from_iso(str(run["start_utc"]))
+    end_ms = _ms_from_iso(str(run["end_utc"]))
+    klines_by_symbol = batch_load_klines_cached(replay_settings, symbols, [interval], start_ms, end_ms)
+    replay_trades = _trade_dicts_from_result(result)
+    trades_by_id = _trade_by_id(replay_trades)
+    events = _blocked_event_dicts(result)
+    rank1_events = [event for event in events if int(event.get("candidate_rank", 0)) == 1]
+    comparison_events: list[BlockedCandidateVsStaleSlotEvent] = []
+    without_eligible_stale = 0
+    for event in rank1_events:
+        eligible_slots = _eligible_pre_tp1_stale_slots(event, stale_bars)
+        if not eligible_slots:
+            without_eligible_stale += 1
+            continue
+        decision_ms = _ms_from_iso(str(event["decision_time_utc"]))
+        candidate = _candidate_outcome(
+            event,
+            klines_by_symbol,
+            interval=interval,
+            decision_ms=decision_ms,
+            step_ms=step_ms,
+            intrabar_policy=replay_settings.backtest.intrabar_policy,
+        )
+        if candidate is None:
+            without_eligible_stale += 1
+            continue
+        oldest_slot = sorted(
+            eligible_slots,
+            key=lambda slot: (-int(slot.get("holding_bars") or 0), str(slot.get("trade_id", ""))),
+        )[0]
+        lowest_unrealized_slot = sorted(eligible_slots, key=lambda slot: (_slot_unrealized_r(slot), str(slot.get("trade_id", ""))))[0]
+        oldest_outcome = _slot_outcome(
+            oldest_slot,
+            trades_by_id,
+            klines_by_symbol,
+            interval=interval,
+            decision_ms=decision_ms,
+            step_ms=step_ms,
+            intrabar_policy=replay_settings.backtest.intrabar_policy,
+        )
+        lowest_outcome = _slot_outcome(
+            lowest_unrealized_slot,
+            trades_by_id,
+            klines_by_symbol,
+            interval=interval,
+            decision_ms=decision_ms,
+            step_ms=step_ms,
+            intrabar_policy=replay_settings.backtest.intrabar_policy,
+        )
+        if oldest_outcome is None:
+            without_eligible_stale += 1
+            continue
+        slot_outcomes = [
+            outcome
+            for slot in eligible_slots
+            for outcome in [
+                _slot_outcome(
+                    slot,
+                    trades_by_id,
+                    klines_by_symbol,
+                    interval=interval,
+                    decision_ms=decision_ms,
+                    step_ms=step_ms,
+                    intrabar_policy=replay_settings.backtest.intrabar_policy,
+                )
+            ]
+            if outcome is not None
+        ]
+        oracle_delta = None
+        slot_r_42_values = [outcome.r_42 for outcome in slot_outcomes if outcome.r_42 is not None]
+        if candidate.r_42 is not None and slot_r_42_values:
+            oracle_delta = candidate.r_42 - min(slot_r_42_values)
+        comparison_events.append(
+            BlockedCandidateVsStaleSlotEvent(
+                event_id=str(event.get("event_id", "")),
+                decision_time_utc=str(event["decision_time_utc"]),
+                month=str(event["decision_time_utc"])[:7],
+                candidate_symbol=str(event.get("symbol", "")),
+                candidate_rank=int(event.get("candidate_rank", 0)),
+                selected_slot_trade_id=str(oldest_slot.get("trade_id", "")),
+                selected_slot_symbol=str(oldest_slot.get("symbol", "")),
+                selected_slot_holding_bars=int(oldest_slot.get("holding_bars") or 0),
+                eligible_stale_slots=len(eligible_slots),
+                candidate_same_bar_stop_possible=bool(event.get("same_bar_entry_exit_possible", False)),
+                candidate_same_bar_tp1_possible=bool(event.get("same_bar_entry_tp1_possible", False)),
+                candidate_r_42=candidate.r_42,
+                stale_slot_r_42=oldest_outcome.r_42,
+                net_replacement_delta_r_42=_delta(candidate.r_42, oldest_outcome.r_42),
+                net_replacement_delta_r_24=_delta(candidate.r_24, oldest_outcome.r_24),
+                net_replacement_delta_r_60=_delta(candidate.r_60, oldest_outcome.r_60),
+                lowest_unrealized_slot_delta_r_42=None if lowest_outcome is None else _delta(candidate.r_42, lowest_outcome.r_42),
+                oracle_upper_bound_delta_r_42=oracle_delta,
+                candidate_first_hit=candidate.first_hit_outcome,
+                stale_slot_first_hit=oldest_outcome.first_hit_outcome,
+                right_censored=candidate.right_censored or oldest_outcome.right_censored,
+            )
+        )
+
+    delta_42_summary = _summary([event.net_replacement_delta_r_42 for event in comparison_events])
+    positive_ratio = delta_42_summary["positive_pct"]
+    mean_42 = delta_42_summary["mean"]
+    right_censored_count = sum(1 for event in comparison_events if event.right_censored)
+    if not comparison_events:
+        verdict = "replacement_comparison_sample_empty"
+        reason = "No rank-1 blocked events had an eligible pre-TP1 stale slot, so replacement comparison cannot be estimated from this run."
+    elif right_censored_count / len(comparison_events) > 0.25:
+        verdict = "replacement_comparison_inconclusive_censored"
+        reason = "Replacement comparison has too much right-censoring for a stable judgment."
+    elif mean_42 is not None and mean_42 > 0 and positive_ratio is not None and positive_ratio >= 55:
+        verdict = "retest_replacement_candidate"
+        reason = "Rank-1 blocked candidates outperform oldest eligible pre-TP1 stale slots on average and in a majority of comparison events, but this remains diagnostic and not deployable."
+    else:
+        verdict = "replacement_edge_not_supported"
+        reason = "Rank-1 blocked candidates do not show a broad enough 42-bar net replacement edge over oldest eligible pre-TP1 stale slots."
+
+    return BlockedCandidateVsStaleSlotReview(
+        source_run_id=run_id,
+        replay_run_id=result.run_id,
+        report_date=report_date or _local_now().strftime("%Y-%m-%d"),
+        start_utc=str(run["start_utc"]),
+        end_utc=str(run["end_utc"]),
+        source_commit_hash=str(run["commit_hash"]),
+        stale_bars=stale_bars,
+        total_blocked_events=len(events),
+        rank1_blocked_events=len(rank1_events),
+        eligible_comparison_events=len(comparison_events),
+        rank1_without_eligible_stale_slot=without_eligible_stale,
+        same_bar_stop_possible_events=sum(1 for event in comparison_events if event.candidate_same_bar_stop_possible),
+        same_bar_tp1_possible_events=sum(1 for event in comparison_events if event.candidate_same_bar_tp1_possible),
+        right_censored_count=right_censored_count,
+        net_delta_r_24_summary=_summary([event.net_replacement_delta_r_24 for event in comparison_events]),
+        net_delta_r_42_summary=delta_42_summary,
+        net_delta_r_60_summary=_summary([event.net_replacement_delta_r_60 for event in comparison_events]),
+        lowest_unrealized_delta_r_42_summary=_summary([event.lowest_unrealized_slot_delta_r_42 for event in comparison_events]),
+        oracle_upper_bound_delta_r_42_summary=_summary([event.oracle_upper_bound_delta_r_42 for event in comparison_events]),
+        first_hit_pair_counts=dict(sorted(Counter(f"{event.candidate_first_hit} vs {event.stale_slot_first_hit}" for event in comparison_events).items())),
+        month_leave_one_out_mean_r_42=_month_leave_one_out(comparison_events),
+        top_contribution_share_r_42=_top_contribution_share([event.net_replacement_delta_r_42 for event in comparison_events]),
+        verdict=verdict,
+        reason=reason,
+        events=comparison_events,
+    )
+
+
+def render_blocked_candidate_vs_stale_slot_review(review: BlockedCandidateVsStaleSlotReview) -> str:
+    now = _local_now()
+    lines = [
+        "---",
+        f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - blocked-candidate-vs-stale-slot-review",
+        "experiment: blocked_candidate_vs_stale_slot_review",
+        f"source_run_id: {review.source_run_id}",
+        f"replay_run_id: {review.replay_run_id}",
+        f"verdict: {review.verdict}",
+        "---",
+        "",
+        "# blocked_candidate_vs_stale_slot_review",
+        "",
+        "## Plain-language conclusion",
+        "",
+        review.reason,
+        "",
+        "This report is diagnostic only. It does not deploy replacement logic, does not change `max_active_positions`, and does not modify `config/settings.toml`, backtest behavior, paper state, strategy defaults, or saved backtest rows.",
+        "",
+        "## Scope",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| source_run_id | `{review.source_run_id}` |",
+        f"| replay_run_id | `{review.replay_run_id}` |",
+        f"| window | `{review.start_utc}` -> `{review.end_utc}` |",
+        f"| source_commit_hash | `{review.source_commit_hash}` |",
+        f"| stale_threshold | {review.stale_bars} bars |",
+        "",
+        "## Sample Definition",
+        "",
+        "Primary sample uses only `candidate_rank=1` blocked events. The replacement slot is the oldest active slot that is still pre-TP1 and has `holding_bars >= stale_bars`. Post-TP1 slots are excluded from V1 eligibility. Oracle is reported only as an upper bound.",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| total_blocked_events | {review.total_blocked_events} |",
+        f"| rank1_blocked_events | {review.rank1_blocked_events} |",
+        f"| eligible_comparison_events | {review.eligible_comparison_events} |",
+        f"| rank1_without_eligible_stale_slot | {review.rank1_without_eligible_stale_slot} |",
+        f"| same_bar_stop_possible_events | {review.same_bar_stop_possible_events} |",
+        f"| same_bar_tp1_possible_events | {review.same_bar_tp1_possible_events} |",
+        f"| right_censored_count | {review.right_censored_count} |",
+        "",
+        "## Net Replacement Delta R",
+        "",
+        "`net_replacement_delta_R = candidate_R - selected_stale_slot_R`; each leg is normalized by its own per-unit risk, so this is a path-quality diagnostic rather than a full portfolio PnL simulation.",
+        "",
+        "| Metric | n | mean | median | positive_pct | min | max |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    for label, summary in [
+        ("net_replacement_delta_R_24", review.net_delta_r_24_summary),
+        ("net_replacement_delta_R_42", review.net_delta_r_42_summary),
+        ("net_replacement_delta_R_60", review.net_delta_r_60_summary),
+        ("lowest_unrealized_slot_delta_R_42", review.lowest_unrealized_delta_r_42_summary),
+        ("oracle_upper_bound_delta_R_42", review.oracle_upper_bound_delta_r_42_summary),
+    ]:
+        lines.append(
+            f"| {label} | {_fmt_summary_value(summary['n'])} | {_fmt_summary_value(summary['mean'])} | "
+            f"{_fmt_summary_value(summary['median'])} | {_fmt_summary_value(summary['positive_pct'])} | "
+            f"{_fmt_summary_value(summary['min'])} | {_fmt_summary_value(summary['max'])} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Robustness",
+            "",
+            "| Metric | Value |",
+            "|---|---:|",
+            f"| positive_n | {_fmt_summary_value(review.top_contribution_share_r_42['positive_n'])} |",
+            f"| top1_positive_contribution_share_pct | {_fmt_summary_value(review.top_contribution_share_r_42['top1_share_pct'])} |",
+            f"| top3_positive_contribution_share_pct | {_fmt_summary_value(review.top_contribution_share_r_42['top3_share_pct'])} |",
+            f"| 20pct_trimmed_mean_R_42 | {_fmt_summary_value(review.top_contribution_share_r_42['trimmed_mean_20pct'])} |",
+            "",
+            "## First-Hit Pairs",
+            "",
+            "| Candidate vs Stale Slot | Count |",
+            "|---|---:|",
+        ]
+    )
+    if review.first_hit_pair_counts:
+        for pair, count in review.first_hit_pair_counts.items():
+            lines.append(f"| `{pair}` | {count} |")
+    else:
+        lines.append("| n/a | 0 |")
+    lines.extend(["", "## Month Leave-One-Out", "", "| Removed Month | Mean R42 |", "|---|---:|"])
+    if review.month_leave_one_out_mean_r_42:
+        for month, value in review.month_leave_one_out_mean_r_42.items():
+            lines.append(f"| {month} | {_fmt_summary_value(value)} |")
+    else:
+        lines.append("| n/a | n/a |")
+    lines.extend(
+        [
+            "",
+            "## First Events",
+            "",
+            "| # | Time | Candidate | Slot | Slot Bars | Delta R42 | Candidate R42 | Slot R42 | Candidate Hit | Slot Hit | Same-bar Flags |",
+            "|---:|---|---|---|---:|---:|---:|---:|---|---|---|",
+        ]
+    )
+    for index, event in enumerate(review.events[:40], start=1):
+        flags = []
+        if event.candidate_same_bar_stop_possible:
+            flags.append("stop")
+        if event.candidate_same_bar_tp1_possible:
+            flags.append("tp1")
+        lines.append(
+            f"| {index} | `{event.decision_time_utc}` | `{event.candidate_symbol}` | `{event.selected_slot_symbol}` | "
+            f"{event.selected_slot_holding_bars} | {_fmt_summary_value(event.net_replacement_delta_r_42)} | "
+            f"{_fmt_summary_value(event.candidate_r_42)} | {_fmt_summary_value(event.stale_slot_r_42)} | "
+            f"`{event.candidate_first_hit}` | `{event.stale_slot_first_hit}` | {','.join(flags) or 'none'} |"
+        )
+    if not review.events:
+        lines.append("| n/a | n/a | n/a | n/a | 0 | n/a | n/a | n/a | n/a | n/a | none |")
+    lines.extend(["", "## Decision", "", f"`{review.verdict}`", "", "## Next Action", ""])
+    if review.verdict == "retest_replacement_candidate":
+        lines.append("Proceed only to a shadow replacement experiment design. Do not deploy and do not modify `max_active_positions` until a full state-machine shadow replay proves portfolio-level benefit after costs and path effects.")
+    elif review.verdict == "replacement_edge_not_supported":
+        lines.append("Do not proceed to shadow replacement yet. Revisit capacity only if a stronger, pre-declared slot selection rule or broader walk-forward evidence appears.")
+    elif review.verdict == "replacement_comparison_inconclusive_censored":
+        lines.append("Retest on a window with lower right-censoring before interpreting replacement value.")
+    else:
+        lines.append("Stop the replacement branch for this source run because no eligible diagnostic comparison sample was available.")
+    lines.extend(
+        [
+            "",
+            "## Raw Summary",
+            "",
+            "```json",
+            json.dumps(asdict(review), ensure_ascii=False, indent=2),
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_blocked_candidate_vs_stale_slot_review_report(
+    settings: Settings,
+    run_id: str,
+    *,
+    stale_bars: int = 42,
+    report_date: str | None = None,
+    progress=None,
+) -> tuple[BlockedCandidateVsStaleSlotReview, list[Path]]:
+    date_text = report_date or _local_now().strftime("%Y-%m-%d")
+    review = build_blocked_candidate_vs_stale_slot_review(
+        settings,
+        run_id,
+        stale_bars=stale_bars,
+        report_date=date_text,
+        progress=progress,
+    )
+    text = render_blocked_candidate_vs_stale_slot_review(review)
+    report_dir = settings.output.reports_dir / date_text
+    obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
+    prefix = f"blocked_candidate_vs_stale_slot_review_{date_text}"
     version = next_report_version([report_dir, obsidian_dir], prefix)
     filename = versioned_markdown_filename(prefix, version)
     paths: list[Path] = []

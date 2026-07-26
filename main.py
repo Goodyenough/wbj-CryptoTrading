@@ -41,6 +41,7 @@ from crypto_trading_system.research_tools import (
     build_experiment_index,
     generate_observation_dashboard,
     split_symbol_master_by_cap,
+    write_blocked_candidate_vs_stale_slot_review_report,
     write_blocked_entry_event_export_report,
     write_replay_consistency_audit_report,
     write_signal_fill_timing_audit_report,
@@ -416,6 +417,14 @@ def build_parser() -> argparse.ArgumentParser:
     stale_slot.add_argument("--stale-bars", type=int, default=42, help="Pre-TP1 stale threshold in primary bars.")
     stale_slot.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
     stale_slot.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    replacement_review = research_subparsers.add_parser(
+        "blocked-candidate-vs-stale-slot-review",
+        help="Compare rank-1 blocked candidates with pre-declared eligible stale slots.",
+    )
+    replacement_review.add_argument("--run-id", required=True, help="Source backtest run_id to replay.")
+    replacement_review.add_argument("--stale-bars", type=int, default=42, help="Pre-TP1 stale threshold in primary bars.")
+    replacement_review.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
+    replacement_review.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
@@ -1114,6 +1123,30 @@ def main() -> None:
             print(f"right_censored_count={review.right_censored_count}")
             print(f"forward_r_42_mean={review.forward_r_42_summary['mean']}")
             print(f"eventual_continuation_r_mean={review.eventual_continuation_r_summary['mean']}")
+            for path in paths:
+                print(f"report={path}")
+        if args.research_command == "blocked-candidate-vs-stale-slot-review":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            review, paths = write_blocked_candidate_vs_stale_slot_review_report(
+                settings,
+                run_id=args.run_id,
+                stale_bars=args.stale_bars,
+                report_date=args.reports_date,
+                progress=_progress,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("blocked_candidate_vs_stale_slot_review=completed")
+            print(f"source_run_id={review.source_run_id}")
+            print(f"replay_run_id={review.replay_run_id}")
+            print(f"verdict={review.verdict}")
+            print(f"rank1_blocked_events={review.rank1_blocked_events}")
+            print(f"eligible_comparison_events={review.eligible_comparison_events}")
+            print(f"net_delta_r_42_mean={review.net_delta_r_42_summary['mean']}")
+            print(f"net_delta_r_42_median={review.net_delta_r_42_summary['median']}")
+            print(f"net_delta_r_42_positive_pct={review.net_delta_r_42_summary['positive_pct']}")
+            print(f"right_censored_count={review.right_censored_count}")
             for path in paths:
                 print(f"report={path}")
 

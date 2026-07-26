@@ -15,6 +15,15 @@
 
 ## 2026-07-27
 
+### 01:04:44 +08:00 - 完成 blocked_candidate_vs_stale_slot_review Stage 4
+- 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增只读研究命令 `python main.py research blocked-candidate-vs-stale-slot-review --run-id ... --stale-bars 42`，实现 `BlockedCandidateVsStaleSlotReview`、路径诊断报告渲染和测试；生成 `reports/2026-07-27/blocked_candidate_vs_stale_slot_review_2026-07-27_v1.md`。
+- 原因：在 Stage 3 证明 pre-TP1 stale slots 继续占槽偏弱后，按 GPT 评审后的主规则比较真实 rank1 blocked candidate 与同一 event 中最老的合格 stale slot。
+- 结果：512 个 blocked events 中 rank1 events 为 46，合格比较事件 42，右截尾 0；`net_delta_R_42_mean=0.309`，median `-0.223`，positive ratio `42.9%`，20% trimmed mean 约 `0.001`，结论 `replacement_edge_not_supported`。
+- 影响：不进入 Stage 5 shadow replacement，不部署 replacement，不提高 `max_active_positions`，不修改 `config/settings.toml`。
+- 验证：已运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests`、`python main.py research blocked-candidate-vs-stale-slot-review --run-id 110c51eef593 --stale-bars 42 --reports-date 2026-07-27 --no-obsidian`；确认 `config/settings.toml` 与 `data/crypto_trading.db` 无 diff。
+- Git：本次计划提交 `Add blocked candidate stale slot review`。
+
 ### 00:50:26 +08:00 - 完成 stale_slot_continuation_review Stage 3
 - 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增只读研究命令 `python main.py research stale-slot-continuation-review --run-id ... --stale-bars 42`，实现 `StaleSlotContinuationReview`、报告渲染和测试；生成 `reports/2026-07-27/stale_slot_continuation_review_2026-07-27_v1.md`。

@@ -388,3 +388,35 @@ shadow experiment 需要回答：
 3. stale slot 只能按事前规则从该 event 的 `active_snapshot_after_exits` 中选择 pre-TP1 且 `holding_bars >= 42` 的旧仓。
 4. 输出 candidate 与 stale slot 的 forward R / first-hit / same-bar ambiguity 对比；post-TP1 仅作对照，oracle 只作上限。
 5. 仍然不修改 `settings.toml`，不部署 replacement。
+
+## 2026-07-27 Stage 4 执行进展
+
+### Stage 4：`blocked_candidate_vs_stale_slot_review`
+
+状态：已完成。
+输出：
+- 报告：`reports/2026-07-27/blocked_candidate_vs_stale_slot_review_2026-07-27_v1.md`
+
+核心事实：
+- source run：`110c51eef593`
+- replay run：`e40da6f04438`
+- total blocked events：`512`
+- rank1 blocked events：`46`
+- eligible comparison events：`42`
+- right censored：`0`
+- same-bar TP1 ambiguity：`1`
+- `net_delta_R_24_mean=0.436`，median `0.145`，positive ratio `59.5%`
+- `net_delta_R_42_mean=0.309`，median `-0.223`，positive ratio `42.9%`
+- `net_delta_R_60_mean=0.176`，median `-0.432`，positive ratio `45.2%`
+- `lowest_unrealized_slot_delta_R_42` median `-0.276`
+- `oracle_upper_bound_delta_R_42` median `0.434`
+- 20% trimmed mean R42 约 `0.001`
+
+结论：`replacement_edge_not_supported`。短期 24 根有改善迹象，但主指标 42 根不稳定，median 为负、positive ratio 低于多数事件、trimmed mean 接近 0；只有 oracle 上限明显为正，不能当作策略证据。
+
+当前决策：
+1. 不进入 Stage 5 shadow replacement experiment。
+2. 不部署 replacement。
+3. 不提高 `max_active_positions`。
+4. 不修改 `settings.toml`。
+5. 容量 replacement 分支暂时收束；若未来重启，必须先提出更强且事前声明的 slot selection 规则或更广 walk-forward 证据。
