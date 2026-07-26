@@ -15,6 +15,15 @@
 
 ## 2026-07-26
 
+### 19:08:04 +08:00 - 完成 atr_reclaim_0_35 交易级归因复核
+- 类型：报告 / 实验日志 / TODO / 计划 / Git
+- 改动：新增 `reports/2026-07-26/atr_reclaim_0_35_trade_attribution_review_2026-07-26_v1.md`，按 common、baseline-only、variant-only 拆分 `atr_reclaim_0_35` 的交易级贡献，并复核两段 MDD timing。
+- 改动：更新 `EXPERIMENT_LEDGER.md`、`TODO.md`、`SYSTEM_OVERVIEW.md`、`开发计划.md` 和 Obsidian 实验日志，记录 `candidate_keep_review_but_path_dependent` 结论。
+- 原因：确认 `atr_reclaim_0_35` 的改善是否来自广泛过滤亏损，还是少数赢家/路径偶然。
+- 影响：`atr_reclaim_0_35` 仍保留为候选，但不部署、不修改 `settings.toml`；下一步只做 top variant-only winners 与 missed baseline winners 的人工路径复盘。
+- 验证：基于既有 A/B 与 backtest Markdown 交易表解析；合并后 common trade delta 为 `-43.72 USDT`，removed baseline-only 为 `+594.76 USDT`，added variant-only 为 `+3184.11 USDT`；`config/settings.toml` 保持无 diff。
+- Git：`Review ATR reclaim trade attribution`。
+
 ### 18:10:00 +08:00 - 完成 ATR reclaim 阈值敏感性 A/B
 - 类型：配置 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增 `atr_reclaim_0_10`、`atr_reclaim_0_15`、`atr_reclaim_0_35` 三个同维度实验定义，并补充阈值可运行性测试。
