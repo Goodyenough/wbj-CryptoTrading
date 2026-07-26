@@ -26,7 +26,11 @@ ALLOWED_OVERRIDE_PATHS: dict[str, set[str]] = {
     "regime": {"analysis.risk_off_core_buy_enabled"},
     "capacity": {"market.top_n"},
     "combined_regime_capacity": {"analysis.risk_off_core_buy_enabled", "market.top_n"},
-    "entry_timing": {"analysis.entry_reclaim_close_enabled"},
+    "entry_timing": {
+        "analysis.entry_reclaim_close_enabled",
+        "analysis.entry_reclaim_min_atr_enabled",
+        "analysis.entry_reclaim_min_atr",
+    },
     "combined_regime_entry": {"analysis.risk_off_core_buy_enabled", "analysis.entry_reclaim_close_enabled"},
     "exit_timing": {"analysis.tp1_move_stop_to_breakeven_enabled", "analysis.tp1_ema_trailing_stop_enabled"},
     "daily_trend": {"analysis.daily_trend_required"},

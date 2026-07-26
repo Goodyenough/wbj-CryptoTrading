@@ -15,6 +15,15 @@
 
 ## 2026-07-26
 
+### 15:45:00 +08:00 - 注册并运行 atr_reclaim_0_25 正式 A/B
+- 类型：代码 / 配置 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增默认关闭的 `analysis.entry_reclaim_min_atr_enabled` 与 `analysis.entry_reclaim_min_atr`，并注册 `atr_reclaim_0_25` 实验；默认 `settings.toml` 不变。
+- 改动：在 dynamic-universe backtest replay 的 WATCHING 入场阶段加入 ATR reclaim margin：当实验启用时，4h 收盘不仅要站回 `entry_high`，还要超过 `entry_high + 0.25 * ATR`。
+- 改动：使用固定 `reports/2026-06-09/dynamic_master_full.json` 跑两段非重叠 A/B，并新增人工复核报告 `reports/2026-07-26/atr_reclaim_0_25_formal_ab_review_2026-07-26_v1.md`。
+- 影响：`atr_reclaim_0_25` 两段净收益、PF、Sharpe、胜率均改善，但早期窗口 MDD 从 16.59% 升至 19.21%，近端 stop rate 小幅升至 87.04%，结论为 `retest`，不部署。
+- 验证：已运行 `python tests\test_abtest.py`、`python -m compileall main.py src tests`、`python main.py abtest-summary --experiment atr_reclaim_0_25 --mode dynamic_universe --reports-date 2026-07-26 --start 2024-07-01 --end 2026-06-01 --drop-overlap-periods`；`config/settings.toml` 保持无 diff。
+- Git：本次提交 `Add atr reclaim threshold abtest`。
+
 ### 12:20:00 +08:00 - 完成 relative strength soft gate 阈值敏感性 A/B
 - 类型：代码 / 配置 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增 `relative_strength_soft_gate_btc_eth_minus_1_0` 与 `relative_strength_soft_gate_btc_eth_0_0` 两个同维度实验定义，并补充 A/B override 测试。

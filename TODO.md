@@ -32,7 +32,9 @@
 
 ## Priority 2：优化入场规则
 
-- [ ] 不在第一次触碰入场区间时立刻入场，要求 4h 收盘重新站回支撑。
+- [x] 不在第一次触碰入场区间时立刻入场，要求 4h 收盘重新站回支撑；当前 `entry_reclaim_close_enabled=true` 已是默认模拟盘口径。
+- [x] 正式单变量 A/B 测试 `reclaim_quality_matrix / atr_reclaim_0_25`：两段净收益、PF、Sharpe、胜率均改善，但早期窗口 MDD 16.59% -> 19.21%，结论 `retest`，不部署。
+- [ ] 做 `atr_reclaim_0_25` 同维度阈值敏感性：优先测试 `atr_reclaim_0_10`、`atr_reclaim_0_15`、`atr_reclaim_0_35`，判断早期 MDD 恶化是阈值过严还是机制问题。
 - [ ] 测试更靠近 `entry_low` 的入场方式，而不是默认按 `entry_high` 附近成交。
 - [ ] 要求 RSI 出现恢复，例如从 45-55 区间重新向上。
 - [ ] 拒绝主要由放量下跌驱动的形态。
@@ -146,7 +148,7 @@
 - [x] 下一轮正式 A/B 只选择一个维度先做：已注册并运行 `relative_strength_soft_gate_btc_eth_minus_0_5` dynamic-universe A/B；两段非重叠窗口净收益、PF、Sharpe 和止损率均改善，但早期窗口 MDD 16.59% -> 18.96% 恶化，结论 `retest`，不部署。
 - [x] 复核 `relative_strength_soft_gate_btc_eth_minus_0_5` 的早期窗口 MDD 恶化来源：variant-only trades 净贡献 +565.32，但 11 月 winner cluster 抬高权益峰值后，12 月、1 月和 5 月新增止损簇扩大 peak-to-trough；结论仍为 `retest`。
 - [x] 设计并运行 `relative_strength_soft_gate` 阈值敏感性 A/B：`-1.0` 近端窗口退化，`0.0` 近端最强但早期 MDD 最差，`-0.5` 仍最平衡但不能 keep；结论 `retest`，不部署。
-- [ ] 下一轮正式单变量 A/B 转向 `reclaim_quality_matrix / atr_reclaim_0_25`：先注册 dynamic-universe A/B 维度，避免叠加相对强度门槛，验证它是否能在两段窗口降低 MDD 或改善 PF/净收益。
+- [x] 下一轮正式单变量 A/B 转向 `reclaim_quality_matrix / atr_reclaim_0_25`：已注册 dynamic-universe A/B 维度并完成两段 walk-forward；不叠加相对强度门槛，结论 `retest`。
 - [ ] 暂不把 MACD 升级为 `macd_hist_4h > 0` 硬门槛；如研究 MACD，仅做 histogram 斜率、连续恶化、reclaim 时改善等离线变体。
 
 ## 运维待办

@@ -15,7 +15,7 @@ from ..ticker_utils import reconstruct_ticker
 from ..trade_state import step_trade
 from ..indicators import ema as _ema
 from ..indicators import ema_series as _ema_series, ema_step as _ema_step
-from ..indicators import percent_change
+from ..indicators import atr as _atr, percent_change
 from .costs import entry_fill, stop_exit_fill, target_exit_fill
 from .history import KlineQualityIssue, batch_load_klines_cached, fetch_klines_cached, interval_ms
 from .universe import (
@@ -203,8 +203,24 @@ def _active_risk(trades: list[_SimTrade]) -> float:
     return risk
 
 
-def _entry_reclaim_close_satisfied(enabled: bool, close: float, entry_high: float) -> bool:
-    return not enabled or close >= entry_high
+def _entry_reclaim_close_satisfied(
+    enabled: bool,
+    close: float,
+    entry_high: float,
+    *,
+    min_margin_atr_enabled: bool = False,
+    min_margin_atr: float = 0.0,
+    atr_4h: float | None = None,
+) -> bool:
+    if not enabled:
+        return True
+    if close < entry_high:
+        return False
+    if not min_margin_atr_enabled or min_margin_atr <= 0:
+        return True
+    if atr_4h is None or atr_4h <= 0:
+        return False
+    return (close - entry_high) >= atr_4h * min_margin_atr
 
 
 def _candidate_to_sim_trade(
@@ -619,14 +635,25 @@ def run_backtest_replay(
                 )
                 _sync_record(item)
                 continue
+            k4h_closed_for_reclaim = _closed_slice(klines_by_symbol[item.paper.symbol]["4h"], "4h", bar_close_ms)
+            atr_4h_reclaim = _atr(k4h_closed_for_reclaim)
             if not _entry_reclaim_close_satisfied(
                 settings.analysis.entry_reclaim_close_enabled,
                 close,
                 item.paper.entry_high,
+                min_margin_atr_enabled=settings.analysis.entry_reclaim_min_atr_enabled,
+                min_margin_atr=settings.analysis.entry_reclaim_min_atr,
+                atr_4h=atr_4h_reclaim,
             ):
                 item.paper.last_price = close
                 item.paper.updated_at_utc = bar_time
-                item.paper.notes = "Watching: entry zone touched, but 4h close has not reclaimed entry_high."
+                if settings.analysis.entry_reclaim_min_atr_enabled and settings.analysis.entry_reclaim_min_atr > 0:
+                    item.paper.notes = (
+                        "Watching: entry zone touched, but 4h close has not reclaimed "
+                        f"entry_high by {settings.analysis.entry_reclaim_min_atr:.2f} ATR."
+                    )
+                else:
+                    item.paper.notes = "Watching: entry zone touched, but 4h close has not reclaimed entry_high."
                 _sync_record(item)
                 continue
 

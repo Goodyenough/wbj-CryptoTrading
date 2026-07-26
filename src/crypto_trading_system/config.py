@@ -41,6 +41,8 @@ class AnalysisSettings:
     regime_eth_7d_drop_pct: float
     regime_require_both_trend: bool
     entry_reclaim_close_enabled: bool
+    entry_reclaim_min_atr_enabled: bool
+    entry_reclaim_min_atr: float
     tp1_move_stop_to_breakeven_enabled: bool
     tp1_ema_trailing_stop_enabled: bool
     daily_trend_required: bool
@@ -169,6 +171,8 @@ def load_settings(path: Path) -> Settings:
             regime_eth_7d_drop_pct=float(analysis.get("regime_eth_7d_drop_pct", -8.0)),
             regime_require_both_trend=bool(analysis.get("regime_require_both_trend", False)),
             entry_reclaim_close_enabled=bool(analysis.get("entry_reclaim_close_enabled", False)),
+            entry_reclaim_min_atr_enabled=bool(analysis.get("entry_reclaim_min_atr_enabled", False)),
+            entry_reclaim_min_atr=float(analysis.get("entry_reclaim_min_atr", 0.0)),
             tp1_move_stop_to_breakeven_enabled=bool(analysis.get("tp1_move_stop_to_breakeven_enabled", False)),
             tp1_ema_trailing_stop_enabled=bool(analysis.get("tp1_ema_trailing_stop_enabled", False)),
             daily_trend_required=bool(analysis.get("daily_trend_required", False)),

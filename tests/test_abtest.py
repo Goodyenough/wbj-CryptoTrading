@@ -131,6 +131,22 @@ def test_entry_timing_override_can_require_reclaim_close() -> None:
     ]
 
 
+def test_atr_reclaim_experiment_is_runnable() -> None:
+    settings = load_settings(ROOT / "config" / "settings.toml")
+    assert settings.analysis.entry_reclaim_close_enabled is True
+    assert settings.analysis.entry_reclaim_min_atr_enabled is False
+    assert settings.analysis.entry_reclaim_min_atr == 0.0
+    definition = load_experiment("atr_reclaim_0_25", ROOT / "config" / "experiments.toml")
+    variant, changes = apply_experiment_overrides(settings, definition)
+    assert variant.analysis.entry_reclaim_close_enabled is True
+    assert variant.analysis.entry_reclaim_min_atr_enabled is True
+    assert variant.analysis.entry_reclaim_min_atr == 0.25
+    assert [(change.path, change.old_value, change.new_value) for change in changes] == [
+        ("analysis.entry_reclaim_min_atr_enabled", False, True),
+        ("analysis.entry_reclaim_min_atr", 0.0, 0.25),
+    ]
+
+
 def test_combined_regime_entry_override_can_pause_and_reclaim() -> None:
     settings = load_settings(ROOT / "config" / "settings.toml")
     settings.analysis.risk_off_core_buy_enabled = True
@@ -464,6 +480,35 @@ def test_relative_strength_soft_gate_downgrades_weak_buy_candidate() -> None:
     assert strong_relative_strength == -0.30000000000000004
 
 
+def test_entry_reclaim_atr_margin_requires_extra_close_strength() -> None:
+    from crypto_trading_system.backtest.replay import _entry_reclaim_close_satisfied
+
+    assert _entry_reclaim_close_satisfied(
+        True,
+        102.6,
+        100.0,
+        min_margin_atr_enabled=True,
+        min_margin_atr=0.25,
+        atr_4h=10.0,
+    )
+    assert not _entry_reclaim_close_satisfied(
+        True,
+        102.4,
+        100.0,
+        min_margin_atr_enabled=True,
+        min_margin_atr=0.25,
+        atr_4h=10.0,
+    )
+    assert _entry_reclaim_close_satisfied(
+        True,
+        100.0,
+        100.0,
+        min_margin_atr_enabled=False,
+        min_margin_atr=0.25,
+        atr_4h=10.0,
+    )
+
+
 if __name__ == "__main__":
     test_load_unknown_experiment_reports_available_names()
     test_daily_trend_experiment_is_runnable()
@@ -474,6 +519,7 @@ if __name__ == "__main__":
     test_capacity_override_can_reduce_top_n()
     test_combined_override_can_change_regime_and_capacity()
     test_entry_timing_override_can_require_reclaim_close()
+    test_atr_reclaim_experiment_is_runnable()
     test_combined_regime_entry_override_can_pause_and_reclaim()
     test_exit_timing_override_can_move_stop_to_breakeven()
     test_exit_timing_override_can_enable_ema_trailing_stop()
@@ -486,4 +532,5 @@ if __name__ == "__main__":
     test_large_cap_only_risk_off_experiment_loads()
     test_large_cap_exempt_in_risk_off_but_altcoin_not()
     test_relative_strength_soft_gate_downgrades_weak_buy_candidate()
+    test_entry_reclaim_atr_margin_requires_extra_close_strength()
     print("test_abtest=passed")

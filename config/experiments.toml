@@ -68,6 +68,15 @@ dimension = "entry_timing"
 [entry_reclaim_close.overrides.analysis]
 entry_reclaim_close_enabled = true
 
+[atr_reclaim_0_25]
+enabled = true
+description = "Require 4h reclaim close to exceed entry_high by at least 0.25 ATR before entering."
+dimension = "entry_timing"
+
+[atr_reclaim_0_25.overrides.analysis]
+entry_reclaim_min_atr_enabled = true
+entry_reclaim_min_atr = 0.25
+
 [risk_off_no_core_entry_reclaim]
 enabled = true
 description = "Combine RISK_OFF core-buy pause with 4h entry reclaim confirmation."
