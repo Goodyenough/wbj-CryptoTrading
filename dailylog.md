@@ -15,6 +15,15 @@
 
 ## 2026-07-27
 
+### 00:36:01 +08:00 - 完成 replay_consistency_audit Stage 2
+- 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
+- 改动：新增只读研究命令 `python main.py research replay-consistency-audit --run-id ... --blocked-events-json ...`，用于对比 source run 与 instrumented replay 的交易集合、active path、final equity 和 blocked event 重复签名。
+- 改动：新增 `ReplayConsistencyAudit` 报告模型与渲染器，明确记录候选排序限制：source run 未直接持久化 blocked candidate ordering，只能通过 replay source marker 与重复 blocked-event signature 间接验证。
+- 结果：对 source run `110c51eef593` 复跑得到 `replay_run_id=1e3cbb13c14a`；trades `389 -> 389`，entered trades `58 -> 58`，active/open-plan path mismatch 均为 0，final equity delta 为 0，blocked event repeat `512 -> 512` 且 signature mismatch 为 0。
+- 影响：仅新增诊断审计能力和报告；不修改 `config/settings.toml`，不保存新的 backtest run 到数据库，不计算 replacement outcome。
+- 验证：已运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests`、`python main.py research replay-consistency-audit --run-id 110c51eef593 --blocked-events-json reports/2026-07-27/blocked_entry_event_export_2026-07-27_v1.json --reports-date 2026-07-27 --no-obsidian`；确认 `config/settings.toml` 与 `data/crypto_trading.db` 无 diff。
+- Git：本次计划提交 `Add replay consistency audit`。
+
 ### 00:21:48 +08:00 - 完成 blocked_entry_event_export Stage 1
 - 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增只读研究命令 `python main.py research blocked-entry-event-export --run-id ...`，在 replay 中记录 `block_reason=max_active_positions` 的 blocked entry event，并导出 Markdown 与 JSON sidecar。

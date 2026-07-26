@@ -68,6 +68,38 @@ class BlockedEntryEventExport:
     events: list[dict]
 
 
+@dataclass(frozen=True)
+class ReplayConsistencyAudit:
+    source_run_id: str
+    replay_run_id: str
+    report_date: str
+    start_utc: str
+    end_utc: str
+    source_commit_hash: str
+    source_trade_count: int
+    replay_trade_count: int
+    source_entered_trades: int
+    replay_entered_trades: int
+    source_closed_trades: int
+    replay_closed_trades: int
+    entered_signature_mismatches: int
+    active_path_points: int
+    active_path_mismatches: int
+    open_plan_path_mismatches: int
+    final_equity_delta: float
+    blocked_events_json: str | None
+    blocked_events_reference_count: int | None
+    blocked_events_replay_count: int
+    blocked_event_signature_mismatches: int | None
+    candidate_ordering_evidence: str
+    ordering_directly_persisted_in_source: bool
+    verdict: str
+    reason: str
+    entered_mismatch_examples: list[dict]
+    active_path_mismatch_examples: list[dict]
+    blocked_event_mismatch_examples: list[dict]
+
+
 def _local_now() -> datetime:
     return datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=8), name="CST"))
 
@@ -1017,28 +1049,20 @@ def _top_event_symbols(events: list[dict], limit: int = 10) -> list[tuple[str, i
     return counts.most_common(limit)
 
 
-def build_blocked_entry_event_export(
-    settings: Settings,
-    run_id: str,
-    *,
-    report_date: str | None = None,
-    progress=None,
-) -> BlockedEntryEventExport:
+def _replay_source_run(settings: Settings, run: sqlite3.Row, *, progress=None):
     from .backtest.replay import run_backtest_replay
 
-    run = _source_run_row(settings, run_id)
     config = json.loads(run["config_json"] or "{}")
     symbols = [str(symbol).replace("/", "").upper() for symbol in json.loads(run["symbols_json"] or "[]")]
     if not symbols:
-        raise ValueError(f"backtest run_id has no stored symbols: {run_id}")
+        raise ValueError(f"backtest run_id has no stored symbols: {run['run_id']}")
     replay_settings = _apply_backtest_config_snapshot(settings, config)
     dynamic_mode = bool(config.get("dynamic_universe_mode"))
     dynamic_summary = config.get("dynamic_universe_summary", {})
     if not isinstance(dynamic_summary, dict):
         dynamic_summary = {}
     max_symbols = _as_int(dynamic_summary.get("max_symbols"))
-    dynamic_master = _stored_symbol_master(run_id, str(run["created_at_utc"]), symbols) if dynamic_mode else None
-
+    dynamic_master = _stored_symbol_master(str(run["run_id"]), str(run["created_at_utc"]), symbols) if dynamic_mode else None
     result = run_backtest_replay(
         replay_settings,
         symbols,
@@ -1050,6 +1074,18 @@ def build_blocked_entry_event_export(
         max_universe_symbols=max_symbols,
         progress=progress,
     )
+    return result, replay_settings, symbols, dynamic_mode, max_symbols
+
+
+def build_blocked_entry_event_export(
+    settings: Settings,
+    run_id: str,
+    *,
+    report_date: str | None = None,
+    progress=None,
+) -> BlockedEntryEventExport:
+    run = _source_run_row(settings, run_id)
+    result, replay_settings, symbols, dynamic_mode, max_symbols = _replay_source_run(settings, run, progress=progress)
     events = _blocked_event_dicts(result)
     event_count = len(events)
     replay_entered = sum(1 for trade in result.trades if trade.entered_at_utc is not None)
@@ -1242,6 +1278,358 @@ def write_blocked_entry_event_export_report(
     json_path = report_dir / json_filename
     json_path.write_text(json.dumps(asdict(export), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return export, paths, json_path
+
+
+def _source_payload(run: sqlite3.Row) -> dict:
+    payload = json.loads(run["payload_json"] or "{}")
+    if not isinstance(payload, dict):
+        raise ValueError(f"backtest run payload is not a JSON object: {run['run_id']}")
+    return payload
+
+
+def _trade_dicts_from_result(result) -> list[dict]:
+    return [asdict(trade) for trade in result.trades]
+
+
+def _entered_signature(trade: dict) -> tuple:
+    return (
+        str(trade.get("symbol", "")),
+        str(trade.get("created_at_utc", "")),
+        str(trade.get("entered_at_utc", "")),
+        None if trade.get("entry_price_filled") is None else round(float(trade["entry_price_filled"]), 10),
+        None if trade.get("quantity") is None else round(float(trade["quantity"]), 10),
+    )
+
+
+def _entered_trades(trades: list[dict]) -> list[dict]:
+    return [trade for trade in trades if trade.get("entered_at_utc") is not None]
+
+
+def _closed_trades(trades: list[dict]) -> list[dict]:
+    return [trade for trade in trades if trade.get("closed_at_utc") is not None]
+
+
+def _signature_mismatches(source_signatures: list[tuple], replay_signatures: list[tuple], limit: int = 10) -> list[dict]:
+    source_counter = Counter(source_signatures)
+    replay_counter = Counter(replay_signatures)
+    examples: list[dict] = []
+    for signature in sorted(set(source_counter) | set(replay_counter)):
+        source_count = source_counter.get(signature, 0)
+        replay_count = replay_counter.get(signature, 0)
+        if source_count == replay_count:
+            continue
+        examples.append(
+            {
+                "signature": list(signature),
+                "source_count": source_count,
+                "replay_count": replay_count,
+            }
+        )
+        if len(examples) >= limit:
+            break
+    return examples
+
+
+def _counter_mismatch_count(left: list[tuple], right: list[tuple]) -> int:
+    left_counter = Counter(left)
+    right_counter = Counter(right)
+    return sum(abs(left_counter.get(signature, 0) - right_counter.get(signature, 0)) for signature in set(left_counter) | set(right_counter))
+
+
+def _equity_path_by_time(points: list[dict]) -> dict[str, dict]:
+    return {str(point.get("timestamp_utc")): point for point in points if point.get("timestamp_utc")}
+
+
+def _active_path_mismatches(source_points: list[dict], replay_points: list[dict], limit: int = 10) -> tuple[int, int, list[dict]]:
+    source_by_time = _equity_path_by_time(source_points)
+    replay_by_time = _equity_path_by_time(replay_points)
+    active_mismatches = 0
+    open_plan_mismatches = 0
+    examples: list[dict] = []
+    for timestamp in sorted(set(source_by_time) | set(replay_by_time)):
+        source = source_by_time.get(timestamp)
+        replay = replay_by_time.get(timestamp)
+        source_active = None if source is None else int(source.get("open_positions", -1))
+        replay_active = None if replay is None else int(replay.get("open_positions", -1))
+        source_open_plans = None if source is None else int(source.get("open_plans", -1))
+        replay_open_plans = None if replay is None else int(replay.get("open_plans", -1))
+        mismatch = False
+        if source_active != replay_active:
+            active_mismatches += 1
+            mismatch = True
+        if source_open_plans != replay_open_plans:
+            open_plan_mismatches += 1
+            mismatch = True
+        if mismatch and len(examples) < limit:
+            examples.append(
+                {
+                    "timestamp_utc": timestamp,
+                    "source_open_positions": source_active,
+                    "replay_open_positions": replay_active,
+                    "source_open_plans": source_open_plans,
+                    "replay_open_plans": replay_open_plans,
+                }
+            )
+    return active_mismatches, open_plan_mismatches, examples
+
+
+def _blocked_event_signature(event: dict) -> tuple:
+    active_symbols = tuple(str(slot.get("symbol", "")) for slot in event.get("active_snapshot_after_exits", []))
+    return (
+        str(event.get("decision_time_utc", "")),
+        str(event.get("symbol", "")),
+        int(event.get("candidate_rank", 0)),
+        int(event.get("active_count_before_decision", 0)),
+        active_symbols,
+        bool(event.get("same_bar_entry_exit_possible", False)),
+        bool(event.get("same_bar_entry_tp1_possible", False)),
+    )
+
+
+def _load_blocked_events_reference(path: Path | None) -> tuple[str | None, list[dict] | None]:
+    if path is None:
+        return None, None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    events = data.get("events") if isinstance(data, dict) else None
+    if not isinstance(events, list):
+        raise ValueError(f"blocked events JSON has no events list: {path}")
+    return str(path), [event for event in events if isinstance(event, dict)]
+
+
+def build_replay_consistency_audit(
+    settings: Settings,
+    run_id: str,
+    *,
+    blocked_events_json: Path | None = None,
+    report_date: str | None = None,
+    progress=None,
+) -> ReplayConsistencyAudit:
+    from .backtest import replay as replay_module
+
+    run = _source_run_row(settings, run_id)
+    payload = _source_payload(run)
+    source_trades = payload.get("trades", [])
+    source_equity = payload.get("equity_curve", [])
+    if not isinstance(source_trades, list) or not isinstance(source_equity, list):
+        raise ValueError(f"backtest run payload lacks trades/equity_curve lists: {run_id}")
+
+    result, _replay_settings, _symbols, _dynamic_mode, _max_symbols = _replay_source_run(settings, run, progress=progress)
+    replay_trades = _trade_dicts_from_result(result)
+    replay_equity = [asdict(point) for point in result.equity_curve]
+
+    source_entered = _entered_trades(source_trades)
+    replay_entered = _entered_trades(replay_trades)
+    source_entered_signatures = [_entered_signature(trade) for trade in source_entered]
+    replay_entered_signatures = [_entered_signature(trade) for trade in replay_entered]
+    entered_mismatch_examples = _signature_mismatches(source_entered_signatures, replay_entered_signatures)
+    entered_mismatches = _counter_mismatch_count(source_entered_signatures, replay_entered_signatures)
+
+    active_mismatches, open_plan_mismatches, active_examples = _active_path_mismatches(source_equity, replay_equity)
+
+    reference_path, reference_events = _load_blocked_events_reference(blocked_events_json)
+    blocked_mismatch_examples: list[dict] = []
+    blocked_signature_mismatches: int | None = None
+    reference_count: int | None = None
+    replay_event_dicts = _blocked_event_dicts(result)
+    if reference_events is not None:
+        reference_count = len(reference_events)
+        reference_signatures = [_blocked_event_signature(event) for event in reference_events]
+        replay_signatures = [_blocked_event_signature(event) for event in replay_event_dicts]
+        blocked_mismatch_examples = _signature_mismatches(reference_signatures, replay_signatures)
+        blocked_signature_mismatches = _counter_mismatch_count(reference_signatures, replay_signatures)
+
+    source_final = float(payload.get("final_equity", 0.0) or 0.0)
+    final_equity_delta = result.final_equity - source_final
+    replay_source = inspect.getsource(replay_module)
+    ordering_marker_found = _source_contains(
+        replay_source,
+        "watching.sort(key=lambda item: (-item.score, item.created_index, item.paper.symbol))",
+    )
+    if blocked_events_json is None:
+        ordering_evidence = "source run did not persist blocked candidate order; current source marker was checked, but no prior event JSON was provided for repeat-order comparison."
+    elif blocked_signature_mismatches == 0 and ordering_marker_found:
+        ordering_evidence = "source run did not persist blocked candidate order directly; current source marker and repeated blocked-event signatures match the prior export."
+    else:
+        ordering_evidence = "candidate ordering could not be accepted because source marker or blocked-event repeat signatures did not match."
+
+    hard_failures = [
+        len(source_trades) != len(replay_trades),
+        len(source_entered) != len(replay_entered),
+        len(_closed_trades(source_trades)) != len(_closed_trades(replay_trades)),
+        entered_mismatches != 0,
+        active_mismatches != 0,
+        abs(final_equity_delta) > 1e-6,
+    ]
+    repeat_failure = blocked_signature_mismatches is not None and blocked_signature_mismatches != 0
+    repeat_missing = blocked_signature_mismatches is None
+    if any(hard_failures) or repeat_failure:
+        verdict = "replay_consistency_fail"
+        reason = "The instrumented replay did not reproduce one or more required source-run or blocked-event consistency checks."
+    elif repeat_missing:
+        verdict = "replay_consistency_incomplete"
+        reason = "Source/replay core path matched, but no prior blocked events JSON was supplied, so blocked-event repeat consistency was not verified."
+    else:
+        verdict = "replay_consistency_pass_with_ordering_limit"
+        reason = (
+            "Source/replay entered trades, final equity, active path, and prior blocked-event signatures match. "
+            "Candidate ordering is accepted only indirectly because the original source run did not persist blocked candidate ordering."
+        )
+
+    return ReplayConsistencyAudit(
+        source_run_id=run_id,
+        replay_run_id=result.run_id,
+        report_date=report_date or _local_now().strftime("%Y-%m-%d"),
+        start_utc=str(run["start_utc"]),
+        end_utc=str(run["end_utc"]),
+        source_commit_hash=str(run["commit_hash"]),
+        source_trade_count=len(source_trades),
+        replay_trade_count=len(replay_trades),
+        source_entered_trades=len(source_entered),
+        replay_entered_trades=len(replay_entered),
+        source_closed_trades=len(_closed_trades(source_trades)),
+        replay_closed_trades=len(_closed_trades(replay_trades)),
+        entered_signature_mismatches=entered_mismatches,
+        active_path_points=len(set(_equity_path_by_time(source_equity)) | set(_equity_path_by_time(replay_equity))),
+        active_path_mismatches=active_mismatches,
+        open_plan_path_mismatches=open_plan_mismatches,
+        final_equity_delta=final_equity_delta,
+        blocked_events_json=reference_path,
+        blocked_events_reference_count=reference_count,
+        blocked_events_replay_count=len(replay_event_dicts),
+        blocked_event_signature_mismatches=blocked_signature_mismatches,
+        candidate_ordering_evidence=ordering_evidence,
+        ordering_directly_persisted_in_source=False,
+        verdict=verdict,
+        reason=reason,
+        entered_mismatch_examples=entered_mismatch_examples,
+        active_path_mismatch_examples=active_examples,
+        blocked_event_mismatch_examples=blocked_mismatch_examples,
+    )
+
+
+def render_replay_consistency_audit(audit: ReplayConsistencyAudit) -> str:
+    now = _local_now()
+    lines = [
+        "---",
+        f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - replay-consistency-audit",
+        "experiment: replay_consistency_audit",
+        f"source_run_id: {audit.source_run_id}",
+        f"replay_run_id: {audit.replay_run_id}",
+        f"verdict: {audit.verdict}",
+        "---",
+        "",
+        "# replay_consistency_audit",
+        "",
+        "## Plain-language conclusion",
+        "",
+        audit.reason,
+        "",
+        "This report is diagnostic only. It does not change `config/settings.toml`, backtest behavior, paper state, strategy defaults, or saved backtest rows.",
+        "",
+        "## Scope",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| source_run_id | `{audit.source_run_id}` |",
+        f"| replay_run_id | `{audit.replay_run_id}` |",
+        f"| window | `{audit.start_utc}` -> `{audit.end_utc}` |",
+        f"| source_commit_hash | `{audit.source_commit_hash}` |",
+        f"| blocked_events_json | `{audit.blocked_events_json or 'not supplied'}` |",
+        "",
+        "## Consistency Checks",
+        "",
+        "| Check | Source | Replay | Mismatches |",
+        "|---|---:|---:|---:|",
+        f"| trades | {audit.source_trade_count} | {audit.replay_trade_count} | {abs(audit.source_trade_count - audit.replay_trade_count)} |",
+        f"| entered_trades | {audit.source_entered_trades} | {audit.replay_entered_trades} | {audit.entered_signature_mismatches} |",
+        f"| closed_trades | {audit.source_closed_trades} | {audit.replay_closed_trades} | {abs(audit.source_closed_trades - audit.replay_closed_trades)} |",
+        f"| active_count_path | {audit.active_path_points} points | {audit.active_path_points} points | {audit.active_path_mismatches} |",
+        f"| open_plan_path | {audit.active_path_points} points | {audit.active_path_points} points | {audit.open_plan_path_mismatches} |",
+        f"| final_equity_delta | n/a | n/a | {audit.final_equity_delta:.10f} |",
+        f"| blocked_event_repeat | {_fmt_optional(audit.blocked_events_reference_count)} | {audit.blocked_events_replay_count} | {_fmt_optional(audit.blocked_event_signature_mismatches)} |",
+        "",
+        "## Candidate Ordering Evidence",
+        "",
+        audit.candidate_ordering_evidence,
+        "",
+        "Important limitation: the original source run did not persist blocked candidate ordering directly. Ordering is therefore verified by replay source marker plus repeat blocked-event signatures, not by an independently persisted source ordering table.",
+        "",
+        "## Mismatch Examples",
+        "",
+        "```json",
+        json.dumps(
+            {
+                "entered_mismatch_examples": audit.entered_mismatch_examples,
+                "active_path_mismatch_examples": audit.active_path_mismatch_examples,
+                "blocked_event_mismatch_examples": audit.blocked_event_mismatch_examples,
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        "```",
+        "",
+        "## Decision",
+        "",
+        f"`{audit.verdict}`",
+        "",
+        "## Next Action",
+        "",
+    ]
+    if audit.verdict == "replay_consistency_pass_with_ordering_limit":
+        lines.append("Proceed to `stale_slot_continuation_review`. Do not calculate replacement outcome until stale-slot continuation value is reviewed independently.")
+    elif audit.verdict == "replay_consistency_incomplete":
+        lines.append("Rerun this audit with `--blocked-events-json` pointing to the Stage 1 JSON sidecar before moving forward.")
+    else:
+        lines.append("Stop the replacement roadmap and fix replay/export consistency before any stale-slot or replacement outcome analysis.")
+    lines.extend(
+        [
+            "",
+            "## Raw Summary",
+            "",
+            "```json",
+            json.dumps(asdict(audit), ensure_ascii=False, indent=2),
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_replay_consistency_audit_report(
+    settings: Settings,
+    run_id: str,
+    *,
+    blocked_events_json: Path | None = None,
+    report_date: str | None = None,
+    progress=None,
+) -> tuple[ReplayConsistencyAudit, list[Path]]:
+    date_text = report_date or _local_now().strftime("%Y-%m-%d")
+    audit = build_replay_consistency_audit(
+        settings,
+        run_id,
+        blocked_events_json=blocked_events_json,
+        report_date=date_text,
+        progress=progress,
+    )
+    text = render_replay_consistency_audit(audit)
+    report_dir = settings.output.reports_dir / date_text
+    obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
+    prefix = f"replay_consistency_audit_{date_text}"
+    version = next_report_version([report_dir, obsidian_dir], prefix)
+    filename = versioned_markdown_filename(prefix, version)
+    paths: list[Path] = []
+    for directory in [report_dir, obsidian_dir]:
+        if directory is None:
+            continue
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / filename
+        path.write_text(text, encoding="utf-8")
+        paths.append(path)
+    return audit, paths
 
 
 def generate_observation_dashboard(

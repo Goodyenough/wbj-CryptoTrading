@@ -327,3 +327,32 @@ shadow experiment 需要回答：
 2. 对比 source run `110c51eef593` 与 exported replay `ed682b4a5531` 的 entered trades、entry time、active count path、candidate ordering 和 blocked event 重复运行一致性。
 3. 若一致性审计未通过，先修正导出器或 source-run 复现口径，不进入 outcome 分析。
 4. 一致性审计通过后，才进入 `stale_slot_continuation_review`。
+
+## 2026-07-27 Stage 2 执行进展
+
+### Stage 2：`replay_consistency_audit`
+
+状态：已完成。
+
+输出：
+- 报告：`reports/2026-07-27/replay_consistency_audit_2026-07-27_v1.md`
+
+核心事实：
+- source run：`110c51eef593`
+- replay run：`1e3cbb13c14a`
+- trades：`389 -> 389`
+- entered trades：`58 -> 58`
+- closed trades：`388 -> 388`
+- active path mismatches：`0`
+- open plan path mismatches：`0`
+- final equity delta：`0`
+- blocked event repeat：`512 -> 512`
+- blocked event signature mismatches：`0`
+
+结论：`replay_consistency_pass_with_ordering_limit`。可以进入下一阶段诊断，但候选排序不是 source run 原生持久化字段，只能通过源码排序 marker 与重复 blocked-event 签名间接验证。
+
+下一步直接执行：
+1. 设计并实现 `stale_slot_continuation_review`。
+2. 主样本只看 canonical baseline 中所有 pre-TP1 且 age 达到 `42 bars = 168h` 的 active slots。
+3. 输出 stale time 后的 `forward_R_24`、`forward_R_42`、`forward_R_60`、eventual R、MFE/MAE、first-hit outcome 和 censored 标记。
+4. 该阶段仍只判断旧仓继续占槽是否有价值，不比较 blocked candidate，不计算 replacement outcome。

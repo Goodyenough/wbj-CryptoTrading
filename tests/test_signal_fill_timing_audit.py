@@ -11,8 +11,10 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from crypto_trading_system.research_tools import (  # noqa: E402
     BlockedEntryEventExport,
+    ReplayConsistencyAudit,
     build_signal_fill_timing_audit,
     render_blocked_entry_event_export,
+    render_replay_consistency_audit,
     write_signal_fill_timing_audit_report,
 )
 
@@ -272,6 +274,48 @@ def test_render_blocked_entry_event_export_includes_required_fields() -> None:
     assert "`events.json`" in text
 
 
+def test_render_replay_consistency_audit_includes_limits_and_next_action() -> None:
+    audit = ReplayConsistencyAudit(
+        source_run_id="source1",
+        replay_run_id="replay1",
+        report_date="2026-07-27",
+        start_utc="2025-06-01T00:00:00+00:00",
+        end_utc="2026-06-01T00:00:00+00:00",
+        source_commit_hash="abc123",
+        source_trade_count=389,
+        replay_trade_count=389,
+        source_entered_trades=58,
+        replay_entered_trades=58,
+        source_closed_trades=58,
+        replay_closed_trades=58,
+        entered_signature_mismatches=0,
+        active_path_points=2190,
+        active_path_mismatches=0,
+        open_plan_path_mismatches=0,
+        final_equity_delta=0.0,
+        blocked_events_json="events.json",
+        blocked_events_reference_count=512,
+        blocked_events_replay_count=512,
+        blocked_event_signature_mismatches=0,
+        candidate_ordering_evidence="source run did not persist blocked candidate order directly; current source marker and repeated blocked-event signatures match the prior export.",
+        ordering_directly_persisted_in_source=False,
+        verdict="replay_consistency_pass_with_ordering_limit",
+        reason="test reason",
+        entered_mismatch_examples=[],
+        active_path_mismatch_examples=[],
+        blocked_event_mismatch_examples=[],
+    )
+
+    text = render_replay_consistency_audit(audit)
+
+    assert "# replay_consistency_audit" in text
+    assert "entered_trades" in text
+    assert "active_count_path" in text
+    assert "blocked_event_repeat" in text
+    assert "did not persist blocked candidate ordering directly" in text
+    assert "Proceed to `stale_slot_continuation_review`" in text
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -281,3 +325,4 @@ if __name__ == "__main__":
         test_write_signal_fill_timing_audit_report_includes_required_sections(root / "write")
         test_signal_fill_timing_audit_missing_run_raises(root / "missing")
         test_render_blocked_entry_event_export_includes_required_fields()
+        test_render_replay_consistency_audit_includes_limits_and_next_action()

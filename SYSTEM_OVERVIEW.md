@@ -120,4 +120,4 @@ flowchart TD
 1. 用 `risk_off_core_buy_enabled=false` 限制弱市开仓。
 2. 用 `entry_reclaim_close_enabled=true` 避免首次触碰入场区间就接入。
 3. 用 `tp1_ema_trailing_stop_enabled=true` 替代简单 TP1 后保本。
-4. 继续研究但尚未部署：`max_holding_bars_without_tp1=42`、`relative_strength_soft_gate`、`entry_reclaim_min_atr=0.35`；其中 `atr_reclaim_0_35` 已降为 `retest_path_dependent`，容量复核显示满仓和长持仓确实影响路径，但证据不足以修改仓位上限或排序。`signal_fill_timing_audit` 已确认 replay 顺序可审计但存在 same-bar ambiguity；`blocked_entry_event_export` 已导出 512 个 `max_active_positions` blocked events，下一步必须先做 `replay_consistency_audit`，确认导出 replay 与 source run 可对齐后，才能分析 stale slot 或 replacement outcome。
+4. 继续研究但尚未部署：`max_holding_bars_without_tp1=42`、`relative_strength_soft_gate`、`entry_reclaim_min_atr=0.35`；其中 `atr_reclaim_0_35` 已降为 `retest_path_dependent`，容量复核显示满仓和长持仓确实影响路径，但证据不足以修改仓位上限或排序。`signal_fill_timing_audit` 已确认 replay 顺序可审计但存在 same-bar ambiguity；`blocked_entry_event_export` 已导出 512 个 `max_active_positions` blocked events；`replay_consistency_audit` 已确认 source/replay entered trades、active path、final equity 与 blocked event repeat 均一致，但候选排序只具备间接验证。下一步是 `stale_slot_continuation_review`，先独立评估旧仓继续占槽是否有价值，再分析 replacement。

@@ -42,6 +42,7 @@ from crypto_trading_system.research_tools import (
     generate_observation_dashboard,
     split_symbol_master_by_cap,
     write_blocked_entry_event_export_report,
+    write_replay_consistency_audit_report,
     write_signal_fill_timing_audit_report,
 )
 from crypto_trading_system.scanner import run_market_scan
@@ -394,6 +395,18 @@ def build_parser() -> argparse.ArgumentParser:
     blocked_export.add_argument("--run-id", required=True, help="Backtest run_id to instrument.")
     blocked_export.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
     blocked_export.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    replay_consistency = research_subparsers.add_parser(
+        "replay-consistency-audit",
+        help="Verify that an instrumented replay reproduces a stored source backtest run.",
+    )
+    replay_consistency.add_argument("--run-id", required=True, help="Source backtest run_id to replay.")
+    replay_consistency.add_argument(
+        "--blocked-events-json",
+        default=None,
+        help="Optional Stage 1 blocked-entry-event-export JSON sidecar for repeat-signature checks.",
+    )
+    replay_consistency.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
+    replay_consistency.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
@@ -1048,6 +1061,29 @@ def main() -> None:
             for path in paths:
                 print(f"report={path}")
             print(f"events_json={json_path}")
+        if args.research_command == "replay-consistency-audit":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            audit, paths = write_replay_consistency_audit_report(
+                settings,
+                run_id=args.run_id,
+                blocked_events_json=None if args.blocked_events_json is None else Path(args.blocked_events_json),
+                report_date=args.reports_date,
+                progress=_progress,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("replay_consistency_audit=completed")
+            print(f"source_run_id={audit.source_run_id}")
+            print(f"replay_run_id={audit.replay_run_id}")
+            print(f"verdict={audit.verdict}")
+            print(f"entered_signature_mismatches={audit.entered_signature_mismatches}")
+            print(f"active_path_mismatches={audit.active_path_mismatches}")
+            print(f"open_plan_path_mismatches={audit.open_plan_path_mismatches}")
+            print(f"blocked_event_signature_mismatches={audit.blocked_event_signature_mismatches}")
+            print(f"final_equity_delta={audit.final_equity_delta:.10f}")
+            for path in paths:
+                print(f"report={path}")
 
     if args.command == "paper":
         init_db(settings.output.database_path)
