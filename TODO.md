@@ -144,7 +144,8 @@
 - [x] 设计并实现 `relative_strength_soft_gate` 离线实验：首轮扩展窗口报告 `paper_shadow_experiment_relative_strength_soft_gate_2026-07-03_2026-07-25_demo_v3.md`，结论 `retest`；`btc_eth_soft_minus_0_5` 错过赢家最少，`btc_eth_hard_0` 过滤亏损最多，需继续跨窗口复测。
 - [x] 跨窗口复核三项 fixed opportunity shadow experiment：已补跑 `2026-06-19 -> 2026-07-02` 与 `2026-07-17 -> 2026-07-25`，并汇总到 `reports/2026-07-25/paper_shadow_experiment_cross_window_review_2026-07-25_v1.md`；结论仍为 `retest`，优先级暂定 `btc_eth_soft_minus_0_5`、`atr_reclaim_0_25`、`trend_support_atr_pullback`。
 - [x] 下一轮正式 A/B 只选择一个维度先做：已注册并运行 `relative_strength_soft_gate_btc_eth_minus_0_5` dynamic-universe A/B；两段非重叠窗口净收益、PF、Sharpe 和止损率均改善，但早期窗口 MDD 16.59% -> 18.96% 恶化，结论 `retest`，不部署。
-- [ ] 复核 `relative_strength_soft_gate_btc_eth_minus_0_5` 的早期窗口 MDD 恶化来源：按 regime、symbol、entry date 分层比较 variant 多出的 11 笔 closed trades，判断是新增交易导致回撤扩大，还是持仓路径/排序变化导致。
+- [x] 复核 `relative_strength_soft_gate_btc_eth_minus_0_5` 的早期窗口 MDD 恶化来源：variant-only trades 净贡献 +565.32，但 11 月 winner cluster 抬高权益峰值后，12 月、1 月和 5 月新增止损簇扩大 peak-to-trough；结论仍为 `retest`。
+- [ ] 设计 `relative_strength_soft_gate` 阈值敏感性 A/B：同一维度只改阈值，优先测试 `-1.0` 与 `0.0`，观察能否保留两段 PF/净收益改善，同时降低早期窗口 MDD。
 - [ ] 暂不把 MACD 升级为 `macd_hist_4h > 0` 硬门槛；如研究 MACD，仅做 histogram 斜率、连续恶化、reclaim 时改善等离线变体。
 
 ## 运维待办

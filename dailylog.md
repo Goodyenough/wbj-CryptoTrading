@@ -15,6 +15,14 @@
 
 ## 2026-07-26
 
+### 00:55:00 +08:00 - 复核 relative strength soft gate 早期窗口 MDD 恶化来源
+- 类型：报告 / 实验日志 / TODO / 计划 / Git
+- 改动：新增 `reports/2026-07-26/relative_strength_soft_gate_mdd_review_2026-07-26_v1.md`，解析 `2024-07-01 -> 2025-06-01` baseline/variant 已结束交易表，比较 variant-only、baseline-only 与 common trades。
+- 改动：确认 MDD 恶化不是单笔尾部亏损，而是路径依赖：variant 11 月 winner cluster 大幅抬高 closed-PnL peak，随后 12 月、1 月和 5 月新增止损簇扩大 peak-to-trough。
+- 影响：`relative_strength_soft_gate_btc_eth_minus_0_5` 仍保持 `retest`，不部署；下一步改为同一维度阈值敏感性测试。
+- 验证：复核报告基于已生成 backtest Markdown 的交易表解析；本次未改代码，未运行代码测试；`config/settings.toml` 保持无 diff。
+- Git：本次提交 `Review relative strength drawdown source`。
+
 ### 00:38:00 +08:00 - 注册并运行 relative strength soft gate 正式 A/B
 - 类型：代码 / 配置 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增 `analysis.relative_strength_soft_gate_enabled` 与 `analysis.relative_strength_min_pct` 的 loader 默认值；注册 `relative_strength_soft_gate_btc_eth_minus_0_5` 实验，仅在 A/B variant 中启用相对 BTC/ETH 24h 平均收益的软门槛。
