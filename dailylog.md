@@ -15,6 +15,14 @@
 
 ## 2026-07-26
 
+### 23:59:00 +08:00 - 生成下一步方向 GPT 评审包
+- 类型：文档 / GPT 评审 / Git
+- 改动：更新 `.gpt-review/current_packet.md`，并新增 `.gpt-review/history/20260726-235900_packet.md`，将 `slot_replacement_quality_review` 下一步方向整理为自包含 GPT 评审包。
+- 原因：在继续执行容量/换仓方向前，引入 GPT 对研究路线、事件定义、标签设计和验收标准做独立复核。
+- 影响：仅生成评审材料并打开 ChatGPT；不执行方案，不修改 `config/settings.toml`，不部署任何策略规则。
+- 验证：确认评审包文件存在并可读取；已运行 `open-gpt-review.ps1` 复制提示词并打开 ChatGPT。
+- Git：本次计划提交 `Prepare GPT review for next research direction`。
+
 ### 23:48:30 +08:00 - 完成 capacity_and_opportunity_order_review
 - 类型：报告 / 实验日志 / TODO / 计划 / Git
 - 改动：新增 `reports/2026-07-26/capacity_and_opportunity_order_review_2026-07-26_v1.md`，复核 `max_active_positions=5`、score 排序和关键机会出现时的 active slot 质量。
