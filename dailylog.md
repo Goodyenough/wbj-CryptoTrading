@@ -15,6 +15,15 @@
 
 ## 2026-07-27
 
+### 23:57:43 +08:00 - 完成 Stage A-E 执行收束
+- 类型：代码 / 报告 / 文档 / 实验日志
+- 改动：新增只读研究命令 `python main.py research replacement-closure-audit --stage1-json ... --stage4-report ...`，从 Stage 1 JSON 与 Stage 4 Raw Summary 生成去重、stale-trade 集中度、first-event-per-stale-trade、exclude 2025-07、exclude same-bar ambiguous 与 cluster bootstrap 结案附录。
+- 改动：生成 `reports/2026-07-27/replacement_closure_audit_2026-07-27_v1.md` 与 `reports/2026-07-27/stage_a_to_e_execution_review_2026-07-27_v1.md`，并更新 `TODO.md`、`开发计划.md`、`EXPERIMENT_LEDGER.md` 和 Obsidian 实验日志。
+- 结果：`eligible_comparison_events=42`、`unique_stale_trades=3`、`stale_trade_top1_share_pct=83.333%`、`first_event_per_stale_trade_R42_median=-0.004`、`cluster_bootstrap_R42_p05=-0.565`；capacity replacement 分支冻结为 `paused_no_stable_executable_edge`，`atr_reclaim_0_35` 维持 `retest_path_dependent`。
+- 影响：不进入 Stage 5 / Stage E shadow replacement，不部署 `atr_reclaim_0_35`，不提高 `max_active_positions`，不修改 `config/settings.toml`。
+- 验证：已运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests`、`python main.py research replacement-closure-audit --stage1-json reports\2026-07-27\blocked_entry_event_export_2026-07-27_v1.json --stage4-report reports\2026-07-27\blocked_candidate_vs_stale_slot_review_2026-07-27_v1.md --reports-date 2026-07-27 --no-obsidian`。
+- Git：本次计划提交 `Add replacement closure audit`。
+
 ### 23:36:15 +08:00 - 生成 Stage 0-4 收束结果 GPT 评审包
 - 类型：文档 / GPT 评审 / 报告 / Git
 - 改动：更新 `.gpt-review/current_packet.md`，新增 `.gpt-review/history/20260727-233615_packet.md`，把 `signal_fill_timing_audit -> blocked_entry_event_export -> replay_consistency_audit -> stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review` 的执行结果整理为自包含 GPT 评审包，并运行 `open-gpt-review.ps1` 打开 ChatGPT、复制提示词。

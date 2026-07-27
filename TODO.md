@@ -1,5 +1,11 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-07-27 当前执行状态
+
+- [x] 完成 `replacement_closure_audit`：复用 Stage 1 JSON 与 Stage 4 Raw Summary 做去重、stale-trade 集中度、first-event-per-stale-trade、exclude 2025-07、exclude same-bar ambiguous 与 cluster bootstrap；结论 `paused_no_stable_executable_edge`，capacity replacement 分支冻结，不进入 Stage 5 shadow replacement。
+- [x] 生成 `stage_a_to_e_execution_review`：整合 Stage A-E gate，确认 Stage B/C/D 证据已由既有 `atr_reclaim_0_35` A/B、交易级归因和阈值敏感性报告覆盖；Stage E 因 gate failed 不启动，下一优先级回到 capacity-neutral entry-quality retest。
+- [ ] 后续如继续 entry-quality 研究，只允许提出单变量 retest 卡片；不得把 `atr_reclaim_0_35` 与 replacement、relative strength 或其它过滤器叠加后直接实验。
+
 ## 策略优化路线图
 
 背景：当前系统已经可以扫盘、生成交易计划、跑模拟盘和回测，但策略交易质量仍然偏弱。

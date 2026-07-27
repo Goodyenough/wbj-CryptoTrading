@@ -1,6 +1,12 @@
 # CryptoTradingSystem 实验账本
 
-更新时间：2026-07-27 00:36 +08:00
+更新时间：2026-07-27 23:57 +08:00
+
+## 2026-07-27 Stage A-E 执行结论
+
+- `replacement_closure_audit`：复用 Stage 1 JSON 与 Stage 4 Raw Summary，检查 512 个 blocked events、42 个 eligible comparison events 的去重、stale trade 集中度、first-event-per-stale-trade、exclude 2025-07、exclude same-bar ambiguous 与 cluster bootstrap。核心结果为 `unique_stale_trades=3`、`stale_trade_top1_share_pct=83.333%`、`first_event_per_stale_trade_R42_median=-0.004`、`cluster_bootstrap_R42_p05=-0.565`，结论 `paused_no_stable_executable_edge`。
+- `stage_a_to_e_execution_review`：确认 Stage B/C/D 已由既有 `atr_reclaim_0_35` 正式 A/B、交易级归因、路径复盘和阈值敏感性报告覆盖。`atr_reclaim_0_35` 报告级指标改善，但收益来源仍主要是 variant-only 新增赢家与容量路径变化，不是 common trades 广泛改善，因此维持 `retest_path_dependent`。
+- 决策：不进入 Stage 5 / Stage E shadow replacement，不部署 `atr_reclaim_0_35`，不提高 `max_active_positions`，不修改 `config/settings.toml`。后续若继续研究，必须回到 capacity-neutral 的单变量 entry-quality retest，且先写实验卡片。
 
 ## 1. 账本规则
 

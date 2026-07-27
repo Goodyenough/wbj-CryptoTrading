@@ -13,12 +13,14 @@ from crypto_trading_system.research_tools import (  # noqa: E402
     BlockedEntryEventExport,
     BlockedCandidateVsStaleSlotEvent,
     BlockedCandidateVsStaleSlotReview,
+    ReplacementClosureAudit,
     ReplayConsistencyAudit,
     StaleSlotContinuationReview,
     StaleSlotObservation,
     build_signal_fill_timing_audit,
     render_blocked_candidate_vs_stale_slot_review,
     render_blocked_entry_event_export,
+    render_replacement_closure_audit,
     render_replay_consistency_audit,
     render_stale_slot_continuation_review,
     write_signal_fill_timing_audit_report,
@@ -449,6 +451,57 @@ def test_render_blocked_candidate_vs_stale_slot_review_keeps_diagnostic_scope() 
     assert "shadow replacement experiment" in text
 
 
+def test_render_replacement_closure_audit_freezes_capacity_branch() -> None:
+    audit = ReplacementClosureAudit(
+        source_run_id="source1",
+        replay_run_id="replay1",
+        report_date="2026-07-27",
+        stage1_json_path="reports/2026-07-27/blocked_entry_event_export_2026-07-27_v1.json",
+        stage4_report_path="reports/2026-07-27/blocked_candidate_vs_stale_slot_review_2026-07-27_v1.md",
+        start_utc="2025-06-01T00:00:00+00:00",
+        end_utc="2026-06-01T00:00:00+00:00",
+        total_blocked_events=512,
+        unique_blocked_timestamps=120,
+        rank1_blocked_events=46,
+        unique_rank1_timestamps=44,
+        eligible_comparison_events=42,
+        unique_comparison_timestamps=42,
+        unique_comparison_candidates=17,
+        unique_stale_trades=2,
+        stale_trade_duplicate_counts={"slot1": 35, "slot2": 7},
+        stale_trade_top1_share_pct=83.33333333333334,
+        stale_trade_top3_share_pct=100.0,
+        first_event_per_stale_trade_summaries={
+            "net_replacement_delta_r_24": {"n": 2, "mean": 0.1, "median": 0.1, "positive_pct": 50.0, "min": -0.4, "max": 0.6},
+            "net_replacement_delta_r_42": {"n": 2, "mean": -0.2, "median": -0.2, "positive_pct": 50.0, "min": -0.9, "max": 0.5},
+            "net_replacement_delta_r_60": {"n": 2, "mean": -0.3, "median": -0.3, "positive_pct": 50.0, "min": -1.0, "max": 0.4},
+        },
+        exclude_2025_07_summaries={
+            "net_replacement_delta_r_24": {"n": 5, "mean": -0.1, "median": -0.2, "positive_pct": 40.0, "min": -0.8, "max": 0.7},
+            "net_replacement_delta_r_42": {"n": 5, "mean": -0.3, "median": -0.4, "positive_pct": 40.0, "min": -1.0, "max": 0.6},
+            "net_replacement_delta_r_60": {"n": 5, "mean": -0.4, "median": -0.5, "positive_pct": 40.0, "min": -1.2, "max": 0.5},
+        },
+        exclude_same_bar_ambiguous_summaries={
+            "net_replacement_delta_r_24": {"n": 41, "mean": 0.4, "median": 0.1, "positive_pct": 58.0, "min": -1.5, "max": 3.4},
+            "net_replacement_delta_r_42": {"n": 41, "mean": 0.2, "median": -0.3, "positive_pct": 41.0, "min": -1.6, "max": 3.5},
+            "net_replacement_delta_r_60": {"n": 41, "mean": 0.1, "median": -0.4, "positive_pct": 44.0, "min": -1.9, "max": 3.5},
+        },
+        cluster_bootstrap_mean_r_42={"clusters": 2, "iterations": 5000, "mean": -0.2, "p05": -0.9, "p50": -0.2, "p95": 0.5},
+        top_contribution_share_r_42={"positive_n": 18, "top1_share_pct": 14.7, "top3_share_pct": 43.4, "trimmed_mean_20pct": 0.001},
+        verdict="paused_no_stable_executable_edge",
+        reason="Stage 4 remains too concentrated and unstable after de-duplication and robustness checks.",
+    )
+
+    text = render_replacement_closure_audit(audit)
+
+    assert "# replacement_closure_audit" in text
+    assert "closure appendix for Stage 4 only" in text
+    assert "does not proceed to Stage 5 shadow replacement" in text
+    assert "paused_no_stable_executable_edge" in text
+    assert "first_event_per_stale_trade" in text
+    assert "Cluster Bootstrap" in text
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -461,3 +514,4 @@ if __name__ == "__main__":
         test_render_replay_consistency_audit_includes_limits_and_next_action()
         test_render_stale_slot_continuation_review_defines_scope_and_next_action()
         test_render_blocked_candidate_vs_stale_slot_review_keeps_diagnostic_scope()
+        test_render_replacement_closure_audit_freezes_capacity_branch()

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 import inspect
 import json
 from pathlib import Path
+import random
 import sqlite3
 
 from .backtest.universe import SymbolMaster, load_symbol_master, save_symbol_master
@@ -220,6 +221,35 @@ class BlockedCandidateVsStaleSlotReview:
     verdict: str
     reason: str
     events: list[BlockedCandidateVsStaleSlotEvent]
+
+
+@dataclass(frozen=True)
+class ReplacementClosureAudit:
+    source_run_id: str
+    replay_run_id: str
+    report_date: str
+    stage1_json_path: str
+    stage4_report_path: str
+    start_utc: str
+    end_utc: str
+    total_blocked_events: int
+    unique_blocked_timestamps: int
+    rank1_blocked_events: int
+    unique_rank1_timestamps: int
+    eligible_comparison_events: int
+    unique_comparison_timestamps: int
+    unique_comparison_candidates: int
+    unique_stale_trades: int
+    stale_trade_duplicate_counts: dict[str, int]
+    stale_trade_top1_share_pct: float | None
+    stale_trade_top3_share_pct: float | None
+    first_event_per_stale_trade_summaries: dict[str, dict[str, float | int | None]]
+    exclude_2025_07_summaries: dict[str, dict[str, float | int | None]]
+    exclude_same_bar_ambiguous_summaries: dict[str, dict[str, float | int | None]]
+    cluster_bootstrap_mean_r_42: dict[str, float | int | None]
+    top_contribution_share_r_42: dict[str, float | int | None]
+    verdict: str
+    reason: str
 
 
 def _local_now() -> datetime:
@@ -2780,6 +2810,292 @@ def write_blocked_candidate_vs_stale_slot_review_report(
         path.write_text(text, encoding="utf-8")
         paths.append(path)
     return review, paths
+
+
+def _event_value(event: dict, key: str) -> float | None:
+    value = event.get(key)
+    if value is None:
+        return None
+    return float(value)
+
+
+def _events_summary(events: list[dict], key: str) -> dict[str, float | int | None]:
+    return _summary([_event_value(event, key) for event in events])
+
+
+def _first_event_per_stale_trade(events: list[dict]) -> list[dict]:
+    first_by_trade: dict[str, dict] = {}
+    for event in sorted(events, key=lambda item: str(item.get("decision_time_utc", ""))):
+        trade_id = str(event.get("selected_slot_trade_id", ""))
+        if trade_id and trade_id not in first_by_trade:
+            first_by_trade[trade_id] = event
+    return list(first_by_trade.values())
+
+
+def _cluster_bootstrap_mean(events: list[dict], *, key: str, cluster_key: str, seed: int = 20260727, iterations: int = 5000) -> dict[str, float | int | None]:
+    clusters: dict[str, list[float]] = {}
+    for event in events:
+        cluster = str(event.get(cluster_key, ""))
+        value = _event_value(event, key)
+        if not cluster or value is None:
+            continue
+        clusters.setdefault(cluster, []).append(value)
+    cluster_means = [sum(values) / len(values) for values in clusters.values() if values]
+    if not cluster_means:
+        return {"clusters": 0, "iterations": iterations, "mean": None, "p05": None, "p50": None, "p95": None}
+    rng = random.Random(seed)
+    sampled_means: list[float] = []
+    for _ in range(iterations):
+        draw = [rng.choice(cluster_means) for _ in cluster_means]
+        sampled_means.append(sum(draw) / len(draw))
+    sampled_means.sort()
+
+    def pct(p: float) -> float:
+        index = int(round((len(sampled_means) - 1) * p))
+        return sampled_means[index]
+
+    return {
+        "clusters": len(cluster_means),
+        "iterations": iterations,
+        "mean": sum(cluster_means) / len(cluster_means),
+        "p05": pct(0.05),
+        "p50": pct(0.50),
+        "p95": pct(0.95),
+    }
+
+
+def build_replacement_closure_audit(
+    stage1_json_path: Path,
+    stage4_report_path: Path,
+    *,
+    report_date: str | None = None,
+) -> ReplacementClosureAudit:
+    stage1 = json.loads(stage1_json_path.read_text(encoding="utf-8"))
+    stage4 = _extract_raw_json(stage4_report_path.read_text(encoding="utf-8"), "Raw Summary")
+    blocked_events = stage1.get("events", []) if isinstance(stage1.get("events"), list) else []
+    comparison_events = stage4.get("events", []) if isinstance(stage4.get("events"), list) else []
+    rank1_events = [event for event in blocked_events if int(event.get("candidate_rank", 0) or 0) == 1]
+    stale_counts = Counter(str(event.get("selected_slot_trade_id", "")) for event in comparison_events if event.get("selected_slot_trade_id"))
+    total_comparisons = sum(stale_counts.values())
+    first_per_stale = _first_event_per_stale_trade(comparison_events)
+    no_july = [event for event in comparison_events if str(event.get("month", "")) != "2025-07"]
+    no_same_bar = [
+        event
+        for event in comparison_events
+        if not bool(event.get("candidate_same_bar_stop_possible")) and not bool(event.get("candidate_same_bar_tp1_possible"))
+    ]
+    stale_top = [count for _trade_id, count in stale_counts.most_common()]
+    stale_top1_share = None if total_comparisons <= 0 else stale_top[0] / total_comparisons * 100
+    stale_top3_share = None if total_comparisons <= 0 else sum(stale_top[:3]) / total_comparisons * 100
+    summaries = {
+        "net_replacement_delta_r_24": _events_summary(first_per_stale, "net_replacement_delta_r_24"),
+        "net_replacement_delta_r_42": _events_summary(first_per_stale, "net_replacement_delta_r_42"),
+        "net_replacement_delta_r_60": _events_summary(first_per_stale, "net_replacement_delta_r_60"),
+    }
+    no_july_summaries = {
+        "net_replacement_delta_r_24": _events_summary(no_july, "net_replacement_delta_r_24"),
+        "net_replacement_delta_r_42": _events_summary(no_july, "net_replacement_delta_r_42"),
+        "net_replacement_delta_r_60": _events_summary(no_july, "net_replacement_delta_r_60"),
+    }
+    no_same_bar_summaries = {
+        "net_replacement_delta_r_24": _events_summary(no_same_bar, "net_replacement_delta_r_24"),
+        "net_replacement_delta_r_42": _events_summary(no_same_bar, "net_replacement_delta_r_42"),
+        "net_replacement_delta_r_60": _events_summary(no_same_bar, "net_replacement_delta_r_60"),
+    }
+    cluster_bootstrap = _cluster_bootstrap_mean(
+        comparison_events,
+        key="net_replacement_delta_r_42",
+        cluster_key="selected_slot_trade_id",
+    )
+    top_contribution = _top_contribution_share([_event_value(event, "net_replacement_delta_r_42") for event in comparison_events])
+    first_r42 = summaries["net_replacement_delta_r_42"]
+    no_july_r42 = no_july_summaries["net_replacement_delta_r_42"]
+    no_same_bar_r42 = no_same_bar_summaries["net_replacement_delta_r_42"]
+    bootstrap_p05 = cluster_bootstrap["p05"]
+    if comparison_events and (
+        (first_r42["median"] is not None and first_r42["median"] < 0)
+        or (no_july_r42["mean"] is not None and no_july_r42["mean"] <= 0)
+        or (no_same_bar_r42["median"] is not None and no_same_bar_r42["median"] < 0)
+        or (isinstance(bootstrap_p05, float) and bootstrap_p05 < 0)
+    ):
+        verdict = "paused_no_stable_executable_edge"
+        reason = "Stage 4 remains too concentrated and unstable after de-duplication and robustness checks, so capacity replacement should be frozen until a new pre-declared mechanism exists."
+    else:
+        verdict = "replacement_closure_requires_manual_review"
+        reason = "Closure checks did not clearly reject the Stage 4 sample, but this is still only diagnostic and cannot justify deployment without a new pre-declared replacement mechanism."
+    return ReplacementClosureAudit(
+        source_run_id=str(stage4.get("source_run_id", stage1.get("source_run_id", ""))),
+        replay_run_id=str(stage4.get("replay_run_id", "")),
+        report_date=report_date or _local_now().strftime("%Y-%m-%d"),
+        stage1_json_path=str(stage1_json_path),
+        stage4_report_path=str(stage4_report_path),
+        start_utc=str(stage4.get("start_utc", stage1.get("start_utc", ""))),
+        end_utc=str(stage4.get("end_utc", stage1.get("end_utc", ""))),
+        total_blocked_events=len(blocked_events),
+        unique_blocked_timestamps=len({str(event.get("decision_time_utc", "")) for event in blocked_events}),
+        rank1_blocked_events=len(rank1_events),
+        unique_rank1_timestamps=len({str(event.get("decision_time_utc", "")) for event in rank1_events}),
+        eligible_comparison_events=len(comparison_events),
+        unique_comparison_timestamps=len({str(event.get("decision_time_utc", "")) for event in comparison_events}),
+        unique_comparison_candidates=len({str(event.get("candidate_symbol", "")) for event in comparison_events}),
+        unique_stale_trades=len(stale_counts),
+        stale_trade_duplicate_counts=dict(stale_counts.most_common()),
+        stale_trade_top1_share_pct=stale_top1_share,
+        stale_trade_top3_share_pct=stale_top3_share,
+        first_event_per_stale_trade_summaries=summaries,
+        exclude_2025_07_summaries=no_july_summaries,
+        exclude_same_bar_ambiguous_summaries=no_same_bar_summaries,
+        cluster_bootstrap_mean_r_42=cluster_bootstrap,
+        top_contribution_share_r_42=top_contribution,
+        verdict=verdict,
+        reason=reason,
+    )
+
+
+def render_replacement_closure_audit(audit: ReplacementClosureAudit) -> str:
+    now = _local_now()
+    lines = [
+        "---",
+        f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - replacement-closure-audit",
+        "experiment: replacement_closure_audit",
+        f"source_run_id: {audit.source_run_id}",
+        f"replay_run_id: {audit.replay_run_id}",
+        f"verdict: {audit.verdict}",
+        "---",
+        "",
+        "# replacement_closure_audit",
+        "",
+        "## Plain-language conclusion",
+        "",
+        audit.reason,
+        "",
+        "This is a closure appendix for Stage 4 only. It does not introduce a trading rule, does not proceed to Stage 5 shadow replacement, does not raise `max_active_positions`, and does not modify production config.",
+        "",
+        "## Scope",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| source_run_id | `{audit.source_run_id}` |",
+        f"| replay_run_id | `{audit.replay_run_id}` |",
+        f"| window | `{audit.start_utc}` -> `{audit.end_utc}` |",
+        f"| stage1_json | `{audit.stage1_json_path}` |",
+        f"| stage4_report | `{audit.stage4_report_path}` |",
+        "",
+        "## Event Uniqueness",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| total_blocked_events | {audit.total_blocked_events} |",
+        f"| unique_blocked_timestamps | {audit.unique_blocked_timestamps} |",
+        f"| rank1_blocked_events | {audit.rank1_blocked_events} |",
+        f"| unique_rank1_timestamps | {audit.unique_rank1_timestamps} |",
+        f"| eligible_comparison_events | {audit.eligible_comparison_events} |",
+        f"| unique_comparison_timestamps | {audit.unique_comparison_timestamps} |",
+        f"| unique_comparison_candidates | {audit.unique_comparison_candidates} |",
+        f"| unique_stale_trades | {audit.unique_stale_trades} |",
+        f"| stale_trade_top1_share_pct | {_fmt_summary_value(audit.stale_trade_top1_share_pct)} |",
+        f"| stale_trade_top3_share_pct | {_fmt_summary_value(audit.stale_trade_top3_share_pct)} |",
+        "",
+        "## Stale Trade Concentration",
+        "",
+        "| Stale Trade ID | Comparison Events |",
+        "|---|---:|",
+    ]
+    if audit.stale_trade_duplicate_counts:
+        for trade_id, count in audit.stale_trade_duplicate_counts.items():
+            lines.append(f"| `{trade_id}` | {count} |")
+    else:
+        lines.append("| n/a | 0 |")
+    lines.extend(
+        [
+            "",
+            "## Robustness Summaries",
+            "",
+            "| Check | Metric | n | mean | median | positive_pct | min | max |",
+            "|---|---|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for check_name, group in [
+        ("first_event_per_stale_trade", audit.first_event_per_stale_trade_summaries),
+        ("exclude_2025_07", audit.exclude_2025_07_summaries),
+        ("exclude_same_bar_ambiguous", audit.exclude_same_bar_ambiguous_summaries),
+    ]:
+        for metric, summary in group.items():
+            lines.append(
+                f"| {check_name} | `{metric}` | {_fmt_summary_value(summary['n'])} | "
+                f"{_fmt_summary_value(summary['mean'])} | {_fmt_summary_value(summary['median'])} | "
+                f"{_fmt_summary_value(summary['positive_pct'])} | {_fmt_summary_value(summary['min'])} | {_fmt_summary_value(summary['max'])} |"
+            )
+    lines.extend(
+        [
+            "",
+            "## Cluster Bootstrap",
+            "",
+            "| Metric | Value |",
+            "|---|---:|",
+        ]
+    )
+    for key in ["clusters", "iterations", "mean", "p05", "p50", "p95"]:
+        lines.append(f"| {key} | {_fmt_summary_value(audit.cluster_bootstrap_mean_r_42.get(key))} |")
+    lines.extend(
+        [
+            "",
+            "## Winner Contribution",
+            "",
+            "| Metric | Value |",
+            "|---|---:|",
+            f"| positive_n | {_fmt_summary_value(audit.top_contribution_share_r_42['positive_n'])} |",
+            f"| top1_positive_contribution_share_pct | {_fmt_summary_value(audit.top_contribution_share_r_42['top1_share_pct'])} |",
+            f"| top3_positive_contribution_share_pct | {_fmt_summary_value(audit.top_contribution_share_r_42['top3_share_pct'])} |",
+            f"| 20pct_trimmed_mean_R_42 | {_fmt_summary_value(audit.top_contribution_share_r_42['trimmed_mean_20pct'])} |",
+            "",
+            "## Decision",
+            "",
+            f"`{audit.verdict}`",
+            "",
+            "## Next Action",
+            "",
+            "Freeze the current capacity replacement branch. Resume capacity research only with a new pre-declared slot-selection mechanism or broader walk-forward evidence; otherwise move back to capacity-neutral `atr_reclaim_0_35` entry-quality attribution.",
+            "",
+            "## Raw Summary",
+            "",
+            "```json",
+            json.dumps(asdict(audit), ensure_ascii=False, indent=2),
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_replacement_closure_audit_report(
+    settings: Settings,
+    stage1_json_path: Path,
+    stage4_report_path: Path,
+    *,
+    report_date: str | None = None,
+) -> tuple[ReplacementClosureAudit, list[Path]]:
+    date_text = report_date or _local_now().strftime("%Y-%m-%d")
+    audit = build_replacement_closure_audit(stage1_json_path, stage4_report_path, report_date=date_text)
+    text = render_replacement_closure_audit(audit)
+    report_dir = settings.output.reports_dir / date_text
+    obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
+    prefix = f"replacement_closure_audit_{date_text}"
+    version = next_report_version([report_dir, obsidian_dir], prefix)
+    filename = versioned_markdown_filename(prefix, version)
+    paths: list[Path] = []
+    for directory in [report_dir, obsidian_dir]:
+        if directory is None:
+            continue
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / filename
+        path.write_text(text, encoding="utf-8")
+        paths.append(path)
+    return audit, paths
 
 
 def generate_observation_dashboard(

@@ -43,6 +43,7 @@ from crypto_trading_system.research_tools import (
     split_symbol_master_by_cap,
     write_blocked_candidate_vs_stale_slot_review_report,
     write_blocked_entry_event_export_report,
+    write_replacement_closure_audit_report,
     write_replay_consistency_audit_report,
     write_signal_fill_timing_audit_report,
     write_stale_slot_continuation_review_report,
@@ -425,6 +426,14 @@ def build_parser() -> argparse.ArgumentParser:
     replacement_review.add_argument("--stale-bars", type=int, default=42, help="Pre-TP1 stale threshold in primary bars.")
     replacement_review.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
     replacement_review.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    replacement_closure = research_subparsers.add_parser(
+        "replacement-closure-audit",
+        help="Close the Stage 4 replacement branch with de-duplication and robustness checks.",
+    )
+    replacement_closure.add_argument("--stage1-json", required=True, help="Stage 1 blocked-entry-event-export JSON sidecar.")
+    replacement_closure.add_argument("--stage4-report", required=True, help="Stage 4 blocked-candidate-vs-stale-slot markdown report.")
+    replacement_closure.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
+    replacement_closure.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
@@ -1147,6 +1156,28 @@ def main() -> None:
             print(f"net_delta_r_42_median={review.net_delta_r_42_summary['median']}")
             print(f"net_delta_r_42_positive_pct={review.net_delta_r_42_summary['positive_pct']}")
             print(f"right_censored_count={review.right_censored_count}")
+            for path in paths:
+                print(f"report={path}")
+        if args.research_command == "replacement-closure-audit":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            audit, paths = write_replacement_closure_audit_report(
+                settings,
+                Path(args.stage1_json),
+                Path(args.stage4_report),
+                report_date=args.reports_date,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("replacement_closure_audit=completed")
+            print(f"source_run_id={audit.source_run_id}")
+            print(f"replay_run_id={audit.replay_run_id}")
+            print(f"verdict={audit.verdict}")
+            print(f"eligible_comparison_events={audit.eligible_comparison_events}")
+            print(f"unique_stale_trades={audit.unique_stale_trades}")
+            print(f"stale_trade_top1_share_pct={audit.stale_trade_top1_share_pct}")
+            print(f"first_event_per_stale_trade_r42_median={audit.first_event_per_stale_trade_summaries['net_replacement_delta_r_42']['median']}")
+            print(f"cluster_bootstrap_r42_p05={audit.cluster_bootstrap_mean_r_42['p05']}")
             for path in paths:
                 print(f"report={path}")
 
