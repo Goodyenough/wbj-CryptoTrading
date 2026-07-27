@@ -15,6 +15,14 @@
 
 ## 2026-07-27
 
+### 23:36:15 +08:00 - 生成 Stage 0-4 收束结果 GPT 评审包
+- 类型：文档 / GPT 评审 / 报告 / Git
+- 改动：更新 `.gpt-review/current_packet.md`，新增 `.gpt-review/history/20260727-233615_packet.md`，把 `signal_fill_timing_audit -> blocked_entry_event_export -> replay_consistency_audit -> stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review` 的执行结果整理为自包含 GPT 评审包，并运行 `open-gpt-review.ps1` 打开 ChatGPT、复制提示词。
+- 原因：用户要求把当前情况交给 GPT 讨论，重点复核 Stage 4 后停止 replacement 分支、不进入 Stage 5 shadow replacement 是否合理。
+- 影响：仅生成评审材料，不修改 `config/settings.toml`，不部署 replacement，不提高 `max_active_positions`。
+- 验证：确认评审包路径为 `.gpt-review/current_packet.md`，历史副本已生成；`open-gpt-review.ps1` 返回 GPT 评审交接已准备完成。
+- Git：本次计划提交 `Prepare GPT review for replacement branch conclusion`；提交时按仓库规则一并纳入 `reports/` 下已生成的 2026-07-27 paper/scan 报告。
+
 ### 01:04:44 +08:00 - 完成 blocked_candidate_vs_stale_slot_review Stage 4
 - 类型：代码 / 报告 / 测试 / TODO / 计划 / Git
 - 改动：新增只读研究命令 `python main.py research blocked-candidate-vs-stale-slot-review --run-id ... --stale-bars 42`，实现 `BlockedCandidateVsStaleSlotReview`、路径诊断报告渲染和测试；生成 `reports/2026-07-27/blocked_candidate_vs_stale_slot_review_2026-07-27_v1.md`。
