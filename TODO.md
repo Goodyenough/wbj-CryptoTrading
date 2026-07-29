@@ -192,3 +192,10 @@
 - [x] 完成 N1 机制层复核：新增 `reports/2026-07-30/atr_reclaim_0_35_n1_diagnostic_retest_review_2026-07-30_v1.md`，结论 `retest_path_dependent`。
 - [ ] 构建 listing-date enriched `SymbolMaster` 或历史 membership 证据，然后重跑 N0。
 - [ ] 改进 opportunity alignment：为 baseline/variant 输出 strict opportunity id、capacity state at decision 和 direct filtered/retained event export，避免把 path/capacity timing 误判为 filter quality。
+
+## 2026-07-30 Stage N2 universe gate ????
+- [x] ?? `atr_reclaim_stage_n2_universe_audit`?? 418 ? current master symbols ?? listing date??? Binance public-data monthly 1d files ?? `2023-07-01 -> 2024-07-01` historical membership??? `diagnostic_only_historical_membership_gap`?
+- [x] ?? listing-enriched master ?? `atr-reclaim-n0-readiness-audit`?N0 ?? `n0_conditional_pass_with_alignment_warning`????????? N2-B ? `147` ? historical symbols ?????
+- [x] ?? gate decision???????? clean confirmatory validation ????????? N1??????????`atr_reclaim_0_35` ????????? diagnostic?
+- [ ] ?? historical symbol membership dataset??? `listing_time / delisting_time / first_kline_time / last_kline_time / tradable_from / tradable_to / source / confidence`?????????????????
+

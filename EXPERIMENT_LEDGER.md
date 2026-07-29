@@ -175,3 +175,13 @@
 - 路径贡献：same-key variant entered / baseline not entered +1609.43，variant-only entered +2726.00，baseline-only removed -2149.62，both-entered delta +95.43；整体改善主要来自 path/capacity-timing added trades，而不是直接过滤质量。
 - cluster：2023-12 +936.23、2023-11 +742.67，但 2024-02 -830.94、2024-03 -355.19；top symbol-month 贡献集中在 FET 2024-03、ETC 2024-03、NEAR 2023-11、BTC 2023-12、DOT 2023-12。
 - 结论：`retest_path_dependent`。不得 keep、不得部署、不得修改 `settings.toml`；下一步优先补 listing-date enriched master / historical membership，并改进 strict opportunity id 后再重跑 N0/N1。
+
+## 2026-07-30 Stage N2 universe gate - atr_reclaim_0_35 third-window qualification
+
+- `atr_reclaim_stage_n2_universe_audit`?????? `2023-07-01 -> 2024-07-01` ???????????????????? `atr_reclaim_0_35` ?????
+- N2-A ???418 ? current master symbols ???? listing date?`listed_after_window=152`?`listed_inside_window=49`?`full_window_coverage=208`?`partial_window_coverage=9`?
+- N2-B ???Binance public-data ????? 1d monthly files ? historical USDT symbols ? `413`??? `147` ??? current master?????? `35.6%`?
+- N0 rerun??? `reports/2026-07-30/dynamic_master_full_listing_enriched_2026-07-30_v2.json` ??? verdict ? `n0_conditional_pass_with_alignment_warning`?? N0 ???? historical membership ????????? N2-B gate?
+- ???`third_window_diagnostic_only_do_not_rerun_n1`???????????? clean confirmatory validation??????? N1??????????
+- ?????? historical symbol membership dataset????? `listing_time / delisting_time / first_kline_time / last_kline_time / tradable_from / tradable_to / source / confidence`?
+

@@ -1,0 +1,8208 @@
+[
+  {
+    "symbol": "1000SATSUSDT",
+    "first_month": "2023-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 7,
+    "in_current_master": true
+  },
+  {
+    "symbol": "1INCHUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AAVEUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ACAUSDT",
+    "first_month": "2022-01",
+    "last_month": "2026-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ACEUSDT",
+    "first_month": "2023-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 7,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ACHUSDT",
+    "first_month": "2022-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ACMUSDT",
+    "first_month": "2021-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ADADOWNUSDT",
+    "first_month": "2020-07",
+    "last_month": "2023-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08"
+    ],
+    "months_in_window_count": 2,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ADAUPUSDT",
+    "first_month": "2020-07",
+    "last_month": "2023-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08"
+    ],
+    "months_in_window_count": 2,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ADAUSDT",
+    "first_month": "2018-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ADXUSDT",
+    "first_month": "2021-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AERGOUSDT",
+    "first_month": "2023-05",
+    "last_month": "2025-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "AEURUSDT",
+    "first_month": "2023-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 7,
+    "in_current_master": false
+  },
+  {
+    "symbol": "AEVOUSDT",
+    "first_month": "2024-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AGIXUSDT",
+    "first_month": "2023-02",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "AGLDUSDT",
+    "first_month": "2021-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AIUSDT",
+    "first_month": "2024-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AKROUSDT",
+    "first_month": "2020-11",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ALCXUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ALGOUSDT",
+    "first_month": "2019-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ALICEUSDT",
+    "first_month": "2021-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ALPACAUSDT",
+    "first_month": "2021-08",
+    "last_month": "2025-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ALPHAUSDT",
+    "first_month": "2020-10",
+    "last_month": "2025-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ALPINEUSDT",
+    "first_month": "2022-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ALTUSDT",
+    "first_month": "2024-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AMBUSDT",
+    "first_month": "2023-03",
+    "last_month": "2025-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "AMPUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ANKRUSDT",
+    "first_month": "2019-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ANTUSDT",
+    "first_month": "2020-08",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "APEUSDT",
+    "first_month": "2022-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "API3USDT",
+    "first_month": "2022-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "APTUSDT",
+    "first_month": "2022-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ARBUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ARDRUSDT",
+    "first_month": "2020-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ARKMUSDT",
+    "first_month": "2023-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ARKUSDT",
+    "first_month": "2023-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ARPAUSDT",
+    "first_month": "2019-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ARUSDT",
+    "first_month": "2021-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ASRUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ASTRUSDT",
+    "first_month": "2022-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ASTUSDT",
+    "first_month": "2023-05",
+    "last_month": "2025-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ATAUSDT",
+    "first_month": "2021-06",
+    "last_month": "2026-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ATMUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ATOMUSDT",
+    "first_month": "2019-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AUCTIONUSDT",
+    "first_month": "2021-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AUDIOUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AVAUSDT",
+    "first_month": "2020-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AXLUSDT",
+    "first_month": "2024-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": true
+  },
+  {
+    "symbol": "AXSUSDT",
+    "first_month": "2020-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BADGERUSDT",
+    "first_month": "2021-03",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BAKEUSDT",
+    "first_month": "2021-04",
+    "last_month": "2025-09",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BALUSDT",
+    "first_month": "2020-08",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BANDUSDT",
+    "first_month": "2019-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BARUSDT",
+    "first_month": "2021-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BATUSDT",
+    "first_month": "2019-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BBUSDT",
+    "first_month": "2024-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 2,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BCHUSDT",
+    "first_month": "2019-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BEAMXUSDT",
+    "first_month": "2023-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BELUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BETAUSDT",
+    "first_month": "2021-10",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BETHUSDT",
+    "first_month": "2023-03",
+    "last_month": "2023-10",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BICOUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BIFIUSDT",
+    "first_month": "2022-04",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BLURUSDT",
+    "first_month": "2023-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BLZUSDT",
+    "first_month": "2020-08",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BNBDOWNUSDT",
+    "first_month": "2020-08",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BNBUPUSDT",
+    "first_month": "2020-08",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BNBUSDT",
+    "first_month": "2017-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BNTUSDT",
+    "first_month": "2020-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BNXUSDT",
+    "first_month": "2021-11",
+    "last_month": "2025-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BOMEUSDT",
+    "first_month": "2024-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BONDUSDT",
+    "first_month": "2021-07",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BONKUSDT",
+    "first_month": "2023-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 7,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BSWUSDT",
+    "first_month": "2022-03",
+    "last_month": "2025-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BTCDOWNUSDT",
+    "first_month": "2020-05",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BTCUPUSDT",
+    "first_month": "2020-05",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BTCUSDT",
+    "first_month": "2017-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BTSUSDT",
+    "first_month": "2020-02",
+    "last_month": "2023-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BTTCUSDT",
+    "first_month": "2022-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "BURGERUSDT",
+    "first_month": "2021-04",
+    "last_month": "2025-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "BUSDUSDT",
+    "first_month": "2019-09",
+    "last_month": "2023-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": false
+  },
+  {
+    "symbol": "C98USDT",
+    "first_month": "2021-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CAKEUSDT",
+    "first_month": "2021-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CELOUSDT",
+    "first_month": "2021-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CELRUSDT",
+    "first_month": "2019-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CFXUSDT",
+    "first_month": "2021-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CHESSUSDT",
+    "first_month": "2021-10",
+    "last_month": "2026-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "CHRUSDT",
+    "first_month": "2020-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CHZUSDT",
+    "first_month": "2019-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CITYUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CKBUSDT",
+    "first_month": "2021-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CLVUSDT",
+    "first_month": "2021-07",
+    "last_month": "2025-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "COMBOUSDT",
+    "first_month": "2023-06",
+    "last_month": "2025-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "COMPUSDT",
+    "first_month": "2020-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "COSUSDT",
+    "first_month": "2019-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "COTIUSDT",
+    "first_month": "2020-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CREAMUSDT",
+    "first_month": "2023-09",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": false
+  },
+  {
+    "symbol": "CRVUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CTKUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CTSIUSDT",
+    "first_month": "2020-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CTXCUSDT",
+    "first_month": "2019-11",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "CVCUSDT",
+    "first_month": "2019-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CVPUSDT",
+    "first_month": "2021-10",
+    "last_month": "2024-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "CVXUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "CYBERUSDT",
+    "first_month": "2023-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 11,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DARUSDT",
+    "first_month": "2021-11",
+    "last_month": "2025-01",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "DASHUSDT",
+    "first_month": "2019-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DATAUSDT",
+    "first_month": "2020-04",
+    "last_month": "2026-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "DCRUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DEGOUSDT",
+    "first_month": "2021-03",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "DENTUSDT",
+    "first_month": "2019-08",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "DEXEUSDT",
+    "first_month": "2021-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DFUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "DGBUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DIAUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DOCKUSDT",
+    "first_month": "2019-08",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "DODOUSDT",
+    "first_month": "2021-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "first_month": "2019-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DOTUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DREPUSDT",
+    "first_month": "2020-01",
+    "last_month": "2024-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": false
+  },
+  {
+    "symbol": "DUSKUSDT",
+    "first_month": "2019-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DYDXUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "DYMUSDT",
+    "first_month": "2024-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": true
+  },
+  {
+    "symbol": "EDUUSDT",
+    "first_month": "2023-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "EGLDUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ELFUSDT",
+    "first_month": "2021-09",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ENAUSDT",
+    "first_month": "2024-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 3,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ENJUSDT",
+    "first_month": "2019-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ENSUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "EOSUSDT",
+    "first_month": "2018-05",
+    "last_month": "2025-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "EPXUSDT",
+    "first_month": "2022-05",
+    "last_month": "2024-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ERNUSDT",
+    "first_month": "2021-06",
+    "last_month": "2025-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ETCUSDT",
+    "first_month": "2018-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ETHDOWNUSDT",
+    "first_month": "2020-07",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ETHFIUSDT",
+    "first_month": "2024-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ETHUPUSDT",
+    "first_month": "2020-07",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ETHUSDT",
+    "first_month": "2017-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "EURUSDT",
+    "first_month": "2020-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FARMUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FDUSDUSDT",
+    "first_month": "2023-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FETUSDT",
+    "first_month": "2019-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "FIDAUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "FILUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "FIOUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FIROUSDT",
+    "first_month": "2021-01",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FISUSDT",
+    "first_month": "2021-03",
+    "last_month": "2025-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FLMUSDT",
+    "first_month": "2020-09",
+    "last_month": "2025-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FLOKIUSDT",
+    "first_month": "2023-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "FLOWUSDT",
+    "first_month": "2021-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "FLUXUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "FORTHUSDT",
+    "first_month": "2021-04",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FORUSDT",
+    "first_month": "2021-08",
+    "last_month": "2024-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FRONTUSDT",
+    "first_month": "2021-10",
+    "last_month": "2024-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FTMUSDT",
+    "first_month": "2019-06",
+    "last_month": "2025-01",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FTTUSDT",
+    "first_month": "2019-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": true
+  },
+  {
+    "symbol": "FUNUSDT",
+    "first_month": "2019-08",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "FXSUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-01",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "GALAUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GALUSDT",
+    "first_month": "2022-05",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "GASUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GBPUSDT",
+    "first_month": "2020-07",
+    "last_month": "2023-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": false
+  },
+  {
+    "symbol": "GFTUSDT",
+    "first_month": "2023-09",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": false
+  },
+  {
+    "symbol": "GHSTUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "GLMRUSDT",
+    "first_month": "2022-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GLMUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GMTUSDT",
+    "first_month": "2022-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GMXUSDT",
+    "first_month": "2022-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GNOUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GNSUSDT",
+    "first_month": "2023-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GRTUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "GTCUSDT",
+    "first_month": "2021-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "HARDUSDT",
+    "first_month": "2020-11",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "HBARUSDT",
+    "first_month": "2019-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "HFTUSDT",
+    "first_month": "2022-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "HIFIUSDT",
+    "first_month": "2023-01",
+    "last_month": "2025-09",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "HIGHUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "HIVEUSDT",
+    "first_month": "2020-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "HOOKUSDT",
+    "first_month": "2022-12",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "HOTUSDT",
+    "first_month": "2019-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ICPUSDT",
+    "first_month": "2021-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ICXUSDT",
+    "first_month": "2018-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IDEXUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "IDUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ILVUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IMXUSDT",
+    "first_month": "2022-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "INJUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IOSTUSDT",
+    "first_month": "2019-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IOTAUSDT",
+    "first_month": "2018-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IOTXUSDT",
+    "first_month": "2019-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IOUSDT",
+    "first_month": "2024-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-06"
+    ],
+    "months_in_window_count": 1,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IQUSDT",
+    "first_month": "2023-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": true
+  },
+  {
+    "symbol": "IRISUSDT",
+    "first_month": "2020-08",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "JASMYUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "JOEUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "JSTUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "JTOUSDT",
+    "first_month": "2023-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 7,
+    "in_current_master": true
+  },
+  {
+    "symbol": "JUPUSDT",
+    "first_month": "2024-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": false
+  },
+  {
+    "symbol": "JUVUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "KAVAUSDT",
+    "first_month": "2019-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "KDAUSDT",
+    "first_month": "2022-03",
+    "last_month": "2025-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "KEYUSDT",
+    "first_month": "2019-08",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "KLAYUSDT",
+    "first_month": "2021-06",
+    "last_month": "2024-10",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "KMDUSDT",
+    "first_month": "2020-08",
+    "last_month": "2025-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "KNCUSDT",
+    "first_month": "2020-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "KP3RUSDT",
+    "first_month": "2021-11",
+    "last_month": "2024-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "KSMUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LAZIOUSDT",
+    "first_month": "2021-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LDOUSDT",
+    "first_month": "2022-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LEVERUSDT",
+    "first_month": "2022-07",
+    "last_month": "2025-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "LINAUSDT",
+    "first_month": "2021-03",
+    "last_month": "2025-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "LINKUSDT",
+    "first_month": "2019-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LISTAUSDT",
+    "first_month": "2024-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-06"
+    ],
+    "months_in_window_count": 1,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LITUSDT",
+    "first_month": "2021-02",
+    "last_month": "2025-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "LOKAUSDT",
+    "first_month": "2022-01",
+    "last_month": "2025-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "LOOMUSDT",
+    "first_month": "2023-03",
+    "last_month": "2024-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "LPTUSDT",
+    "first_month": "2021-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LQTYUSDT",
+    "first_month": "2023-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LRCUSDT",
+    "first_month": "2020-06",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "LSKUSDT",
+    "first_month": "2020-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LTCUSDT",
+    "first_month": "2017-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LTOUSDT",
+    "first_month": "2020-02",
+    "last_month": "2025-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "LUNAUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "LUNCUSDT",
+    "first_month": "2022-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MAGICUSDT",
+    "first_month": "2022-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MANAUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MANTAUSDT",
+    "first_month": "2024-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MASKUSDT",
+    "first_month": "2021-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MATICUSDT",
+    "first_month": "2019-04",
+    "last_month": "2024-09",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "MAVUSDT",
+    "first_month": "2023-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MBLUSDT",
+    "first_month": "2020-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MBOXUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MCUSDT",
+    "first_month": "2021-12",
+    "last_month": "2023-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": false
+  },
+  {
+    "symbol": "MDTUSDT",
+    "first_month": "2020-06",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "MDXUSDT",
+    "first_month": "2021-05",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "MEMEUSDT",
+    "first_month": "2023-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": true
+  },
+  {
+    "symbol": "METISUSDT",
+    "first_month": "2024-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MINAUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MKRUSDT",
+    "first_month": "2020-07",
+    "last_month": "2025-09",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "MLNUSDT",
+    "first_month": "2021-07",
+    "last_month": "2026-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "MOBUSDT",
+    "first_month": "2022-04",
+    "last_month": "2024-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": false
+  },
+  {
+    "symbol": "MOVRUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MTLUSDT",
+    "first_month": "2019-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "MULTIUSDT",
+    "first_month": "2022-04",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "NEARUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "NEOUSDT",
+    "first_month": "2017-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "NEXOUSDT",
+    "first_month": "2022-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "NFPUSDT",
+    "first_month": "2023-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 7,
+    "in_current_master": true
+  },
+  {
+    "symbol": "NKNUSDT",
+    "first_month": "2019-10",
+    "last_month": "2026-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "NMRUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "NOTUSDT",
+    "first_month": "2024-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 2,
+    "in_current_master": true
+  },
+  {
+    "symbol": "NTRNUSDT",
+    "first_month": "2023-10",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 9,
+    "in_current_master": false
+  },
+  {
+    "symbol": "NULSUSDT",
+    "first_month": "2018-07",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "OAXUSDT",
+    "first_month": "2023-03",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "OCEANUSDT",
+    "first_month": "2020-08",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "OGNUSDT",
+    "first_month": "2020-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "OGUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "OMGUSDT",
+    "first_month": "2019-04",
+    "last_month": "2024-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "OMNIUSDT",
+    "first_month": "2024-04",
+    "last_month": "2025-09",
+    "months_in_window": [
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 3,
+    "in_current_master": false
+  },
+  {
+    "symbol": "OMUSDT",
+    "first_month": "2021-03",
+    "last_month": "2026-03",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "ONEUSDT",
+    "first_month": "2019-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ONGUSDT",
+    "first_month": "2019-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ONTUSDT",
+    "first_month": "2018-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "OOKIUSDT",
+    "first_month": "2021-12",
+    "last_month": "2024-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "OPUSDT",
+    "first_month": "2022-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ORDIUSDT",
+    "first_month": "2023-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ORNUSDT",
+    "first_month": "2020-09",
+    "last_month": "2024-10",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "OSMOUSDT",
+    "first_month": "2022-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "OXTUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PAXGUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PDAUSDT",
+    "first_month": "2024-03",
+    "last_month": "2025-05",
+    "months_in_window": [
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PENDLEUSDT",
+    "first_month": "2023-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PEOPLEUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PEPEUSDT",
+    "first_month": "2023-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PERLUSDT",
+    "first_month": "2019-08",
+    "last_month": "2023-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PERPUSDT",
+    "first_month": "2021-03",
+    "last_month": "2025-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PHAUSDT",
+    "first_month": "2021-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PHBUSDT",
+    "first_month": "2022-11",
+    "last_month": "2026-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PIVXUSDT",
+    "first_month": "2023-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PIXELUSDT",
+    "first_month": "2024-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PLAUSDT",
+    "first_month": "2021-11",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PNTUSDT",
+    "first_month": "2020-06",
+    "last_month": "2024-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04"
+    ],
+    "months_in_window_count": 10,
+    "in_current_master": false
+  },
+  {
+    "symbol": "POLSUSDT",
+    "first_month": "2021-05",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "POLYXUSDT",
+    "first_month": "2022-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PONDUSDT",
+    "first_month": "2021-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PORTALUSDT",
+    "first_month": "2024-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PORTOUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "POWRUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PROMUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PROSUSDT",
+    "first_month": "2023-01",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "PSGUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PUNDIXUSDT",
+    "first_month": "2021-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PYRUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "PYTHUSDT",
+    "first_month": "2024-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": true
+  },
+  {
+    "symbol": "QIUSDT",
+    "first_month": "2021-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "QKCUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "QNTUSDT",
+    "first_month": "2021-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "QTUMUSDT",
+    "first_month": "2018-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "QUICKUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RADUSDT",
+    "first_month": "2021-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RAREUSDT",
+    "first_month": "2021-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RAYUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RDNTUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "REEFUSDT",
+    "first_month": "2020-12",
+    "last_month": "2024-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "REIUSDT",
+    "first_month": "2022-05",
+    "last_month": "2025-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "RENUSDT",
+    "first_month": "2019-09",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "REQUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "REZUSDT",
+    "first_month": "2024-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 3,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RIFUSDT",
+    "first_month": "2021-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RLCUSDT",
+    "first_month": "2019-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RNDRUSDT",
+    "first_month": "2021-11",
+    "last_month": "2024-07",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "RONINUSDT",
+    "first_month": "2024-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ROSEUSDT",
+    "first_month": "2020-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RPLUSDT",
+    "first_month": "2023-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RSRUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RUNEUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "RVNUSDT",
+    "first_month": "2019-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SAGAUSDT",
+    "first_month": "2024-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 3,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SANDUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SANTOSUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SCRTUSDT",
+    "first_month": "2022-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SCUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SEIUSDT",
+    "first_month": "2023-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 11,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SFPUSDT",
+    "first_month": "2021-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SHIBUSDT",
+    "first_month": "2021-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SKLUSDT",
+    "first_month": "2020-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SLPUSDT",
+    "first_month": "2021-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SNTUSDT",
+    "first_month": "2023-05",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "SNXUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SOLUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SPELLUSDT",
+    "first_month": "2021-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SSVUSDT",
+    "first_month": "2023-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "STEEMUSDT",
+    "first_month": "2022-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "STGUSDT",
+    "first_month": "2022-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "STMXUSDT",
+    "first_month": "2020-06",
+    "last_month": "2025-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "STORJUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "STPTUSDT",
+    "first_month": "2020-03",
+    "last_month": "2025-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "STRAXUSDT",
+    "first_month": "2020-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "STRKUSDT",
+    "first_month": "2024-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": true
+  },
+  {
+    "symbol": "STXUSDT",
+    "first_month": "2019-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SUIUSDT",
+    "first_month": "2023-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SUNUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SUPERUSDT",
+    "first_month": "2021-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SUSHIUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SXPUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "SYNUSDT",
+    "first_month": "2023-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "SYSUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "TAOUSDT",
+    "first_month": "2024-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 3,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TFUELUSDT",
+    "first_month": "2019-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "THETAUSDT",
+    "first_month": "2019-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TIAUSDT",
+    "first_month": "2023-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 9,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TKOUSDT",
+    "first_month": "2021-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TLMUSDT",
+    "first_month": "2021-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TNSRUSDT",
+    "first_month": "2024-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 3,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TOMOUSDT",
+    "first_month": "2019-08",
+    "last_month": "2023-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": false
+  },
+  {
+    "symbol": "TRBUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TROYUSDT",
+    "first_month": "2019-12",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "TRUUSDT",
+    "first_month": "2021-01",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "TRXUSDT",
+    "first_month": "2018-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TUSDT",
+    "first_month": "2022-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "TUSDUSDT",
+    "first_month": "2018-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "TVKUSDT",
+    "first_month": "2021-08",
+    "last_month": "2023-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11"
+    ],
+    "months_in_window_count": 5,
+    "in_current_master": false
+  },
+  {
+    "symbol": "TWTUSDT",
+    "first_month": "2021-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "UFTUSDT",
+    "first_month": "2023-03",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "UMAUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "UNFIUSDT",
+    "first_month": "2020-11",
+    "last_month": "2024-11",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "UNIUSDT",
+    "first_month": "2020-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "USDCUSDT",
+    "first_month": "2018-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "USDPUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "USTCUSDT",
+    "first_month": "2023-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "UTKUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "VANRYUSDT",
+    "first_month": "2023-12",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 7,
+    "in_current_master": true
+  },
+  {
+    "symbol": "VETUSDT",
+    "first_month": "2018-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "VGXUSDT",
+    "first_month": "2021-11",
+    "last_month": "2024-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "VIBUSDT",
+    "first_month": "2023-02",
+    "last_month": "2025-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "VICUSDT",
+    "first_month": "2023-11",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": true
+  },
+  {
+    "symbol": "VIDTUSDT",
+    "first_month": "2021-09",
+    "last_month": "2025-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "VITEUSDT",
+    "first_month": "2019-12",
+    "last_month": "2025-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "VOXELUSDT",
+    "first_month": "2021-12",
+    "last_month": "2025-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "VTHOUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WANUSDT",
+    "first_month": "2019-08",
+    "last_month": "2026-04",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "WAVESUSDT",
+    "first_month": "2019-01",
+    "last_month": "2024-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "WAXPUSDT",
+    "first_month": "2021-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WBETHUSDT",
+    "first_month": "2023-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WBTCUSDT",
+    "first_month": "2023-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WIFUSDT",
+    "first_month": "2024-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 4,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WINGUSDT",
+    "first_month": "2020-09",
+    "last_month": "2025-05",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "WINUSDT",
+    "first_month": "2019-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WLDUSDT",
+    "first_month": "2023-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WNXMUSDT",
+    "first_month": "2020-08",
+    "last_month": "2024-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "WOOUSDT",
+    "first_month": "2022-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "WRXUSDT",
+    "first_month": "2020-02",
+    "last_month": "2024-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "WTCUSDT",
+    "first_month": "2020-04",
+    "last_month": "2023-12",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": false
+  },
+  {
+    "symbol": "WUSDT",
+    "first_month": "2024-04",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 3,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XAIUSDT",
+    "first_month": "2024-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 6,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XECUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XEMUSDT",
+    "first_month": "2020-11",
+    "last_month": "2024-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": false
+  },
+  {
+    "symbol": "XLMUSDT",
+    "first_month": "2018-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XMRUSDT",
+    "first_month": "2019-03",
+    "last_month": "2024-02",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02"
+    ],
+    "months_in_window_count": 8,
+    "in_current_master": false
+  },
+  {
+    "symbol": "XNOUSDT",
+    "first_month": "2022-01",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XRPUSDT",
+    "first_month": "2018-05",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XTZUSDT",
+    "first_month": "2019-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XVGUSDT",
+    "first_month": "2021-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "XVSUSDT",
+    "first_month": "2020-10",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "YFIIUSDT",
+    "first_month": "2020-09",
+    "last_month": "2023-08",
+    "months_in_window": [
+      "2023-07",
+      "2023-08"
+    ],
+    "months_in_window_count": 2,
+    "in_current_master": false
+  },
+  {
+    "symbol": "YFIUSDT",
+    "first_month": "2020-08",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "YGGUSDT",
+    "first_month": "2021-09",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ZECUSDT",
+    "first_month": "2019-03",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ZENUSDT",
+    "first_month": "2020-07",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ZILUSDT",
+    "first_month": "2019-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ZKUSDT",
+    "first_month": "2024-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-06"
+    ],
+    "months_in_window_count": 1,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ZROUSDT",
+    "first_month": "2024-06",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2024-06"
+    ],
+    "months_in_window_count": 1,
+    "in_current_master": true
+  },
+  {
+    "symbol": "ZRXUSDT",
+    "first_month": "2019-02",
+    "last_month": "2026-06",
+    "months_in_window": [
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06"
+    ],
+    "months_in_window_count": 12,
+    "in_current_master": true
+  }
+]

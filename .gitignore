@@ -5,3 +5,4 @@ __pycache__/
 *.log
 data/*.db
 data/*.db-journal
+reports/**/.n2_cache/
