@@ -185,3 +185,10 @@
 - [x] 生成 N1 diagnostic retest card：`reports/2026-07-29/atr_reclaim_0_35_n1_diagnostic_retest_card_2026-07-29_v1.md`，明确主检验只能是 baseline vs fixed `atr_reclaim_0_35`，相邻阈值只允许探索性记录。
 - [ ] 优先补齐 listing-date enriched `SymbolMaster` 或历史 membership 证据，然后重跑 N0；当前 `listing_dates_present=false`，第三窗口只能作为 diagnostic，不能作为 clean confirmatory validation。
 - [ ] 若用户明确批准在 caveat 下继续，才运行 N1 diagnostic A/B；运行后必须同时报告组合层指标、direct filtered vs retained 机制层证据、symbol/month/symbol-month cluster concentration。
+
+## 2026-07-30 Stage N1 diagnostic retest 当前状态
+
+- [x] 完成 `atr_reclaim_0_35` 第三窗口 diagnostic A/B：`2023-07-01 -> 2024-07-01`，baseline run `86861b2dd032`，variant run `0d78a8dc60e3`。
+- [x] 完成 N1 机制层复核：新增 `reports/2026-07-30/atr_reclaim_0_35_n1_diagnostic_retest_review_2026-07-30_v1.md`，结论 `retest_path_dependent`。
+- [ ] 构建 listing-date enriched `SymbolMaster` 或历史 membership 证据，然后重跑 N0。
+- [ ] 改进 opportunity alignment：为 baseline/variant 输出 strict opportunity id、capacity state at decision 和 direct filtered/retained event export，避免把 path/capacity timing 误判为 filter quality。

@@ -166,3 +166,12 @@
 - Universe 审计：固定 master 有 418 个 symbols，但 `listing_dates_present=false`；第三窗口 1h/4h/1d 完整覆盖均为 207 个 symbols，部分覆盖 59 个，完全无历史 K 线 152 个，覆盖率约 56.1%。
 - 结论：`n0_conditional_pass_with_universe_bias_warning`。`atr_reclaim_0_35` 第三窗口可以准备 diagnostic retest，但不能称为 clean confirmatory validation，不能用于 keep 或部署。
 - 下一步：优先补 listing-date enriched `SymbolMaster` 或历史 membership 证据后重跑 N0；若用户明确批准，也可在 caveat 下运行 N1 diagnostic，但必须同时报告组合层、direct filtered/retained 机制层和 symbol/month/symbol-month cluster concentration。
+
+## 2026-07-30 Stage N1 diagnostic retest - atr_reclaim_0_35
+
+- `atr_reclaim_0_35` 第三窗口 diagnostic A/B 已完成：baseline run `86861b2dd032`，variant run `0d78a8dc60e3`，报告 `reports/2026-07-30/abtest_dynamic_universe_atr_reclaim_0_35_2023-07-01_2024-07-01_v1.md`。
+- 组合层事实：closed_trades 122 -> 116，win_rate 47.54% -> 50.00%，PF 1.264 -> 1.376，net_return 22.10% -> 31.55%，MDD 21.85% -> 21.08%，Sharpe 0.932 -> 1.238，`sample_sufficient=true`。
+- 机制层事实：same-key baseline entered / variant did not enter 的 50 笔直接过滤样本原本净贡献 +1335.62 USDT；避免亏损 +3141.55，但错过赢家 -4477.17，direct-filter effect 为负。
+- 路径贡献：same-key variant entered / baseline not entered +1609.43，variant-only entered +2726.00，baseline-only removed -2149.62，both-entered delta +95.43；整体改善主要来自 path/capacity-timing added trades，而不是直接过滤质量。
+- cluster：2023-12 +936.23、2023-11 +742.67，但 2024-02 -830.94、2024-03 -355.19；top symbol-month 贡献集中在 FET 2024-03、ETC 2024-03、NEAR 2023-11、BTC 2023-12、DOT 2023-12。
+- 结论：`retest_path_dependent`。不得 keep、不得部署、不得修改 `settings.toml`；下一步优先补 listing-date enriched master / historical membership，并改进 strict opportunity id 后再重跑 N0/N1。

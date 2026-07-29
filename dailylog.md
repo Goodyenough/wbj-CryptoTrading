@@ -1658,3 +1658,13 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：工程代码首次同步到 GitHub 仓库 `Goodyenough/wbj-CryptoTrading`。
 - 验证：确认远程 `origin/main` 指向提交 `45b6ed9`。
 - Git：`45b6ed9` - `Initial crypto trading system MVP`。
+
+## 2026-07-30
+
+### 00:25:00 +08:00 - 完成 atr_reclaim_0_35 Stage N1 diagnostic retest
+- 类型：A/B 实验 / 报告 / 实验日志 / Git
+- 改动：运行 `python main.py abtest --experiment atr_reclaim_0_35 --dynamic-universe --symbol-master-file reports\2026-06-09\dynamic_master_full.json --start 2023-07-01 --end 2024-07-01 --no-obsidian`，生成第三窗口 A/B 报告，并新增 `reports/2026-07-30/atr_reclaim_0_35_n1_diagnostic_retest_review_2026-07-30_v1.md`。
+- 结果：组合层改善，净收益 22.10% -> 31.55%，PF 1.264 -> 1.376，MDD 21.85% -> 21.08%，Sharpe 0.932 -> 1.238；但机制层失败，same-key direct filter 净贡献为 -1335.62 USDT，错过赢家成本大于避免亏损收益，改善主要来自 variant-only / path-added trades。
+- 决策：`atr_reclaim_0_35` 维持 `retest_path_dependent`，不 keep、不部署、不修改 `config/settings.toml`，不继续用同一第三窗口调相邻阈值。
+- 验证：A/B 命令完成，baseline run `86861b2dd032`，variant run `0d78a8dc60e3`，`sample_sufficient=true`；机制复核基于 `data/crypto_trading.db` 的 `backtest_trades` 和 4h `kline_cache`。
+- Git：本次计划提交 `Complete atr reclaim N1 diagnostic retest`。
