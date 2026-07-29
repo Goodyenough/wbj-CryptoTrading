@@ -3143,7 +3143,7 @@ def _git_commit() -> str:
 
 def _git_dirty() -> bool:
     try:
-        return bool(subprocess.check_output(["git", "status", "--short"], text=True).strip())
+        return bool(subprocess.check_output(["git", "status", "--short", "--untracked-files=no"], text=True).strip())
     except Exception:
         return True
 

@@ -15,6 +15,14 @@
 
 ## 2026-07-29
 
+### 23:45:00 +08:00 - 修正 Stage N0 git dirty 判定口径
+- 类型：代码 / 审计口径 / Git
+- 改动：将 Stage N0 readiness audit 的 `git_dirty` 判定改为 `git status --short --untracked-files=no`，只检查已跟踪代码、配置和文档是否存在未提交修改。
+- 原因：N0 报告自身属于新生成的未跟踪 artifact，不能反向污染“冻结代码版本是否干净”的判定。
+- 影响：不修改生产策略配置；N0 仍会把生成报告纳入后续 Git 提交。
+- 验证：待重新运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests` 并重跑 N0。
+- Git：本次计划提交 `Fix N0 git dirty audit scope`。
+
 ### 22:35:00 +08:00 - 新增 atr_reclaim_0_35 Stage N0 readiness audit
 - 类型：代码 / 测试 / Git
 - 改动：新增只读研究命令 `python main.py research atr-reclaim-n0-readiness-audit --experiment atr_reclaim_0_35 --symbol-master-file ... --start ... --end ...`，用于在第三历史窗口 retest 前冻结 git commit、配置 hash、symbol master hash、baseline/variant 条件、K 线缓存覆盖、listing-date 风险和 opportunity alignment 能力。
