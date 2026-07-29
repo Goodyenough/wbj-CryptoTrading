@@ -15,6 +15,14 @@
 
 ## 2026-07-29
 
+### 23:55:00 +08:00 - 完成 atr_reclaim_0_35 Stage N0 readiness audit
+- 类型：报告 / 文档 / 实验日志 / Git
+- 改动：生成 `reports/2026-07-29/atr_reclaim_n0_readiness_audit_2026-07-29_v1.md` 和 `reports/2026-07-29/atr_reclaim_0_35_n1_diagnostic_retest_card_2026-07-29_v1.md`，并更新 `TODO.md`、`EXPERIMENT_LEDGER.md`、`开发计划.md` 与 Obsidian 实验日志。
+- 结果：N0 verdict 为 `n0_conditional_pass_with_universe_bias_warning`；`git_dirty=false`，commit `4910a67f103d2c6d116f585e04bf66eaad7e2915`；固定 master 418 个符号中 207 个完整覆盖第三窗口，59 个部分覆盖，152 个无历史 K 线，且 `listing_dates_present=false`。
+- 决策：第三窗口 `atr_reclaim_0_35` 只能作为 diagnostic retest，不能称为 clean confirmatory validation；优先补 listing-date enriched `SymbolMaster` 或历史 membership 证据后重跑 N0。
+- 验证：已运行 `python main.py research atr-reclaim-n0-readiness-audit --experiment atr_reclaim_0_35 --symbol-master-file reports\2026-06-09\dynamic_master_full.json --start 2023-07-01 --end 2024-07-01 --reports-date 2026-07-29 --no-obsidian`。
+- Git：本次计划提交 `Record atr reclaim N0 readiness result`。
+
 ### 23:45:00 +08:00 - 修正 Stage N0 git dirty 判定口径
 - 类型：代码 / 审计口径 / Git
 - 改动：将 Stage N0 readiness audit 的 `git_dirty` 判定改为 `git status --short --untracked-files=no`，只检查已跟踪代码、配置和文档是否存在未提交修改。

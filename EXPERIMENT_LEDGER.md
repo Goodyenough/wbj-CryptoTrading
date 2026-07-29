@@ -158,3 +158,11 @@
 ## 9. 实验完成后是否允许修改生产配置
 默认：不允许。
 ```
+
+## 2026-07-29 Stage N0 readiness audit - atr_reclaim_0_35 third-window gate
+
+- `atr_reclaim_n0_readiness_audit`：固定 `atr_reclaim_0_35`、窗口 `2023-07-01 -> 2024-07-01`、master `reports/2026-06-09/dynamic_master_full.json`，生成 `reports/2026-07-29/atr_reclaim_n0_readiness_audit_2026-07-29_v1.md`。
+- 核心事实：`git_dirty=false`，commit `4910a67f103d2c6d116f585e04bf66eaad7e2915`；`settings_hash=be7ec39ec21f6a838571511cb2cd0e290263031b521a9a07a6fb70164b8ef4bf`；`experiments_hash=7e6eca2609546d94293162870df6cc6ab8795666845b58facd979b698917dbe1`。
+- Universe 审计：固定 master 有 418 个 symbols，但 `listing_dates_present=false`；第三窗口 1h/4h/1d 完整覆盖均为 207 个 symbols，部分覆盖 59 个，完全无历史 K 线 152 个，覆盖率约 56.1%。
+- 结论：`n0_conditional_pass_with_universe_bias_warning`。`atr_reclaim_0_35` 第三窗口可以准备 diagnostic retest，但不能称为 clean confirmatory validation，不能用于 keep 或部署。
+- 下一步：优先补 listing-date enriched `SymbolMaster` 或历史 membership 证据后重跑 N0；若用户明确批准，也可在 caveat 下运行 N1 diagnostic，但必须同时报告组合层、direct filtered/retained 机制层和 symbol/month/symbol-month cluster concentration。

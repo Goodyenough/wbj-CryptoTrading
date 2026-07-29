@@ -178,3 +178,10 @@
 - 默认使用中文记录 TODO。
 - 保留必要英文术语、命令名、配置键和状态值，例如 `BUY_CANDIDATE`、`sample_sufficient`、`python main.py ...`。
 - 每条 TODO 必须是可执行动作，不写泛泛想法。
+
+## 2026-07-29 Stage N0 / N1 当前状态
+
+- [x] 完成 `atr-reclaim-n0-readiness-audit`：固定 `atr_reclaim_0_35`、`2023-07-01 -> 2024-07-01`、`reports/2026-06-09/dynamic_master_full.json`，输出 `reports/2026-07-29/atr_reclaim_n0_readiness_audit_2026-07-29_v1.md`。
+- [x] 生成 N1 diagnostic retest card：`reports/2026-07-29/atr_reclaim_0_35_n1_diagnostic_retest_card_2026-07-29_v1.md`，明确主检验只能是 baseline vs fixed `atr_reclaim_0_35`，相邻阈值只允许探索性记录。
+- [ ] 优先补齐 listing-date enriched `SymbolMaster` 或历史 membership 证据，然后重跑 N0；当前 `listing_dates_present=false`，第三窗口只能作为 diagnostic，不能作为 clean confirmatory validation。
+- [ ] 若用户明确批准在 caveat 下继续，才运行 N1 diagnostic A/B；运行后必须同时报告组合层指标、direct filtered vs retained 机制层证据、symbol/month/symbol-month cluster concentration。
