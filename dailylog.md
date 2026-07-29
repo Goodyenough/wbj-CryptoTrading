@@ -13,6 +13,16 @@
 - Git：
 ```
 
+## 2026-07-29
+
+### 21:48:47 +08:00 - 生成下一步方向 GPT 评审包
+- 类型：文档 / GPT 评审 / 报告 / Git
+- 改动：更新 `.gpt-review/current_packet.md`，新增 `.gpt-review/history/20260729-214451_packet.md`，把 Stage A-E 执行收束、capacity replacement 冻结、`atr_reclaim_0_35` 的 `retest_path_dependent` 状态，以及下一步候选 `atr_reclaim_0_35_entry_quality_retest` 方案整理为自包含 GPT 评审包。
+- 原因：用户要求“跟 GPT 讨论一下下一步干嘛”，重点复核下一步应优先做第三历史窗口、当前 paper/opportunity 新窗口、小型阈值矩阵还是交易级机制补强。
+- 影响：仅生成评审材料；不执行新实验，不修改 `config/settings.toml`，不部署 `atr_reclaim_0_35`，不重启 replacement，不提高 `max_active_positions`。
+- 验证：已运行 `powershell -ExecutionPolicy Bypass -File C:\Users\10537\.codex\skills\gpt-plan-review\scripts\open-gpt-review.ps1 -PacketPath .gpt-review\current_packet.md`，脚本已复制提示词、选中评审包并打开 ChatGPT。
+- Git：本次计划提交 `Prepare GPT review for next research direction`；提交时按仓库规则一并纳入 `reports/` 下 2026-07-28 与 2026-07-29 自动生成的 paper/scan 报告。
+
 ## 2026-07-27
 
 ### 23:57:43 +08:00 - 完成 Stage A-E 执行收束
