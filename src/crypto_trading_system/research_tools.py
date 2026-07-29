@@ -3,11 +3,13 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
+import hashlib
 import inspect
 import json
 from pathlib import Path
 import random
 import sqlite3
+import subprocess
 
 from .backtest.universe import SymbolMaster, load_symbol_master, save_symbol_master
 from .config import Settings
@@ -248,6 +250,36 @@ class ReplacementClosureAudit:
     exclude_same_bar_ambiguous_summaries: dict[str, dict[str, float | int | None]]
     cluster_bootstrap_mean_r_42: dict[str, float | int | None]
     top_contribution_share_r_42: dict[str, float | int | None]
+    verdict: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class AtrReclaimN0ReadinessAudit:
+    experiment_id: str
+    report_date: str
+    start_utc: str
+    end_utc: str
+    symbol_master_path: str
+    symbol_master_source: str
+    symbol_master_created_at_utc: str
+    symbol_master_hash: str
+    settings_hash: str
+    experiments_hash: str
+    git_commit: str
+    git_dirty: bool
+    baseline_config_snapshot: dict
+    variant_overrides: dict
+    fixed_conditions: dict
+    symbol_master_count: int
+    listing_dates_present: bool
+    listed_after_start_count: int | None
+    listed_after_start_examples: list[str]
+    missing_listing_dates_count: int | None
+    kline_coverage: dict[str, dict[str, int | float | str | list[str]]]
+    prior_third_window_abtests: list[str]
+    opportunity_alignment_fields: dict[str, bool]
+    readiness_checks: dict[str, str]
     verdict: str
     reason: str
 
@@ -3085,6 +3117,399 @@ def write_replacement_closure_audit_report(
     report_dir = settings.output.reports_dir / date_text
     obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
     prefix = f"replacement_closure_audit_{date_text}"
+    version = next_report_version([report_dir, obsidian_dir], prefix)
+    filename = versioned_markdown_filename(prefix, version)
+    paths: list[Path] = []
+    for directory in [report_dir, obsidian_dir]:
+        if directory is None:
+            continue
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / filename
+        path.write_text(text, encoding="utf-8")
+        paths.append(path)
+    return audit, paths
+
+
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git_commit() -> str:
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    except Exception:
+        return "unknown"
+
+
+def _git_dirty() -> bool:
+    try:
+        return bool(subprocess.check_output(["git", "status", "--short"], text=True).strip())
+    except Exception:
+        return True
+
+
+def _ms_from_date(date_text: str) -> int:
+    return int(datetime.fromisoformat(date_text).replace(tzinfo=timezone.utc).timestamp() * 1000)
+
+
+def _interval_expected_bars(start_ms: int, end_ms: int, interval: str) -> int:
+    step = {"1h": 3_600_000, "4h": 14_400_000, "1d": 86_400_000}[interval]
+    return max(0, int((end_ms - start_ms) // step))
+
+
+def _kline_cache_coverage(
+    settings: Settings,
+    symbols: list[str],
+    *,
+    start_ms: int,
+    end_ms: int,
+    interval: str,
+) -> dict[str, int | float | str | list[str]]:
+    expected = _interval_expected_bars(start_ms, end_ms, interval)
+    if expected <= 0 or not symbols:
+        return {
+            "symbols": len(symbols),
+            "expected_bars_per_symbol": expected,
+            "complete_symbols": 0,
+            "partial_symbols": 0,
+            "empty_symbols": len(symbols),
+            "min_bars": 0,
+            "avg_bars": 0.0,
+            "coverage_pct": 0.0,
+            "partial_examples": [],
+            "empty_examples": symbols[:10],
+        }
+    placeholders = ",".join("?" for _ in symbols)
+    with connect_db(settings.output.database_path) as connection:
+        rows = connection.execute(
+            f"""
+            SELECT symbol, COUNT(*) AS bars
+            FROM kline_cache
+            WHERE source = 'Binance'
+              AND interval = ?
+              AND open_time >= ?
+              AND open_time < ?
+              AND is_closed = 1
+              AND symbol IN ({placeholders})
+            GROUP BY symbol
+            """,
+            [interval, start_ms, end_ms, *symbols],
+        ).fetchall()
+    counts = {str(row["symbol"]): int(row["bars"]) for row in rows}
+    complete = [symbol for symbol in symbols if counts.get(symbol, 0) >= expected]
+    partial = [symbol for symbol in symbols if 0 < counts.get(symbol, 0) < expected]
+    empty = [symbol for symbol in symbols if counts.get(symbol, 0) == 0]
+    total_expected = expected * len(symbols)
+    total_observed = sum(min(counts.get(symbol, 0), expected) for symbol in symbols)
+    return {
+        "symbols": len(symbols),
+        "expected_bars_per_symbol": expected,
+        "complete_symbols": len(complete),
+        "partial_symbols": len(partial),
+        "empty_symbols": len(empty),
+        "min_bars": min((counts.get(symbol, 0) for symbol in symbols), default=0),
+        "avg_bars": total_observed / len(symbols),
+        "coverage_pct": total_observed / total_expected * 100 if total_expected else 0.0,
+        "partial_examples": partial[:10],
+        "empty_examples": empty[:10],
+    }
+
+
+def _prior_window_abtest_reports(settings: Settings, start: str, end: str) -> list[str]:
+    pattern = f"abtest_dynamic_universe_*_{start}_{end}_v*.md"
+    return [str(path) for path in sorted(settings.output.reports_dir.glob(f"**/{pattern}"))]
+
+
+def build_atr_reclaim_n0_readiness_audit(
+    settings: Settings,
+    *,
+    experiment_id: str,
+    symbol_master_path: Path,
+    start: str,
+    end: str,
+    reports_date: str | None = None,
+) -> AtrReclaimN0ReadinessAudit:
+    master = load_symbol_master(symbol_master_path)
+    start_ms = _ms_from_date(start)
+    end_ms = _ms_from_date(end)
+    warmup_start_ms = min(
+        start_ms - settings.backtest.warmup_1h_bars * 3_600_000,
+        start_ms - settings.backtest.warmup_4h_bars * 14_400_000,
+        start_ms - settings.backtest.warmup_1d_bars * 86_400_000,
+    )
+    coverage = {
+        interval: _kline_cache_coverage(settings, master.symbols, start_ms=warmup_start_ms, end_ms=end_ms, interval=interval)
+        for interval in ["1h", "4h", "1d"]
+    }
+    listing_dates_present = master.listing_dates is not None
+    listed_after_start: list[str] = []
+    missing_listing_dates_count: int | None = None
+    if master.listing_dates is not None:
+        for symbol in master.symbols:
+            listed = master.listing_dates.get(symbol)
+            if listed is None:
+                continue
+            if listed > start:
+                listed_after_start.append(f"{symbol}:{listed}")
+        missing_listing_dates_count = sum(1 for symbol in master.symbols if symbol not in master.listing_dates)
+    opportunity_fields = {
+        "symbol": True,
+        "decision_time_utc": True,
+        "status": True,
+        "baseline_first_hit": True,
+        "baseline_r": True,
+        "mfe_r": True,
+        "mae_r": True,
+        "reclaim_margin_atr": True,
+        "distance_to_support_atr": True,
+        "stop_distance_atr": True,
+        "capacity_state_at_decision": False,
+        "stable_opportunity_id_shared_by_baseline_variant": False,
+    }
+    checks: dict[str, str] = {}
+    checks["git_clean"] = "pass" if not _git_dirty() else "warn_dirty_worktree"
+    checks["listing_dates"] = "pass" if listing_dates_present else "warn_missing_listing_dates"
+    checks["listed_after_start"] = "pass" if listed_after_start == [] else "warn_symbols_listed_after_window_start"
+    checks["kline_cache_coverage"] = (
+        "pass"
+        if all(float(item["coverage_pct"]) >= 99.0 and int(item["empty_symbols"]) == 0 for item in coverage.values())
+        else "warn_or_fail_incomplete_local_cache"
+    )
+    checks["opportunity_alignment"] = (
+        "pass"
+        if opportunity_fields["stable_opportunity_id_shared_by_baseline_variant"] and opportunity_fields["capacity_state_at_decision"]
+        else "warn_not_strictly_capacity_path_neutral"
+    )
+    prior_window_reports = _prior_window_abtest_reports(settings, start, end)
+    checks["prior_window_exists"] = "pass" if prior_window_reports else "warn_no_prior_third_window_abtest_reference"
+
+    hard_fail = (
+        (float(coverage["4h"]["coverage_pct"]) < 50.0 or float(coverage["1d"]["coverage_pct"]) < 50.0)
+        and not prior_window_reports
+    )
+    if hard_fail:
+        verdict = "n0_blocked_cache_incomplete"
+        reason = "Third-window readiness is blocked because local kline cache coverage is too incomplete for a reliable confirmatory retest."
+    elif not listing_dates_present:
+        verdict = "n0_conditional_pass_with_universe_bias_warning"
+        reason = "Third-window retest can be run as a diagnostic, but the fixed symbol master lacks listing_dates, so the result cannot be treated as a clean confirmatory validation without survivor-bias caveat."
+    elif not opportunity_fields["stable_opportunity_id_shared_by_baseline_variant"]:
+        verdict = "n0_conditional_pass_with_alignment_warning"
+        reason = "Third-window retest can run, but opportunity-level mechanism evidence must be labeled approximate until stable baseline/variant opportunity IDs are available."
+    else:
+        verdict = "n0_pass_ready_for_confirmatory_retest"
+        reason = "Data, configuration, universe, and opportunity-alignment prerequisites are sufficient for the pre-declared confirmatory retest."
+
+    return AtrReclaimN0ReadinessAudit(
+        experiment_id=experiment_id,
+        report_date=reports_date or _local_now().strftime("%Y-%m-%d"),
+        start_utc=f"{start}T00:00:00+00:00",
+        end_utc=f"{end}T00:00:00+00:00",
+        symbol_master_path=str(symbol_master_path),
+        symbol_master_source=master.source,
+        symbol_master_created_at_utc=master.created_at_utc,
+        symbol_master_hash=_file_sha256(symbol_master_path),
+        settings_hash=_file_sha256(Path("config/settings.toml")),
+        experiments_hash=_file_sha256(Path("config/experiments.toml")),
+        git_commit=_git_commit(),
+        git_dirty=_git_dirty(),
+        baseline_config_snapshot={
+            "entry_reclaim_close_enabled": settings.analysis.entry_reclaim_close_enabled,
+            "entry_reclaim_min_atr_enabled": settings.analysis.entry_reclaim_min_atr_enabled,
+            "entry_reclaim_min_atr": settings.analysis.entry_reclaim_min_atr,
+            "relative_strength_soft_gate_enabled": settings.analysis.relative_strength_soft_gate_enabled,
+            "max_active_positions": settings.backtest.max_active_positions,
+            "intrabar_policy": settings.backtest.intrabar_policy,
+            "primary_interval": settings.backtest.primary_interval,
+            "maker_fee_bps": settings.backtest.maker_fee_bps,
+            "taker_fee_bps": settings.backtest.taker_fee_bps,
+            "entry_slippage_bps": settings.backtest.entry_slippage_bps,
+            "stop_slippage_bps": settings.backtest.stop_slippage_bps,
+        },
+        variant_overrides={
+            "analysis.entry_reclaim_min_atr_enabled": True,
+            "analysis.entry_reclaim_min_atr": 0.35,
+        },
+        fixed_conditions={
+            "production_settings_toml_unchanged": True,
+            "replacement_enabled": False,
+            "max_active_positions_changed": False,
+            "score_sorting_changed": False,
+            "additional_filters_stacked": False,
+            "main_test": "baseline_vs_fixed_atr_reclaim_0_35_only",
+            "nearby_thresholds": "exploratory_only_if_run",
+        },
+        symbol_master_count=len(master.symbols),
+        listing_dates_present=listing_dates_present,
+        listed_after_start_count=None if master.listing_dates is None else len(listed_after_start),
+        listed_after_start_examples=listed_after_start[:10],
+        missing_listing_dates_count=missing_listing_dates_count,
+        kline_coverage=coverage,
+        prior_third_window_abtests=prior_window_reports,
+        opportunity_alignment_fields=opportunity_fields,
+        readiness_checks=checks,
+        verdict=verdict,
+        reason=reason,
+    )
+
+
+def render_atr_reclaim_n0_readiness_audit(audit: AtrReclaimN0ReadinessAudit) -> str:
+    now = _local_now()
+    lines = [
+        "---",
+        f"created: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        "tags:",
+        "  - crypto",
+        "  - trading-system",
+        "  - atr-reclaim-n0-readiness",
+        "experiment: atr_reclaim_n0_readiness_audit",
+        f"experiment_id: {audit.experiment_id}",
+        f"verdict: {audit.verdict}",
+        "---",
+        "",
+        "# atr_reclaim_n0_readiness_audit",
+        "",
+        "## Plain-language conclusion",
+        "",
+        audit.reason,
+        "",
+        "This is Stage N0 only. It freezes and audits prerequisites for the next retest; it does not run the `atr_reclaim_0_35` A/B, does not deploy, does not change `settings.toml`, does not restart replacement, and does not change `max_active_positions`.",
+        "",
+        "## Scope",
+        "",
+        "| Field | Value |",
+        "|---|---:|",
+        f"| experiment_id | `{audit.experiment_id}` |",
+        f"| window | `{audit.start_utc}` -> `{audit.end_utc}` |",
+        f"| git_commit | `{audit.git_commit}` |",
+        f"| git_dirty | {audit.git_dirty} |",
+        f"| settings_hash | `{audit.settings_hash}` |",
+        f"| experiments_hash | `{audit.experiments_hash}` |",
+        f"| symbol_master | `{audit.symbol_master_path}` |",
+        f"| symbol_master_hash | `{audit.symbol_master_hash}` |",
+        f"| symbol_master_count | {audit.symbol_master_count} |",
+        f"| symbol_master_created_at_utc | `{audit.symbol_master_created_at_utc}` |",
+        "",
+        "## Frozen Test Definition",
+        "",
+        "| Field | Value |",
+        "|---|---|",
+    ]
+    for key, value in audit.baseline_config_snapshot.items():
+        lines.append(f"| baseline.{key} | `{value}` |")
+    for key, value in audit.variant_overrides.items():
+        lines.append(f"| variant.{key} | `{value}` |")
+    for key, value in audit.fixed_conditions.items():
+        lines.append(f"| fixed.{key} | `{value}` |")
+    lines.extend(
+        [
+            "",
+            "## Symbol Master Audit",
+            "",
+            "| Metric | Value |",
+            "|---|---:|",
+            f"| source | `{audit.symbol_master_source}` |",
+            f"| listing_dates_present | {audit.listing_dates_present} |",
+            f"| listed_after_start_count | {_fmt_summary_value(audit.listed_after_start_count)} |",
+            f"| missing_listing_dates_count | {_fmt_summary_value(audit.missing_listing_dates_count)} |",
+            f"| listed_after_start_examples | `{', '.join(audit.listed_after_start_examples) or 'n/a'}` |",
+            "",
+            "## Local Kline Cache Coverage",
+            "",
+            "| Interval | Symbols | Expected Bars/Symbol | Complete | Partial | Empty | Min Bars | Avg Bars | Coverage % | Examples |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for interval, item in audit.kline_coverage.items():
+        examples = list(item.get("empty_examples", [])) + list(item.get("partial_examples", []))
+        lines.append(
+            f"| `{interval}` | {item['symbols']} | {item['expected_bars_per_symbol']} | {item['complete_symbols']} | "
+            f"{item['partial_symbols']} | {item['empty_symbols']} | {item['min_bars']} | {_fmt_summary_value(float(item['avg_bars']))} | "
+            f"{_fmt_summary_value(float(item['coverage_pct']))} | `{', '.join(examples[:8]) or 'n/a'}` |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Opportunity Alignment Capability",
+            "",
+            "| Field | Available |",
+            "|---|---:|",
+        ]
+    )
+    for key, value in audit.opportunity_alignment_fields.items():
+        lines.append(f"| `{key}` | {value} |")
+    lines.extend(
+        [
+            "",
+            "## Readiness Checks",
+            "",
+            "| Check | Status |",
+            "|---|---|",
+        ]
+    )
+    for key, value in audit.readiness_checks.items():
+        lines.append(f"| `{key}` | `{value}` |")
+    lines.extend(["", "## Prior Third-window A/B References", "", "| Path |", "|---|"])
+    if audit.prior_third_window_abtests:
+        for path in audit.prior_third_window_abtests[:20]:
+            lines.append(f"| `{path}` |")
+    else:
+        lines.append("| n/a |")
+    lines.extend(
+        [
+            "",
+            "## N1 Gate",
+            "",
+            f"`{audit.verdict}`",
+            "",
+            "## Recommended Next Action",
+            "",
+        ]
+    )
+    if audit.verdict == "n0_blocked_cache_incomplete":
+        lines.append("Do not run N1 yet. First repair or fetch missing local klines, then rerun this readiness audit.")
+    elif audit.verdict == "n0_conditional_pass_with_universe_bias_warning":
+        lines.append("N1 may run only as a clearly caveated third-window diagnostic. Do not call it clean confirmatory validation unless listing-date or historical membership evidence is added.")
+    elif audit.verdict == "n0_conditional_pass_with_alignment_warning":
+        lines.append("N1 may run as the fixed `0.35` system-level retest, but mechanism evidence must be labeled approximate until strict opportunity IDs and capacity-state fields are available.")
+    else:
+        lines.append("Proceed to N1 fixed `atr_reclaim_0_35` confirmatory retest. Nearby thresholds, if run, must be exploratory only.")
+    lines.extend(
+        [
+            "",
+            "## Raw Summary",
+            "",
+            "```json",
+            json.dumps(asdict(audit), ensure_ascii=False, indent=2),
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_atr_reclaim_n0_readiness_audit_report(
+    settings: Settings,
+    *,
+    experiment_id: str,
+    symbol_master_path: Path,
+    start: str,
+    end: str,
+    reports_date: str | None = None,
+) -> tuple[AtrReclaimN0ReadinessAudit, list[Path]]:
+    date_text = reports_date or _local_now().strftime("%Y-%m-%d")
+    audit = build_atr_reclaim_n0_readiness_audit(
+        settings,
+        experiment_id=experiment_id,
+        symbol_master_path=symbol_master_path,
+        start=start,
+        end=end,
+        reports_date=date_text,
+    )
+    text = render_atr_reclaim_n0_readiness_audit(audit)
+    report_dir = settings.output.reports_dir / date_text
+    obsidian_dir = None if settings.output.obsidian_dir is None else settings.output.obsidian_dir / "Reports" / date_text
+    prefix = f"atr_reclaim_n0_readiness_audit_{date_text}"
     version = next_report_version([report_dir, obsidian_dir], prefix)
     filename = versioned_markdown_filename(prefix, version)
     paths: list[Path] = []

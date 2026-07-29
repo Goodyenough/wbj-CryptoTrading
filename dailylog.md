@@ -15,6 +15,14 @@
 
 ## 2026-07-29
 
+### 22:35:00 +08:00 - 新增 atr_reclaim_0_35 Stage N0 readiness audit
+- 类型：代码 / 测试 / Git
+- 改动：新增只读研究命令 `python main.py research atr-reclaim-n0-readiness-audit --experiment atr_reclaim_0_35 --symbol-master-file ... --start ... --end ...`，用于在第三历史窗口 retest 前冻结 git commit、配置 hash、symbol master hash、baseline/variant 条件、K 线缓存覆盖、listing-date 风险和 opportunity alignment 能力。
+- 原因：综合 Codex 判断和 GPT 评审意见，下一步不能直接跑第三窗口 A/B；必须先做 N0 数据与实验冻结审计，防止把确认性窗口误用成重新调参或在 universe 口径不清时误判结论。
+- 影响：不修改 `config/settings.toml`，不部署 `atr_reclaim_0_35`，不提高 `max_active_positions`，不重启 capacity replacement；仅新增审计工具和报告模板。
+- 验证：已运行 `python tests\test_signal_fill_timing_audit.py`、`python -m compileall main.py src tests`。
+- Git：本次计划提交 `Add atr reclaim N0 readiness audit`。
+
 ### 21:48:47 +08:00 - 生成下一步方向 GPT 评审包
 - 类型：文档 / GPT 评审 / 报告 / Git
 - 改动：更新 `.gpt-review/current_packet.md`，新增 `.gpt-review/history/20260729-214451_packet.md`，把 Stage A-E 执行收束、capacity replacement 冻结、`atr_reclaim_0_35` 的 `retest_path_dependent` 状态，以及下一步候选 `atr_reclaim_0_35_entry_quality_retest` 方案整理为自包含 GPT 评审包。

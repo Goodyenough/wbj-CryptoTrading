@@ -44,6 +44,7 @@ from crypto_trading_system.research_tools import (
     write_blocked_candidate_vs_stale_slot_review_report,
     write_blocked_entry_event_export_report,
     write_replacement_closure_audit_report,
+    write_atr_reclaim_n0_readiness_audit_report,
     write_replay_consistency_audit_report,
     write_signal_fill_timing_audit_report,
     write_stale_slot_continuation_review_report,
@@ -434,6 +435,16 @@ def build_parser() -> argparse.ArgumentParser:
     replacement_closure.add_argument("--stage4-report", required=True, help="Stage 4 blocked-candidate-vs-stale-slot markdown report.")
     replacement_closure.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-27.")
     replacement_closure.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    atr_reclaim_n0 = research_subparsers.add_parser(
+        "atr-reclaim-n0-readiness-audit",
+        help="Freeze and audit prerequisites before the fixed atr_reclaim_0_35 third-window retest.",
+    )
+    atr_reclaim_n0.add_argument("--experiment", default="atr_reclaim_0_35", help="Fixed experiment id under review.")
+    atr_reclaim_n0.add_argument("--symbol-master-file", required=True, help="Frozen dynamic symbol master JSON.")
+    atr_reclaim_n0.add_argument("--start", required=True, help="UTC start date, e.g. 2023-07-01.")
+    atr_reclaim_n0.add_argument("--end", required=True, help="UTC end date, e.g. 2024-07-01.")
+    atr_reclaim_n0.add_argument("--reports-date", default=None, help="Report date directory, e.g. 2026-07-29.")
+    atr_reclaim_n0.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper = subparsers.add_parser("paper", help="Manage paper trading watchlist and positions.")
     paper_subparsers = paper.add_subparsers(dest="paper_command", required=True)
@@ -1178,6 +1189,33 @@ def main() -> None:
             print(f"stale_trade_top1_share_pct={audit.stale_trade_top1_share_pct}")
             print(f"first_event_per_stale_trade_r42_median={audit.first_event_per_stale_trade_summaries['net_replacement_delta_r_42']['median']}")
             print(f"cluster_bootstrap_r42_p05={audit.cluster_bootstrap_mean_r_42['p05']}")
+            for path in paths:
+                print(f"report={path}")
+        if args.research_command == "atr-reclaim-n0-readiness-audit":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            audit, paths = write_atr_reclaim_n0_readiness_audit_report(
+                settings,
+                experiment_id=args.experiment,
+                symbol_master_path=Path(args.symbol_master_file),
+                start=args.start,
+                end=args.end,
+                reports_date=args.reports_date,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("atr_reclaim_n0_readiness_audit=completed")
+            print(f"experiment_id={audit.experiment_id}")
+            print(f"verdict={audit.verdict}")
+            print(f"reason={audit.reason}")
+            print(f"git_commit={audit.git_commit}")
+            print(f"git_dirty={audit.git_dirty}")
+            print(f"symbol_master_count={audit.symbol_master_count}")
+            for interval, coverage in audit.kline_coverage.items():
+                print(
+                    f"coverage_{interval}={coverage['coverage_pct']:.3f}% "
+                    f"empty_symbols={coverage['empty_symbols']} partial_symbols={coverage['partial_symbols']}"
+                )
             for path in paths:
                 print(f"report={path}")
 

@@ -13,6 +13,7 @@ from crypto_trading_system.research_tools import (  # noqa: E402
     BlockedEntryEventExport,
     BlockedCandidateVsStaleSlotEvent,
     BlockedCandidateVsStaleSlotReview,
+    AtrReclaimN0ReadinessAudit,
     ReplacementClosureAudit,
     ReplayConsistencyAudit,
     StaleSlotContinuationReview,
@@ -20,11 +21,66 @@ from crypto_trading_system.research_tools import (  # noqa: E402
     build_signal_fill_timing_audit,
     render_blocked_candidate_vs_stale_slot_review,
     render_blocked_entry_event_export,
+    render_atr_reclaim_n0_readiness_audit,
     render_replacement_closure_audit,
     render_replay_consistency_audit,
     render_stale_slot_continuation_review,
     write_signal_fill_timing_audit_report,
 )
+
+
+def test_render_atr_reclaim_n0_readiness_audit_declares_fixed_main_test() -> None:
+    audit = AtrReclaimN0ReadinessAudit(
+        experiment_id="atr_reclaim_0_35",
+        report_date="2026-07-29",
+        start_utc="2023-07-01T00:00:00+00:00",
+        end_utc="2024-07-01T00:00:00+00:00",
+        symbol_master_path="reports/2026-06-09/dynamic_master_full.json",
+        symbol_master_source="binance_futures_usdt_perpetual",
+        symbol_master_created_at_utc="2026-06-09T07:07:56+00:00",
+        symbol_master_hash="abc",
+        settings_hash="def",
+        experiments_hash="ghi",
+        git_commit="abc123",
+        git_dirty=False,
+        baseline_config_snapshot={"max_active_positions": 5},
+        variant_overrides={"analysis.entry_reclaim_min_atr": 0.35},
+        fixed_conditions={
+            "main_test": "baseline_vs_fixed_atr_reclaim_0_35_only",
+            "nearby_thresholds": "exploratory_only_if_run",
+        },
+        symbol_master_count=2,
+        listing_dates_present=False,
+        listed_after_start_count=None,
+        listed_after_start_examples=[],
+        missing_listing_dates_count=None,
+        kline_coverage={
+            "4h": {
+                "interval": "4h",
+                "symbols": 2,
+                "expected_bars_per_symbol": 10,
+                "observed_bars": 20,
+                "coverage_pct": 100.0,
+                "empty_symbols": 0,
+                "partial_symbols": 0,
+                "complete_symbols": 2,
+                "empty_examples": [],
+                "partial_examples": [],
+            },
+        },
+        prior_third_window_abtests=["reports/2026-06-09/abtest_dynamic_universe_example.md"],
+        opportunity_alignment_fields={"stable_opportunity_id_shared_by_baseline_variant": False},
+        readiness_checks={"listing_dates": "warn_missing_listing_dates"},
+        verdict="n0_conditional_pass_with_universe_bias_warning",
+        reason="listing-date evidence is missing",
+    )
+
+    text = render_atr_reclaim_n0_readiness_audit(audit)
+
+    assert "baseline_vs_fixed_atr_reclaim_0_35_only" in text
+    assert "exploratory_only_if_run" in text
+    assert "Stage N0 only" in text
+    assert "n0_conditional_pass_with_universe_bias_warning" in text
 
 
 def _settings(tmp_path: Path):
