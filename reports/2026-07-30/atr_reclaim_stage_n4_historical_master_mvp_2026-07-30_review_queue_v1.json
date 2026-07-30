@@ -1,0 +1,1780 @@
+[
+  {
+    "symbol": "ACAUSDT",
+    "base_asset": "ACA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-01",
+    "last_kline_month": "2026-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "AERGOUSDT",
+    "base_asset": "AERGO",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-05",
+    "last_kline_month": "2025-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "AGIXUSDT",
+    "base_asset": "AGIX",
+    "symbol_type": "standard_spot_rename_or_migration_candidate",
+    "first_kline_month": "2023-02",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "AKROUSDT",
+    "base_asset": "AKRO",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-11",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ALPACAUSDT",
+    "base_asset": "ALPACA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-08",
+    "last_kline_month": "2025-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ALPHAUSDT",
+    "base_asset": "ALPHA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-10",
+    "last_kline_month": "2025-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "AMBUSDT",
+    "base_asset": "AMB",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-03",
+    "last_kline_month": "2025-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ANTUSDT",
+    "base_asset": "ANT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-08",
+    "last_kline_month": "2024-02",
+    "months_in_window_count": 8,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ASTUSDT",
+    "base_asset": "AST",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-05",
+    "last_kline_month": "2025-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ATAUSDT",
+    "base_asset": "ATA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-06",
+    "last_kline_month": "2026-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BADGERUSDT",
+    "base_asset": "BADGER",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-03",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BAKEUSDT",
+    "base_asset": "BAKE",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-04",
+    "last_kline_month": "2025-09",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BALUSDT",
+    "base_asset": "BAL",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-08",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BETAUSDT",
+    "base_asset": "BETA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-10",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BIFIUSDT",
+    "base_asset": "BIFI",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-04",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BLZUSDT",
+    "base_asset": "BLZ",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-08",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BNXUSDT",
+    "base_asset": "BNX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-11",
+    "last_kline_month": "2025-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BONDUSDT",
+    "base_asset": "BOND",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-07",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BSWUSDT",
+    "base_asset": "BSW",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-03",
+    "last_kline_month": "2025-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BTSUSDT",
+    "base_asset": "BTS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-02",
+    "last_kline_month": "2023-12",
+    "months_in_window_count": 6,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "BURGERUSDT",
+    "base_asset": "BURGER",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-04",
+    "last_kline_month": "2025-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "CHESSUSDT",
+    "base_asset": "CHESS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-10",
+    "last_kline_month": "2026-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "CLVUSDT",
+    "base_asset": "CLV",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-07",
+    "last_kline_month": "2025-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "COMBOUSDT",
+    "base_asset": "COMBO",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-06",
+    "last_kline_month": "2025-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "CREAMUSDT",
+    "base_asset": "CREAM",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-09",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 10,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "CTXCUSDT",
+    "base_asset": "CTXC",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-11",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "CVPUSDT",
+    "base_asset": "CVP",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-10",
+    "last_kline_month": "2024-08",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "DARUSDT",
+    "base_asset": "DAR",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-11",
+    "last_kline_month": "2025-01",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "DATAUSDT",
+    "base_asset": "DATA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-04",
+    "last_kline_month": "2026-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "DEGOUSDT",
+    "base_asset": "DEGO",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-03",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "DENTUSDT",
+    "base_asset": "DENT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-08",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "DFUSDT",
+    "base_asset": "DF",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-09",
+    "last_kline_month": "2026-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "DOCKUSDT",
+    "base_asset": "DOCK",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-08",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "DREPUSDT",
+    "base_asset": "DREP",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-01",
+    "last_kline_month": "2024-04",
+    "months_in_window_count": 10,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ELFUSDT",
+    "base_asset": "ELF",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-09",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "EOSUSDT",
+    "base_asset": "EOS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2018-05",
+    "last_kline_month": "2025-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "EPXUSDT",
+    "base_asset": "EPX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-05",
+    "last_kline_month": "2024-08",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ERNUSDT",
+    "base_asset": "ERN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-06",
+    "last_kline_month": "2025-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FARMUSDT",
+    "base_asset": "FARM",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-08",
+    "last_kline_month": "2026-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FIOUSDT",
+    "base_asset": "FIO",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-09",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FIROUSDT",
+    "base_asset": "FIRO",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-01",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FISUSDT",
+    "base_asset": "FIS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-03",
+    "last_kline_month": "2025-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FLMUSDT",
+    "base_asset": "FLM",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-09",
+    "last_kline_month": "2025-11",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FORTHUSDT",
+    "base_asset": "FORTH",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-04",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FORUSDT",
+    "base_asset": "FOR",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-08",
+    "last_kline_month": "2024-08",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FRONTUSDT",
+    "base_asset": "FRONT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-10",
+    "last_kline_month": "2024-08",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FTMUSDT",
+    "base_asset": "FTM",
+    "symbol_type": "standard_spot_rename_or_migration_candidate",
+    "first_kline_month": "2019-06",
+    "last_kline_month": "2025-01",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FUNUSDT",
+    "base_asset": "FUN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-08",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "FXSUSDT",
+    "base_asset": "FXS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-12",
+    "last_kline_month": "2026-01",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "GALUSDT",
+    "base_asset": "GAL",
+    "symbol_type": "standard_spot_rename_or_migration_candidate",
+    "first_kline_month": "2022-05",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "GFTUSDT",
+    "base_asset": "GFT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-09",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 10,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "GHSTUSDT",
+    "base_asset": "GHST",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-08",
+    "last_kline_month": "2026-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "HARDUSDT",
+    "base_asset": "HARD",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-11",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "HIFIUSDT",
+    "base_asset": "HIFI",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-01",
+    "last_kline_month": "2025-09",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "HOOKUSDT",
+    "base_asset": "HOOK",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-12",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "IDEXUSDT",
+    "base_asset": "IDEX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-09",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "IRISUSDT",
+    "base_asset": "IRIS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-08",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "KDAUSDT",
+    "base_asset": "KDA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-03",
+    "last_kline_month": "2025-11",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "KEYUSDT",
+    "base_asset": "KEY",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-08",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "KLAYUSDT",
+    "base_asset": "KLAY",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-06",
+    "last_kline_month": "2024-10",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "KMDUSDT",
+    "base_asset": "KMD",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-08",
+    "last_kline_month": "2025-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "KP3RUSDT",
+    "base_asset": "KP3R",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-11",
+    "last_kline_month": "2024-11",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "LEVERUSDT",
+    "base_asset": "LEVER",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-07",
+    "last_kline_month": "2025-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "LINAUSDT",
+    "base_asset": "LINA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-03",
+    "last_kline_month": "2025-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "LITUSDT",
+    "base_asset": "LIT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-02",
+    "last_kline_month": "2025-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "LOKAUSDT",
+    "base_asset": "LOKA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-01",
+    "last_kline_month": "2025-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "LOOMUSDT",
+    "base_asset": "LOOM",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-03",
+    "last_kline_month": "2024-08",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "LRCUSDT",
+    "base_asset": "LRC",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-06",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "LTOUSDT",
+    "base_asset": "LTO",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-02",
+    "last_kline_month": "2025-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MATICUSDT",
+    "base_asset": "MATIC",
+    "symbol_type": "standard_spot_rename_or_migration_candidate",
+    "first_kline_month": "2019-04",
+    "last_kline_month": "2024-09",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MCUSDT",
+    "base_asset": "MC",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-12",
+    "last_kline_month": "2023-11",
+    "months_in_window_count": 5,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MDTUSDT",
+    "base_asset": "MDT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-06",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MDXUSDT",
+    "base_asset": "MDX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-05",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MKRUSDT",
+    "base_asset": "MKR",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-07",
+    "last_kline_month": "2025-09",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MLNUSDT",
+    "base_asset": "MLN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-07",
+    "last_kline_month": "2026-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MOBUSDT",
+    "base_asset": "MOB",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-04",
+    "last_kline_month": "2024-04",
+    "months_in_window_count": 10,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "MULTIUSDT",
+    "base_asset": "MULTI",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-04",
+    "last_kline_month": "2024-02",
+    "months_in_window_count": 8,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "NKNUSDT",
+    "base_asset": "NKN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-10",
+    "last_kline_month": "2026-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "NTRNUSDT",
+    "base_asset": "NTRN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-10",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 9,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "NULSUSDT",
+    "base_asset": "NULS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2018-07",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "OAXUSDT",
+    "base_asset": "OAX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-03",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "OCEANUSDT",
+    "base_asset": "OCEAN",
+    "symbol_type": "standard_spot_rename_or_migration_candidate",
+    "first_kline_month": "2020-08",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "OMGUSDT",
+    "base_asset": "OMG",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-04",
+    "last_kline_month": "2024-06",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "OMNIUSDT",
+    "base_asset": "OMNI",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2024-04",
+    "last_kline_month": "2025-09",
+    "months_in_window_count": 3,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "OMUSDT",
+    "base_asset": "OM",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-03",
+    "last_kline_month": "2026-03",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "OOKIUSDT",
+    "base_asset": "OOKI",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-12",
+    "last_kline_month": "2024-11",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "ORNUSDT",
+    "base_asset": "ORN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-09",
+    "last_kline_month": "2024-10",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "OXTUSDT",
+    "base_asset": "OXT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-09",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "PDAUSDT",
+    "base_asset": "PDA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2024-03",
+    "last_kline_month": "2025-05",
+    "months_in_window_count": 4,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "PERLUSDT",
+    "base_asset": "PERL",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-08",
+    "last_kline_month": "2023-12",
+    "months_in_window_count": 6,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "PERPUSDT",
+    "base_asset": "PERP",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-03",
+    "last_kline_month": "2025-11",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "PHBUSDT",
+    "base_asset": "PHB",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-11",
+    "last_kline_month": "2026-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "PLAUSDT",
+    "base_asset": "PLA",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-11",
+    "last_kline_month": "2024-02",
+    "months_in_window_count": 8,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "PNTUSDT",
+    "base_asset": "PNT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-06",
+    "last_kline_month": "2024-04",
+    "months_in_window_count": 10,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "POLSUSDT",
+    "base_asset": "POLS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-05",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "PROSUSDT",
+    "base_asset": "PROS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-01",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "RDNTUSDT",
+    "base_asset": "RDNT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-03",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "REEFUSDT",
+    "base_asset": "REEF",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-12",
+    "last_kline_month": "2024-08",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "REIUSDT",
+    "base_asset": "REI",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2022-05",
+    "last_kline_month": "2025-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "RENUSDT",
+    "base_asset": "REN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-09",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "RNDRUSDT",
+    "base_asset": "RNDR",
+    "symbol_type": "standard_spot_rename_or_migration_candidate",
+    "first_kline_month": "2021-11",
+    "last_kline_month": "2024-07",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "SNTUSDT",
+    "base_asset": "SNT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-05",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "STMXUSDT",
+    "base_asset": "STMX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-06",
+    "last_kline_month": "2025-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "STPTUSDT",
+    "base_asset": "STPT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-03",
+    "last_kline_month": "2025-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "SXPUSDT",
+    "base_asset": "SXP",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-07",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "SYSUSDT",
+    "base_asset": "SYS",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-09",
+    "last_kline_month": "2026-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "TOMOUSDT",
+    "base_asset": "TOMO",
+    "symbol_type": "standard_spot_rename_or_migration_candidate",
+    "first_kline_month": "2019-08",
+    "last_kline_month": "2023-11",
+    "months_in_window_count": 5,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "TROYUSDT",
+    "base_asset": "TROY",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-12",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "TRUUSDT",
+    "base_asset": "TRU",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-01",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "TVKUSDT",
+    "base_asset": "TVK",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-08",
+    "last_kline_month": "2023-11",
+    "months_in_window_count": 5,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "UFTUSDT",
+    "base_asset": "UFT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-03",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "UNFIUSDT",
+    "base_asset": "UNFI",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-11",
+    "last_kline_month": "2024-11",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "UTKUSDT",
+    "base_asset": "UTK",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-10",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "VGXUSDT",
+    "base_asset": "VGX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-11",
+    "last_kline_month": "2024-08",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "VIBUSDT",
+    "base_asset": "VIB",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2023-02",
+    "last_kline_month": "2025-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "VIDTUSDT",
+    "base_asset": "VIDT",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-09",
+    "last_kline_month": "2025-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "VITEUSDT",
+    "base_asset": "VITE",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-12",
+    "last_kline_month": "2025-02",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "VOXELUSDT",
+    "base_asset": "VOXEL",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2021-12",
+    "last_kline_month": "2025-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "WANUSDT",
+    "base_asset": "WAN",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-08",
+    "last_kline_month": "2026-04",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "WAVESUSDT",
+    "base_asset": "WAVES",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-01",
+    "last_kline_month": "2024-06",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "WINGUSDT",
+    "base_asset": "WING",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-09",
+    "last_kline_month": "2025-05",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "WNXMUSDT",
+    "base_asset": "WNXM",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-08",
+    "last_kline_month": "2024-06",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "WRXUSDT",
+    "base_asset": "WRX",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-02",
+    "last_kline_month": "2024-12",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "WTCUSDT",
+    "base_asset": "WTC",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-04",
+    "last_kline_month": "2023-12",
+    "months_in_window_count": 6,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "XEMUSDT",
+    "base_asset": "XEM",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-11",
+    "last_kline_month": "2024-06",
+    "months_in_window_count": 12,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "XMRUSDT",
+    "base_asset": "XMR",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2019-03",
+    "last_kline_month": "2024-02",
+    "months_in_window_count": 8,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  },
+  {
+    "symbol": "YFIIUSDT",
+    "base_asset": "YFII",
+    "symbol_type": "standard_spot_missing_from_current_master",
+    "first_kline_month": "2020-09",
+    "last_kline_month": "2023-08",
+    "months_in_window_count": 2,
+    "review_question": "Was this a normal spot asset that should be included in the historical universe, or should it be mapped/excluded because of delisting, migration, or strategy eligibility rules?",
+    "minimum_sources_needed": [
+      "Binance listing or delisting announcement when available",
+      "Binance public-data kline availability",
+      "Current or archived symbol mapping if renamed/migrated"
+    ]
+  }
+]
