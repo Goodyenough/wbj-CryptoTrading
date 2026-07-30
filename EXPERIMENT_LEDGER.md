@@ -320,3 +320,12 @@
 - Covered cases: no shadow rows, candidate-only rows, plan-linked but immature rows, missing required lines, accidental `controls_paper=1`, sample gate not reached, and attribution-ready state.
 - Gate reminder: reconciliation ready only allows read-only attribution review; it does not authorize `atr_reclaim_0_35` deployment or `settings.toml` changes.
 - Current state: `paper_shadow_decisions=[]`; action remains `wait_for_normal_daily_or_entry_zone_4h_trigger`.
+## 2026-07-30 19:36 +08:00 - atr_reclaim prospective shadow runbook check
+
+- Experiment/check: `atr_reclaim_prospective_shadow_runbook_check`.
+- Question: after the approved global plan, have normal paper/shadow rows appeared so attribution can begin?
+- Commands: `python main.py paper shadow-decisions --limit 20`, `python main.py paper shadow-maturity --no-obsidian`, `python main.py paper shadow-reconciliation --no-obsidian`, and `python main.py db status`.
+- Result: `paper_shadow_decisions=[]`; generated `paper_shadow_maturity_review_2026-07-30_demo_v10.md` and `paper_shadow_reconciliation_2026-07-30_demo_v4.md`.
+- Verdict: both reports are `no_shadow_samples_yet`; pre-attribution gate remains at 0 complete opportunities, 0 mature terminal opportunities, and 0 independent symbols.
+- Decision: `operations_wait`; no direct filtering attribution, no capacity/path attribution, no `atr_reclaim_0_35` deployment, and no `config/settings.toml` change.
+- Next action: wait for normal daily/import or `ONDOUSDT` entry-zone 4h decision to create prospective shadow rows, then rerun maturity and reconciliation.

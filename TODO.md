@@ -259,5 +259,6 @@
 
 - [x] 新增 `reports/2026-07-30/atr_reclaim_global_execution_plan_2026-07-30_v1.md`，统一记录当前背景、困难、正式决策、三线/四线对照框架和下一步 stage。
 - [x] 明确 `atr_reclaim_0_35_shadow` 必须作为独立 challenger-like shadow line 长期保留，用于 `atr_reclaim_0_35_shadow vs reference_baseline`，避免后续失去判断 `0.35` 自身贡献的参照。
-- [ ] 下一次正常 daily/cycle 后，先检查 `paper shadow-decisions`、`paper shadow-maturity` 和 `paper shadow-reconciliation`；若仍为 `no_shadow_samples_yet`，继续等待正常样本，不手动制造样本。
+- [x] 2026-07-30 19:36 按 runbook 检查 `paper shadow-decisions`、`paper shadow-maturity` 和 `paper shadow-reconciliation`：`paper_shadow_decisions=[]`，maturity v10 与 reconciliation v4 均为 `no_shadow_samples_yet`。
+- [ ] 下一次正常 daily/cycle 后，继续检查 `paper shadow-decisions`、`paper shadow-maturity` 和 `paper shadow-reconciliation`；若仍为 `no_shadow_samples_yet`，继续等待正常样本，不手动制造样本。
 - [ ] 当 reconciliation 达到 pre-attribution sample gate 后，只允许启动只读 direct filtering / capacity-path attribution，不得直接升级为 paper deployment。

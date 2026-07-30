@@ -1853,3 +1853,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：不修改 `config/settings.toml`，不运行新的近端历史 `0.35` A/B，不授权 paper deployment；下一步仍等待正常 daily/import 或 entry-zone 4h update 产生 `paper_shadow_decisions`。
 - 验证：文档复核；确认本次为计划和项目文档更新，无策略配置变更。
 - Git：待提交。
+
+### 19:36:34 +08:00 - prospective shadow runbook 检查
+- 类型：报告 / TODO / 开发计划 / Git
+- 改动：按 `2026-07-30-atr-reclaim-prospective-shadow-runbook.md` 执行只读检查，运行 `paper shadow-decisions`、`paper shadow-maturity --no-obsidian`、`paper shadow-reconciliation --no-obsidian` 和 `db status`。
+- 结果：`paper_shadow_decisions=[]`；新增报告 `reports/2026-07-30/paper_shadow_maturity_review_2026-07-30_demo_v10.md` 与 `reports/2026-07-30/paper_shadow_reconciliation_2026-07-30_demo_v4.md`，二者 verdict 均为 `no_shadow_samples_yet`。
+- 影响：当前不能做 direct filtering / capacity-path attribution，不能把 `0.35` 升级为 paper deployment；继续等待正常 daily/import 或 `ONDOUSDT` WATCHING plan 触发 entry-zone 4h decision。
+- 验证：`python main.py db status` 通过，最新 4h run `20260730_111428_76a80af1` 为 success，`config/settings.toml` 无改动。
+- Git：待提交。
