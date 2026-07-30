@@ -15,6 +15,13 @@
 
 ## 2026-07-30
 
+### 14:08:40 +08:00 - atr_reclaim 近端窗口资格审计
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `reports/2026-07-30/atr_reclaim_recent_window_eligibility_audit_2026-07-30_v1.md`，并更新 `TODO.md`、`EXPERIMENT_LEDGER.md`、`开发计划.md`。
+- 影响：正式记录 `no_clean_recent_window_available_for_strong_historical_validation`；现有近端历史窗口只作为辅助/诊断证据，不启动新的 `atr_reclaim_0_35` 近端历史 A/B。
+- 验证：仅做窗口使用记录审计，未运行新的 A/B，未修改 `config/settings.toml`。
+- Git：随提交 `Record atr reclaim recent window gate` 记录
+
 ### 12:26:28 +08:00 - ?? atr_reclaim ???????????
 - ????? / TODO / ???? / ?? / Git
 - ????? `reports/2026-07-30/atr_reclaim_2023_2024_window_abandonment_decision_2026-07-30_v1.md` ? `reports/2026-07-30/atr_reclaim_next_action_plan_2026-07-30_v1.md`?

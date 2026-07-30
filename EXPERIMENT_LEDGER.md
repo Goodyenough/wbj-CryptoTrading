@@ -209,3 +209,12 @@
 - ???N0-N4 ????? diagnostic evidence?????? 2023-2024 historical universe???? corrected N1??? path fork audit????????? `atr_reclaim_0_35` ??????
 - ????`freeze diagnostic artifacts -> candidate recent-window eligibility audit -> prospective shadow observation schema -> ?????? one-time auxiliary A/B`?
 
+## 2026-07-30 atr_reclaim recent-window eligibility audit
+
+- 审计目标：判断是否存在一个近端历史窗口，可以作为 `atr_reclaim_0_35` 的事前锁定 one-time A/B 验证窗口。
+- 执行边界：没有运行新的 A/B，也没有查看新的 `atr_reclaim_0_35` 收益结果；只复核既有报告、账本和窗口使用记录。
+- 关键事实：`2024-07-01 -> 2025-06-01` 与 `2025-06-01 -> 2026-06-01` 已被 ATR reclaim 阈值敏感性、正式 A/B、交易级归因、路径复盘和 capacity review 反复观察；`2026-06-19 -> 2026-07-02`、`2026-07-03 -> 2026-07-25`、`2026-07-17 -> 2026-07-25` 已被 paper/shadow 复盘使用。
+- 结论：`no_clean_recent_window_available_for_strong_historical_validation`。现有近端历史窗口只能作为 auxiliary/context 或 diagnostic evidence，不能承担强验证。
+- 决策：不运行新的近端历史 `atr_reclaim_0_35` A/B，不部署，不修改 `config/settings.toml`。
+- 下一步：转向 prospective shadow observation schema/MVP，记录 baseline 与 `atr_reclaim_0_35` variant 的同一时点决策、capacity state、direct filtering 与 path contribution。
+
