@@ -1846,3 +1846,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：后续正常 daily/cycle 后有明确执行入口；即使 reconciliation ready，也只允许只读 attribution review，不授权 `0.35` paper deployment 或 `settings.toml` 修改。
 - 验证：文档复核；确认当前 `paper_shadow_decisions=[]`。
 - Git：待提交
+### 19:32:00 +08:00 - atr_reclaim 全局执行计划
+- 类型：文档 / TODO / 开发计划 / Git
+- 改动：新增 `reports/2026-07-30/atr_reclaim_global_execution_plan_2026-07-30_v1.md`，统一记录当前背景、困难、正式决策、三线/四线对照框架、prospective shadow observation 和后续 stage。
+- 结果：计划明确 `atr_reclaim_0_35` 作为 `provisional_research_incumbent`，同时保留独立 `atr_reclaim_0_35_shadow` 与 `reference_baseline` 对比；后续 `new_challenger` 只与 `research_incumbent` 做增量比较，但不能替代对 `0.35` 自身的长期校准。
+- 影响：不修改 `config/settings.toml`，不运行新的近端历史 `0.35` A/B，不授权 paper deployment；下一步仍等待正常 daily/import 或 entry-zone 4h update 产生 `paper_shadow_decisions`。
+- 验证：文档复核；确认本次为计划和项目文档更新，无策略配置变更。
+- Git：待提交。
