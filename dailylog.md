@@ -44,6 +44,14 @@
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status`、`python main.py paper shadow-decisions --limit 5`。
 - Git：待提交
 
+### 18:48:16 +08:00 - shadow maturity waiting diagnostics
+- 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Git
+- 改动：增强 `paper_shadow_maturity.py`，在无 shadow rows 或样本未成熟时输出 `Waiting Diagnostics`：open plan 数量、WATCHING 数量、latest scan、latest daily/4h run、open plan 明细和 next trigger。
+- 结果：生成 `reports/2026-07-30/paper_shadow_maturity_review_2026-07-30_demo_v8.md`；当前 verdict 仍为 `no_shadow_samples_yet`，但报告已明确等待条件为 daily/import candidate rows 或 WATCHING plan 触及 entry_high。
+- 影响：等待样本阶段现在可审计，不需要人为运行 stateful daily 来制造候选；不修改 `config/settings.toml`，不改变 paper 下单。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-maturity --no-obsidian`。
+- Git：待提交
+
 ### 18:30:48 +08:00 - paper cycle 自动生成 shadow maturity review
 - 类型：代码 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git
 - 改动：`daily` 和 `paper cycle` 成功完成 paper update、paper report、observation dashboard 后，自动调用 `write_shadow_maturity_report` 生成 `paper_shadow_maturity_review`。

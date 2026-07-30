@@ -30,6 +30,7 @@ class ShadowMaturityReview:
     scanner_action_counts: dict[str, int]
     terminal_status_counts: dict[str, int]
     opportunity_summaries: list[dict[str, object]]
+    diagnostics: dict[str, object]
     verdict: str
     reason: str
 
@@ -80,6 +81,41 @@ def build_shadow_maturity_review(settings: Settings, account_name: str | None = 
             """,
             (account,),
         ).fetchall()
+        open_plan_rows = connection.execute(
+            """
+            SELECT plan_id, symbol, status, entry_low, entry_high, updated_at
+            FROM paper_plans
+            WHERE account_name = ? AND status IN ('WATCHING', 'ENTERED', 'TP1_HIT')
+            ORDER BY updated_at DESC, plan_id
+            """,
+            (account,),
+        ).fetchall()
+        latest_scan = connection.execute(
+            """
+            SELECT scan_id, scan_time, candidate_count, buy_candidate_count, watch_only_count
+            FROM market_scans
+            ORDER BY scan_time DESC
+            LIMIT 1
+            """
+        ).fetchone()
+        latest_daily_run = connection.execute(
+            """
+            SELECT run_id, status, started_at, finished_at
+            FROM runs
+            WHERE run_type = 'daily_full'
+            ORDER BY started_at DESC
+            LIMIT 1
+            """
+        ).fetchone()
+        latest_4h_run = connection.execute(
+            """
+            SELECT run_id, status, started_at, finished_at
+            FROM runs
+            WHERE run_type = 'paper_4h_update'
+            ORDER BY started_at DESC
+            LIMIT 1
+            """
+        ).fetchone()
 
     line_counts: Counter[str] = Counter()
     stage_counts: Counter[str] = Counter()
@@ -145,6 +181,47 @@ def build_shadow_maturity_review(settings: Settings, account_name: str | None = 
         verdict = "maturity_review_available"
         reason = "At least one plan-linked shadow decision has reached a terminal paper status."
 
+    open_plan_count = len(open_plan_rows)
+    watching_plan_count = sum(1 for row in open_plan_rows if str(row["status"]) == "WATCHING")
+    diagnostics: dict[str, object] = {
+        "open_plan_count": open_plan_count,
+        "watching_plan_count": watching_plan_count,
+        "latest_scan": dict(latest_scan) if latest_scan is not None else None,
+        "latest_daily_run": dict(latest_daily_run) if latest_daily_run is not None else None,
+        "latest_4h_run": dict(latest_4h_run) if latest_4h_run is not None else None,
+        "open_plans": [
+            {
+                "plan_id": str(row["plan_id"]),
+                "symbol": str(row["symbol"]),
+                "status": str(row["status"]),
+                "entry_low": row["entry_low"],
+                "entry_high": row["entry_high"],
+                "updated_at": str(row["updated_at"]),
+            }
+            for row in open_plan_rows[:10]
+        ],
+    }
+    if not rows:
+        if open_plan_count == 0:
+            next_trigger = "Wait for the next daily scan/import to create candidate-level shadow rows."
+        elif watching_plan_count > 0:
+            next_trigger = (
+                "Wait for the next daily scan/import candidate rows, or for a WATCHING plan to touch "
+                "entry_high during a 4h paper update so plan-linked shadow decisions can be recorded."
+            )
+        else:
+            next_trigger = (
+                "Wait for a plan-linked 4h decision point from open entered/TP1 plans, or for the next "
+                "daily scan/import to create candidate-level shadow rows."
+            )
+    elif decision_level_count == 0:
+        next_trigger = "Wait for a WATCHING plan to touch entry_high during a 4h paper update."
+    elif mature_terminal_count == 0:
+        next_trigger = "Wait for plan-linked shadow decisions to reach terminal paper statuses."
+    else:
+        next_trigger = "Review direct filtering and capacity/path contribution once the sample reaches the pre-set threshold."
+    diagnostics["next_trigger"] = next_trigger
+
     return ShadowMaturityReview(
         account_name=account,
         decision_count=len(rows),
@@ -173,6 +250,7 @@ def build_shadow_maturity_review(settings: Settings, account_name: str | None = 
             }
             for item in sorted(opportunity_summary.values(), key=lambda value: str(value["opportunity_id"]))
         ],
+        diagnostics=diagnostics,
         verdict=verdict,
         reason=reason,
     )
@@ -201,6 +279,24 @@ def render_shadow_maturity_report(review: ShadowMaturityReview, version: int) ->
         )
     else:
         opportunity_lines.append("| none | 0 |  |  |  |  |")
+    latest_scan = review.diagnostics.get("latest_scan")
+    latest_daily = review.diagnostics.get("latest_daily_run")
+    latest_4h = review.diagnostics.get("latest_4h_run")
+    open_plan_lines = [
+        "| Plan | Symbol | Status | Entry low | Entry high | Updated |",
+        "|---|---|---|---:|---:|---|",
+    ]
+    open_plans = review.diagnostics.get("open_plans", [])
+    if open_plans:
+        open_plan_lines.extend(
+            (
+                f"| `{item['plan_id']}` | `{item['symbol']}` | `{item['status']}` | "
+                f"{item['entry_low']} | {item['entry_high']} | {item['updated_at']} |"
+            )
+            for item in open_plans
+        )
+    else:
+        open_plan_lines.append("| none | n/a | n/a | n/a | n/a | n/a |")
 
     lines = [
         f"# atr_reclaim prospective shadow maturity review v{version}",
@@ -229,6 +325,22 @@ def render_shadow_maturity_report(review: ShadowMaturityReview, version: int) ->
         f"| right-censored open rows | {review.right_censored_open_count} |",
         f"| unknown plan rows | {review.unknown_plan_count} |",
         f"| right-censored ratio | {review.right_censored_ratio_pct:.2f}% |",
+        "",
+        "## Waiting Diagnostics",
+        "",
+        f"- open_plan_count: {review.diagnostics.get('open_plan_count', 0)}",
+        f"- watching_plan_count: {review.diagnostics.get('watching_plan_count', 0)}",
+        f"- latest_scan: `{latest_scan.get('scan_id') if isinstance(latest_scan, dict) else 'n/a'}` "
+        f"at `{latest_scan.get('scan_time') if isinstance(latest_scan, dict) else 'n/a'}`",
+        f"- latest_daily_run: `{latest_daily.get('run_id') if isinstance(latest_daily, dict) else 'n/a'}` "
+        f"status=`{latest_daily.get('status') if isinstance(latest_daily, dict) else 'n/a'}`",
+        f"- latest_4h_run: `{latest_4h.get('run_id') if isinstance(latest_4h, dict) else 'n/a'}` "
+        f"status=`{latest_4h.get('status') if isinstance(latest_4h, dict) else 'n/a'}`",
+        f"- next_trigger: {review.diagnostics.get('next_trigger')}",
+        "",
+        "### Open Plans",
+        "",
+        *open_plan_lines,
         "",
         "## By Line",
         "",

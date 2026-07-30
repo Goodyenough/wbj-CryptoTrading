@@ -754,6 +754,33 @@ def test_shadow_maturity_review_classifies_candidate_terminal_and_open_rows() ->
     assert "scan_candidate:scan1:TESTUSDT" in text
 
 
+def test_shadow_maturity_review_explains_waiting_state_without_rows() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+    settings = _settings_for(path)
+    settings.output.reports_dir = path.parent / "reports"
+    settings.output.obsidian_dir = None
+
+    review = build_shadow_maturity_review(settings)
+    assert review.verdict == "no_shadow_samples_yet"
+    assert review.diagnostics["open_plan_count"] == 1
+    assert review.diagnostics["watching_plan_count"] == 1
+    assert review.diagnostics["latest_scan"]["scan_id"] == "scan1"
+    assert "WATCHING plan" in str(review.diagnostics["next_trigger"])
+
+    _, paths = write_shadow_maturity_report(settings)
+    text = paths[0].read_text(encoding="utf-8")
+    assert "## Waiting Diagnostics" in text
+    assert "- open_plan_count: 1" in text
+    assert "`scan1`" in text
+    assert "WATCHING plan" in text
+
+
 def test_unclosed_kline_records_skip_without_state_change() -> None:
     path = _temp_db()
     init_db(path)
@@ -1593,6 +1620,7 @@ if __name__ == "__main__":
     test_add_from_scan_writes_plan_created_once()
     test_add_from_scan_records_shadow_context_for_skipped_candidate()
     test_shadow_maturity_review_classifies_candidate_terminal_and_open_rows()
+    test_shadow_maturity_review_explains_waiting_state_without_rows()
     test_unclosed_kline_records_skip_without_state_change()
     test_kline_api_error_is_recorded_and_does_not_fail_run()
     test_ticker_api_error_is_recorded_and_does_not_fail_run()

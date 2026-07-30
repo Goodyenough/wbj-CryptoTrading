@@ -230,5 +230,6 @@
 - [x] 修复 4h/paper update 的 ticker API 瞬断阻塞：`ticker_24hr` 失败时现在为 open plan 写入 `API_DELAY_SKIPPED` 和 snapshot，run 可成功结束并保留诊断，不再因一次 SSL/网络错误阻断后续报告链路。
 - [ ] 等待足够前向样本后，比较 `atr_reclaim_0_35_shadow vs reference_baseline` 的直接过滤贡献和容量路径贡献；未达到样本门槛前不得把 `0.35` 升级为 paper deployment。
 - [x] 验证下一次 4h 任务成功后会自动生成 `paper_shadow_maturity_review`：手动运行 `python main.py paper cycle --no-obsidian` 成功，生成 `paper_shadow_maturity_review_2026-07-30_demo_v7.md`；当前仍为 `no_shadow_samples_yet`。
+- [x] 增强 `paper_shadow_maturity_review` 的等待诊断：无 shadow rows 时报告 open plans、latest scan、latest daily/4h run 和 next trigger；最新 v8 显示 1 个 `WATCHING` plan `ONDOUSDT`，等待 daily/import 或 entry-zone 4h decision。
 - [ ] 等待下一次 daily scan/import 或 open plan 触发 entry-zone 4h decision 后，再检查 `paper_shadow_maturity_review` 是否出现 candidate-level 或 plan-linked shadow rows。
 
