@@ -1838,3 +1838,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：当前主线继续锁定为 prospective shadow observation；等待正常 daily/import 或 entry-zone 4h update 产生 `paper_shadow_decisions`，不手动制造样本，不运行新的近端历史 `0.35` A/B。
 - 验证：已检查 `python main.py paper shadow-decisions --limit 5` 仍为空，`python main.py db status` 正常。
 - Git：待提交
+
+### 19:27:49 +08:00 - atr_reclaim prospective shadow runbook
+- 类型：文档 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `2026-07-30-atr-reclaim-prospective-shadow-runbook.md`，固化 prospective shadow observation 的日常检查命令、maturity/reconciliation 分支、pre-attribution gate 和部署禁区。
+- 结果：runbook 覆盖 no shadow rows、candidate-only、plan-linked immature、missing lines、`controls_paper=1`、sample gate 未达标和 attribution-ready 七种分支。
+- 影响：后续正常 daily/cycle 后有明确执行入口；即使 reconciliation ready，也只允许只读 attribution review，不授权 `0.35` paper deployment 或 `settings.toml` 修改。
+- 验证：文档复核；确认当前 `paper_shadow_decisions=[]`。
+- Git：待提交

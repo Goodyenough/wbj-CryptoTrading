@@ -312,3 +312,11 @@
 - Evidence retained: N0-N4 reports, historical master MVP, blocking review queue, and diagnostic conclusions remain useful as data-quality evidence.
 - Boundary: these artifacts must not be used to keep, reject, or deploy `atr_reclaim_0_35`.
 - Current main line: prospective shadow observation only; wait for normal daily/import or entry-zone 4h update to create `paper_shadow_decisions`.
+
+## 2026-07-30 atr_reclaim prospective shadow runbook
+
+- Artifact: `2026-07-30-atr-reclaim-prospective-shadow-runbook.md`.
+- Purpose: define the operational decision tree after normal daily/cycle jobs produce or fail to produce shadow rows.
+- Covered cases: no shadow rows, candidate-only rows, plan-linked but immature rows, missing required lines, accidental `controls_paper=1`, sample gate not reached, and attribution-ready state.
+- Gate reminder: reconciliation ready only allows read-only attribution review; it does not authorize `atr_reclaim_0_35` deployment or `settings.toml` changes.
+- Current state: `paper_shadow_decisions=[]`; action remains `wait_for_normal_daily_or_entry_zone_4h_trigger`.

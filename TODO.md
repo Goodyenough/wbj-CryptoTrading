@@ -253,3 +253,5 @@
 - [x] 冻结 N2/N3/N4 historical master 产物：保留报告、MVP、blocking review queue 和 diagnostic 结论，但不得再用于 keep/reject/deploy `atr_reclaim_0_35`。
 - [x] 取消 127 个 standard-like missing symbols 的 source-backed mapping：除非未来独立项目明确要求重建 point-in-time historical master，否则不继续投入。
 - [x] 当前主线锁定为 prospective shadow observation：等待正常 daily/import 或 entry-zone 4h update 产生 `paper_shadow_decisions`，不手动制造样本，不运行新的近端历史 `0.35` A/B。
+- [x] 新增 `2026-07-30-atr-reclaim-prospective-shadow-runbook.md`：固化 shadow rows 出现前后如何检查 maturity/reconciliation、何时继续等待、何时允许进入 attribution、以及哪些动作仍禁止。
+- [ ] 下一次正常 daily/cycle 后，按 `2026-07-30-atr-reclaim-prospective-shadow-runbook.md` 执行检查并记录结果。
