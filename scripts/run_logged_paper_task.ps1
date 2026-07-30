@@ -43,6 +43,15 @@ function Write-LogLine([string]$Message) {
     Add-Content -LiteralPath $logPath -Value $Message -Encoding UTF8
 }
 
+trap {
+    $message = $_.Exception.Message
+    if ([string]::IsNullOrWhiteSpace($message)) {
+        $message = $_.ToString()
+    }
+    Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label failed powershell_exception: $message ==="
+    exit 1
+}
+
 function Get-NotifyWebhookUrl {
     $candidateNames = @(
         "CRYPTO_TRADING_WECOM_WEBHOOK_URL",
@@ -162,6 +171,10 @@ $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
 Set-Location $projectRoot
 Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label start ==="
+
+if (-not (Test-Path -LiteralPath $python)) {
+    throw "Configured Python interpreter not found: $python"
+}
 
 $taskOutput = New-Object System.Collections.Generic.List[string]
 & $python @commandArgs 2>&1 | ForEach-Object {

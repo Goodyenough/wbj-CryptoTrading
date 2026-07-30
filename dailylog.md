@@ -1861,3 +1861,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：当前不能做 direct filtering / capacity-path attribution，不能把 `0.35` 升级为 paper deployment；继续等待正常 daily/import 或 `ONDOUSDT` WATCHING plan 触发 entry-zone 4h decision。
 - 验证：`python main.py db status` 通过，最新 4h run `20260730_111428_76a80af1` 为 success，`config/settings.toml` 无改动。
 - Git：待提交。
+
+### 19:43:08 +08:00 - 4h 任务失败可观测性增强
+- 类型：脚本 / 报告 / TODO / 开发计划 / Git
+- 改动：复核 Windows 计划任务 `CryptoTrading_4H_PaperUpdate`，发现 16:10 自动运行 `LastTaskResult=1` 且日志只有 start；手动运行同一 `scripts/paper_4h_update.bat` 成功后，增强 `scripts/run_logged_paper_task.ps1`，新增 PowerShell 异常 `trap` 和 Python 路径检查。
+- 结果：手动验证 run `20260730_114150_57deaf93` 成功，生成 `paper_4h_update_1941_demo_v1.md`、`paper_4h_dashboard_1941_demo_v1.md`、`paper_shadow_maturity_review_2026-07-30_demo_v11.md` 与 `paper_shadow_reconciliation_2026-07-30_demo_v5.md`；shadow verdict 仍为 `no_shadow_samples_yet`。
+- 影响：后续若计划任务再次在 PowerShell 层失败，会写入明确异常原因；不修改 `config/settings.toml`，不改变 paper 下单或策略逻辑。
+- 验证：PowerShell parser 检查 `scripts/run_logged_paper_task.ps1` 返回 `parse_ok`；`python main.py paper shadow-decisions --limit 5` 返回 `[]`；`config/settings.toml` 无 diff。
+- Git：待提交。

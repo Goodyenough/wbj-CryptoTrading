@@ -329,3 +329,13 @@
 - Verdict: both reports are `no_shadow_samples_yet`; pre-attribution gate remains at 0 complete opportunities, 0 mature terminal opportunities, and 0 independent symbols.
 - Decision: `operations_wait`; no direct filtering attribution, no capacity/path attribution, no `atr_reclaim_0_35` deployment, and no `config/settings.toml` change.
 - Next action: wait for normal daily/import or `ONDOUSDT` entry-zone 4h decision to create prospective shadow rows, then rerun maturity and reconciliation.
+
+## 2026-07-30 19:43 +08:00 - paper 4h scheduler observability check
+
+- Experiment/check: `paper_4h_scheduler_observability_check`.
+- Question: is the automatic 4h observation chain healthy enough to support prospective shadow observation?
+- Evidence: Windows task `CryptoTrading_4H_PaperUpdate` showed `LastTaskResult=1` for the 16:10 run; `paper_4h_update.log` contained only the start line and no run_id or failure detail.
+- Verification: manual execution of the same `scripts/paper_4h_update.bat` succeeded, creating run `20260730_114150_57deaf93`.
+- Result: generated `paper_shadow_maturity_review_2026-07-30_demo_v11.md` and `paper_shadow_reconciliation_2026-07-30_demo_v5.md`; both still have verdict `no_shadow_samples_yet`.
+- Tooling change: `scripts/run_logged_paper_task.ps1` now logs PowerShell-level exceptions through `trap` and checks that the configured Python interpreter exists before invoking the task.
+- Decision: `operations_wait_with_improved_logging`; continue waiting for normal daily/import or entry-zone 4h samples, and inspect the next scheduled task run if it returns nonzero again.
