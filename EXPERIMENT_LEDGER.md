@@ -2,6 +2,15 @@
 
 更新时间：2026-07-27 23:57 +08:00
 
+## 2026-07-30 atr_reclaim prospective shadow logging
+
+- 实验名：`atr_reclaim_prospective_shadow_observation_logging`
+- 变更：在既有 `paper_shadow_decisions` 基础上，补充 daily/import 阶段的 candidate-level context logging；每个 scan candidate 固定写入 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条参照线。
+- 样本：未来真实 daily/import 与 4h paper update 产生的 prospective 样本；当前提交只验证记录链路，不形成收益判断。
+- 结论：`infrastructure_ready_partial`。候选登记、4h decision-state、查看命令和导出链路已经具备基础能力，但需要等待足够前向样本后才能评估 `0.35` 的直接过滤贡献和容量路径贡献。
+- 决策：`atr_reclaim_0_35` 继续作为 `provisional_research_incumbent` 与独立 `atr_reclaim_0_35_shadow` 参照线保留；不控制 paper 下单，不修改 `config/settings.toml`。
+- 下一步：实现 shadow decision maturity review，按 `opportunity_id`、`line_name`、`capacity_state` 和成熟结果汇总 prospective evidence。
+
 ## 2026-07-27 Stage A-E 执行结论
 
 - `replacement_closure_audit`：复用 Stage 1 JSON 与 Stage 4 Raw Summary，检查 512 个 blocked events、42 个 eligible comparison events 的去重、stale trade 集中度、first-event-per-stale-trade、exclude 2025-07、exclude same-bar ambiguous 与 cluster bootstrap。核心结果为 `unique_stale_trades=3`、`stale_trade_top1_share_pct=83.333%`、`first_event_per_stale_trade_R42_median=-0.004`、`cluster_bootstrap_R42_p05=-0.565`，结论 `paused_no_stable_executable_edge`。

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -363,6 +364,77 @@ def _record_atr_reclaim_shadow_decisions(
         )
 
 
+def _record_candidate_shadow_context(
+    connection: sqlite3.Connection,
+    *,
+    settings: Settings,
+    account_name: str,
+    run_id: str | None,
+    scan_id: str,
+    scan_time: str,
+    payload: dict,
+    source_rank: int,
+    plan_id: str | None = None,
+) -> None:
+    symbol = str(payload["symbol"])
+    action = str(payload.get("action", "WATCH_ONLY")).upper()
+    entry_high = None if payload.get("entry_high") is None else float(payload["entry_high"])
+    current_price = None if payload.get("price") is None else float(payload["price"])
+    active_positions = _active_position_count(connection, account_name)
+    max_active_positions = settings.backtest.max_active_positions
+    capacity_state = "at_capacity" if active_positions >= max_active_positions else "capacity_available"
+    opportunity_id = f"scan_candidate:{scan_id}:{symbol}"
+    lines = ("reference_baseline", "atr_reclaim_0_35_shadow", "research_incumbent")
+    for line_name in lines:
+        line_decision = "candidate_registered"
+        decision_key = f"{opportunity_id}:{line_name}:{scan_time}"
+        decision_id = hashlib.sha256(decision_key.encode("utf-8")).hexdigest()[:12]
+        payload_json = {
+            "stage": "daily_import_candidate_context",
+            "paper_deployment": "not_controlled_by_shadow",
+            "line_name": line_name,
+            "scan_id": scan_id,
+            "source_rank": source_rank,
+            "scanner_action": action,
+            "entry_reclaim_min_atr": 0.35 if line_name != "reference_baseline" else 0.0,
+        }
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO paper_shadow_decisions(
+                decision_id, run_id, account_name, opportunity_id, plan_id, symbol,
+                decision_time, kline_time, line_name, controls_paper, decision,
+                accepted, reject_reason, reference_baseline_decision,
+                atr_reclaim_0_35_decision, research_incumbent_decision,
+                current_price, last_4h_close, entry_high, atr_4h,
+                reclaim_margin_atr, active_positions, max_active_positions,
+                capacity_state, direct_filter_contribution_r,
+                path_capacity_contribution_r, raw_json, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, 0, ?, 1, NULL, ?, ?, ?, ?, NULL, ?, NULL, NULL, ?, ?, ?, NULL, NULL, ?, ?)
+            """,
+            (
+                decision_id,
+                run_id,
+                account_name,
+                opportunity_id,
+                plan_id,
+                symbol,
+                scan_time,
+                line_name,
+                line_decision,
+                line_decision,
+                line_decision,
+                line_decision,
+                current_price,
+                entry_high,
+                active_positions,
+                max_active_positions,
+                capacity_state,
+                json.dumps(payload_json, ensure_ascii=False, sort_keys=True),
+                scan_time,
+            ),
+        )
+
+
 def _sync_paper_plan(
     connection: sqlite3.Connection,
     trade: PaperTrade,
@@ -662,6 +734,16 @@ def add_from_scan(
     with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
         chosen_scan_id = scan_id or _latest_scan_id(connection)
+        scan_time_row = connection.execute(
+            "SELECT scan_time FROM market_scans WHERE scan_id = ?",
+            (chosen_scan_id,),
+        ).fetchone()
+        if scan_time_row is None:
+            scan_time_row = connection.execute(
+                "SELECT timestamp_utc FROM scan_runs WHERE scan_id = ?",
+                (chosen_scan_id,),
+            ).fetchone()
+        scan_time = str(scan_time_row[0]) if scan_time_row is not None else now
         rows = connection.execute(
             """
             SELECT rank, payload_json
@@ -676,6 +758,16 @@ def add_from_scan(
 
         for row in rows:
             payload = json.loads(row["payload_json"])
+            _record_candidate_shadow_context(
+                connection,
+                settings=settings,
+                account_name=account,
+                run_id=run_id,
+                scan_id=chosen_scan_id,
+                scan_time=scan_time,
+                payload=payload,
+                source_rank=int(row["rank"]),
+            )
             action = str(payload.get("action", "WATCH_ONLY")).upper()
             if action not in allowed_actions:
                 skipped += 1

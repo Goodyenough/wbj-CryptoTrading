@@ -1738,3 +1738,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 决策：`atr_reclaim_0_35` 维持 `retest_path_dependent`，不 keep、不部署、不修改 `config/settings.toml`，不继续用同一第三窗口调相邻阈值。
 - 验证：A/B 命令完成，baseline run `86861b2dd032`，variant run `0d78a8dc60e3`，`sample_sufficient=true`；机制复核基于 `data/crypto_trading.db` 的 `backtest_trades` 和 4h `kline_cache`。
 - Git：本次计划提交 `Complete atr reclaim N1 diagnostic retest`。
+
+### 18:14:04 +08:00 - atr_reclaim candidate-level shadow context logging
+- 类型：代码 / 测试 / TODO / 开发计划 / 实验账本 / Git
+- 改动：`paper add-from-scan` 在 daily/import 阶段为每个 scan candidate 写入 `paper_shadow_decisions` 候选级 context，固定三条参照线：`reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent`；记录 `scan_id`、`source_rank`、`scanner_action`、`active_positions`、`max_active_positions` 和 `capacity_state`。
+- 影响：补齐 prospective shadow observation 的入口阶段样本底座；该记录仅表示候选被同一时点三条线共同观察，不代表 `0.35` 已控制 paper 下单，也不修改 `config/settings.toml`。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status`、`python main.py paper shadow-decisions --limit 5`。
+- Git：待提交

@@ -223,3 +223,9 @@
 - [x] ?? live decision-state shadow logging??? paper 4h update ??????????? `active_positions`?capacity state?reference baseline decision?`atr_reclaim_0_35_shadow` decision ? opportunity id?
 - [ ] ?? live decision-state shadow logging ? daily/import ??????? scan candidate ??????????????????? reference baseline / `0.35` shadow ??????
 
+## 2026-07-30 atr_reclaim prospective shadow observation 后续
+
+- [x] 完成 daily/import candidate-level shadow context logging：`paper add-from-scan` 现在为每个 scan candidate 写入 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条候选级参照记录；该记录不控制 paper 下单。
+- [ ] 补充 shadow decision maturity review：汇总 `paper_shadow_decisions` 中 candidate-level 与 4h decision-level 样本，按 `opportunity_id`、`line_name`、`capacity_state`、`scanner_action` 输出成熟度、右截尾和结果分层。
+- [ ] 等待足够前向样本后，比较 `atr_reclaim_0_35_shadow vs reference_baseline` 的直接过滤贡献和容量路径贡献；未达到样本门槛前不得把 `0.35` 升级为 paper deployment。
+

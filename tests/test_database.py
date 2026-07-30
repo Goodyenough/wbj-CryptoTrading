@@ -586,6 +586,76 @@ def test_add_from_scan_writes_plan_created_once() -> None:
         assert connection.execute(
             "SELECT COUNT(*) FROM paper_events WHERE event_type='PLAN_CREATED'"
         ).fetchone()[0] == 1
+        shadow_rows = connection.execute(
+            """
+            SELECT line_name, decision, accepted, plan_id, raw_json
+            FROM paper_shadow_decisions
+            ORDER BY line_name
+            """
+        ).fetchall()
+    assert len(shadow_rows) == 3
+    assert {row["line_name"] for row in shadow_rows} == {
+        "atr_reclaim_0_35_shadow",
+        "reference_baseline",
+        "research_incumbent",
+    }
+    assert {row["decision"] for row in shadow_rows} == {"candidate_registered"}
+    assert {row["accepted"] for row in shadow_rows} == {1}
+    assert {row["plan_id"] for row in shadow_rows} == {None}
+    assert {json.loads(row["raw_json"])["stage"] for row in shadow_rows} == {
+        "daily_import_candidate_context"
+    }
+
+
+def test_add_from_scan_records_shadow_context_for_skipped_candidate() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    payload = {
+        "action": "WATCH_ONLY",
+        "symbol": "TESTUSDT",
+        "base_asset": "TEST",
+        "setup": "test setup",
+        "verdict": "test verdict",
+        "entry_low": 100.0,
+        "entry_high": 105.0,
+        "stop_loss": 90.0,
+        "take_profit_1": 120.0,
+        "take_profit_2": 135.0,
+        "risk_reward_1": 2.0,
+        "risk_reward_2": 3.0,
+        "price": 103.0,
+    }
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO scan_candidates(
+                scan_id, rank, symbol, base_asset, verdict, score, payload_json
+            ) VALUES ('scan1', 1, 'TESTUSDT', 'TEST', 'test verdict', 1.0, ?)
+            """,
+            (json.dumps(payload),),
+        )
+    result = add_from_scan(_settings_for(path), scan_id="scan1", run_id="run1")
+    assert result["added"] == 0
+    assert result["skipped_action"] == 1
+    with connect_db(path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM paper_plans").fetchone()[0] == 0
+        shadow_rows = connection.execute(
+            """
+            SELECT line_name, decision, opportunity_id, plan_id, raw_json
+            FROM paper_shadow_decisions
+            ORDER BY line_name
+            """
+        ).fetchall()
+    assert len(shadow_rows) == 3
+    assert {row["decision"] for row in shadow_rows} == {"candidate_registered"}
+    assert {row["opportunity_id"] for row in shadow_rows} == {
+        "scan_candidate:scan1:TESTUSDT"
+    }
+    assert {row["plan_id"] for row in shadow_rows} == {None}
+    assert {json.loads(row["raw_json"])["scanner_action"] for row in shadow_rows} == {
+        "WATCH_ONLY"
+    }
 
 
 def test_unclosed_kline_records_skip_without_state_change() -> None:
@@ -1388,6 +1458,7 @@ if __name__ == "__main__":
     test_scan_and_plan_inherit_run_metadata()
     test_schema_v2_backfills_operational_plan_fields()
     test_add_from_scan_writes_plan_created_once()
+    test_add_from_scan_records_shadow_context_for_skipped_candidate()
     test_unclosed_kline_records_skip_without_state_change()
     test_kline_api_error_is_recorded_and_does_not_fail_run()
     test_structured_event_names_cover_plan_requirements()
