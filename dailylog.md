@@ -29,6 +29,14 @@
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-maturity --no-obsidian`。
 - Git：待提交
 
+### 18:51:44 +08:00 - db stability 5-day gate passed
+- 类型：运维验证 / TODO / 开发计划 / Git
+- 改动：运行 `python main.py db stability --days 5` 并更新稳定性 TODO。
+- 结果：2026-07-25 -> 2026-07-29 连续 5 个 daily run 全部 `ready=true`；`ready_for_4h_task=true`；`observed_config_hashes=["be7ec39ec21f6a83"]`；无 duplicate plan/event、foreign key、UTC timestamp、config hash 或 database health errors。
+- 影响：SQLite 观察基础设施与 daily 样本链路通过 5 天稳定性门槛；这只证明运维/数据链路可用，不构成任何策略或 `atr_reclaim_0_35` 有效性结论。
+- 验证：`python main.py db stability --days 5`。
+- Git：待提交
+
 ### 18:34:51 +08:00 - paper update ticker API failure graceful skip
 - 类型：代码 / 测试 / 运维稳定性 / TODO / Git
 - 改动：`update_paper_trades` 在 `ticker_24hr` 失败时不再让整个 paper run 抛错失败，而是为每个 open plan 写入 `API_DELAY_SKIPPED` 事件和 snapshot，并返回当前 open plans。
