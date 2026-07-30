@@ -24,6 +24,10 @@ from crypto_trading_system.paper_db import (
     load_paper_shadow_decisions,
 )
 from crypto_trading_system.paper_shadow_maturity import build_shadow_maturity_review, write_shadow_maturity_report
+from crypto_trading_system.paper_shadow_reconciliation import (
+    build_shadow_reconciliation_review,
+    write_shadow_reconciliation_report,
+)
 from crypto_trading_system import paper_trader as paper_trader_module
 from crypto_trading_system.paper_trader import (
     _insert_paper_trade,
@@ -779,6 +783,87 @@ def test_shadow_maturity_review_explains_waiting_state_without_rows() -> None:
     assert "- open_plan_count: 1" in text
     assert "`scan1`" in text
     assert "WATCHING plan" in text
+
+
+def test_shadow_reconciliation_explains_waiting_state_without_rows() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+    settings = _settings_for(path)
+    settings.output.reports_dir = path.parent / "reports"
+    settings.output.obsidian_dir = None
+
+    review = build_shadow_reconciliation_review(settings)
+    assert review.verdict == "no_shadow_samples_yet"
+    assert review.decision_count == 0
+    assert review.diagnostics["open_plan_count"] == 1
+    assert review.diagnostics["watching_plan_count"] == 1
+
+    _, paths = write_shadow_reconciliation_report(settings)
+    text = paths[0].read_text(encoding="utf-8")
+    assert "Paper Shadow Decision-State Reconciliation" in text
+    assert "no_shadow_samples_yet" in text
+    assert "Required lines" in text
+
+
+def test_shadow_reconciliation_detects_complete_terminal_opportunity() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+        plan_id = connection.execute(
+            "SELECT plan_id FROM paper_plans WHERE source_symbol='TESTUSDT'"
+        ).fetchone()[0]
+        connection.execute("UPDATE paper_plans SET status='STOPPED' WHERE plan_id=?", (plan_id,))
+        for index, line_name in enumerate(["reference_baseline", "atr_reclaim_0_35_shadow", "research_incumbent"]):
+            connection.execute(
+                """
+                INSERT INTO paper_shadow_decisions(
+                    decision_id, run_id, account_name, opportunity_id, plan_id, symbol,
+                    decision_time, kline_time, line_name, controls_paper, decision,
+                    accepted, reference_baseline_decision, atr_reclaim_0_35_decision,
+                    research_incumbent_decision, active_positions, max_active_positions,
+                    capacity_state, raw_json, created_at
+                ) VALUES (?, 'run1', 'demo', 'paper_plan:plan1', ?, 'TESTUSDT',
+                    '2026-06-12T04:00:00Z', '2026-06-12T04:00:00Z', ?, 0, ?,
+                    ?, 'accept', 'reject', 'reject', 1, 3, 'capacity_available',
+                    '{"stage":"paper_4h_decision"}', '2026-06-12T04:00:00Z'
+                )
+                """,
+                (
+                    f"shadow-recon-{index}",
+                    plan_id,
+                    line_name,
+                    "accept" if line_name == "reference_baseline" else "reject",
+                    1 if line_name == "reference_baseline" else 0,
+                ),
+            )
+
+    settings = _settings_for(path)
+    settings.output.reports_dir = path.parent / "reports"
+    settings.output.obsidian_dir = None
+    review = build_shadow_reconciliation_review(settings)
+    assert review.verdict == "reconciliation_ready_for_attribution"
+    assert review.decision_count == 3
+    assert review.complete_opportunity_count == 1
+    assert review.incomplete_opportunity_count == 0
+    assert review.mismatch_opportunity_count == 1
+    assert review.mature_terminal_opportunity_count == 1
+    assert review.controls_paper_count == 0
+
+    _, paths = write_shadow_reconciliation_report(settings)
+    text = paths[0].read_text(encoding="utf-8")
+    assert "reconciliation_ready_for_attribution" in text
+    assert "complete opportunities | 1" in text
+    assert "paper_plan:plan1" in text
+    assert "atr_reclaim_0_35_shadow:reject" in text
 
 
 def test_unclosed_kline_records_skip_without_state_change() -> None:

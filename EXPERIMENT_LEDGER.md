@@ -276,3 +276,13 @@
 - Result: paper event/state linkage is clean; the only current open plan is `ONDOUSDT` `9734a33dea2e` in `WATCHING`; one transient market-data issue was recorded as `API_DELAY_SKIPPED` without changing paper state.
 - Limitation: `paper_shadow_decisions` remains empty, so reference baseline vs `atr_reclaim_0_35_shadow` vs research incumbent cannot yet be reconciled.
 - Conclusion: `execution_precheck_pass_shadow_reconciliation_waiting_for_samples`; continue observation, but do not validate or deploy `0.35` or any new challenger yet.
+
+## 2026-07-30 paper shadow reconciliation MVP
+
+- Experiment/tooling: `paper_shadow_reconciliation_mvp`.
+- Purpose: create the read-only report that will be used once prospective shadow rows exist, before interpreting direct filtering or capacity/path contribution.
+- Implementation: added `python main.py paper shadow-reconciliation --no-obsidian`, backed by `paper_shadow_reconciliation.py`.
+- Checks: required three lines are `reference_baseline`, `atr_reclaim_0_35_shadow`, and `research_incumbent`; report flags missing lines, `controls_paper=1`, decision mismatches, terminal maturity, and right-censored opportunities.
+- Verification: `python tests\test_database.py`, `python -m compileall main.py src tests`, and real-db `python main.py paper shadow-reconciliation --no-obsidian` passed.
+- Current real-db result: `no_shadow_samples_yet`, `decisions=0`, `opportunities=0`; report `reports/2026-07-30/paper_shadow_reconciliation_2026-07-30_demo_v1.md`.
+- Decision: tooling is ready, but no `atr_reclaim_0_35` validity conclusion is available until shadow rows and mature terminal opportunities exist.

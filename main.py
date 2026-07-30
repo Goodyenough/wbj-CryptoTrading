@@ -37,6 +37,7 @@ from crypto_trading_system.paper_audit import write_paper_audit_report
 from crypto_trading_system.paper_checkpoint import checkpoint_summary_lines, write_paper_checkpoint_report
 from crypto_trading_system.paper_shadow_experiments import EXPERIMENTS, write_shadow_experiment_report
 from crypto_trading_system.paper_shadow_maturity import write_shadow_maturity_report
+from crypto_trading_system.paper_shadow_reconciliation import write_shadow_reconciliation_report
 from crypto_trading_system.paper_shadow_replay import write_shadow_replay_report
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
@@ -537,6 +538,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     paper_shadow_maturity.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
     paper_shadow_maturity.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+
+    paper_shadow_reconciliation = paper_subparsers.add_parser(
+        "shadow-reconciliation",
+        help="Write a read-only three-line reconciliation report for paper shadow decisions.",
+    )
+    paper_shadow_reconciliation.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_shadow_reconciliation.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper_export = paper_subparsers.add_parser("db-export", help="Export plans, events, and snapshots as CSV.")
     paper_export.add_argument("--output-dir", default="exports", help="CSV output directory.")
@@ -1384,6 +1392,22 @@ def main() -> None:
             print(f"decisions={review.decision_count}")
             print(f"opportunities={review.opportunity_count}")
             print(f"right_censored_ratio={review.right_censored_ratio_pct:.2f}%")
+            for path in report_paths:
+                print(f"report={path}")
+
+        if args.paper_command == "shadow-reconciliation":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            review, report_paths = write_shadow_reconciliation_report(settings, account_name=args.account)
+            settings.output.obsidian_dir = original_obsidian
+            print("paper_shadow_reconciliation=completed")
+            print(f"verdict={review.verdict}")
+            print(f"reason={review.reason}")
+            print(f"decisions={review.decision_count}")
+            print(f"opportunities={review.opportunity_count}")
+            print(f"complete_opportunities={review.complete_opportunity_count}")
+            print(f"incomplete_opportunities={review.incomplete_opportunity_count}")
             for path in report_paths:
                 print(f"report={path}")
 

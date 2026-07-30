@@ -1806,3 +1806,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：结论为 `execution_precheck_pass_shadow_reconciliation_waiting_for_samples`；继续等待 prospective shadow rows，不修改 `config/settings.toml`，不启动新 challenger。
 - 验证：已运行 `python main.py db status`、`python main.py db stability --days 5`、`python main.py paper shadow-decisions --limit 5`，并执行只读 SQLite linkage checks。
 - Git：待提交
+
+### 19:13:00 +08:00 - paper shadow reconciliation MVP
+- 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `src/crypto_trading_system/paper_shadow_reconciliation.py` 与 `python main.py paper shadow-reconciliation --no-obsidian`，生成三线 decision-state reconciliation 报告；新增测试覆盖空样本等待状态和完整 terminal opportunity。
+- 结果：真实库生成 `reports/2026-07-30/paper_shadow_reconciliation_2026-07-30_demo_v1.md`，当前 verdict=`no_shadow_samples_yet`、decisions=0、opportunities=0。
+- 影响：后续 shadow rows 出现后，可以先检查 `reference_baseline` / `atr_reclaim_0_35_shadow` / `research_incumbent` 是否同机会齐全，再进入 direct filtering 或 capacity/path attribution；不修改 `config/settings.toml`，不改变 paper 状态。
+- 验证：已运行 `python tests\test_database.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-reconciliation --no-obsidian`；确认 `config/settings.toml` 无 diff。
+- Git：待提交
