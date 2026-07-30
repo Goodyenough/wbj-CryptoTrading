@@ -23,6 +23,7 @@ from crypto_trading_system.paper_db import (
     export_paper_db,
     load_paper_shadow_decisions,
 )
+from crypto_trading_system.paper_shadow_maturity import build_shadow_maturity_review, write_shadow_maturity_report
 from crypto_trading_system import paper_trader as paper_trader_module
 from crypto_trading_system.paper_trader import (
     _insert_paper_trade,
@@ -656,6 +657,98 @@ def test_add_from_scan_records_shadow_context_for_skipped_candidate() -> None:
     assert {json.loads(row["raw_json"])["scanner_action"] for row in shadow_rows} == {
         "WATCH_ONLY"
     }
+
+
+def test_shadow_maturity_review_classifies_candidate_terminal_and_open_rows() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    settings = _settings_for(path)
+    settings.output.reports_dir = path.parent / "reports"
+    settings.output.obsidian_dir = None
+
+    payload = {
+        "action": "BUY_CANDIDATE",
+        "symbol": "TESTUSDT",
+        "base_asset": "TEST",
+        "setup": "test setup",
+        "verdict": "test verdict",
+        "entry_low": 100.0,
+        "entry_high": 105.0,
+        "stop_loss": 90.0,
+        "take_profit_1": 120.0,
+        "take_profit_2": 135.0,
+        "risk_reward_1": 2.0,
+        "risk_reward_2": 3.0,
+        "price": 103.0,
+    }
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO scan_candidates(
+                scan_id, rank, symbol, base_asset, verdict, score, payload_json
+            ) VALUES ('scan1', 1, 'TESTUSDT', 'TEST', 'test verdict', 1.0, ?)
+            """,
+            (json.dumps(payload),),
+        )
+    add_from_scan(settings, scan_id="scan1", run_id="run1")
+
+    original_client = paper_trader_module.BinanceClient
+    paper_trader_module.BinanceClient = _FakeBinanceClient
+    try:
+        update_paper_trades(settings, run_id="run1")
+    finally:
+        paper_trader_module.BinanceClient = original_client
+
+    open_trade = _trade()
+    open_trade.paper_trade_id = "openplan"
+    open_trade.source_scan_id = "scan1"
+    open_trade.source_rank = 2
+    open_trade.symbol = "OPENUSDT"
+    open_trade.base_asset = "OPEN"
+    with connect_db(path) as connection:
+        plan_id = connection.execute(
+            "SELECT plan_id FROM paper_plans WHERE source_symbol='TESTUSDT'"
+        ).fetchone()[0]
+        connection.execute("UPDATE paper_plans SET status='STOPPED' WHERE plan_id=?", (plan_id,))
+        assert _insert_paper_trade(connection, open_trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, open_trade, run_id="run1", payload={"stop_loss": 90.0})
+        connection.execute(
+            """
+            INSERT INTO paper_shadow_decisions(
+                decision_id, run_id, account_name, opportunity_id, plan_id, symbol,
+                decision_time, kline_time, line_name, controls_paper, decision,
+                accepted, reference_baseline_decision, atr_reclaim_0_35_decision,
+                research_incumbent_decision, active_positions, max_active_positions,
+                capacity_state, raw_json, created_at
+            ) VALUES (
+                'open-shadow-1', 'run1', 'demo', 'paper_plan:openplan', 'openplan', 'OPENUSDT',
+                '2026-06-12T04:00:00Z', '2026-06-12T04:00:00Z', 'reference_baseline',
+                0, 'accept', 1, 'accept', 'accept', 'accept', 1, 3, 'capacity_available',
+                '{"stage":"paper_4h_decision"}', '2026-06-12T04:00:00Z'
+            )
+            """
+        )
+
+    review = build_shadow_maturity_review(settings)
+    assert review.decision_count == 7
+    assert review.candidate_only_count == 3
+    assert review.decision_level_count == 4
+    assert review.mature_terminal_count == 3
+    assert review.right_censored_open_count == 1
+    assert review.right_censored_ratio_pct == 25.0
+    assert review.verdict == "maturity_review_available"
+    assert review.line_counts["reference_baseline"] == 3
+    assert review.scanner_action_counts["BUY_CANDIDATE"] == 3
+    assert any(item["opportunity_id"] == "scan_candidate:scan1:TESTUSDT" for item in review.opportunity_summaries)
+
+    _, paths = write_shadow_maturity_report(settings)
+    assert len(paths) == 1
+    text = paths[0].read_text(encoding="utf-8")
+    assert "candidate-only rows | 3" in text
+    assert "right-censored ratio | 25.00%" in text
+    assert "## By Opportunity" in text
+    assert "scan_candidate:scan1:TESTUSDT" in text
 
 
 def test_unclosed_kline_records_skip_without_state_change() -> None:
@@ -1459,6 +1552,7 @@ if __name__ == "__main__":
     test_schema_v2_backfills_operational_plan_fields()
     test_add_from_scan_writes_plan_created_once()
     test_add_from_scan_records_shadow_context_for_skipped_candidate()
+    test_shadow_maturity_review_classifies_candidate_terminal_and_open_rows()
     test_unclosed_kline_records_skip_without_state_change()
     test_kline_api_error_is_recorded_and_does_not_fail_run()
     test_structured_event_names_cover_plan_requirements()

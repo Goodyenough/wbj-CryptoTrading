@@ -22,6 +22,13 @@
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status`、`python main.py paper shadow-decisions --limit 5`；确认 `config/settings.toml` 无 diff。
 - Git：待提交
 
+### 18:22:45 +08:00 - atr_reclaim shadow maturity review
+- 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `paper_shadow_maturity.py` 与 `python main.py paper shadow-maturity`，只读汇总 `paper_shadow_decisions` 的候选级、计划级、右截尾和终结状态成熟度；最新验证报告为 `reports/2026-07-30/paper_shadow_maturity_review_2026-07-30_demo_v3.md`。
+- 影响：prospective shadow observation 现在具备成熟度复核报告入口；当前真实库 verdict=`no_shadow_samples_yet`，说明还需等待新的 daily/import 或 4h update 产生样本；不修改 `config/settings.toml`，不改变 paper 下单。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-maturity --no-obsidian`。
+- Git：待提交
+
 ### 18:00:09 +08:00 - atr_reclaim incumbent shadow MVP
 - 类型：代码 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git
 - 改动：新增 `atr_reclaim_incumbent_shadow` 固定 opportunity set shadow experiment，输出 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三线对照，并在 detail rows 中记录 reclaim margin、direct filter R 与 capacity/path 占位字段。

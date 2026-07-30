@@ -36,6 +36,7 @@ from crypto_trading_system.paper_db import (
 from crypto_trading_system.paper_audit import write_paper_audit_report
 from crypto_trading_system.paper_checkpoint import checkpoint_summary_lines, write_paper_checkpoint_report
 from crypto_trading_system.paper_shadow_experiments import EXPERIMENTS, write_shadow_experiment_report
+from crypto_trading_system.paper_shadow_maturity import write_shadow_maturity_report
 from crypto_trading_system.paper_shadow_replay import write_shadow_replay_report
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
@@ -529,6 +530,13 @@ def build_parser() -> argparse.ArgumentParser:
     paper_shadow_decisions = paper_subparsers.add_parser("shadow-decisions", help="Show paper shadow decision-state logs.")
     paper_shadow_decisions.add_argument("--opportunity-id", default=None, help="Optional opportunity id filter.")
     paper_shadow_decisions.add_argument("--limit", type=int, default=200, help="Maximum decisions to show.")
+
+    paper_shadow_maturity = paper_subparsers.add_parser(
+        "shadow-maturity",
+        help="Write a read-only maturity review for paper shadow decision-state logs.",
+    )
+    paper_shadow_maturity.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_shadow_maturity.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper_export = paper_subparsers.add_parser("db-export", help="Export plans, events, and snapshots as CSV.")
     paper_export.add_argument("--output-dir", default="exports", help="CSV output directory.")
@@ -1357,6 +1365,21 @@ def main() -> None:
                     indent=2,
                 )
             )
+
+        if args.paper_command == "shadow-maturity":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            review, report_paths = write_shadow_maturity_report(settings, account_name=args.account)
+            settings.output.obsidian_dir = original_obsidian
+            print("paper_shadow_maturity=completed")
+            print(f"verdict={review.verdict}")
+            print(f"reason={review.reason}")
+            print(f"decisions={review.decision_count}")
+            print(f"opportunities={review.opportunity_count}")
+            print(f"right_censored_ratio={review.right_censored_ratio_pct:.2f}%")
+            for path in report_paths:
+                print(f"report={path}")
 
         if args.paper_command == "db-export":
             for path in export_paper_db(settings.output.database_path, Path(args.output_dir)):
