@@ -242,3 +242,5 @@
 - [ ] 下一次正常 daily scan/import 或 entry-zone 4h update 后，重新运行 `python main.py paper shadow-maturity --no-obsidian`，确认 `paper_shadow_decisions` 是否开始积累 candidate-level 或 plan-linked rows。
 - [x] 新增 `python main.py paper shadow-reconciliation --no-obsidian`：三线 reconciliation 报告会检查 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 是否同机会齐全、是否误设 `controls_paper=1`、是否已有 terminal opportunity；当前真实库 verdict=`no_shadow_samples_yet`。
 - [ ] 等 shadow rows 出现后，先运行 `paper shadow-reconciliation`，只有 complete opportunities 且 mature terminal opportunities 达到样本门槛后，才进入 direct filtering / path-capacity attribution。
+- [x] 将 `paper shadow-reconciliation` 接入 `daily` 与 `paper cycle` 自动报告链路，并修正 maturity/reconciliation 自动报告生成时当前 run 误显示 `running` 的问题；验证 run `20260730_111428_76a80af1` 成功生成 maturity v9 与 reconciliation v2。
+- [ ] 下次正常 daily/cycle 后同时检查 `paper_shadow_maturity_review` 与 `paper_shadow_reconciliation`，若仍为 `no_shadow_samples_yet`，继续等待正常 scan/import 或 entry-zone 触发，不手动制造样本。

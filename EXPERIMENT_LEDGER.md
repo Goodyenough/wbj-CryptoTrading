@@ -286,3 +286,11 @@
 - Verification: `python tests\test_database.py`, `python -m compileall main.py src tests`, and real-db `python main.py paper shadow-reconciliation --no-obsidian` passed.
 - Current real-db result: `no_shadow_samples_yet`, `decisions=0`, `opportunities=0`; report `reports/2026-07-30/paper_shadow_reconciliation_2026-07-30_demo_v1.md`.
 - Decision: tooling is ready, but no `atr_reclaim_0_35` validity conclusion is available until shadow rows and mature terminal opportunities exist.
+
+## 2026-07-30 paper shadow reconciliation auto-report
+
+- Tooling change: `daily` and `paper cycle` now generate `paper_shadow_reconciliation` automatically after `paper_shadow_maturity_review`.
+- Report-state fix: maturity/reconciliation reports now accept the current run id and display the in-progress current run as `success` for report context, matching the final tracked-run result after report generation.
+- Verification: `python tests\test_database.py`, `python tests\test_paper_shadow_replay.py`, `python -m compileall main.py src tests`, and real-db `python main.py paper cycle --no-obsidian` passed.
+- Real run: `20260730_111428_76a80af1` generated `paper_shadow_maturity_review_2026-07-30_demo_v9.md` and `paper_shadow_reconciliation_2026-07-30_demo_v2.md`; both show latest 4h run status=`success`.
+- Current evidence: `paper_shadow_decisions` remains empty, so the result is still `no_shadow_samples_yet`; this is an automation readiness improvement, not a strategy validity result.

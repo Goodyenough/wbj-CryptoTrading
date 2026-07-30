@@ -627,10 +627,20 @@ def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_ob
                     run_type=run_type,
                 )
             with _run_step(run_id, "shadow_maturity_review"):
-                _, maturity_paths = write_shadow_maturity_report(settings, account_name=account_name)
+                _, maturity_paths = write_shadow_maturity_report(
+                    settings,
+                    account_name=account_name,
+                    current_run_id=run_id,
+                )
+            with _run_step(run_id, "shadow_reconciliation_report"):
+                _, reconciliation_paths = write_shadow_reconciliation_report(
+                    settings,
+                    account_name=account_name,
+                    current_run_id=run_id,
+                )
         finally:
             settings.output.obsidian_dir = original_obsidian
-    return run_id, updated, report_paths, dashboard_paths, maturity_paths
+    return run_id, updated, report_paths, dashboard_paths, maturity_paths, reconciliation_paths
 
 
 def main() -> None:
@@ -730,7 +740,17 @@ def main() -> None:
                         run_type="daily_full",
                     )
                 with _run_step(run_id, "shadow_maturity_review"):
-                    _, maturity_paths = write_shadow_maturity_report(settings, account_name=args.account)
+                    _, maturity_paths = write_shadow_maturity_report(
+                        settings,
+                        account_name=args.account,
+                        current_run_id=run_id,
+                    )
+                with _run_step(run_id, "shadow_reconciliation_report"):
+                    _, reconciliation_paths = write_shadow_reconciliation_report(
+                        settings,
+                        account_name=args.account,
+                        current_run_id=run_id,
+                    )
             finally:
                 settings.output.obsidian_dir = original_obsidian
 
@@ -763,6 +783,8 @@ def main() -> None:
                 print(f"observation_dashboard={path}")
             for path in maturity_paths:
                 print(f"shadow_maturity_report={path}")
+            for path in reconciliation_paths:
+                print(f"shadow_reconciliation_report={path}")
 
     if args.command == "verify":
         result = verify_symbol(settings, args.symbol, progress=_progress)
@@ -1416,7 +1438,7 @@ def main() -> None:
                 print(f"export={path}")
 
         if args.paper_command == "cycle":
-            run_id, updated, report_paths, dashboard_paths, maturity_paths = _run_paper_cycle(
+            run_id, updated, report_paths, dashboard_paths, maturity_paths, reconciliation_paths = _run_paper_cycle(
                 settings,
                 account_name=args.account,
                 run_type=args.run_type,
@@ -1431,6 +1453,8 @@ def main() -> None:
                 print(f"dashboard={path}")
             for path in maturity_paths:
                 print(f"shadow_maturity_report={path}")
+            for path in reconciliation_paths:
+                print(f"shadow_reconciliation_report={path}")
 
 
 if __name__ == "__main__":

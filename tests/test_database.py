@@ -1661,11 +1661,17 @@ def test_consecutive_4h_cycles_are_idempotent_and_do_not_lock() -> None:
     assert all(cycle[2][0].name.startswith("paper_4h_update_") for cycle in cycles)
     assert all(cycle[3][0].name.startswith("paper_4h_dashboard_") for cycle in cycles)
     assert all(cycle[4][0].name.startswith("paper_shadow_maturity_review_") for cycle in cycles)
+    assert all(cycle[5][0].name.startswith("paper_shadow_reconciliation_") for cycle in cycles)
     assert all(path.parent / "obsidian" not in cycle[2][0].parents for cycle in cycles)
     assert all(path.parent / "obsidian" not in cycle[4][0].parents for cycle in cycles)
+    assert all(path.parent / "obsidian" not in cycle[5][0].parents for cycle in cycles)
     latest_dashboard_text = cycles[-1][3][0].read_text(encoding="utf-8")
     assert f"| `paper_4h_update` | `{run_ids[-1]}` | success |" in latest_dashboard_text
     assert "| 4h running last 24h | 0 |" in latest_dashboard_text
+    latest_maturity_text = cycles[-1][4][0].read_text(encoding="utf-8")
+    latest_reconciliation_text = cycles[-1][5][0].read_text(encoding="utf-8")
+    assert f"latest_4h_run: `{run_ids[-1]}` status=`success`" in latest_maturity_text
+    assert f"latest_4h_run: `{run_ids[-1]}` status=`success`" in latest_reconciliation_text
     with connect_db(path) as connection:
         runs = connection.execute(
             "SELECT run_type, status FROM runs WHERE run_id IN (?, ?) ORDER BY started_at, run_id",

@@ -1814,3 +1814,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：后续 shadow rows 出现后，可以先检查 `reference_baseline` / `atr_reclaim_0_35_shadow` / `research_incumbent` 是否同机会齐全，再进入 direct filtering 或 capacity/path attribution；不修改 `config/settings.toml`，不改变 paper 状态。
 - 验证：已运行 `python tests\test_database.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-reconciliation --no-obsidian`；确认 `config/settings.toml` 无 diff。
 - Git：待提交
+
+### 19:14:50 +08:00 - auto-generate shadow reconciliation in paper cycles
+- 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Git
+- 改动：`daily` 与 `paper cycle` 在 `shadow_maturity_review` 后自动生成 `shadow_reconciliation_report`；`paper_shadow_maturity.py` 与 `paper_shadow_reconciliation.py` 增加 `current_run_id` 口径，避免报告生成时当前 run 尚未退出而误显示 `running`。
+- 结果：真实库运行 `python main.py paper cycle --no-obsidian` 成功，run `20260730_111428_76a80af1` 生成 `paper_shadow_maturity_review_2026-07-30_demo_v9.md` 与 `paper_shadow_reconciliation_2026-07-30_demo_v2.md`，二者 latest 4h run 均显示 status=`success`。
+- 影响：后续正常 daily/cycle 会自动留下 maturity + reconciliation 两类 shadow 证据；当前 `paper_shadow_decisions` 仍为空，不能解释 `0.35` 有效性，不修改 `config/settings.toml`。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper cycle --no-obsidian`、`python main.py paper shadow-decisions --limit 5`、`python main.py db status`。
+- Git：待提交

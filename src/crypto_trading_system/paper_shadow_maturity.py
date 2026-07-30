@@ -65,7 +65,22 @@ def _maturity_for_row(row: sqlite3.Row) -> str:
     return "unknown_plan_status"
 
 
-def build_shadow_maturity_review(settings: Settings, account_name: str | None = None) -> ShadowMaturityReview:
+def _adjust_current_run(row: dict | None, current_run_id: str | None) -> dict | None:
+    if row is None or current_run_id is None:
+        return row
+    if row.get("run_id") == current_run_id and row.get("status") == "running":
+        adjusted = dict(row)
+        adjusted["status"] = "success"
+        adjusted["finished_at"] = adjusted.get("finished_at") or "assumed_success_after_report_generation"
+        return adjusted
+    return row
+
+
+def build_shadow_maturity_review(
+    settings: Settings,
+    account_name: str | None = None,
+    current_run_id: str | None = None,
+) -> ShadowMaturityReview:
     account = account_name or settings.paper.account_name
     with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
@@ -187,8 +202,8 @@ def build_shadow_maturity_review(settings: Settings, account_name: str | None = 
         "open_plan_count": open_plan_count,
         "watching_plan_count": watching_plan_count,
         "latest_scan": dict(latest_scan) if latest_scan is not None else None,
-        "latest_daily_run": dict(latest_daily_run) if latest_daily_run is not None else None,
-        "latest_4h_run": dict(latest_4h_run) if latest_4h_run is not None else None,
+        "latest_daily_run": _adjust_current_run(dict(latest_daily_run) if latest_daily_run is not None else None, current_run_id),
+        "latest_4h_run": _adjust_current_run(dict(latest_4h_run) if latest_4h_run is not None else None, current_run_id),
         "open_plans": [
             {
                 "plan_id": str(row["plan_id"]),
@@ -376,8 +391,12 @@ def render_shadow_maturity_report(review: ShadowMaturityReview, version: int) ->
     return "\n".join(lines)
 
 
-def write_shadow_maturity_report(settings: Settings, account_name: str | None = None) -> tuple[ShadowMaturityReview, list[Path]]:
-    review = build_shadow_maturity_review(settings, account_name=account_name)
+def write_shadow_maturity_report(
+    settings: Settings,
+    account_name: str | None = None,
+    current_run_id: str | None = None,
+) -> tuple[ShadowMaturityReview, list[Path]]:
+    review = build_shadow_maturity_review(settings, account_name=account_name, current_run_id=current_run_id)
     now = datetime.now(timezone(timedelta(hours=8)))
     date_text = now.strftime("%Y-%m-%d")
     report_dir = settings.output.reports_dir / date_text

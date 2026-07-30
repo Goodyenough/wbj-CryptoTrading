@@ -52,9 +52,21 @@ def _maturity_for_status(status: str | None) -> str:
     return "unknown_plan_status"
 
 
+def _adjust_current_run(row: dict | None, current_run_id: str | None) -> dict | None:
+    if row is None or current_run_id is None:
+        return row
+    if row.get("run_id") == current_run_id and row.get("status") == "running":
+        adjusted = dict(row)
+        adjusted["status"] = "success"
+        adjusted["finished_at"] = adjusted.get("finished_at") or "assumed_success_after_report_generation"
+        return adjusted
+    return row
+
+
 def build_shadow_reconciliation_review(
     settings: Settings,
     account_name: str | None = None,
+    current_run_id: str | None = None,
 ) -> ShadowReconciliationReview:
     account = account_name or settings.paper.account_name
     with connect_db(settings.output.database_path) as connection:
@@ -152,8 +164,8 @@ def build_shadow_reconciliation_review(
         "expected_lines": list(EXPECTED_LINES),
         "open_plan_count": len(open_plans),
         "watching_plan_count": sum(1 for row in open_plans if str(row["status"]) == "WATCHING"),
-        "latest_daily_run": dict(latest_daily_run) if latest_daily_run is not None else None,
-        "latest_4h_run": dict(latest_4h_run) if latest_4h_run is not None else None,
+        "latest_daily_run": _adjust_current_run(dict(latest_daily_run) if latest_daily_run is not None else None, current_run_id),
+        "latest_4h_run": _adjust_current_run(dict(latest_4h_run) if latest_4h_run is not None else None, current_run_id),
         "open_plans": [
             {
                 "plan_id": str(row["plan_id"]),
@@ -316,8 +328,13 @@ def render_shadow_reconciliation_report(review: ShadowReconciliationReview, vers
 def write_shadow_reconciliation_report(
     settings: Settings,
     account_name: str | None = None,
+    current_run_id: str | None = None,
 ) -> tuple[ShadowReconciliationReview, list[Path]]:
-    review = build_shadow_reconciliation_review(settings, account_name=account_name)
+    review = build_shadow_reconciliation_review(
+        settings,
+        account_name=account_name,
+        current_run_id=current_run_id,
+    )
     now = datetime.now(timezone(timedelta(hours=8)))
     date_text = now.strftime("%Y-%m-%d")
     report_dir = settings.output.reports_dir / date_text
