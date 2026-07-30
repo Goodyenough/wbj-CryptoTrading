@@ -221,12 +221,12 @@
 - [ ] ???????????????? A/B?? prospective shadow observation ????????
 - [x] ?? prospective shadow observation MVP?????? `atr_reclaim_0_35` ? baseline/variant ?????????????????????????????? mature outcome review?
 - [x] ?? live decision-state shadow logging??? paper 4h update ??????????? `active_positions`?capacity state?reference baseline decision?`atr_reclaim_0_35_shadow` decision ? opportunity id?
-- [ ] ?? live decision-state shadow logging ? daily/import ??????? scan candidate ??????????????????? reference baseline / `0.35` shadow ??????
+- [x] 完成 live decision-state shadow logging 的 daily/import 候选级记录：scan candidate 已写入 `reference_baseline` / `atr_reclaim_0_35_shadow` / `research_incumbent` 三条参照线。
 
 ## 2026-07-30 atr_reclaim prospective shadow observation 后续
 
 - [x] 完成 daily/import candidate-level shadow context logging：`paper add-from-scan` 现在为每个 scan candidate 写入 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条候选级参照记录；该记录不控制 paper 下单。
 - [x] 补充 shadow decision maturity review：新增 `python main.py paper shadow-maturity`，汇总 `paper_shadow_decisions` 中 candidate-level 与 4h decision-level 样本，按 `line_name`、`stage`、`capacity_state`、`scanner_action`、terminal status 输出成熟度、右截尾和结果分层；当前真实库报告为 `no_shadow_samples_yet`。
 - [ ] 等待足够前向样本后，比较 `atr_reclaim_0_35_shadow vs reference_baseline` 的直接过滤贡献和容量路径贡献；未达到样本门槛前不得把 `0.35` 升级为 paper deployment。
-- [ ] 下一次 daily 或 4h 任务成功后，运行 `python main.py paper shadow-maturity --no-obsidian`，确认 candidate-level 或 plan-linked shadow rows 已开始进入报告。
+- [ ] 下一次 daily 或 4h 任务成功后，检查自动生成的 `paper_shadow_maturity_review`，确认 candidate-level 或 plan-linked shadow rows 已开始进入报告。
 

@@ -1514,6 +1514,8 @@ def test_consecutive_4h_cycles_are_idempotent_and_do_not_lock() -> None:
     assert settings.output.obsidian_dir == path.parent / "obsidian"
     assert all(cycle[2][0].name.startswith("paper_4h_update_") for cycle in cycles)
     assert all(cycle[3][0].name.startswith("paper_4h_dashboard_") for cycle in cycles)
+    assert all(cycle[4][0].name.startswith("paper_shadow_maturity_review_") for cycle in cycles)
+    assert all(path.parent / "obsidian" not in cycle[4][0].parents for cycle in cycles)
     with connect_db(path) as connection:
         runs = connection.execute(
             "SELECT run_type, status FROM runs WHERE run_id IN (?, ?) ORDER BY started_at, run_id",

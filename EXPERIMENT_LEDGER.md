@@ -7,9 +7,9 @@
 - 实验名：`atr_reclaim_prospective_shadow_observation_logging`
 - 变更：在既有 `paper_shadow_decisions` 基础上，补充 daily/import 阶段的 candidate-level context logging；每个 scan candidate 固定写入 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条参照线。
 - 样本：未来真实 daily/import 与 4h paper update 产生的 prospective 样本；当前提交只验证记录链路，不形成收益判断。
-- 结论：`infrastructure_ready_waiting_for_samples`。候选登记、4h decision-state、查看命令、导出链路和 `paper shadow-maturity` 成熟度报告已经具备基础能力；真实库当前报告 `no_shadow_samples_yet`，需要等待新的 daily/import 或 4h update 产生前向样本。
+- 结论：`infrastructure_ready_waiting_for_samples`。候选登记、4h decision-state、查看命令、导出链路和 `paper shadow-maturity` 成熟度报告已经具备基础能力；`daily` 与 `paper cycle` 成功运行后会自动生成 maturity review；真实库当前报告 `no_shadow_samples_yet`，需要等待新的 daily/import 或 4h update 产生前向样本。
 - 决策：`atr_reclaim_0_35` 继续作为 `provisional_research_incumbent` 与独立 `atr_reclaim_0_35_shadow` 参照线保留；不控制 paper 下单，不修改 `config/settings.toml`。
-- 下一步：下一次 daily 或 4h 任务成功后重跑 `python main.py paper shadow-maturity --no-obsidian`，确认样本开始进入 maturity review；足够成熟前不比较 `0.35` 的有效性，也不授权 paper deployment。
+- 下一步：下一次 daily 或 4h 任务成功后检查自动生成的 `paper_shadow_maturity_review`，确认样本开始进入 maturity review；足够成熟前不比较 `0.35` 的有效性，也不授权 paper deployment。
 
 ## 2026-07-27 Stage A-E 执行结论
 

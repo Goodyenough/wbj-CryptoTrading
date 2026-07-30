@@ -24,8 +24,15 @@
 
 ### 18:22:45 +08:00 - atr_reclaim shadow maturity review
 - 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Git
-- 改动：新增 `paper_shadow_maturity.py` 与 `python main.py paper shadow-maturity`，只读汇总 `paper_shadow_decisions` 的候选级、计划级、右截尾和终结状态成熟度；最新验证报告为 `reports/2026-07-30/paper_shadow_maturity_review_2026-07-30_demo_v3.md`。
+- 改动：新增 `paper_shadow_maturity.py` 与 `python main.py paper shadow-maturity`，只读汇总 `paper_shadow_decisions` 的候选级、计划级、右截尾和终结状态成熟度；最新验证报告为 `reports/2026-07-30/paper_shadow_maturity_review_2026-07-30_demo_v5.md`。
 - 影响：prospective shadow observation 现在具备成熟度复核报告入口；当前真实库 verdict=`no_shadow_samples_yet`，说明还需等待新的 daily/import 或 4h update 产生样本；不修改 `config/settings.toml`，不改变 paper 下单。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-maturity --no-obsidian`。
+- Git：待提交
+
+### 18:30:48 +08:00 - paper cycle 自动生成 shadow maturity review
+- 类型：代码 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git
+- 改动：`daily` 和 `paper cycle` 成功完成 paper update、paper report、observation dashboard 后，自动调用 `write_shadow_maturity_report` 生成 `paper_shadow_maturity_review`。
+- 影响：下一次 daily 或 4h 任务成功后会自动留下 `0.35` prospective shadow maturity 报告，不再依赖人工手动运行；仍是只读报告，不修改 `config/settings.toml`，不改变 paper 下单。
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-maturity --no-obsidian`。
 - Git：待提交
 
