@@ -246,3 +246,10 @@
 - [ ] 下次正常 daily/cycle 后同时检查 `paper_shadow_maturity_review` 与 `paper_shadow_reconciliation`，若仍为 `no_shadow_samples_yet`，继续等待正常 scan/import 或 entry-zone 触发，不手动制造样本。
 - [x] 将 `paper shadow-reconciliation` 的 pre-attribution sample gate 代码化：默认至少 10 个 complete opportunities、5 个 mature terminal opportunities、3 个 independent symbols，且 `controls_paper rows=0`、`incomplete opportunities=0`，才会进入 `reconciliation_ready_for_attribution`。
 - [ ] 即使 reconciliation 达到 pre-attribution gate，也只允许开始 direct filtering / path-capacity attribution；不得直接把 `0.35` 升级为 paper deployment。
+
+## 2026-07-30 取消/冻结登记
+
+- [x] 取消 2023-07-01 -> 2024-07-01 第三窗口的 historical membership 修复主线：不再补 listing date、delisting date、source-backed mapping 或 corrected N0/N1 来验证 `atr_reclaim_0_35`。
+- [x] 冻结 N2/N3/N4 historical master 产物：保留报告、MVP、blocking review queue 和 diagnostic 结论，但不得再用于 keep/reject/deploy `atr_reclaim_0_35`。
+- [x] 取消 127 个 standard-like missing symbols 的 source-backed mapping：除非未来独立项目明确要求重建 point-in-time historical master，否则不继续投入。
+- [x] 当前主线锁定为 prospective shadow observation：等待正常 daily/import 或 entry-zone 4h update 产生 `paper_shadow_decisions`，不手动制造样本，不运行新的近端历史 `0.35` A/B。

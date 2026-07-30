@@ -1830,3 +1830,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：防止少数早期 terminal 样本触发过早归因；通过该 gate 也只允许开始 attribution，不代表 `0.35` keep 或 paper deployment。
 - 验证：已运行 `python tests\test_database.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-reconciliation --no-obsidian`；确认 `config/settings.toml` 无 diff。
 - Git：待提交
+
+### 19:24:39 +08:00 - freeze abandoned 2023-2024 repair tasks
+- 类型：TODO / 开发计划 / 实验账本 / Git
+- 改动：在 `TODO.md` 末尾新增取消/冻结登记，明确停止 2023-07-01 -> 2024-07-01 第三窗口 historical membership 修复、127 个 standard-like missing symbols 的 source-backed mapping、corrected N0/N1 和 N2/N3/N4 historical master 扩展。
+- 结果：旧窗口产物保留为 diagnostic evidence，但不得用于 keep/reject/deploy `atr_reclaim_0_35`。
+- 影响：当前主线继续锁定为 prospective shadow observation；等待正常 daily/import 或 entry-zone 4h update 产生 `paper_shadow_decisions`，不手动制造样本，不运行新的近端历史 `0.35` A/B。
+- 验证：已检查 `python main.py paper shadow-decisions --limit 5` 仍为空，`python main.py db status` 正常。
+- Git：待提交

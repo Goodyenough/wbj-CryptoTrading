@@ -303,3 +303,12 @@
 - Verification: `python tests\test_database.py`, `python -m compileall main.py src tests`, and real-db `python main.py paper shadow-reconciliation --no-obsidian` passed.
 - Current real-db result: `paper_shadow_reconciliation_2026-07-30_demo_v3.md` still has `no_shadow_samples_yet`, `decisions=0`, and gate current values all zero.
 - Boundary: passing this gate only allows direct filtering / path-capacity attribution to begin; it is not deployment approval.
+
+## 2026-07-30 atr_reclaim 2023-2024 repair branch frozen
+
+- Decision cleanup: historical repair tasks for the `2023-07-01 -> 2024-07-01` `atr_reclaim_0_35` validation branch are now explicitly frozen in `TODO.md`.
+- Scope frozen: listing/delisting enrichment, source-backed mapping for the 127 standard-like missing symbols, corrected N0/N1, and N2/N3/N4 historical master expansion.
+- Reason: the project already decided `abandon_2023_2024_window_for_atr_reclaim_validation`; continuing this repair branch would consume engineering time without producing clean validation evidence for the current main line.
+- Evidence retained: N0-N4 reports, historical master MVP, blocking review queue, and diagnostic conclusions remain useful as data-quality evidence.
+- Boundary: these artifacts must not be used to keep, reject, or deploy `atr_reclaim_0_35`.
+- Current main line: prospective shadow observation only; wait for normal daily/import or entry-zone 4h update to create `paper_shadow_decisions`.
