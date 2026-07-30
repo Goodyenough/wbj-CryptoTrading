@@ -600,17 +600,17 @@ def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_ob
     ) as run_id:
         with _run_step(run_id, "paper_update"):
             updated = update_paper_trades(settings, account_name=account_name, run_id=run_id)
-        with _run_step(run_id, "paper_report"):
-            _, report_paths = generate_paper_report(
-                settings,
-                account_name=account_name,
-                run_id=run_id,
-                run_type=run_type,
-            )
         original_obsidian = settings.output.obsidian_dir
         try:
             if no_obsidian:
                 settings.output.obsidian_dir = None
+            with _run_step(run_id, "paper_report"):
+                _, report_paths = generate_paper_report(
+                    settings,
+                    account_name=account_name,
+                    run_id=run_id,
+                    run_type=run_type,
+                )
             with _run_step(run_id, "observation_dashboard"):
                 _, dashboard_paths = generate_observation_dashboard(
                     settings,
@@ -702,18 +702,18 @@ def main() -> None:
             with _run_step(run_id, "paper_update"):
                 updated = update_paper_trades(settings, account_name=args.account, run_id=run_id)
             _progress("writing paper trading report")
-            with _run_step(run_id, "paper_report"):
-                _, paper_report_paths = generate_paper_report(
-                    settings,
-                    account_name=args.account,
-                    run_id=run_id,
-                    run_type="daily_full",
-                )
-            _progress("writing three-week observation dashboard")
             original_obsidian = settings.output.obsidian_dir
             try:
                 if args.no_obsidian:
                     settings.output.obsidian_dir = None
+                with _run_step(run_id, "paper_report"):
+                    _, paper_report_paths = generate_paper_report(
+                        settings,
+                        account_name=args.account,
+                        run_id=run_id,
+                        run_type="daily_full",
+                    )
+                _progress("writing three-week observation dashboard")
                 with _run_step(run_id, "observation_dashboard"):
                     _, observation_paths = generate_observation_dashboard(
                         settings,

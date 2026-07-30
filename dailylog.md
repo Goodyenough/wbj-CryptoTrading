@@ -36,6 +36,14 @@
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`。
 - Git：待提交
 
+### 18:41:40 +08:00 - paper cycle shadow maturity smoke run
+- 类型：代码 / 报告 / 测试 / 运维验证 / TODO / 开发计划 / Git
+- 改动：手动运行 `python main.py paper cycle --no-obsidian` 验证 4h paper cycle、paper report、dashboard 和 shadow maturity review 链路；同时修复 cycle/daily 中 `--no-obsidian` 未覆盖 paper report 的问题，并修正 dashboard 在 run 尚未退出时误显示当前 run 为 `running` 的报告口径。
+- 结果：真实库新增成功 run `20260730_104051_53df384d`；生成 `reports/2026-07-30/paper_4h_update_1840_demo_v1.md`、`reports/2026-07-30/paper_4h_dashboard_1840_demo_v1.md`、`reports/2026-07-30/paper_shadow_maturity_review_2026-07-30_demo_v7.md`；maturity verdict 仍为 `no_shadow_samples_yet`。
+- 影响：证明自动 maturity report 链路已可运行；当前没有 shadow rows，因为本次 4h cycle 未发生 daily/import 候选登记，也未触发 open plan 的 entry-zone 4h decision。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status`、`python main.py paper shadow-decisions --limit 5`。
+- Git：待提交
+
 ### 18:30:48 +08:00 - paper cycle 自动生成 shadow maturity review
 - 类型：代码 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git
 - 改动：`daily` 和 `paper cycle` 成功完成 paper update、paper report、observation dashboard 后，自动调用 `write_shadow_maturity_report` 生成 `paper_shadow_maturity_review`。

@@ -10,7 +10,8 @@
 - 结论：`infrastructure_ready_waiting_for_samples`。候选登记、4h decision-state、查看命令、导出链路和 `paper shadow-maturity` 成熟度报告已经具备基础能力；`daily` 与 `paper cycle` 成功运行后会自动生成 maturity review；真实库当前报告 `no_shadow_samples_yet`，需要等待新的 daily/import 或 4h update 产生前向样本。
 - 决策：`atr_reclaim_0_35` 继续作为 `provisional_research_incumbent` 与独立 `atr_reclaim_0_35_shadow` 参照线保留；不控制 paper 下单，不修改 `config/settings.toml`。
 - 运维边界：`ticker_24hr` 瞬断现在会记录为 `API_DELAY_SKIPPED` 并生成 snapshot，避免一次 SSL/网络错误阻断 maturity review 链路；这不是策略有效性证据。
-- 下一步：下一次 daily 或 4h 任务成功后检查自动生成的 `paper_shadow_maturity_review`，确认样本开始进入 maturity review；足够成熟前不比较 `0.35` 的有效性，也不授权 paper deployment。
+- 链路验证：手动运行 `python main.py paper cycle --no-obsidian` 成功，run `20260730_104051_53df384d` 生成 `paper_shadow_maturity_review_2026-07-30_demo_v7.md`；verdict 仍为 `no_shadow_samples_yet`，因为本次没有 daily/import candidate rows，也没有 entry-zone 4h decision rows。
+- 下一步：等待新的 daily scan/import 或 open plan 触发 entry-zone 4h decision 后检查自动生成的 `paper_shadow_maturity_review`；足够成熟前不比较 `0.35` 的有效性，也不授权 paper deployment。
 
 ## 2026-07-27 Stage A-E 执行结论
 

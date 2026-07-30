@@ -794,6 +794,29 @@ def _stale_running_runs(settings: Settings, now_utc: datetime, max_age_hours: fl
     return output
 
 
+def _apply_current_run_dashboard_assumption(
+    run_health: dict,
+    stale_runs: list[dict],
+    *,
+    run_id: str | None,
+    run_type: str,
+    now_utc: datetime,
+) -> list[dict]:
+    if run_id is None:
+        return stale_runs
+    latest = run_health["latest"].get(run_type)
+    if latest and latest.get("run_id") == run_id and latest.get("status") == "running":
+        adjusted = dict(latest)
+        adjusted["status"] = "success"
+        adjusted["finished_at"] = now_utc.isoformat(timespec="seconds").replace("+00:00", "Z")
+        run_health["latest"][run_type] = adjusted
+        counts = run_health["counts"][run_type]
+        if counts.get("running", 0) > 0:
+            counts["running"] -= 1
+        counts["success"] += 1
+    return [row for row in stale_runs if row["run_id"] != run_id]
+
+
 def _holding_42_bar_review(settings: Settings, threshold_hours: float = 168.0) -> list[dict]:
     with connect_db(settings.output.database_path) as connection:
         connection.row_factory = sqlite3.Row
@@ -3554,6 +3577,13 @@ def generate_observation_dashboard(
     now_utc = datetime.now(timezone.utc)
     run_health = _run_health_summary(settings, now_utc)
     stale_runs = _stale_running_runs(settings, now_utc)
+    stale_runs = _apply_current_run_dashboard_assumption(
+        run_health,
+        stale_runs,
+        run_id=run_id,
+        run_type=run_type,
+        now_utc=now_utc,
+    )
     holding_42_rows = _holding_42_bar_review(settings)
     open_holding_hours = []
     for trade in trades:

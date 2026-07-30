@@ -1545,10 +1545,15 @@ def test_consecutive_4h_cycles_are_idempotent_and_do_not_lock() -> None:
     assert len(set(run_ids)) == 2
     assert all(len(cycle[1]) == 1 for cycle in cycles)
     assert settings.output.obsidian_dir == path.parent / "obsidian"
+    assert all(len(cycle[2]) == 1 for cycle in cycles)
     assert all(cycle[2][0].name.startswith("paper_4h_update_") for cycle in cycles)
     assert all(cycle[3][0].name.startswith("paper_4h_dashboard_") for cycle in cycles)
     assert all(cycle[4][0].name.startswith("paper_shadow_maturity_review_") for cycle in cycles)
+    assert all(path.parent / "obsidian" not in cycle[2][0].parents for cycle in cycles)
     assert all(path.parent / "obsidian" not in cycle[4][0].parents for cycle in cycles)
+    latest_dashboard_text = cycles[-1][3][0].read_text(encoding="utf-8")
+    assert f"| `paper_4h_update` | `{run_ids[-1]}` | success |" in latest_dashboard_text
+    assert "| 4h running last 24h | 0 |" in latest_dashboard_text
     with connect_db(path) as connection:
         runs = connection.execute(
             "SELECT run_type, status FROM runs WHERE run_id IN (?, ?) ORDER BY started_at, run_id",
