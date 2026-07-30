@@ -501,6 +501,18 @@ def load_paper_db_events(path: Path, plan_id: str | None = None, limit: int = 20
         return [dict(row) for row in connection.execute(sql, tuple(params)).fetchall()]
 
 
+def load_paper_shadow_decisions(path: Path, opportunity_id: str | None = None, limit: int = 200) -> list[dict]:
+    sql = "SELECT * FROM paper_shadow_decisions"
+    params: list[object] = []
+    if opportunity_id:
+        sql += " WHERE opportunity_id = ?"
+        params.append(opportunity_id)
+    sql += " ORDER BY decision_time DESC, line_name LIMIT ?"
+    params.append(limit)
+    with connect_db(path) as connection:
+        return [dict(row) for row in connection.execute(sql, tuple(params)).fetchall()]
+
+
 def export_paper_db(path: Path, output_dir: Path) -> list[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     beijing = timezone(timedelta(hours=8))
@@ -509,6 +521,7 @@ def export_paper_db(path: Path, output_dir: Path) -> list[Path]:
         ("paper_db_summary", "paper_plans", "updated_at"),
         ("paper_events", "paper_events", "event_time"),
         ("paper_snapshots", "paper_snapshots", "snapshot_time"),
+        ("paper_shadow_decisions", "paper_shadow_decisions", "decision_time"),
     ]
     paths: list[Path] = []
     with connect_db(path) as connection:

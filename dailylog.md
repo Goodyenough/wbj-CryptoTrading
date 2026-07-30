@@ -15,6 +15,13 @@
 
 ## 2026-07-30
 
+### 18:34:00 +08:00 - atr_reclaim live decision-state logging
+- 类型：代码 / 测试 / 数据库 schema / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `paper_shadow_decisions` 表；`paper update` 在 WATCHING 计划触及 entry zone 且存在已收 4h K 线时，记录 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三线 decision state；新增 `python main.py paper shadow-decisions` 查看命令，并将 shadow decisions 纳入 `db-export`。
+- 影响：开始为 `0.35` 独立 shadow 线积累 live decision-state 证据；不改变 paper 下单逻辑，不修改生产配置。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status`、`python main.py paper shadow-decisions --limit 5`；确认 `config/settings.toml` 无 diff。
+- Git：待提交
+
 ### 18:00:09 +08:00 - atr_reclaim incumbent shadow MVP
 - 类型：代码 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git
 - 改动：新增 `atr_reclaim_incumbent_shadow` 固定 opportunity set shadow experiment，输出 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三线对照，并在 detail rows 中记录 reclaim margin、direct filter R 与 capacity/path 占位字段。

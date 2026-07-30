@@ -236,3 +236,12 @@
 - 诊断结果：`atr_reclaim_0_35_shadow` opportunities `95`、accepted `75`、filtered `20`、total_decision_R `50.14`、direct_filter_R `10.00`；`reference_baseline` total_decision_R `44.14`。这是 MVP smoke/diagnostic，不是强验证或部署依据。
 - 下一步：在 live paper 4h/daily 决策点补 `active_positions`、capacity state、strict opportunity id 与 reference/0.35 shadow decisions，才能做完整 path/capacity attribution。
 
+## 2026-07-30 atr_reclaim live decision-state logging
+
+- 实现：新增 SQLite 表 `paper_shadow_decisions`，只追加记录 shadow decision，不改变 `paper_plans` / `paper_events` 的交易状态语义。
+- 接入点：`paper update` 中 WATCHING 计划触及 entry zone 且存在已收 4h K 线时，写入 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条同一时点决策。
+- 记录字段：`opportunity_id=paper_plan:{plan_id}`、plan_id、symbol、decision_time、kline_time、line_name、decision、accepted、current_price、last_4h_close、entry_high、atr_4h、reclaim_margin_atr、active_positions、max_active_positions、capacity_state。
+- 可见性：新增 `python main.py paper shadow-decisions --limit N`；`db-export` 新增 `paper_shadow_decisions_YYYY-MM-DD.csv`。
+- 验证：`python main.py db status` 真实库 schema/tables/indexes OK；`python main.py paper shadow-decisions --limit 5` 当前返回空列表，说明新表已可读，但新 logging 尚需下一次符合条件的 paper update 触发。
+- 边界：仍不修改 `config/settings.toml`，不启用 `0.35` 控制 paper 下单，不授权实盘。
+

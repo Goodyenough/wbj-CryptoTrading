@@ -25,6 +25,8 @@ REQUIRED_OBSERVATION_INDEXES = {
     "idx_event_run",
     "idx_snapshot_run_plan",
     "idx_snapshot_plan_time",
+    "idx_shadow_decision_time",
+    "idx_shadow_opportunity_line",
 }
 REQUIRED_OBSERVATION_TABLES = {
     "runs",
@@ -33,6 +35,7 @@ REQUIRED_OBSERVATION_TABLES = {
     "paper_plans",
     "paper_events",
     "paper_snapshots",
+    "paper_shadow_decisions",
 }
 OBSERVATION_UTC_COLUMNS = {
     "schema_metadata": ("updated_at",),
@@ -42,6 +45,7 @@ OBSERVATION_UTC_COLUMNS = {
     "paper_plans": ("created_at", "updated_at", "closed_at", "entered_at_utc", "tp1_hit_at_utc"),
     "paper_events": ("event_time", "kline_time", "created_at"),
     "paper_snapshots": ("snapshot_time", "created_at"),
+    "paper_shadow_decisions": ("decision_time", "kline_time", "created_at"),
 }
 
 
@@ -233,6 +237,40 @@ def init_observation_db(path: Path) -> None:
                 UNIQUE(run_id, plan_id)
             );
 
+            CREATE TABLE IF NOT EXISTS paper_shadow_decisions (
+                decision_id TEXT PRIMARY KEY,
+                run_id TEXT,
+                account_name TEXT NOT NULL,
+                opportunity_id TEXT NOT NULL,
+                plan_id TEXT,
+                symbol TEXT NOT NULL,
+                decision_time TEXT NOT NULL,
+                kline_time TEXT,
+                line_name TEXT NOT NULL,
+                controls_paper INTEGER NOT NULL DEFAULT 0,
+                decision TEXT NOT NULL,
+                accepted INTEGER NOT NULL,
+                reject_reason TEXT,
+                reference_baseline_decision TEXT,
+                atr_reclaim_0_35_decision TEXT,
+                research_incumbent_decision TEXT,
+                current_price REAL,
+                last_4h_close REAL,
+                entry_high REAL,
+                atr_4h REAL,
+                reclaim_margin_atr REAL,
+                active_positions INTEGER,
+                max_active_positions INTEGER,
+                capacity_state TEXT,
+                direct_filter_contribution_r REAL,
+                path_capacity_contribution_r REAL,
+                raw_json TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(plan_id) REFERENCES paper_plans(plan_id),
+                FOREIGN KEY(run_id) REFERENCES runs(run_id),
+                UNIQUE(opportunity_id, line_name, decision_time, kline_time)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_runs_type_started ON runs(run_type, started_at);
             CREATE INDEX IF NOT EXISTS idx_runs_status_started ON runs(status, started_at);
             CREATE INDEX IF NOT EXISTS idx_plans_symbol_status ON paper_plans(symbol, status);
@@ -242,6 +280,8 @@ def init_observation_db(path: Path) -> None:
             CREATE INDEX IF NOT EXISTS idx_event_run ON paper_events(run_id);
             CREATE INDEX IF NOT EXISTS idx_snapshot_run_plan ON paper_snapshots(run_id, plan_id);
             CREATE INDEX IF NOT EXISTS idx_snapshot_plan_time ON paper_snapshots(plan_id, snapshot_time);
+            CREATE INDEX IF NOT EXISTS idx_shadow_decision_time ON paper_shadow_decisions(decision_time);
+            CREATE INDEX IF NOT EXISTS idx_shadow_opportunity_line ON paper_shadow_decisions(opportunity_id, line_name);
             """
         )
         scan_columns = [

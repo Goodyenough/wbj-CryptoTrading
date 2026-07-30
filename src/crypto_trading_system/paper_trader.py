@@ -14,6 +14,7 @@ from .market_regime import classify_market_regime
 from .models import PaperTrade, PaperTradeEvent
 from .report_versions import next_report_version, versioned_markdown_filename
 from .trade_state import step_trade
+from .indicators import atr as _atr
 from .indicators import ema as _ema
 
 
@@ -240,6 +241,124 @@ def _record_event(
                 trade.realized_pnl,
                 trade.unrealized_pnl,
                 message,
+            ),
+        )
+
+
+def _decision_label(accepted: bool) -> str:
+    return "accept" if accepted else "reject"
+
+
+def _active_position_count(connection: sqlite3.Connection, account_name: str) -> int:
+    return int(
+        connection.execute(
+            """
+            SELECT COUNT(*)
+            FROM paper_plans
+            WHERE account_name = ? AND status IN ('ENTERED', 'TP1_HIT')
+            """,
+            (account_name,),
+        ).fetchone()[0]
+    )
+
+
+def _record_atr_reclaim_shadow_decisions(
+    connection: sqlite3.Connection,
+    *,
+    settings: Settings,
+    trade: PaperTrade,
+    account_name: str,
+    run_id: str | None,
+    decision_time_utc: str,
+    current_price: float,
+    last_4h_close: float,
+    kline_time: str | None,
+    closed_4h: list[list],
+) -> None:
+    atr_4h = _atr(closed_4h)
+    reference_accepted = last_4h_close >= trade.entry_high
+    atr_accepted = bool(
+        atr_4h is not None
+        and atr_4h > 0
+        and last_4h_close >= trade.entry_high + 0.35 * atr_4h
+    )
+    reclaim_margin_atr = None
+    if atr_4h is not None and atr_4h > 0:
+        reclaim_margin_atr = (last_4h_close - trade.entry_high) / atr_4h
+    active_positions = _active_position_count(connection, account_name)
+    max_active_positions = settings.backtest.max_active_positions
+    capacity_state = "at_capacity" if active_positions >= max_active_positions else "capacity_available"
+    opportunity_id = f"paper_plan:{trade.paper_trade_id}"
+    reference_decision = _decision_label(reference_accepted)
+    atr_decision = _decision_label(atr_accepted)
+    lines = [
+        (
+            "reference_baseline",
+            reference_accepted,
+            "first 4h close >= entry_high" if reference_accepted else "4h close below entry_high",
+        ),
+        (
+            "atr_reclaim_0_35_shadow",
+            atr_accepted,
+            "close >= entry_high + 0.35 ATR" if atr_accepted else "close below entry_high + 0.35 ATR",
+        ),
+        (
+            "research_incumbent",
+            atr_accepted,
+            "same decision as atr_reclaim_0_35_shadow",
+        ),
+    ]
+    for line_name, accepted, reason in lines:
+        decision = _decision_label(accepted)
+        payload = {
+            "paper_deployment": "not_controlled_by_shadow",
+            "entry_reclaim_min_atr": 0.35,
+            "line_name": line_name,
+            "reference_baseline_decision": reference_decision,
+            "atr_reclaim_0_35_decision": atr_decision,
+            "research_incumbent_decision": atr_decision,
+        }
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO paper_shadow_decisions(
+                decision_id, run_id, account_name, opportunity_id, plan_id, symbol,
+                decision_time, kline_time, line_name, controls_paper, decision,
+                accepted, reject_reason, reference_baseline_decision,
+                atr_reclaim_0_35_decision, research_incumbent_decision,
+                current_price, last_4h_close, entry_high, atr_4h,
+                reclaim_margin_atr, active_positions, max_active_positions,
+                capacity_state, direct_filter_contribution_r,
+                path_capacity_contribution_r, raw_json, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                uuid.uuid4().hex[:12],
+                run_id,
+                account_name,
+                opportunity_id,
+                trade.paper_trade_id,
+                trade.symbol,
+                decision_time_utc,
+                kline_time,
+                line_name,
+                decision,
+                1 if accepted else 0,
+                None if accepted else reason,
+                reference_decision,
+                atr_decision,
+                atr_decision,
+                current_price,
+                last_4h_close,
+                trade.entry_high,
+                atr_4h,
+                reclaim_margin_atr,
+                active_positions,
+                max_active_positions,
+                capacity_state,
+                None,
+                None,
+                json.dumps(payload, ensure_ascii=False, sort_keys=True),
+                decision_time_utc,
             ),
         )
 
@@ -848,6 +967,19 @@ def update_paper_trades(
                 and current_price <= trade.entry_high
             ):
                 last_close = float(closed_4h[-1][4])
+                with connect_db(settings.output.database_path) as connection:
+                    _record_atr_reclaim_shadow_decisions(
+                        connection,
+                        settings=settings,
+                        trade=trade,
+                        account_name=account,
+                        run_id=run_id,
+                        decision_time_utc=now,
+                        current_price=current_price,
+                        last_4h_close=last_close,
+                        kline_time=last_closed_time,
+                        closed_4h=closed_4h,
+                    )
                 if last_close < trade.entry_high:
                     old_status = trade.status
                     old_stop = trade.stop_loss

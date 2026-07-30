@@ -31,6 +31,7 @@ from crypto_trading_system.paper_db import (
     build_paper_db_summary,
     export_paper_db,
     load_paper_db_events,
+    load_paper_shadow_decisions,
 )
 from crypto_trading_system.paper_audit import write_paper_audit_report
 from crypto_trading_system.paper_checkpoint import checkpoint_summary_lines, write_paper_checkpoint_report
@@ -524,6 +525,10 @@ def build_parser() -> argparse.ArgumentParser:
     paper_events = paper_subparsers.add_parser("db-events", help="Show structured paper events.")
     paper_events.add_argument("--plan-id", default=None, help="Optional plan id filter.")
     paper_events.add_argument("--limit", type=int, default=200, help="Maximum events to show.")
+
+    paper_shadow_decisions = paper_subparsers.add_parser("shadow-decisions", help="Show paper shadow decision-state logs.")
+    paper_shadow_decisions.add_argument("--opportunity-id", default=None, help="Optional opportunity id filter.")
+    paper_shadow_decisions.add_argument("--limit", type=int, default=200, help="Maximum decisions to show.")
 
     paper_export = paper_subparsers.add_parser("db-export", help="Export plans, events, and snapshots as CSV.")
     paper_export.add_argument("--output-dir", default="exports", help="CSV output directory.")
@@ -1339,6 +1344,15 @@ def main() -> None:
             print(
                 json.dumps(
                     load_paper_db_events(settings.output.database_path, args.plan_id, args.limit),
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+
+        if args.paper_command == "shadow-decisions":
+            print(
+                json.dumps(
+                    load_paper_shadow_decisions(settings.output.database_path, args.opportunity_id, args.limit),
                     ensure_ascii=False,
                     indent=2,
                 )

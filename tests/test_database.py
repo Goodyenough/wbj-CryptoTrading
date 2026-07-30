@@ -17,7 +17,12 @@ from crypto_trading_system.database import connect_db, database_status, mark_run
 from crypto_trading_system import database as database_module
 from crypto_trading_system.config import load_settings
 from crypto_trading_system.models import PaperTrade, ScanResult
-from crypto_trading_system.paper_db import audit_database_stability, build_paper_db_summary, export_paper_db
+from crypto_trading_system.paper_db import (
+    audit_database_stability,
+    build_paper_db_summary,
+    export_paper_db,
+    load_paper_shadow_decisions,
+)
 from crypto_trading_system import paper_trader as paper_trader_module
 from crypto_trading_system.paper_trader import (
     _insert_paper_trade,
@@ -267,8 +272,9 @@ def test_summary_and_export_use_structured_tables() -> None:
     assert summary["run_type_summary"]["daily_full"]["beijing_dates"] == ["2026-06-12"]
     output_dir = path.parent / "exports"
     exports = export_paper_db(path, output_dir)
-    assert len(exports) == 3
+    assert len(exports) == 4
     assert all(item.exists() for item in exports)
+    assert any(item.name.startswith("paper_shadow_decisions_") for item in exports)
 
 
 def test_wal_allows_reader_during_write_transaction() -> None:
@@ -388,6 +394,18 @@ def test_paper_update_writes_event_plan_and_snapshot_atomically() -> None:
         assert connection.execute("SELECT status FROM paper_plans WHERE plan_id='plan1'").fetchone()[0] == "ENTERED"
         assert connection.execute("SELECT COUNT(*) FROM paper_events WHERE event_type='ENTERED'").fetchone()[0] == 1
         assert connection.execute("SELECT COUNT(*) FROM paper_snapshots WHERE run_id='run1'").fetchone()[0] == 1
+        decisions = connection.execute(
+            "SELECT line_name, decision, accepted, active_positions, capacity_state FROM paper_shadow_decisions ORDER BY line_name"
+        ).fetchall()
+    assert [(row["line_name"], row["decision"], row["accepted"]) for row in decisions] == [
+        ("atr_reclaim_0_35_shadow", "reject", 0),
+        ("reference_baseline", "accept", 1),
+        ("research_incumbent", "reject", 0),
+    ]
+    assert {row["active_positions"] for row in decisions} == {0}
+    assert {row["capacity_state"] for row in decisions} == {"capacity_available"}
+    loaded_decisions = load_paper_shadow_decisions(path, opportunity_id="paper_plan:plan1")
+    assert len(loaded_decisions) == 3
 
 
 def test_plan_failure_rolls_back_atomically_and_next_plan_continues() -> None:
