@@ -15,6 +15,13 @@
 
 ## 2026-07-30
 
+### 18:00:09 +08:00 - atr_reclaim incumbent shadow MVP
+- 类型：代码 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `atr_reclaim_incumbent_shadow` 固定 opportunity set shadow experiment，输出 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三线对照，并在 detail rows 中记录 reclaim margin、direct filter R 与 capacity/path 占位字段。
+- 影响：落实 incumbent/challenger 计划的第一步；仍为只读离线诊断，不修改 paper state，不启用 `0.35` 控制下单。
+- 验证：已运行 `python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-experiment --account demo --start-date 2026-07-03 --end-date 2026-07-25 --experiment atr_reclaim_incumbent_shadow --no-obsidian`；确认 `config/settings.toml` 与 `data/crypto_trading.db` 无 diff。
+- Git：待提交
+
 ### 14:45:00 +08:00 - atr_reclaim incumbent/challenger 研究计划
 - 类型：报告 / TODO / 开发计划 / 实验账本 / Git
 - 改动：新增 `reports/2026-07-30/atr_reclaim_incumbent_challenger_plan_2026-07-30_v1.md`，并更新 `TODO.md`、`EXPERIMENT_LEDGER.md`、`开发计划.md`。

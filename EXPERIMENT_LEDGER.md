@@ -227,3 +227,12 @@
 - 比较框架：日常研发用 `new challenger vs research_incumbent`；长期校准保留 `atr_reclaim_0_35_shadow vs reference_baseline`；完整系统检查看 `new challenger vs reference_baseline`。
 - 后续优先级：满仓候选排序与机会成本、容量利用、`TIME_EXIT` 与退出规则、执行质量/滑点/状态一致性、市场状态适应性、新入场过滤因素。
 
+## 2026-07-30 atr_reclaim incumbent shadow MVP
+
+- 实现：新增只读 shadow experiment `atr_reclaim_incumbent_shadow`，通过 `python main.py paper shadow-experiment --experiment atr_reclaim_incumbent_shadow` 生成固定 opportunity set 上的三线对照。
+- 三线：`reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent`；其中 `research_incumbent` 在当前 MVP 中等同 `atr_reclaim_0_35_shadow`，但仍独立输出，便于后续 challenger 对照。
+- 输出字段：decision timestamp、symbol、variant decision、reclaim margin ATR、mature outcome、direct filter R；capacity/path 字段暂标记为 `not_available_in_offline_opportunity_set`。
+- 验证运行：`2026-07-03 -> 2026-07-25` demo opportunity set `9468fbe1bab35767`；报告 `reports/2026-07-30/paper_shadow_experiment_atr_reclaim_incumbent_shadow_2026-07-03_2026-07-25_demo_v1.md`。
+- 诊断结果：`atr_reclaim_0_35_shadow` opportunities `95`、accepted `75`、filtered `20`、total_decision_R `50.14`、direct_filter_R `10.00`；`reference_baseline` total_decision_R `44.14`。这是 MVP smoke/diagnostic，不是强验证或部署依据。
+- 下一步：在 live paper 4h/daily 决策点补 `active_positions`、capacity state、strict opportunity id 与 reference/0.35 shadow decisions，才能做完整 path/capacity attribution。
+

@@ -32,6 +32,7 @@ from .report_versions import next_report_version, versioned_markdown_filename
 
 
 EXPERIMENTS = {
+    "atr_reclaim_incumbent_shadow",
     "reclaim_quality_matrix",
     "momentum_pullback_definition_ab",
     "relative_strength_soft_gate",
@@ -62,6 +63,11 @@ class ExperimentDecisionRow:
     mfe_r: float | None
     mae_r: float | None
     reason: str
+    reclaim_margin_atr: float | None = None
+    capacity_state: str = "not_available_in_offline_opportunity_set"
+    active_positions: int | None = None
+    direct_filter_contribution_r: float | None = None
+    path_capacity_contribution_r: float | None = None
 
 
 def _opportunity_dict(row: OpportunityRow) -> dict[str, object]:
@@ -113,6 +119,9 @@ def _decision(
     reason: str,
 ) -> ExperimentDecisionRow:
     outcome, pnl_r = _outcome_from_opportunity(row, accepted)
+    direct_filter_contribution_r = None
+    if variant == "atr_reclaim_0_35_shadow" and not accepted:
+        direct_filter_contribution_r = pnl_r
     return ExperimentDecisionRow(
         experiment=experiment,
         variant=variant,
@@ -127,6 +136,8 @@ def _decision(
         mfe_r=row.mfe_r,
         mae_r=row.mae_r,
         reason=reason,
+        reclaim_margin_atr=row.reclaim_margin_atr,
+        direct_filter_contribution_r=direct_filter_contribution_r,
     )
 
 
@@ -153,6 +164,9 @@ def _passes_reclaim_variant(settings: Settings, row: OpportunityRow, end_utc: da
         if variant == "atr_reclaim_0_25":
             if atr is not None and atr > 0 and close >= row.entry + 0.25 * atr:
                 return True, "close >= entry_high + 0.25 ATR"
+        elif variant == "atr_reclaim_0_35_shadow":
+            if atr is not None and atr > 0 and close >= row.entry + 0.35 * atr:
+                return True, "close >= entry_high + 0.35 ATR"
         elif variant == "quality_close":
             strong_body = candle_range > 0 and body / candle_range >= 0.35
             upper_close = candle_range > 0 and (high - close) / candle_range <= 0.35
@@ -172,6 +186,29 @@ def run_reclaim_quality_matrix(settings: Settings, opportunity_set: OpportunityS
             except Exception as exc:  # noqa: BLE001 - report the data gap per row.
                 accepted, reason = False, f"data_gap: {exc}"
             output.append(_decision(experiment="reclaim_quality_matrix", variant=variant, row=row, accepted=accepted, reason=reason))
+    return output
+
+
+def run_atr_reclaim_incumbent_shadow(settings: Settings, opportunity_set: OpportunitySet) -> list[ExperimentDecisionRow]:
+    _start_utc, end_utc = _parse_window(opportunity_set.start_date, opportunity_set.end_date)
+    output: list[ExperimentDecisionRow] = []
+    variants = [
+        "reference_baseline",
+        "atr_reclaim_0_35_shadow",
+        "research_incumbent",
+    ]
+    for row in opportunity_set.rows:
+        for variant in variants:
+            try:
+                if variant == "reference_baseline":
+                    accepted, reason = _passes_reclaim_variant(settings, row, end_utc, "current_4h_close_reclaim")
+                    reason = f"reference baseline: {reason}"
+                else:
+                    accepted, reason = _passes_reclaim_variant(settings, row, end_utc, "atr_reclaim_0_35_shadow")
+                    reason = f"{variant}: {reason}"
+            except Exception as exc:  # noqa: BLE001 - report the data gap per row.
+                accepted, reason = False, f"data_gap: {exc}"
+            output.append(_decision(experiment="atr_reclaim_incumbent_shadow", variant=variant, row=row, accepted=accepted, reason=reason))
     return output
 
 
@@ -280,6 +317,8 @@ def run_relative_strength_soft_gate(settings: Settings, opportunity_set: Opportu
 
 
 def _experiment_rows(settings: Settings, opportunity_set: OpportunitySet, experiment: str) -> list[ExperimentDecisionRow]:
+    if experiment == "atr_reclaim_incumbent_shadow":
+        return run_atr_reclaim_incumbent_shadow(settings, opportunity_set)
     if experiment == "reclaim_quality_matrix":
         return run_reclaim_quality_matrix(settings, opportunity_set)
     if experiment == "momentum_pullback_definition_ab":
@@ -299,6 +338,7 @@ def _variant_summary(rows: list[ExperimentDecisionRow]) -> list[dict[str, object
         filtered = [row for row in items if not row.accepted]
         outcomes = Counter(row.outcome for row in items)
         pnl_values = [row.pnl_r for row in items if row.pnl_r is not None]
+        direct_filter_values = [row.direct_filter_contribution_r for row in items if row.direct_filter_contribution_r is not None]
         output.append(
             {
                 "variant": variant,
@@ -310,6 +350,7 @@ def _variant_summary(rows: list[ExperimentDecisionRow]) -> list[dict[str, object
                 "filtered_loser": outcomes.get("filtered_loser", 0),
                 "missed_winner": outcomes.get("missed_winner", 0),
                 "total_decision_R": None if not pnl_values else sum(pnl_values),
+                "direct_filter_R": None if not direct_filter_values else sum(direct_filter_values),
                 "outcomes": dict(outcomes),
             }
         )
@@ -355,6 +396,21 @@ def render_shadow_experiment_report(
         "",
         "This is an offline diagnostic experiment. It uses a fixed opportunity set and does not modify settings, plans, events, snapshots, or paper state.",
         "",
+    ]
+    if experiment == "atr_reclaim_incumbent_shadow":
+        lines.extend([
+            "## Incumbent Framework",
+            "",
+            "| Line | Definition | Controls paper? | Purpose |",
+            "|---|---|---|---|",
+            "| reference_baseline | Original strategy without `atr_reclaim_0_35` | no | Long-term calibration reference. |",
+            "| atr_reclaim_0_35_shadow | Original strategy plus frozen `0.35 ATR` reclaim requirement | no | Independent forward comparison line. |",
+            "| research_incumbent | Same decision rule as `atr_reclaim_0_35_shadow` for this MVP | no | Current research reference for future challengers. |",
+            "",
+            "Capacity/path fields are explicit placeholders in this offline MVP. They require live decision-state logging before they can be treated as complete path attribution.",
+            "",
+        ])
+    lines.extend([
         "## Decision",
         "",
         f"- verdict: {_verdict(summary)}",
@@ -364,14 +420,14 @@ def render_shadow_experiment_report(
         "",
         "## Variant Summary",
         "",
-        "| Variant | Opportunities | Accepted | Filtered | Accepted Loser | Accepted Winner Path | Filtered Loser | Missed Winner | Total Decision R |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
-    ]
+        "| Variant | Opportunities | Accepted | Filtered | Accepted Loser | Accepted Winner Path | Filtered Loser | Missed Winner | Total Decision R | Direct Filter R |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ])
     for item in summary:
         lines.append(
             f"| {item['variant']} | {item['opportunities']} | {item['accepted']} | {item['filtered']} | "
             f"{item['accepted_loser']} | {item['accepted_winner_path']} | {item['filtered_loser']} | "
-            f"{item['missed_winner']} | {_fmt(item['total_decision_R'], 2)} |"
+            f"{item['missed_winner']} | {_fmt(item['total_decision_R'], 2)} | {_fmt(item['direct_filter_R'], 2)} |"
         )
     lines.extend([
         "",
@@ -395,14 +451,16 @@ def render_shadow_experiment_report(
     lines.extend([
         "## Detail Rows",
         "",
-        "| Variant | Source | Symbol | Time | Regime | Accepted | Outcome | PnL_R | MFE_R | MAE_R | Reason |",
-        "|---|---|---|---|---|---|---|---:|---:|---:|---|",
+        "| Variant | Source | Symbol | Time | Regime | Accepted | Outcome | PnL_R | MFE_R | MAE_R | Reclaim Margin ATR | Capacity State | Active Positions | Direct Filter R | Path/Capacity R | Reason |",
+        "|---|---|---|---|---|---|---|---:|---:|---:|---:|---|---:|---:|---:|---|",
     ])
     for row in rows:
         lines.append(
             f"| {row.variant} | {row.source} | `{row.symbol}` | {_local_timestamp(row.first_time)} | "
             f"{row.market_regime} | {str(row.accepted).lower()} | {row.outcome} | {_fmt(row.pnl_r, 2)} | "
-            f"{_fmt(row.mfe_r, 2)} | {_fmt(row.mae_r, 2)} | {row.reason} |"
+            f"{_fmt(row.mfe_r, 2)} | {_fmt(row.mae_r, 2)} | {_fmt(row.reclaim_margin_atr, 2)} | "
+            f"{row.capacity_state} | {_fmt(row.active_positions, 0)} | {_fmt(row.direct_filter_contribution_r, 2)} | "
+            f"{_fmt(row.path_capacity_contribution_r, 2)} | {row.reason} |"
         )
     lines.extend([
         "",

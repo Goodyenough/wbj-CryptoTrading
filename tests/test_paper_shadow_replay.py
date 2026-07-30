@@ -23,6 +23,7 @@ from crypto_trading_system.paper_shadow_experiments import (
     OpportunitySet,
     _outcome_from_opportunity,
     render_shadow_experiment_report,
+    run_atr_reclaim_incumbent_shadow,
 )
 from crypto_trading_system.storage import init_db
 
@@ -201,7 +202,59 @@ def test_shadow_experiment_report_uses_fixed_set_and_negative_missed_winner_r() 
         opportunity_set_path=Path("opportunity_set.json"),
     )
     assert "opportunity_set_hash: abc123" in text
-    assert "| test_variant | 1 | 0 | 1 | 0 | 0 | 0 | 1 | -1.90 |" in text
+    assert "| test_variant | 1 | 0 | 1 | 0 | 0 | 0 | 1 | -1.90 | n/a |" in text
+
+
+def test_atr_reclaim_incumbent_shadow_keeps_independent_reference_line() -> None:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        settings = _settings(Path(tmp))
+        opportunity = OpportunityRow(
+            source="WATCH_ONLY",
+            symbol="TESTUSDT",
+            plan_id="scan1:TESTUSDT",
+            first_time="2026-06-19T00:00:00Z",
+            reason="test",
+            entry=100.0,
+            entry_low=98.0,
+            stop=90.0,
+            tp1=120.0,
+            max_price_after=119.0,
+            min_price_after=95.0,
+            reclaimed=True,
+            hit_tp1=False,
+            hit_stop=False,
+            classification="missed_winner",
+            explanation="test",
+            maturity_status="mature",
+            classification_final=True,
+            mfe_r=1.9,
+            counterfactual_pnl_r=1.9,
+            first_hit="near_tp1_first",
+            atr_4h=10.0,
+            reclaim_margin_atr=0.2,
+            opportunity_set_key="WATCH_ONLY:scan1:TESTUSDT",
+        )
+        original = shadow_module.fetch_klines_cached
+        shadow_module.fetch_klines_cached = lambda *args, **kwargs: _FakeFetchResult(
+            [
+                _kline(0, 99, 103, 98, 102),
+                _kline(1, 102, 103, 99, 101),
+            ]
+        )
+        try:
+            rows = run_atr_reclaim_incumbent_shadow(
+                settings,
+                OpportunitySet("demo", "2026-06-19", "2026-07-25", [opportunity], "abc123"),
+            )
+        finally:
+            shadow_module.fetch_klines_cached = original
+    by_variant = {row.variant: row for row in rows}
+    assert set(by_variant) == {"reference_baseline", "atr_reclaim_0_35_shadow", "research_incumbent"}
+    assert by_variant["reference_baseline"].accepted is True
+    assert by_variant["atr_reclaim_0_35_shadow"].accepted is False
+    assert by_variant["research_incumbent"].accepted is False
+    assert by_variant["atr_reclaim_0_35_shadow"].direct_filter_contribution_r == -1.9
+    assert by_variant["atr_reclaim_0_35_shadow"].capacity_state == "not_available_in_offline_opportunity_set"
 
 
 if __name__ == "__main__":
@@ -209,3 +262,4 @@ if __name__ == "__main__":
     test_shadow_replay_report_contains_summary_sections()
     test_relative_strength_gate_filters_weak_stop_first_path()
     test_shadow_experiment_report_uses_fixed_set_and_negative_missed_winner_r()
+    test_atr_reclaim_incumbent_shadow_keeps_independent_reference_line()
