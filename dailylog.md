@@ -15,6 +15,13 @@
 
 ## 2026-07-30
 
+### 14:45:00 +08:00 - atr_reclaim incumbent/challenger 研究计划
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `reports/2026-07-30/atr_reclaim_incumbent_challenger_plan_2026-07-30_v1.md`，并更新 `TODO.md`、`EXPERIMENT_LEDGER.md`、`开发计划.md`。
+- 影响：正式采用 `accept_atr_reclaim_0_35_as_provisional_research_incumbent`；保留 `reference_baseline`、`atr_reclaim_0_35_shadow`、`new_challenger` 三线比较框架。
+- 验证：仅更新研究计划和记录，未运行新的 A/B，未修改 `config/settings.toml`。
+- Git：待提交
+
 ### 14:08:40 +08:00 - atr_reclaim 近端窗口资格审计
 - 类型：报告 / TODO / 开发计划 / 实验账本 / Git
 - 改动：新增 `reports/2026-07-30/atr_reclaim_recent_window_eligibility_audit_2026-07-30_v1.md`，并更新 `TODO.md`、`EXPERIMENT_LEDGER.md`、`开发计划.md`。

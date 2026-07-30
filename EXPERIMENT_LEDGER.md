@@ -218,3 +218,12 @@
 - 决策：不运行新的近端历史 `atr_reclaim_0_35` A/B，不部署，不修改 `config/settings.toml`。
 - 下一步：转向 prospective shadow observation schema/MVP，记录 baseline 与 `atr_reclaim_0_35` variant 的同一时点决策、capacity state、direct filtering 与 path contribution。
 
+## 2026-07-30 atr_reclaim provisional research incumbent decision
+
+- 决策：`accept_atr_reclaim_0_35_as_provisional_research_incumbent`。
+- 定义：`reference_baseline=original_strategy_without_atr_reclaim_0_35`；`atr_reclaim_0_35_shadow=original_strategy_plus_atr_reclaim_0_35`；`research_incumbent=reference_baseline_plus_atr_reclaim_0_35`。
+- 边界：`paper_deployment=pending_shadow_or_explicit_user_approval`；`real_money_deployment=not_authorized`；`parameter_tuning=frozen`。
+- 证据状态：`historical_validation_status=promising_but_not_independently_validated`；`mechanism_status=direct_filter_advantage_unconfirmed / capacity_path_advantage_plausible_but_unconfirmed`。
+- 比较框架：日常研发用 `new challenger vs research_incumbent`；长期校准保留 `atr_reclaim_0_35_shadow vs reference_baseline`；完整系统检查看 `new challenger vs reference_baseline`。
+- 后续优先级：满仓候选排序与机会成本、容量利用、`TIME_EXIT` 与退出规则、执行质量/滑点/状态一致性、市场状态适应性、新入场过滤因素。
+
