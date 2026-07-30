@@ -227,6 +227,7 @@
 
 - [x] 完成 daily/import candidate-level shadow context logging：`paper add-from-scan` 现在为每个 scan candidate 写入 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条候选级参照记录；该记录不控制 paper 下单。
 - [x] 补充 shadow decision maturity review：新增 `python main.py paper shadow-maturity`，汇总 `paper_shadow_decisions` 中 candidate-level 与 4h decision-level 样本，按 `line_name`、`stage`、`capacity_state`、`scanner_action`、terminal status 输出成熟度、右截尾和结果分层；当前真实库报告为 `no_shadow_samples_yet`。
+- [x] 修复 4h/paper update 的 ticker API 瞬断阻塞：`ticker_24hr` 失败时现在为 open plan 写入 `API_DELAY_SKIPPED` 和 snapshot，run 可成功结束并保留诊断，不再因一次 SSL/网络错误阻断后续报告链路。
 - [ ] 等待足够前向样本后，比较 `atr_reclaim_0_35_shadow vs reference_baseline` 的直接过滤贡献和容量路径贡献；未达到样本门槛前不得把 `0.35` 升级为 paper deployment。
 - [ ] 下一次 daily 或 4h 任务成功后，检查自动生成的 `paper_shadow_maturity_review`，确认 candidate-level 或 plan-linked shadow rows 已开始进入报告。
 

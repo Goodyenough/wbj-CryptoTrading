@@ -29,6 +29,13 @@
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-maturity --no-obsidian`。
 - Git：待提交
 
+### 18:34:51 +08:00 - paper update ticker API failure graceful skip
+- 类型：代码 / 测试 / 运维稳定性 / TODO / Git
+- 改动：`update_paper_trades` 在 `ticker_24hr` 失败时不再让整个 paper run 抛错失败，而是为每个 open plan 写入 `API_DELAY_SKIPPED` 事件和 snapshot，并返回当前 open plans。
+- 影响：降低 Binance SSL EOF / ticker API 瞬断对 4h paper cycle 的阻断；任务可以生成报告和 shadow maturity review，明确记录为行情延迟而不是策略状态变化。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`。
+- Git：待提交
+
 ### 18:30:48 +08:00 - paper cycle 自动生成 shadow maturity review
 - 类型：代码 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git
 - 改动：`daily` 和 `paper cycle` 成功完成 paper update、paper report、observation dashboard 后，自动调用 `write_shadow_maturity_report` 生成 `paper_shadow_maturity_review`。

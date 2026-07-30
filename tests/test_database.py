@@ -354,11 +354,14 @@ class _FakeBinanceClient:
     close_time: int = 1
     close_price: float = 106.0
     kline_error: Exception | None = None
+    ticker_error: Exception | None = None
 
     def __init__(self, *args, **kwargs) -> None:
         pass
 
     def ticker_24hr(self) -> list[dict]:
+        if self.ticker_error is not None:
+            raise self.ticker_error
         return [{"symbol": "TESTUSDT", "lastPrice": "103"}]
 
     def klines(self, symbol: str, interval: str, limit: int) -> list[list]:
@@ -817,6 +820,36 @@ def test_kline_api_error_is_recorded_and_does_not_fail_run() -> None:
         ).fetchone()
         assert plan["updated_at"] == "2026-06-12T00:00:00Z"
         assert plan["created_reason"] == ""
+
+
+def test_ticker_api_error_is_recorded_and_does_not_fail_run() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    trade = _trade()
+    with connect_db(path) as connection:
+        assert _insert_paper_trade(connection, trade, {"stop_loss": 90.0})
+        _sync_paper_plan(connection, trade, run_id="run1", payload={"stop_loss": 90.0})
+    original_client = paper_trader_module.BinanceClient
+    _FakeBinanceClient.ticker_error = TimeoutError("ticker delayed")
+    paper_trader_module.BinanceClient = _FakeBinanceClient
+    try:
+        updated = update_paper_trades(_settings_for(path), run_id="run1")
+    finally:
+        paper_trader_module.BinanceClient = original_client
+        _FakeBinanceClient.ticker_error = None
+    assert len(updated) == 1
+    assert updated[0].status == "WATCHING"
+    with connect_db(path) as connection:
+        row = connection.execute(
+            "SELECT reason FROM paper_events WHERE event_type='API_DELAY_SKIPPED'"
+        ).fetchone()
+        assert row is not None
+        assert "ticker delayed" in row["reason"]
+        assert connection.execute(
+            "SELECT COUNT(*) FROM paper_snapshots WHERE run_id='run1'"
+        ).fetchone()[0] == 1
+        assert connection.execute("SELECT status FROM paper_plans WHERE plan_id='plan1'").fetchone()[0] == "WATCHING"
 
 
 def test_structured_event_names_cover_plan_requirements() -> None:
@@ -1557,6 +1590,7 @@ if __name__ == "__main__":
     test_shadow_maturity_review_classifies_candidate_terminal_and_open_rows()
     test_unclosed_kline_records_skip_without_state_change()
     test_kline_api_error_is_recorded_and_does_not_fail_run()
+    test_ticker_api_error_is_recorded_and_does_not_fail_run()
     test_structured_event_names_cover_plan_requirements()
     test_report_contains_current_run_events_and_api_delay_count()
     test_structured_tables_remain_operational_without_legacy_rows()

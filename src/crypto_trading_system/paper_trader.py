@@ -958,9 +958,39 @@ def update_paper_trades(
         timeout_seconds=settings.market.request_timeout_seconds,
         pause_seconds=settings.market.request_pause_seconds,
     )
-    ticker_map = {item["symbol"]: float(item["lastPrice"]) for item in client.ticker_24hr()}
     updated: list[PaperTrade] = []
     now = _utc_now()
+
+    with connect_db(settings.output.database_path) as connection:
+        trades = _load_open_trades(connection, account)
+
+    try:
+        ticker_map = {item["symbol"]: float(item["lastPrice"]) for item in client.ticker_24hr()}
+    except Exception as exc:
+        expected_time = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+        for trade in trades:
+            trade.updated_at_utc = now
+            trade.notes = f"24h ticker unavailable; state update skipped: {type(exc).__name__}: {exc}"
+            with connect_db(settings.output.database_path) as connection:
+                _record_event(
+                    connection,
+                    trade,
+                    "API_DELAY_SKIPPED",
+                    trade.notes,
+                    event_time_utc=now,
+                    price=trade.last_price,
+                    run_id=run_id,
+                    old_status=trade.status,
+                    new_status=trade.status,
+                    old_stop=trade.stop_loss,
+                    new_stop=trade.stop_loss,
+                    kline_time=expected_time,
+                    structured_event_type="API_DELAY_SKIPPED",
+                )
+                if run_id is not None:
+                    _write_snapshot(connection, trade, run_id, now)
+            updated.append(trade)
+        return updated
 
     entry_reclaim_enabled = settings.analysis.entry_reclaim_close_enabled
     ema_trailing_enabled = settings.analysis.tp1_ema_trailing_stop_enabled
@@ -981,8 +1011,6 @@ def update_paper_trades(
         boundary = current.replace(hour=boundary_hour, minute=0, second=0, microsecond=0)
         return boundary.isoformat(timespec="seconds").replace("+00:00", "Z")
 
-    with connect_db(settings.output.database_path) as connection:
-        trades = _load_open_trades(connection, account)
     errors: list[str] = []
     for trade in trades:
         try:
