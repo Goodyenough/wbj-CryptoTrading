@@ -258,3 +258,12 @@
 - 验证：`python main.py db status` 真实库 schema/tables/indexes OK；`python main.py paper shadow-decisions --limit 5` 当前返回空列表，说明新表已可读，但新 logging 尚需下一次符合条件的 paper update 触发。
 - 边界：仍不修改 `config/settings.toml`，不启用 `0.35` 控制 paper 下单，不授权实盘。
 
+
+## 2026-07-30 paper max_holding_42 forward review
+
+- Experiment: `paper_max_holding_42_forward_review`.
+- Question: does current paper evidence support writing fixed `max_holding_bars_without_tp1=42` into default `config/settings.toml`?
+- Evidence: `db stability --days 5` passed; `paper_4h_dashboard_1840_demo_v1.md` found 3 positions over `42 x 4h / 168h`; event review checked plans `2ed171ff8ada`, `5d1c3b7ddf56`, and `616e1bbfd4c6`.
+- Result: all 3 over-threshold paper cases ultimately ended as `STOPPED`, with no `TP1_HIT` event found before the terminal stop; however, 2/3 cases are `ONDOUSDT` and the sample covers only 2 independent symbols.
+- Conclusion: `defer_keep_review_insufficient_forward_evidence`. Fixed 42-bar exit remains directionally supported, but current forward evidence is too small and concentrated to justify default deployment.
+- Decision: do not modify `config/settings.toml`; keep observing daily + 4h paper samples and reopen keep review after at least 5 independent symbols or 8-10 terminal over-42h cases.

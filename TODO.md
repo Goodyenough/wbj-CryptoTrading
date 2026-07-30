@@ -233,3 +233,8 @@
 - [x] 增强 `paper_shadow_maturity_review` 的等待诊断：无 shadow rows 时报告 open plans、latest scan、latest daily/4h run 和 next trigger；最新 v8 显示 1 个 `WATCHING` plan `ONDOUSDT`，等待 daily/import 或 entry-zone 4h decision。
 - [ ] 等待下一次 daily scan/import 或 open plan 触发 entry-zone 4h decision 后，再检查 `paper_shadow_maturity_review` 是否出现 candidate-level 或 plan-linked shadow rows。
 
+
+# 2026-07-30 当前执行状态
+
+- [x] 完成 fixed `max_holding_bars_without_tp1=42` 的 paper 前向复盘：3 个超过 `42 x 4h / 168h` 的 terminal 样本最终均 `STOPPED`，但只有 2 个独立 symbol，结论为 `defer_keep_review_insufficient_forward_evidence`，不修改 `config/settings.toml`。
+- [ ] 继续 daily + 4h paper observation；等至少 5 个独立 symbol 或 8-10 个 over-42h terminal cases 后，再重开 fixed `max_holding_bars_without_tp1=42` keep review。

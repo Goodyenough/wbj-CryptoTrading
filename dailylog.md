@@ -1790,3 +1790,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：补齐 prospective shadow observation 的入口阶段样本底座；该记录仅表示候选被同一时点三条线共同观察，不代表 `0.35` 已控制 paper 下单，也不修改 `config/settings.toml`。
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status`、`python main.py paper shadow-decisions --limit 5`。
 - Git：待提交
+
+### 18:57:42 +08:00 - fixed 42-bar paper forward review
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `reports/2026-07-30/paper_max_holding_42_forward_review_2026-07-30_demo_v1.md`，复核 fixed `max_holding_bars_without_tp1=42` 的当前 paper 前向证据；同步更新 `TODO.md`、`开发计划.md` 和 `EXPERIMENT_LEDGER.md`。
+- 结果：当前 3 个超过 `42 x 4h / 168h` 的 terminal pre-TP1 样本最终均 `STOPPED`，但只有 2 个独立 symbol，且 ONDO 样本高度同源。
+- 影响：结论为 `defer_keep_review_insufficient_forward_evidence`；继续保留 fixed 42-bar exit 为候选，不修改 `config/settings.toml`。
+- 验证：已查询 `paper_4h_dashboard_1840_demo_v1.md`、`python main.py db status`、`python main.py paper db-events --plan-id ...` 和 `data/crypto_trading.db` 快照。
+- Git：待提交
