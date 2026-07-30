@@ -244,3 +244,5 @@
 - [ ] 等 shadow rows 出现后，先运行 `paper shadow-reconciliation`，只有 complete opportunities 且 mature terminal opportunities 达到样本门槛后，才进入 direct filtering / path-capacity attribution。
 - [x] 将 `paper shadow-reconciliation` 接入 `daily` 与 `paper cycle` 自动报告链路，并修正 maturity/reconciliation 自动报告生成时当前 run 误显示 `running` 的问题；验证 run `20260730_111428_76a80af1` 成功生成 maturity v9 与 reconciliation v2。
 - [ ] 下次正常 daily/cycle 后同时检查 `paper_shadow_maturity_review` 与 `paper_shadow_reconciliation`，若仍为 `no_shadow_samples_yet`，继续等待正常 scan/import 或 entry-zone 触发，不手动制造样本。
+- [x] 将 `paper shadow-reconciliation` 的 pre-attribution sample gate 代码化：默认至少 10 个 complete opportunities、5 个 mature terminal opportunities、3 个 independent symbols，且 `controls_paper rows=0`、`incomplete opportunities=0`，才会进入 `reconciliation_ready_for_attribution`。
+- [ ] 即使 reconciliation 达到 pre-attribution gate，也只允许开始 direct filtering / path-capacity attribution；不得直接把 `0.35` 升级为 paper deployment。

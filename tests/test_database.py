@@ -850,18 +850,28 @@ def test_shadow_reconciliation_detects_complete_terminal_opportunity() -> None:
     settings.output.reports_dir = path.parent / "reports"
     settings.output.obsidian_dir = None
     review = build_shadow_reconciliation_review(settings)
-    assert review.verdict == "reconciliation_ready_for_attribution"
+    assert review.verdict == "reconciliation_waiting_for_sample_threshold"
     assert review.decision_count == 3
     assert review.complete_opportunity_count == 1
     assert review.incomplete_opportunity_count == 0
     assert review.mismatch_opportunity_count == 1
     assert review.mature_terminal_opportunity_count == 1
+    assert review.independent_symbol_count == 1
     assert review.controls_paper_count == 0
+
+    ready_review = build_shadow_reconciliation_review(
+        settings,
+        min_complete_opportunities=1,
+        min_terminal_opportunities=1,
+        min_independent_symbols=1,
+    )
+    assert ready_review.verdict == "reconciliation_ready_for_attribution"
 
     _, paths = write_shadow_reconciliation_report(settings)
     text = paths[0].read_text(encoding="utf-8")
-    assert "reconciliation_ready_for_attribution" in text
+    assert "reconciliation_waiting_for_sample_threshold" in text
     assert "complete opportunities | 1" in text
+    assert "mature terminal opportunities | 1 | 5" in text
     assert "paper_plan:plan1" in text
     assert "atr_reclaim_0_35_shadow:reject" in text
 

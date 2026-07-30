@@ -13,6 +13,9 @@ from .report_versions import next_report_version, versioned_markdown_filename
 
 
 EXPECTED_LINES = ("reference_baseline", "atr_reclaim_0_35_shadow", "research_incumbent")
+DEFAULT_MIN_COMPLETE_OPPORTUNITIES = 10
+DEFAULT_MIN_TERMINAL_OPPORTUNITIES = 5
+DEFAULT_MIN_INDEPENDENT_SYMBOLS = 3
 
 
 @dataclass(frozen=True)
@@ -26,6 +29,10 @@ class ShadowReconciliationReview:
     mismatch_opportunity_count: int
     mature_terminal_opportunity_count: int
     right_censored_opportunity_count: int
+    independent_symbol_count: int
+    min_complete_opportunities: int
+    min_terminal_opportunities: int
+    min_independent_symbols: int
     line_counts: dict[str, int]
     stage_counts: dict[str, int]
     decision_counts: dict[str, int]
@@ -67,6 +74,9 @@ def build_shadow_reconciliation_review(
     settings: Settings,
     account_name: str | None = None,
     current_run_id: str | None = None,
+    min_complete_opportunities: int = DEFAULT_MIN_COMPLETE_OPPORTUNITIES,
+    min_terminal_opportunities: int = DEFAULT_MIN_TERMINAL_OPPORTUNITIES,
+    min_independent_symbols: int = DEFAULT_MIN_INDEPENDENT_SYMBOLS,
 ) -> ShadowReconciliationReview:
     account = account_name or settings.paper.account_name
     with connect_db(settings.output.database_path) as connection:
@@ -128,6 +138,7 @@ def build_shadow_reconciliation_review(
     mismatch_opportunity_count = 0
     mature_terminal_opportunity_count = 0
     right_censored_opportunity_count = 0
+    independent_symbols: set[str] = set()
 
     for opportunity_id, items in sorted(by_opportunity.items()):
         lines = {str(row["line_name"]) for row in items}
@@ -136,6 +147,8 @@ def build_shadow_reconciliation_review(
         accepted_by_line = {str(row["line_name"]): int(row["accepted"]) for row in items}
         statuses = {str(row["plan_status"]) for row in items if row["plan_status"] is not None}
         maturities = {_maturity_for_status(row["plan_status"]) for row in items}
+        symbols = {str(row["symbol"]) for row in items}
+        independent_symbols.update(symbols)
         complete = not missing_lines
         if complete:
             complete_opportunity_count += 1
@@ -157,6 +170,7 @@ def build_shadow_reconciliation_review(
                 "accepted": ",".join(f"{key}:{value}" for key, value in sorted(accepted_by_line.items())),
                 "maturity": ",".join(sorted(maturities)),
                 "plan_status": ",".join(sorted(statuses)) if statuses else "none",
+                "symbols": ",".join(sorted(symbols)),
             }
         )
 
@@ -191,9 +205,19 @@ def build_shadow_reconciliation_review(
     elif mature_terminal_opportunity_count == 0:
         verdict = "reconciliation_waiting_for_terminal_outcomes"
         reason = "All opportunities have the required lines, but no plan-linked opportunity is mature terminal yet."
+    elif (
+        complete_opportunity_count < min_complete_opportunities
+        or mature_terminal_opportunity_count < min_terminal_opportunities
+        or len(independent_symbols) < min_independent_symbols
+    ):
+        verdict = "reconciliation_waiting_for_sample_threshold"
+        reason = (
+            "Three-line reconciliation is structurally clean, but the minimum pre-attribution "
+            "sample gate has not been reached."
+        )
     else:
         verdict = "reconciliation_ready_for_attribution"
-        reason = "Required lines are present and at least one opportunity has a terminal plan status."
+        reason = "Required lines are present and the minimum pre-attribution sample gate has been reached."
 
     return ShadowReconciliationReview(
         account_name=account,
@@ -205,6 +229,10 @@ def build_shadow_reconciliation_review(
         mismatch_opportunity_count=mismatch_opportunity_count,
         mature_terminal_opportunity_count=mature_terminal_opportunity_count,
         right_censored_opportunity_count=right_censored_opportunity_count,
+        independent_symbol_count=len(independent_symbols),
+        min_complete_opportunities=min_complete_opportunities,
+        min_terminal_opportunities=min_terminal_opportunities,
+        min_independent_symbols=min_independent_symbols,
         line_counts=dict(sorted(line_counts.items())),
         stage_counts=dict(sorted(stage_counts.items())),
         decision_counts=dict(sorted(decision_counts.items())),
@@ -227,20 +255,20 @@ def render_shadow_reconciliation_report(review: ShadowReconciliationReview, vers
     latest_daily = review.diagnostics.get("latest_daily_run")
     latest_4h = review.diagnostics.get("latest_4h_run")
     opportunity_lines = [
-        "| Opportunity | Rows | Lines | Missing lines | Decisions | Accepted | Maturity | Plan status |",
-        "|---|---:|---|---|---|---|---|---|",
+        "| Opportunity | Rows | Symbols | Lines | Missing lines | Decisions | Accepted | Maturity | Plan status |",
+        "|---|---:|---|---|---|---|---|---|---|",
     ]
     if review.opportunity_summaries:
         opportunity_lines.extend(
             (
-                f"| `{item['opportunity_id']}` | {item['rows']} | `{item['lines']}` | "
+                f"| `{item['opportunity_id']}` | {item['rows']} | `{item['symbols']}` | `{item['lines']}` | "
                 f"`{item['missing_lines']}` | `{item['decisions']}` | `{item['accepted']}` | "
                 f"`{item['maturity']}` | `{item['plan_status']}` |"
             )
             for item in review.opportunity_summaries
         )
     else:
-        opportunity_lines.append("| none | 0 |  |  |  |  |  |  |")
+        opportunity_lines.append("| none | 0 |  |  |  |  |  |  |  |")
 
     open_plan_lines = [
         "| Plan | Symbol | Status | Entry low | Entry high | Updated |",
@@ -284,6 +312,17 @@ def render_shadow_reconciliation_report(review: ShadowReconciliationReview, vers
         f"| mismatch opportunities | {review.mismatch_opportunity_count} |",
         f"| mature terminal opportunities | {review.mature_terminal_opportunity_count} |",
         f"| right-censored opportunities | {review.right_censored_opportunity_count} |",
+        f"| independent symbols | {review.independent_symbol_count} |",
+        "",
+        "## Pre-Attribution Gate",
+        "",
+        "| Requirement | Current | Minimum |",
+        "|---|---:|---:|",
+        f"| complete opportunities | {review.complete_opportunity_count} | {review.min_complete_opportunities} |",
+        f"| mature terminal opportunities | {review.mature_terminal_opportunity_count} | {review.min_terminal_opportunities} |",
+        f"| independent symbols | {review.independent_symbol_count} | {review.min_independent_symbols} |",
+        f"| controls_paper rows | {review.controls_paper_count} | 0 |",
+        f"| incomplete opportunities | {review.incomplete_opportunity_count} | 0 |",
         "",
         "## Run Context",
         "",
@@ -329,11 +368,17 @@ def write_shadow_reconciliation_report(
     settings: Settings,
     account_name: str | None = None,
     current_run_id: str | None = None,
+    min_complete_opportunities: int = DEFAULT_MIN_COMPLETE_OPPORTUNITIES,
+    min_terminal_opportunities: int = DEFAULT_MIN_TERMINAL_OPPORTUNITIES,
+    min_independent_symbols: int = DEFAULT_MIN_INDEPENDENT_SYMBOLS,
 ) -> tuple[ShadowReconciliationReview, list[Path]]:
     review = build_shadow_reconciliation_review(
         settings,
         account_name=account_name,
         current_run_id=current_run_id,
+        min_complete_opportunities=min_complete_opportunities,
+        min_terminal_opportunities=min_terminal_opportunities,
+        min_independent_symbols=min_independent_symbols,
     )
     now = datetime.now(timezone(timedelta(hours=8)))
     date_text = now.strftime("%Y-%m-%d")

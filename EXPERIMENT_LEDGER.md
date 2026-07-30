@@ -294,3 +294,12 @@
 - Verification: `python tests\test_database.py`, `python tests\test_paper_shadow_replay.py`, `python -m compileall main.py src tests`, and real-db `python main.py paper cycle --no-obsidian` passed.
 - Real run: `20260730_111428_76a80af1` generated `paper_shadow_maturity_review_2026-07-30_demo_v9.md` and `paper_shadow_reconciliation_2026-07-30_demo_v2.md`; both show latest 4h run status=`success`.
 - Current evidence: `paper_shadow_decisions` remains empty, so the result is still `no_shadow_samples_yet`; this is an automation readiness improvement, not a strategy validity result.
+
+## 2026-07-30 paper shadow reconciliation sample gate
+
+- Tooling change: `paper_shadow_reconciliation` now has a pre-attribution sample gate.
+- Default gate: at least 10 complete three-line opportunities, 5 mature terminal opportunities, 3 independent symbols, `controls_paper rows=0`, and `incomplete opportunities=0`.
+- Purpose: prevent one or two early terminal samples from being interpreted as a stable `atr_reclaim_0_35` signal.
+- Verification: `python tests\test_database.py`, `python -m compileall main.py src tests`, and real-db `python main.py paper shadow-reconciliation --no-obsidian` passed.
+- Current real-db result: `paper_shadow_reconciliation_2026-07-30_demo_v3.md` still has `no_shadow_samples_yet`, `decisions=0`, and gate current values all zero.
+- Boundary: passing this gate only allows direct filtering / path-capacity attribution to begin; it is not deployment approval.

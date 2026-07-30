@@ -1822,3 +1822,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：后续正常 daily/cycle 会自动留下 maturity + reconciliation 两类 shadow 证据；当前 `paper_shadow_decisions` 仍为空，不能解释 `0.35` 有效性，不修改 `config/settings.toml`。
 - 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py paper cycle --no-obsidian`、`python main.py paper shadow-decisions --limit 5`、`python main.py db status`。
 - Git：待提交
+
+### 19:19:11 +08:00 - shadow reconciliation sample gate
+- 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Git
+- 改动：`paper_shadow_reconciliation.py` 增加 pre-attribution sample gate，默认要求 10 个 complete opportunities、5 个 mature terminal opportunities、3 个 independent symbols，且 `controls_paper rows=0`、`incomplete opportunities=0`；CLI 新增对应 `--min-*` 参数。
+- 结果：真实库生成 `reports/2026-07-30/paper_shadow_reconciliation_2026-07-30_demo_v3.md`，当前仍为 `no_shadow_samples_yet`，gate current values 均为 0。
+- 影响：防止少数早期 terminal 样本触发过早归因；通过该 gate 也只允许开始 attribution，不代表 `0.35` keep 或 paper deployment。
+- 验证：已运行 `python tests\test_database.py`、`python -m compileall main.py src tests`、`python main.py paper shadow-reconciliation --no-obsidian`；确认 `config/settings.toml` 无 diff。
+- Git：待提交

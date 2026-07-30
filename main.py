@@ -545,6 +545,24 @@ def build_parser() -> argparse.ArgumentParser:
     )
     paper_shadow_reconciliation.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
     paper_shadow_reconciliation.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
+    paper_shadow_reconciliation.add_argument(
+        "--min-complete-opportunities",
+        type=int,
+        default=10,
+        help="Minimum complete three-line opportunities required before attribution.",
+    )
+    paper_shadow_reconciliation.add_argument(
+        "--min-terminal-opportunities",
+        type=int,
+        default=5,
+        help="Minimum mature terminal opportunities required before attribution.",
+    )
+    paper_shadow_reconciliation.add_argument(
+        "--min-independent-symbols",
+        type=int,
+        default=3,
+        help="Minimum independent symbols required before attribution.",
+    )
 
     paper_export = paper_subparsers.add_parser("db-export", help="Export plans, events, and snapshots as CSV.")
     paper_export.add_argument("--output-dir", default="exports", help="CSV output directory.")
@@ -1421,7 +1439,13 @@ def main() -> None:
             original_obsidian = settings.output.obsidian_dir
             if args.no_obsidian:
                 settings.output.obsidian_dir = None
-            review, report_paths = write_shadow_reconciliation_report(settings, account_name=args.account)
+            review, report_paths = write_shadow_reconciliation_report(
+                settings,
+                account_name=args.account,
+                min_complete_opportunities=args.min_complete_opportunities,
+                min_terminal_opportunities=args.min_terminal_opportunities,
+                min_independent_symbols=args.min_independent_symbols,
+            )
             settings.output.obsidian_dir = original_obsidian
             print("paper_shadow_reconciliation=completed")
             print(f"verdict={review.verdict}")
