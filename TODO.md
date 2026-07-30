@@ -238,3 +238,5 @@
 
 - [x] 完成 fixed `max_holding_bars_without_tp1=42` 的 paper 前向复盘：3 个超过 `42 x 4h / 168h` 的 terminal 样本最终均 `STOPPED`，但只有 2 个独立 symbol，结论为 `defer_keep_review_insufficient_forward_evidence`，不修改 `config/settings.toml`。
 - [ ] 继续 daily + 4h paper observation；等至少 5 个独立 symbol 或 8-10 个 over-42h terminal cases 后，再重开 fixed `max_holding_bars_without_tp1=42` keep review。
+- [x] 完成 Priority 4 execution/state consistency precheck：paper DB、5-day daily stability、event/snapshot linkage 和 duplicate checks 通过；`paper_shadow_decisions` 仍为空，结论 `execution_precheck_pass_shadow_reconciliation_waiting_for_samples`。
+- [ ] 下一次正常 daily scan/import 或 entry-zone 4h update 后，重新运行 `python main.py paper shadow-maturity --no-obsidian`，确认 `paper_shadow_decisions` 是否开始积累 candidate-level 或 plan-linked rows。

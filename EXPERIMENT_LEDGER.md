@@ -267,3 +267,12 @@
 - Result: all 3 over-threshold paper cases ultimately ended as `STOPPED`, with no `TP1_HIT` event found before the terminal stop; however, 2/3 cases are `ONDOUSDT` and the sample covers only 2 independent symbols.
 - Conclusion: `defer_keep_review_insufficient_forward_evidence`. Fixed 42-bar exit remains directionally supported, but current forward evidence is too small and concentrated to justify default deployment.
 - Decision: do not modify `config/settings.toml`; keep observing daily + 4h paper samples and reopen keep review after at least 5 independent symbols or 8-10 terminal over-42h cases.
+
+## 2026-07-30 paper execution state consistency precheck
+
+- Experiment: `paper_execution_state_consistency_precheck`.
+- Question: is the current paper database and shadow logging chain clean enough to continue prospective observation?
+- Evidence: `db status` OK; `db stability --days 5` passed; paper DB contains 25 plans, 534 snapshots, 0 duplicate event groups, 0 events without plan, and 0 snapshots without plan.
+- Result: paper event/state linkage is clean; the only current open plan is `ONDOUSDT` `9734a33dea2e` in `WATCHING`; one transient market-data issue was recorded as `API_DELAY_SKIPPED` without changing paper state.
+- Limitation: `paper_shadow_decisions` remains empty, so reference baseline vs `atr_reclaim_0_35_shadow` vs research incumbent cannot yet be reconciled.
+- Conclusion: `execution_precheck_pass_shadow_reconciliation_waiting_for_samples`; continue observation, but do not validate or deploy `0.35` or any new challenger yet.

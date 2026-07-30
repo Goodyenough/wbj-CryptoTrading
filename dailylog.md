@@ -1798,3 +1798,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：结论为 `defer_keep_review_insufficient_forward_evidence`；继续保留 fixed 42-bar exit 为候选，不修改 `config/settings.toml`。
 - 验证：已查询 `paper_4h_dashboard_1840_demo_v1.md`、`python main.py db status`、`python main.py paper db-events --plan-id ...` 和 `data/crypto_trading.db` 快照。
 - Git：待提交
+
+### 19:12:00 +08:00 - paper execution state consistency precheck
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Git
+- 改动：新增 `reports/2026-07-30/paper_execution_state_consistency_precheck_2026-07-30_demo_v1.md`，按 incumbent/challenger 计划 Priority 4 做 paper execution/state consistency 预检查；同步更新 `TODO.md`、`开发计划.md` 和 `EXPERIMENT_LEDGER.md`。
+- 结果：paper DB 当前 25 个 plans、534 个 snapshots，未发现 duplicate event groups、events without plan 或 snapshots without plan；5-day daily stability 通过；`paper_shadow_decisions` 仍为空。
+- 影响：结论为 `execution_precheck_pass_shadow_reconciliation_waiting_for_samples`；继续等待 prospective shadow rows，不修改 `config/settings.toml`，不启动新 challenger。
+- 验证：已运行 `python main.py db status`、`python main.py db stability --days 5`、`python main.py paper shadow-decisions --limit 5`，并执行只读 SQLite linkage checks。
+- Git：待提交
