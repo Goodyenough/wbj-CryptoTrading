@@ -1,6 +1,17 @@
 # CryptoTradingSystem 实验账本
 
-更新时间：2026-07-27 23:57 +08:00
+更新时间：2026-07-31 11:42 +08:00
+
+## 2026-07-31 atr_reclaim execution plan update
+
+- 检查名：`atr_reclaim_execution_plan_update_2026_07_31`。
+- 问题：当前是否应继续按 `0.35` prospective shadow 计划执行，以及是否已有足够样本开始归因。
+- 当前状态：`CryptoTrading_DailyPaperUpdate` 上次运行 `2026-07-30 20:05:01`，结果 `0`；`CryptoTrading_4H_PaperUpdate` 上次运行 `2026-07-31 08:10:01`，结果 `0`，下一次 `2026-07-31 12:10:00`；最新数据库 run 为 `20260731_001002_b39e3bc4`，状态 `success`。
+- 样本：`paper_shadow_decisions` 当前有 15 行，来自 2026-07-30 daily/import 的 5 个 scan candidates，每个 candidate 均有 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三线。
+- 结论：`candidate_context_only_wait_for_plan_linked_samples`。candidate-level logging 已经正常，但仍没有 plan-linked decision rows 和 mature terminal outcomes，不能开始 direct filtering 或 capacity/path attribution。
+- 决策：继续执行 prospective shadow observation；不运行新的近端历史 `atr_reclaim_0_35` A/B；不修复 2023-2024 validation branch；不修改 `config/settings.toml`；不授权 `0.35` 控制 paper。
+- 计划产物：`reports/2026-07-31/atr_reclaim_execution_plan_update_2026-07-31_v1.md`。
+- 下一步：等待正常 `2026-07-31 12:10 +08:00` 4h 任务后复查 `paper shadow-decisions`、`paper shadow-maturity`、`paper shadow-reconciliation` 和 `db status`；若仍只有 candidate-level rows，则继续等待正常触发。
 
 ## 2026-07-30 atr_reclaim prospective shadow logging
 

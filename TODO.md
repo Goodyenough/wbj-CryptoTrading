@@ -1,5 +1,15 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-07-31 atr_reclaim prospective shadow 执行计划
+
+- [x] 写入完整计划更新：`reports/2026-07-31/atr_reclaim_execution_plan_update_2026-07-31_v1.md`。
+- [x] 确认 `atr_reclaim_0_35` 定位为 `provisional_research_incumbent`，不是 paper deployment，也不是 real-money deployment。
+- [x] 确认保留独立 `atr_reclaim_0_35_shadow` 对照线，用于长期比较 `atr_reclaim_0_35_shadow vs reference_baseline`。
+- [x] 确认当前样本状态为 `candidate_context_only_wait_for_plan_linked_samples`：已有 15 条 candidate-level rows，但没有 plan-linked decision rows 或 mature terminal outcomes。
+- [ ] 等待正常 `2026-07-31 12:10 +08:00` 4h 自动任务后复查：`python main.py paper shadow-decisions --limit 30`、`python main.py paper shadow-maturity --no-obsidian`、`python main.py paper shadow-reconciliation --no-obsidian`、`python main.py db status`。
+- [ ] 只有在 pre-attribution gate 达标后，才开始只读 direct filtering 与 capacity/path attribution；未达标前不解释 `0.35` 有效性。
+- [ ] 下一轮正式 challenger 研究暂不启动，等 shadow logging/reconciliation 稳定后，再优先选择 candidate ranking / full-capacity opportunity cost 方向。
+
 ## 2026-07-27 当前执行状态
 
 - [x] 完成 `replacement_closure_audit`：复用 Stage 1 JSON 与 Stage 4 Raw Summary 做去重、stale-trade 集中度、first-event-per-stale-trade、exclude 2025-07、exclude same-bar ambiguous 与 cluster bootstrap；结论 `paused_no_stable_executable_edge`，capacity replacement 分支冻结，不进入 Stage 5 shadow replacement。

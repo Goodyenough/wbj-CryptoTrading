@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-07-31
+
+### 11:42:23 +08:00 - atr_reclaim 执行计划更新
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Obsidian / Git
+- 改动：新增 `reports/2026-07-31/atr_reclaim_execution_plan_update_2026-07-31_v1.md`，把 `0.35` 的当前定位、困难、决策、三线对照结构和后续执行阶段写成可执行计划；同步更新 `TODO.md`、`开发计划.md`、`EXPERIMENT_LEDGER.md` 和 Obsidian 实验日志。
+- 影响：明确 `atr_reclaim_0_35` 继续作为 `provisional_research_incumbent`，同时保留独立 `atr_reclaim_0_35_shadow` 对照线；当前只允许 prospective shadow observation，不运行新近端历史 A/B，不修复 2023-2024 validation branch，不授权 paper 或实盘部署。
+- 验证：已检查 `CryptoTrading_DailyPaperUpdate` 与 `CryptoTrading_4H_PaperUpdate` 最近运行结果均为 `0`；`python main.py db status` 成功；`python main.py paper shadow-decisions --limit 30` 显示 15 条 candidate-level 三线 shadow rows，尚无 plan-linked 或 terminal 样本。
+- Git：待提交
+
 ## 2026-07-30
 
 ### 18:34:00 +08:00 - atr_reclaim live decision-state logging
