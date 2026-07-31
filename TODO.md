@@ -262,5 +262,7 @@
 - [x] 2026-07-30 19:36 按 runbook 检查 `paper shadow-decisions`、`paper shadow-maturity` 和 `paper shadow-reconciliation`：`paper_shadow_decisions=[]`，maturity v10 与 reconciliation v4 均为 `no_shadow_samples_yet`。
 - [x] 2026-07-30 19:41 复核 4h 自动任务：计划任务 16:10 `LastTaskResult=1` 且日志只有 start；手动运行同一 `scripts/paper_4h_update.bat` 成功，生成 run `20260730_114150_57deaf93`、maturity v11 与 reconciliation v5，仍为 `no_shadow_samples_yet`。
 - [x] 增强 `scripts/run_logged_paper_task.ps1`：增加 PowerShell 级异常 `trap` 和 Python 路径检查，避免后续计划任务失败时只留下 start 而没有失败原因。
+- [x] 2026-07-31 复核 overnight daily/4h：20:05 daily 与 00:10/04:10/08:10 4h 自动任务均已成功，`paper_shadow_decisions` 出现 15 行候选级记录，覆盖 5 个 scan candidates 与三条线；maturity v3=`candidate_context_only`，reconciliation v3=`reconciliation_waiting_for_terminal_outcomes`。
 - [ ] 下一次正常 daily/cycle 后，继续检查 `paper shadow-decisions`、`paper shadow-maturity` 和 `paper shadow-reconciliation`；若仍为 `no_shadow_samples_yet`，继续等待正常样本，不手动制造样本。
+- [ ] 等待 `ONDOUSDT` WATCHING plan 或后续新计划触发 entry-zone 4h decision，产生 plan-linked shadow rows；candidate-only rows 不得用于 direct filtering / capacity-path attribution。
 - [ ] 当 reconciliation 达到 pre-attribution sample gate 后，只允许启动只读 direct filtering / capacity-path attribution，不得直接升级为 paper deployment。

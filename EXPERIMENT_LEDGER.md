@@ -339,3 +339,14 @@
 - Result: generated `paper_shadow_maturity_review_2026-07-30_demo_v11.md` and `paper_shadow_reconciliation_2026-07-30_demo_v5.md`; both still have verdict `no_shadow_samples_yet`.
 - Tooling change: `scripts/run_logged_paper_task.ps1` now logs PowerShell-level exceptions through `trap` and checks that the configured Python interpreter exists before invoking the task.
 - Decision: `operations_wait_with_improved_logging`; continue waiting for normal daily/import or entry-zone 4h samples, and inspect the next scheduled task run if it returns nonzero again.
+
+## 2026-07-31 11:35 +08:00 - atr_reclaim prospective shadow candidate context check
+
+- Experiment/check: `atr_reclaim_prospective_shadow_candidate_context_check`.
+- Question: did overnight normal daily/import and 4h runs start producing prospective shadow rows, and are the three required lines structurally complete?
+- Evidence: `CryptoTrading_DailyPaperUpdate` last result 0 at 2026-07-30 20:05; `CryptoTrading_4H_PaperUpdate` last result 0 at 2026-07-31 08:10; latest DB run `20260731_001002_b39e3bc4` success.
+- Result: `paper_shadow_decisions` contains 15 candidate-level rows from daily run `20260730_120502_4a73a4c7`, covering 5 opportunities and all three lines: `reference_baseline`, `atr_reclaim_0_35_shadow`, and `research_incumbent`.
+- Maturity report: `paper_shadow_maturity_review_2026-07-31_demo_v3.md`, verdict `candidate_context_only`, with 15 candidate-only rows and 0 plan-linked rows.
+- Reconciliation report: `paper_shadow_reconciliation_2026-07-31_demo_v3.md`, verdict `reconciliation_waiting_for_terminal_outcomes`, complete opportunities 5/10, mature terminal opportunities 0/5, independent symbols 5/3, controls_paper rows 0, incomplete opportunities 0.
+- Decision: `operations_wait_for_plan_linked_rows`; candidate-level logging is structurally working, but attribution is still blocked until plan-linked and mature terminal samples exist.
+- Next action: wait for `ONDOUSDT` or later WATCHING plans to touch entry_high during a 4h paper update; do not deploy or tune `atr_reclaim_0_35`.

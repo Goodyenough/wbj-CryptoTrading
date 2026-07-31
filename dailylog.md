@@ -1869,3 +1869,13 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：后续若计划任务再次在 PowerShell 层失败，会写入明确异常原因；不修改 `config/settings.toml`，不改变 paper 下单或策略逻辑。
 - 验证：PowerShell parser 检查 `scripts/run_logged_paper_task.ps1` 返回 `parse_ok`；`python main.py paper shadow-decisions --limit 5` 返回 `[]`；`config/settings.toml` 无 diff。
 - Git：待提交。
+
+## 2026-07-31
+
+### 11:35:59 +08:00 - prospective shadow overnight 检查
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Git
+- 改动：复核 2026-07-30 20:05 daily 与 2026-07-31 00:10/04:10/08:10 4h 自动任务产物，检查 `paper_shadow_decisions`、maturity v3 与 reconciliation v3。
+- 结果：`paper_shadow_decisions` 已有 15 行候选级记录，覆盖 5 个 scan candidates 与 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条线；`paper_shadow_maturity_review_2026-07-31_demo_v3.md` verdict=`candidate_context_only`，`paper_shadow_reconciliation_2026-07-31_demo_v3.md` verdict=`reconciliation_waiting_for_terminal_outcomes`。
+- 影响：三线候选级 logging 链路已开始积累且结构完整，但还没有 plan-linked decision rows 或 mature terminal opportunities；不能做 direct filtering / capacity-path attribution，不能升级 `0.35`。
+- 验证：`python main.py db status` 通过，最新 4h run `20260731_001002_b39e3bc4` success；`CryptoTrading_DailyPaperUpdate` 与 `CryptoTrading_4H_PaperUpdate` 最近运行结果均为 0；`config/settings.toml` 无改动。
+- Git：待提交。
