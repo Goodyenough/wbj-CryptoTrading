@@ -2,6 +2,15 @@
 
 更新时间：2026-08-03 00:18 +08:00
 
+## 2026-08-03 atr_reclaim shadow gate v3 check
+
+- 检查名：`atr_reclaim_shadow_gate_v3_check_2026_08_03`。
+- 问题：在没有新 4h/daily 自动运行的情况下，当前 shadow reconciliation/maturity 是否已经满足 pre-attribution gate。
+- 样本：同 `2026-08-03 00:10 +08:00` 自动运行后的真实库状态，`decisions=105`、`opportunities=21`。
+- 结果：`complete opportunities=21`、`incomplete opportunities=0`、`controls_paper rows=0`、`mismatch opportunities=0`、`independent symbols=13`；`mature terminal opportunities=0`，`right_censored_ratio=100.00%`。
+- 结论：`decision_samples_not_mature` / `reconciliation_waiting_for_terminal_outcomes`。没有新增 terminal 样本，不能开始 direct filtering 或 capacity/path attribution。
+- 决策：继续等待正常自动任务；不修改配置，不部署 `atr_reclaim_0_35`，不启动新 challenger。
+
 ## 2026-08-03 atr_reclaim prospective shadow 00:10 check
 
 - 检查名：`atr_reclaim_prospective_shadow_0010_check_2026_08_03`。

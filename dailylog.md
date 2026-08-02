@@ -15,6 +15,13 @@
 
 ## 2026-08-03
 
+### 00:25:31 +08:00 - atr_reclaim shadow gate 只读复核
+- 类型：报告 / 状态复核 / Git
+- 改动：运行 `python main.py paper shadow-reconciliation --no-obsidian` 与 `python main.py paper shadow-maturity --no-obsidian`，生成 `reports/2026-08-03/paper_shadow_reconciliation_2026-08-03_demo_v3.md` 与 `reports/2026-08-03/paper_shadow_maturity_review_2026-08-03_demo_v3.md`。
+- 影响：确认当前仍为 `decision_samples_not_mature` / `reconciliation_waiting_for_terminal_outcomes`；`complete opportunities=21`、`independent symbols=13`、`controls_paper rows=0`、`incomplete opportunities=0` 均达标，但 `mature terminal opportunities=0 < 5`，仍不能开始 `0.35` 归因或新 challenger。
+- 验证：`python tests\test_database.py` 通过；`python main.py paper shadow-reconciliation --no-obsidian` 和 `python main.py paper shadow-maturity --no-obsidian` 成功。
+- Git：本次提交 `Record atr reclaim shadow gate v3 check`
+
 ### 00:18:54 +08:00 - atr_reclaim shadow 00:10 自动运行复核
 - 类型：报告 / TODO / 开发计划 / 实验账本 / Obsidian / Git
 - 改动：复核 `2026-08-03 00:10 +08:00` 正常 4h 自动任务产物，纳入 `reports/2026-08-03/paper_4h_update_0010_demo_v1.md`、`paper_4h_dashboard_0010_demo_v1.md`、`paper_shadow_maturity_review_2026-08-03_demo_v2.md` 和 `paper_shadow_reconciliation_2026-08-03_demo_v2.md`；同步更新 `TODO.md`、`开发计划.md`、`EXPERIMENT_LEDGER.md` 和 Obsidian 实验日志。
