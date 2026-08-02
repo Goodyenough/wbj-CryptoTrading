@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-08-03
+
+### 00:03:59 +08:00 - atr_reclaim shadow 当前进度确认
+- 类型：报告 / 状态复核 / Git
+- 改动：根据 `atr_reclaim_incumbent_challenger_plan_2026-07-30_v1_zh-CN.md` 复核当前项目状态，生成 `reports/2026-08-03/paper_shadow_maturity_review_2026-08-03_demo_v1.md` 与 `reports/2026-08-03/paper_shadow_reconciliation_2026-08-03_demo_v1.md`。
+- 影响：确认项目仍按 prospective shadow observation 路线执行；当前已有 105 条三线 decision rows、21 个 opportunities、45 条 plan-linked decision rows，且 `controls_paper rows=0`、三线齐全；但 `mature terminal opportunities=0`，pre-attribution gate 未通过，不能开始 direct filtering 或 capacity/path attribution，也不能部署 `atr_reclaim_0_35`。
+- 验证：已运行 `python main.py paper shadow-decisions --limit 60`、`python main.py paper shadow-maturity --no-obsidian`、`python main.py paper shadow-reconciliation --no-obsidian`、`python main.py db status`。
+- Git：待提交
+
 ## 2026-07-31
 
 ### 11:42:23 +08:00 - atr_reclaim 执行计划更新
