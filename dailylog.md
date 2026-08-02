@@ -22,6 +22,15 @@
 - 验证：已检查 `CryptoTrading_DailyPaperUpdate` 与 `CryptoTrading_4H_PaperUpdate` 最近运行结果均为 `0`；`python main.py db status` 成功；`python main.py paper shadow-decisions --limit 30` 显示 15 条 candidate-level 三线 shadow rows，尚无 plan-linked 或 terminal 样本。
 - Git：待提交
 
+## 2026-08-02
+
+### 23:26:58 +08:00 - atr_reclaim shadow 进度复核
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Obsidian / Git
+- 改动：复核 2026-08-02 最新 `paper_shadow_maturity` 与 `paper_shadow_reconciliation`，并更新 `TODO.md`、`开发计划.md`、`EXPERIMENT_LEDGER.md` 和 Obsidian 实验日志。
+- 影响：确认计划已从 candidate-only 推进到 plan-linked shadow observation，但 `mature terminal opportunities=0`，仍不能开始 direct filtering 或 capacity/path attribution；不修改 `config/settings.toml`，不授权 `atr_reclaim_0_35` 部署。
+- 验证：已运行 `python main.py db status`、`python main.py paper shadow-decisions --limit 60`，并读取 `reports/2026-08-02/paper_shadow_maturity_review_2026-08-02_demo_v6.md` 与 `reports/2026-08-02/paper_shadow_reconciliation_2026-08-02_demo_v6.md`。
+- Git：待提交
+
 ## 2026-07-30
 
 ### 18:34:00 +08:00 - atr_reclaim live decision-state logging

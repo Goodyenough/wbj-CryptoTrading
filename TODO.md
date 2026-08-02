@@ -6,7 +6,8 @@
 - [x] 确认 `atr_reclaim_0_35` 定位为 `provisional_research_incumbent`，不是 paper deployment，也不是 real-money deployment。
 - [x] 确认保留独立 `atr_reclaim_0_35_shadow` 对照线，用于长期比较 `atr_reclaim_0_35_shadow vs reference_baseline`。
 - [x] 确认当前样本状态为 `candidate_context_only_wait_for_plan_linked_samples`：已有 15 条 candidate-level rows，但没有 plan-linked decision rows 或 mature terminal outcomes。
-- [ ] 等待正常 `2026-07-31 12:10 +08:00` 4h 自动任务后复查：`python main.py paper shadow-decisions --limit 30`、`python main.py paper shadow-maturity --no-obsidian`、`python main.py paper shadow-reconciliation --no-obsidian`、`python main.py db status`。
+- [x] 等待正常 4h/daily 自动任务后复查 shadow 状态：截至 `2026-08-02 23:26 +08:00`，已有 105 条 decisions、21 个 opportunities、45 条 plan-linked decision rows；三线齐全，`controls_paper rows=0`，但 `mature terminal opportunities=0`。
+- [ ] 等待 `paper_plan:9734a33dea2e`（`ONDOUSDT`）或后续 plan-linked opportunities 达到 terminal paper status；当前 pre-attribution gate 仍未通过，因为 mature terminal opportunities `0 < 5`。
 - [ ] 只有在 pre-attribution gate 达标后，才开始只读 direct filtering 与 capacity/path attribution；未达标前不解释 `0.35` 有效性。
 - [ ] 下一轮正式 challenger 研究暂不启动，等 shadow logging/reconciliation 稳定后，再优先选择 candidate ranking / full-capacity opportunity cost 方向。
 

@@ -2,6 +2,17 @@
 
 更新时间：2026-07-31 11:42 +08:00
 
+## 2026-08-02 atr_reclaim prospective shadow progress check
+
+- 检查名：`atr_reclaim_prospective_shadow_progress_check_2026_08_02`。
+- 问题：计划是否已经从 candidate-only 等待状态推进到 plan-linked shadow observation，以及是否可以开始归因。
+- 当前状态：`CryptoTrading_DailyPaperUpdate` 上次运行 `2026-08-02 20:05:01`，结果 `0`；`CryptoTrading_4H_PaperUpdate` 上次运行 `2026-08-02 16:10:01`，结果 `0`；最新数据库 run 为 `20260802_120502_350dcb28`，状态 `success`。
+- 样本：最新 maturity/reconciliation 报告显示 `decisions=105`、`opportunities=21`、`candidate-only rows=60`、`plan-linked decision rows=45`、`mature terminal rows=0`、`right-censored open rows=45`。
+- 数据洁净度：三线 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 均存在；`complete opportunities=21`，`incomplete opportunities=0`，`controls_paper rows=0`，`mismatch opportunities=0`，`independent symbols=13`。
+- 结论：`decision_samples_not_mature` / `reconciliation_waiting_for_terminal_outcomes`。计划已进入 plan-linked shadow observation，但所有 plan-linked 样本仍处于 open/right-censored，尚不能开始 direct filtering 或 capacity/path attribution。
+- 决策：继续观察；不修改 `config/settings.toml`；不部署 `atr_reclaim_0_35`；不启动新 challenger。
+- 下一步：等待 `paper_plan:9734a33dea2e`（`ONDOUSDT`）或后续 plan-linked opportunities 达到 terminal paper status；pre-attribution gate 需要 `mature terminal opportunities >= 5`，当前为 `0`。
+
 ## 2026-07-31 atr_reclaim execution plan update
 
 - 检查名：`atr_reclaim_execution_plan_update_2026_07_31`。
