@@ -2,6 +2,15 @@
 
 更新时间：2026-08-03 00:34 +08:00
 
+## 2026-08-03 atr_reclaim shadow gate v6 wait check
+
+- 检查名：`atr_reclaim_shadow_gate_v6_wait_check_2026_08_03`。
+- 问题：当前是否已有新的自然 4h/daily 样本，或新增 candidate/outcome 表是否已经开始积累。
+- 当前状态：本机时间 `2026-08-03 00:35:14 +08:00`，下一次 4h 自动任务为 `2026-08-03 04:10:00`，因此没有新 4h run 是预期状态。
+- 结果：`decisions=105`、`opportunities=21`、`complete opportunities=21`、`controls_paper rows=0`、`incomplete opportunities=0`、`independent symbols=13`，但 `mature terminal opportunities=0`；新 `candidate observations=0`、`counterfactual outcomes=0`。
+- 结论：`decision_samples_not_mature` / `reconciliation_waiting_for_terminal_outcomes`。等待状态正常，不构成策略有效性证据。
+- 决策：继续等待 04:10 4h run 与 20:05 daily/import；不修改配置，不部署 `0.35`，不启动新 challenger。
+
 ## 2026-08-03 atr_reclaim shadow candidate outcome infrastructure
 
 - 检查名：`atr_reclaim_shadow_candidate_outcome_infrastructure_2026_08_03`。

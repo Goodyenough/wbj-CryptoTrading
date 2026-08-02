@@ -15,6 +15,13 @@
 
 ## 2026-08-03
 
+### 00:35:14 +08:00 - atr_reclaim shadow gate v6 等待检查
+- 类型：报告 / 状态复核 / Git
+- 改动：在 04:10 自动任务触发前执行只读检查，生成 `reports/2026-08-03/paper_shadow_reconciliation_2026-08-03_demo_v6.md` 与 `reports/2026-08-03/paper_shadow_maturity_review_2026-08-03_demo_v6.md`。
+- 影响：确认当前还没到下一次 4h 自动运行时间；新 candidate/outcome 表仍为 0 条，符合“等待下一次 daily/import 自然写入”的预期；pre-attribution gate 仍未通过。
+- 验证：`Get-Date` 显示 `2026-08-03 00:35:14 +08:00`，计划任务下一次 4h 为 `2026-08-03 04:10:00`；`db status` 正常；`shadow-candidate-observations` 与 `shadow-counterfactual-outcomes` 查询为空。
+- Git：本次提交 `Record atr reclaim shadow gate v6 wait`
+
 ### 00:34:00 +08:00 - atr_reclaim shadow candidate outcome 观察链路
 - 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Obsidian / Git
 - 改动：新增 `paper_shadow_candidate_observations` 与 `paper_shadow_counterfactual_outcomes` 两张观察表；daily/import 阶段记录候选级 observation 并初始化三线 counterfactual outcome；4h update 只读推进 counterfactual outcome；新增 `paper shadow-candidate-observations` 与 `paper shadow-counterfactual-outcomes` 查看入口，并让 maturity/reconciliation 报告显示 candidate/outcome 计数。
