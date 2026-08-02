@@ -21,6 +21,8 @@ from crypto_trading_system.paper_db import (
     audit_database_stability,
     build_paper_db_summary,
     export_paper_db,
+    load_paper_shadow_candidate_observations,
+    load_paper_shadow_counterfactual_outcomes,
     load_paper_shadow_decisions,
 )
 from crypto_trading_system.paper_shadow_maturity import build_shadow_maturity_review, write_shadow_maturity_report
@@ -277,9 +279,11 @@ def test_summary_and_export_use_structured_tables() -> None:
     assert summary["run_type_summary"]["daily_full"]["beijing_dates"] == ["2026-06-12"]
     output_dir = path.parent / "exports"
     exports = export_paper_db(path, output_dir)
-    assert len(exports) == 4
+    assert len(exports) == 6
     assert all(item.exists() for item in exports)
     assert any(item.name.startswith("paper_shadow_decisions_") for item in exports)
+    assert any(item.name.startswith("paper_shadow_candidate_observations_") for item in exports)
+    assert any(item.name.startswith("paper_shadow_counterfactual_outcomes_") for item in exports)
 
 
 def test_wal_allows_reader_during_write_transaction() -> None:
@@ -613,6 +617,21 @@ def test_add_from_scan_writes_plan_created_once() -> None:
     assert {json.loads(row["raw_json"])["stage"] for row in shadow_rows} == {
         "daily_import_candidate_context"
     }
+    observations = load_paper_shadow_candidate_observations(path, scan_id="scan1")
+    assert len(observations) == 1
+    assert observations[0]["symbol"] == "TESTUSDT"
+    assert observations[0]["scanner_action"] == "BUY_CANDIDATE"
+    assert observations[0]["source_rank"] == 1
+    assert observations[0]["signal_density"] == 1
+    outcomes = load_paper_shadow_counterfactual_outcomes(path, observation_id=observations[0]["observation_id"])
+    assert len(outcomes) == 3
+    assert {row["line_name"] for row in outcomes} == {
+        "atr_reclaim_0_35_shadow",
+        "reference_baseline",
+        "research_incumbent",
+    }
+    assert {row["maturity_state"] for row in outcomes} == {"not_entered"}
+    assert {row["right_censored"] for row in outcomes} == {1}
 
 
 def test_add_from_scan_records_shadow_context_for_skipped_candidate() -> None:
@@ -664,6 +683,71 @@ def test_add_from_scan_records_shadow_context_for_skipped_candidate() -> None:
     assert {json.loads(row["raw_json"])["scanner_action"] for row in shadow_rows} == {
         "WATCH_ONLY"
     }
+    observations = load_paper_shadow_candidate_observations(path, scan_id="scan1")
+    assert len(observations) == 1
+    assert observations[0]["scanner_action"] == "WATCH_ONLY"
+    assert observations[0]["sample_level"] == "candidate_level"
+    outcomes = load_paper_shadow_counterfactual_outcomes(path, observation_id=observations[0]["observation_id"])
+    assert len(outcomes) == 3
+    assert {row["maturity_state"] for row in outcomes} == {"not_entered"}
+
+
+def test_paper_update_advances_counterfactual_outcomes() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    payload = {
+        "action": "WATCH_ONLY",
+        "symbol": "TESTUSDT",
+        "base_asset": "TEST",
+        "setup": "test setup",
+        "verdict": "test verdict",
+        "entry_low": 100.0,
+        "entry_high": 105.0,
+        "stop_loss": 90.0,
+        "take_profit_1": 120.0,
+        "take_profit_2": 135.0,
+        "risk_reward_1": 2.0,
+        "risk_reward_2": 3.0,
+        "price": 103.0,
+        "atr_4h": 10.0,
+    }
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO scan_candidates(
+                scan_id, rank, symbol, base_asset, verdict, score, payload_json
+            ) VALUES ('scan1', 1, 'TESTUSDT', 'TEST', 'test verdict', 1.0, ?)
+            """,
+            (json.dumps(payload),),
+        )
+    settings = _settings_for(path)
+    add_from_scan(settings, scan_id="scan1", run_id="run1")
+
+    class _CounterfactualClient(_FakeBinanceClient):
+        close_price = 106.0
+
+        def klines(self, symbol: str, interval: str, limit: int) -> list[list]:
+            return [
+                [index, "100", "110", "95", "106", "1", 1_781_481_600_000 + index, "1", 1, "1", "1", "0"]
+                for index in range(25)
+            ]
+
+    original_client = paper_trader_module.BinanceClient
+    paper_trader_module.BinanceClient = _CounterfactualClient
+    try:
+        update_paper_trades(settings, run_id="run1")
+    finally:
+        paper_trader_module.BinanceClient = original_client
+
+    outcomes = load_paper_shadow_counterfactual_outcomes(path)
+    by_line = {row["line_name"]: row for row in outcomes}
+    assert by_line["reference_baseline"]["would_enter"] == 1
+    assert by_line["reference_baseline"]["maturity_state"] == "open_entered"
+    assert by_line["reference_baseline"]["entry_price_assumption"] == 105.0
+    assert by_line["atr_reclaim_0_35_shadow"]["would_enter"] == 0
+    assert by_line["atr_reclaim_0_35_shadow"]["maturity_state"] == "not_entered"
+    assert by_line["research_incumbent"]["would_enter"] == 0
 
 
 def test_shadow_maturity_review_classifies_candidate_terminal_and_open_rows() -> None:
@@ -1720,6 +1804,7 @@ if __name__ == "__main__":
     test_schema_v2_backfills_operational_plan_fields()
     test_add_from_scan_writes_plan_created_once()
     test_add_from_scan_records_shadow_context_for_skipped_candidate()
+    test_paper_update_advances_counterfactual_outcomes()
     test_shadow_maturity_review_classifies_candidate_terminal_and_open_rows()
     test_shadow_maturity_review_explains_waiting_state_without_rows()
     test_unclosed_kline_records_skip_without_state_change()

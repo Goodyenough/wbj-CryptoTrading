@@ -435,6 +435,413 @@ def _record_candidate_shadow_context(
         )
 
 
+def _candidate_float(payload: dict, key: str) -> float | None:
+    value = payload.get(key)
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _record_candidate_observation(
+    connection: sqlite3.Connection,
+    *,
+    settings: Settings,
+    account_name: str,
+    run_id: str | None,
+    scan_id: str,
+    scan_time: str,
+    payload: dict,
+    source_rank: int,
+    signal_density: int,
+) -> str:
+    symbol = str(payload["symbol"])
+    active_positions = _active_position_count(connection, account_name)
+    max_active_positions = settings.backtest.max_active_positions
+    capacity_state = "at_capacity" if active_positions >= max_active_positions else "capacity_available"
+    observation_key = f"{account_name}:{scan_id}:{symbol}"
+    observation_id = hashlib.sha256(observation_key.encode("utf-8")).hexdigest()[:12]
+    action = str(payload.get("action", "WATCH_ONLY")).upper()
+    market_regime = payload.get("market_regime")
+    if not market_regime:
+        scan_row = connection.execute(
+            "SELECT market_regime FROM market_scans WHERE scan_id = ?",
+            (scan_id,),
+        ).fetchone()
+        market_regime = None if scan_row is None else scan_row["market_regime"]
+    values = {
+        "observation_id": observation_id,
+        "account_name": account_name,
+        "run_id": run_id,
+        "scan_id": scan_id,
+        "scan_time": scan_time,
+        "symbol": symbol,
+        "source_rank": source_rank,
+        "scanner_action": action,
+        "score": _candidate_float(payload, "score"),
+        "market_regime": market_regime,
+        "signal_density": signal_density,
+        "active_positions": active_positions,
+        "max_active_positions": max_active_positions,
+        "capacity_state": capacity_state,
+        "would_be_blocked_by_capacity": 1 if capacity_state == "at_capacity" else 0,
+        "price": _candidate_float(payload, "price"),
+        "entry_low": _candidate_float(payload, "entry_low"),
+        "entry_high": _candidate_float(payload, "entry_high"),
+        "stop_loss": _candidate_float(payload, "stop_loss"),
+        "tp1": _candidate_float(payload, "take_profit_1"),
+        "tp2": _candidate_float(payload, "take_profit_2"),
+        "atr_4h": _candidate_float(payload, "atr_4h"),
+        "rsi_1h": _candidate_float(payload, "rsi_1h"),
+        "rsi_4h": _candidate_float(payload, "rsi_4h"),
+        "ema20_4h": _candidate_float(payload, "ema20_4h"),
+        "ema50_4h": _candidate_float(payload, "ema50_4h"),
+        "ema20_1d": _candidate_float(payload, "ema20_1d"),
+        "ema50_1d": _candidate_float(payload, "ema50_1d"),
+        "pct_24h": _candidate_float(payload, "pct_24h"),
+        "pct_3d": _candidate_float(payload, "pct_3d"),
+        "pct_7d": _candidate_float(payload, "pct_7d"),
+        "quote_volume_24h": _candidate_float(payload, "quote_volume_24h"),
+        "volume_ratio_24h": _candidate_float(payload, "volume_ratio_24h"),
+        "high_low_range_24h": _candidate_float(payload, "high_low_range_24h"),
+        "raw_json": json.dumps(payload, ensure_ascii=False, sort_keys=True),
+        "created_at": scan_time,
+        "updated_at": scan_time,
+    }
+    connection.execute(
+        """
+        INSERT INTO paper_shadow_candidate_observations(
+            observation_id, account_name, run_id, scan_id, scan_time, symbol, source_rank,
+            scanner_action, score, market_regime, sample_level, signal_density,
+            active_positions, max_active_positions, capacity_state, would_be_blocked_by_capacity,
+            price, entry_low, entry_high, stop_loss, tp1, tp2, atr_4h, rsi_1h, rsi_4h,
+            ema20_4h, ema50_4h, ema20_1d, ema50_1d, pct_24h, pct_3d, pct_7d,
+            quote_volume_24h, volume_ratio_24h, high_low_range_24h, raw_json,
+            created_at, updated_at
+        ) VALUES (
+            :observation_id, :account_name, :run_id, :scan_id, :scan_time, :symbol, :source_rank,
+            :scanner_action, :score, :market_regime, 'candidate_level', :signal_density,
+            :active_positions, :max_active_positions, :capacity_state, :would_be_blocked_by_capacity,
+            :price, :entry_low, :entry_high, :stop_loss, :tp1, :tp2, :atr_4h, :rsi_1h, :rsi_4h,
+            :ema20_4h, :ema50_4h, :ema20_1d, :ema50_1d, :pct_24h, :pct_3d, :pct_7d,
+            :quote_volume_24h, :volume_ratio_24h, :high_low_range_24h, :raw_json,
+            :created_at, :updated_at
+        )
+        ON CONFLICT(account_name, scan_id, symbol) DO UPDATE SET
+            run_id=COALESCE(excluded.run_id, paper_shadow_candidate_observations.run_id),
+            scanner_action=excluded.scanner_action,
+            score=excluded.score,
+            market_regime=COALESCE(excluded.market_regime, paper_shadow_candidate_observations.market_regime),
+            signal_density=excluded.signal_density,
+            active_positions=excluded.active_positions,
+            max_active_positions=excluded.max_active_positions,
+            capacity_state=excluded.capacity_state,
+            would_be_blocked_by_capacity=excluded.would_be_blocked_by_capacity,
+            price=excluded.price,
+            entry_low=excluded.entry_low,
+            entry_high=excluded.entry_high,
+            stop_loss=excluded.stop_loss,
+            tp1=excluded.tp1,
+            tp2=excluded.tp2,
+            atr_4h=excluded.atr_4h,
+            raw_json=excluded.raw_json,
+            updated_at=excluded.updated_at
+        """,
+        values,
+    )
+    for line_name in ("reference_baseline", "atr_reclaim_0_35_shadow", "research_incumbent"):
+        outcome_key = f"{observation_id}:{line_name}"
+        outcome_id = hashlib.sha256(outcome_key.encode("utf-8")).hexdigest()[:12]
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO paper_shadow_counterfactual_outcomes(
+                outcome_id, observation_id, account_name, run_id, line_name, symbol,
+                maturity_state, right_censored, raw_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, 'not_entered', 1, ?, ?, ?)
+            """,
+            (
+                outcome_id,
+                observation_id,
+                account_name,
+                run_id,
+                line_name,
+                symbol,
+                json.dumps({"paper_deployment": "not_controlled_by_shadow"}, sort_keys=True),
+                scan_time,
+                scan_time,
+            ),
+        )
+    return observation_id
+
+
+def _virtual_trade_from_observation(row: sqlite3.Row, status: str = "WATCHING") -> PaperTrade | None:
+    entry_low = row["entry_low"]
+    entry_high = row["entry_high"]
+    stop_loss = row["stop_loss"]
+    tp1 = row["tp1"]
+    tp2 = row["tp2"]
+    price = row["price"]
+    if None in (entry_low, entry_high, stop_loss, tp1, tp2):
+        return None
+    return PaperTrade(
+        paper_trade_id=str(row["observation_id"]),
+        account_name=str(row["account_name"]),
+        source_scan_id=str(row["scan_id"]),
+        source_rank=int(row["source_rank"] or 0),
+        symbol=str(row["symbol"]),
+        base_asset=str(row["symbol"]).removesuffix("USDT"),
+        status=status,
+        created_at_utc=str(row["scan_time"]),
+        updated_at_utc=str(row["scan_time"]),
+        setup="counterfactual_shadow_candidate",
+        verdict=str(row["scanner_action"] or ""),
+        entry_low=float(entry_low),
+        entry_high=float(entry_high),
+        planned_entry_mid=(float(entry_low) + float(entry_high)) / 2,
+        stop_loss=float(stop_loss),
+        take_profit_1=float(tp1),
+        take_profit_2=float(tp2),
+        risk_reward_1=0.0,
+        risk_reward_2=0.0,
+        account_equity=0.0,
+        risk_per_trade_pct=0.0,
+        cash_risk=1.0,
+        last_price=None if price is None else float(price),
+        notes="Counterfactual candidate path.",
+    )
+
+
+def _restore_virtual_trade(row: sqlite3.Row) -> PaperTrade | None:
+    raw = json.loads(row["outcome_raw_json"] or "{}")
+    trade_state = raw.get("trade_state")
+    if isinstance(trade_state, dict):
+        try:
+            return PaperTrade(**trade_state)
+        except TypeError:
+            pass
+    return _virtual_trade_from_observation(row)
+
+
+def _counterfactual_entry_allowed(row: sqlite3.Row, line_name: str, last_close: float, atr_4h: float | None) -> bool:
+    entry_high = row["entry_high"]
+    if entry_high is None:
+        return False
+    if line_name == "reference_baseline":
+        return last_close >= float(entry_high)
+    if atr_4h is None or atr_4h <= 0:
+        return False
+    return last_close >= float(entry_high) + 0.35 * atr_4h
+
+
+def _update_shadow_counterfactual_outcomes(
+    connection: sqlite3.Connection,
+    *,
+    settings: Settings,
+    account_name: str,
+    run_id: str | None,
+    now: str,
+    get_closed_4h,
+) -> int:
+    rows = connection.execute(
+        """
+        SELECT
+            o.outcome_id,
+            o.line_name,
+            o.would_enter,
+            o.entry_triggered_at,
+            o.entry_price_assumption,
+            o.mfe_r,
+            o.mae_r,
+            o.bars_observed,
+            o.maturity_state,
+            o.last_observed_at,
+            o.raw_json AS outcome_raw_json,
+            c.*
+        FROM paper_shadow_counterfactual_outcomes o
+        JOIN paper_shadow_candidate_observations c ON c.observation_id = o.observation_id
+        WHERE o.account_name = ?
+          AND o.maturity_state NOT IN ('terminal_stopped', 'terminal_closed', 'terminal_invalidated', 'terminal_time_exit')
+        ORDER BY c.scan_time, c.source_rank, o.line_name
+        """,
+        (account_name,),
+    ).fetchall()
+    updated = 0
+    closed_4h_cache: dict[str, list] = {}
+    for row in rows:
+        symbol = str(row["symbol"])
+        try:
+            if symbol not in closed_4h_cache:
+                closed_4h_cache[symbol] = get_closed_4h(symbol)
+            closed_4h = closed_4h_cache[symbol]
+        except Exception:
+            continue
+        if not closed_4h:
+            continue
+        latest = closed_4h[-1]
+        kline_time = datetime.fromtimestamp(
+            int(latest[6]) / 1000,
+            tz=timezone.utc,
+        ).isoformat(timespec="seconds").replace("+00:00", "Z")
+        if str(row["scan_time"]) >= kline_time or str(row["last_observed_at"] or "") == kline_time:
+            continue
+        high = float(latest[2])
+        low = float(latest[3])
+        close = float(latest[4])
+        atr_4h = _atr(closed_4h)
+        trade = _restore_virtual_trade(row)
+        if trade is None:
+            continue
+        raw = json.loads(row["outcome_raw_json"] or "{}")
+        events_payload: list[dict] = list(raw.get("events", [])) if isinstance(raw.get("events"), list) else []
+        would_enter = int(row["would_enter"] or 0)
+        entry_triggered_at = row["entry_triggered_at"]
+        entry_price = None if row["entry_price_assumption"] is None else float(row["entry_price_assumption"])
+
+        if not would_enter:
+            if not _counterfactual_entry_allowed(row, str(row["line_name"]), close, atr_4h):
+                connection.execute(
+                    """
+                    UPDATE paper_shadow_counterfactual_outcomes
+                    SET bars_observed = bars_observed + 1,
+                        maturity_state = 'not_entered',
+                        right_censored = 1,
+                        last_observed_at = ?,
+                        raw_json = ?,
+                        updated_at = ?
+                    WHERE outcome_id = ?
+                    """,
+                    (
+                        kline_time,
+                        json.dumps(
+                            {
+                                "paper_deployment": "not_controlled_by_shadow",
+                                "last_close": close,
+                                "atr_4h": atr_4h,
+                                "entry_reclaim_min_atr": 0.0 if row["line_name"] == "reference_baseline" else 0.35,
+                            },
+                            ensure_ascii=False,
+                            sort_keys=True,
+                        ),
+                        now,
+                        row["outcome_id"],
+                    ),
+                )
+                updated += 1
+                continue
+            would_enter = 1
+            entry_triggered_at = kline_time
+            entry_price = float(row["entry_high"])
+            trade.status = "ENTERED"
+            trade.entry_price = entry_price
+            trade.entered_at_utc = kline_time
+            risk = entry_price - trade.stop_loss
+            if risk > 0:
+                trade.quantity = trade.cash_risk / risk
+            trade.updated_at_utc = kline_time
+            events_payload.append(
+                {
+                    "event_type": "COUNTERFACTUAL_ENTERED",
+                    "event_time_utc": kline_time,
+                    "price": entry_price,
+                }
+            )
+
+        events = step_trade(
+            trade,
+            high=high,
+            low=low,
+            close=close,
+            event_time_utc=kline_time,
+            entry_price_override=entry_price,
+            move_stop_to_breakeven_on_tp1=settings.analysis.tp1_move_stop_to_breakeven_enabled,
+        )
+        events_payload.extend(asdict(event) for event in events)
+        risk_per_unit = None
+        if entry_price is not None:
+            risk_per_unit = entry_price - trade.stop_loss if trade.status == "WATCHING" else entry_price - float(row["stop_loss"])
+        mfe_r = row["mfe_r"]
+        mae_r = row["mae_r"]
+        if risk_per_unit is not None and risk_per_unit > 0:
+            bar_mfe = (high - entry_price) / risk_per_unit
+            bar_mae = (low - entry_price) / risk_per_unit
+            mfe_r = bar_mfe if mfe_r is None else max(float(mfe_r), bar_mfe)
+            mae_r = bar_mae if mae_r is None else min(float(mae_r), bar_mae)
+        first_terminal_event = None
+        terminal_at = None
+        terminal_price = None
+        realized_r = None
+        maturity_state = "open_entered"
+        right_censored = 1
+        if trade.status in {"STOPPED", "CLOSED", "INVALIDATED"}:
+            first_terminal_event = trade.status
+            terminal_at = trade.closed_at_utc
+            terminal_price = trade.exit_price
+            if entry_price is not None and terminal_price is not None and risk_per_unit is not None and risk_per_unit > 0:
+                realized_r = (terminal_price - entry_price) / risk_per_unit
+            maturity_state = {
+                "STOPPED": "terminal_stopped",
+                "CLOSED": "terminal_closed",
+                "INVALIDATED": "terminal_invalidated",
+            }[trade.status]
+            right_censored = 0
+        raw_json = json.dumps(
+            {
+                "paper_deployment": "not_controlled_by_shadow",
+                "trade_state": asdict(trade),
+                "events": events_payload,
+                "last_close": close,
+                "atr_4h": atr_4h,
+                "entry_reclaim_min_atr": 0.0 if row["line_name"] == "reference_baseline" else 0.35,
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        connection.execute(
+            """
+            UPDATE paper_shadow_counterfactual_outcomes
+            SET run_id = COALESCE(?, run_id),
+                would_enter = ?,
+                entry_triggered_at = ?,
+                entry_price_assumption = ?,
+                first_terminal_event = COALESCE(?, first_terminal_event),
+                terminal_at = COALESCE(?, terminal_at),
+                terminal_price = COALESCE(?, terminal_price),
+                realized_r = COALESCE(?, realized_r),
+                mfe_r = ?,
+                mae_r = ?,
+                bars_observed = bars_observed + 1,
+                maturity_state = ?,
+                right_censored = ?,
+                last_observed_at = ?,
+                raw_json = ?,
+                updated_at = ?
+            WHERE outcome_id = ?
+            """,
+            (
+                run_id,
+                would_enter,
+                entry_triggered_at,
+                entry_price,
+                first_terminal_event,
+                terminal_at,
+                terminal_price,
+                realized_r,
+                mfe_r,
+                mae_r,
+                maturity_state,
+                right_censored,
+                kline_time,
+                raw_json,
+                now,
+                row["outcome_id"],
+            ),
+        )
+        updated += 1
+    return updated
+
+
 def _sync_paper_plan(
     connection: sqlite3.Connection,
     trade: PaperTrade,
@@ -755,9 +1162,21 @@ def add_from_scan(
         ).fetchall()
         if not rows:
             raise ValueError(f"No candidates found for scan_id={chosen_scan_id}")
+        signal_density = len(rows)
 
         for row in rows:
             payload = json.loads(row["payload_json"])
+            _record_candidate_observation(
+                connection,
+                settings=settings,
+                account_name=account,
+                run_id=run_id,
+                scan_id=chosen_scan_id,
+                scan_time=scan_time,
+                payload=payload,
+                source_rank=int(row["rank"]),
+                signal_density=signal_density,
+            )
             _record_candidate_shadow_context(
                 connection,
                 settings=settings,
@@ -1188,6 +1607,15 @@ def update_paper_trades(
             errors.append(f"{trade.paper_trade_id}/{trade.symbol}: {type(exc).__name__}: {exc}")
     if errors:
         raise RuntimeError("Paper update completed with plan errors: " + " | ".join(errors))
+    with connect_db(settings.output.database_path) as connection:
+        _update_shadow_counterfactual_outcomes(
+            connection,
+            settings=settings,
+            account_name=account,
+            run_id=run_id,
+            now=now,
+            get_closed_4h=_get_closed_4h,
+        )
     return updated
 
 

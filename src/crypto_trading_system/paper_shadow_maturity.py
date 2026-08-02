@@ -31,6 +31,9 @@ class ShadowMaturityReview:
     terminal_status_counts: dict[str, int]
     opportunity_summaries: list[dict[str, object]]
     diagnostics: dict[str, object]
+    candidate_observation_count: int
+    counterfactual_outcome_count: int
+    counterfactual_terminal_count: int
     verdict: str
     reason: str
 
@@ -130,6 +133,22 @@ def build_shadow_maturity_review(
             ORDER BY started_at DESC
             LIMIT 1
             """
+        ).fetchone()
+        candidate_observation_count = int(
+            connection.execute(
+                "SELECT COUNT(*) FROM paper_shadow_candidate_observations WHERE account_name = ?",
+                (account,),
+            ).fetchone()[0]
+        )
+        outcome_counts = connection.execute(
+            """
+            SELECT
+                COUNT(*) AS total,
+                SUM(CASE WHEN right_censored = 0 THEN 1 ELSE 0 END) AS terminal
+            FROM paper_shadow_counterfactual_outcomes
+            WHERE account_name = ?
+            """,
+            (account,),
         ).fetchone()
 
     line_counts: Counter[str] = Counter()
@@ -266,6 +285,9 @@ def build_shadow_maturity_review(
             for item in sorted(opportunity_summary.values(), key=lambda value: str(value["opportunity_id"]))
         ],
         diagnostics=diagnostics,
+        candidate_observation_count=candidate_observation_count,
+        counterfactual_outcome_count=int(outcome_counts["total"] or 0),
+        counterfactual_terminal_count=int(outcome_counts["terminal"] or 0),
         verdict=verdict,
         reason=reason,
     )
@@ -340,6 +362,9 @@ def render_shadow_maturity_report(review: ShadowMaturityReview, version: int) ->
         f"| right-censored open rows | {review.right_censored_open_count} |",
         f"| unknown plan rows | {review.unknown_plan_count} |",
         f"| right-censored ratio | {review.right_censored_ratio_pct:.2f}% |",
+        f"| candidate observations | {review.candidate_observation_count} |",
+        f"| counterfactual outcomes | {review.counterfactual_outcome_count} |",
+        f"| terminal counterfactual outcomes | {review.counterfactual_terminal_count} |",
         "",
         "## Waiting Diagnostics",
         "",

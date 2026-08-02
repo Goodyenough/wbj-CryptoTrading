@@ -31,6 +31,8 @@ from crypto_trading_system.paper_db import (
     build_paper_db_summary,
     export_paper_db,
     load_paper_db_events,
+    load_paper_shadow_candidate_observations,
+    load_paper_shadow_counterfactual_outcomes,
     load_paper_shadow_decisions,
 )
 from crypto_trading_system.paper_audit import write_paper_audit_report
@@ -531,6 +533,20 @@ def build_parser() -> argparse.ArgumentParser:
     paper_shadow_decisions = paper_subparsers.add_parser("shadow-decisions", help="Show paper shadow decision-state logs.")
     paper_shadow_decisions.add_argument("--opportunity-id", default=None, help="Optional opportunity id filter.")
     paper_shadow_decisions.add_argument("--limit", type=int, default=200, help="Maximum decisions to show.")
+
+    paper_shadow_observations = paper_subparsers.add_parser(
+        "shadow-candidate-observations",
+        help="Show candidate-level shadow observations.",
+    )
+    paper_shadow_observations.add_argument("--scan-id", default=None, help="Optional scan id filter.")
+    paper_shadow_observations.add_argument("--limit", type=int, default=200, help="Maximum observations to show.")
+
+    paper_shadow_outcomes = paper_subparsers.add_parser(
+        "shadow-counterfactual-outcomes",
+        help="Show candidate-level counterfactual shadow outcomes.",
+    )
+    paper_shadow_outcomes.add_argument("--observation-id", default=None, help="Optional observation id filter.")
+    paper_shadow_outcomes.add_argument("--limit", type=int, default=200, help="Maximum outcomes to show.")
 
     paper_shadow_maturity = paper_subparsers.add_parser(
         "shadow-maturity",
@@ -1415,6 +1431,28 @@ def main() -> None:
             print(
                 json.dumps(
                     load_paper_shadow_decisions(settings.output.database_path, args.opportunity_id, args.limit),
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+
+        if args.paper_command == "shadow-candidate-observations":
+            print(
+                json.dumps(
+                    load_paper_shadow_candidate_observations(settings.output.database_path, args.scan_id, args.limit),
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+
+        if args.paper_command == "shadow-counterfactual-outcomes":
+            print(
+                json.dumps(
+                    load_paper_shadow_counterfactual_outcomes(
+                        settings.output.database_path,
+                        args.observation_id,
+                        args.limit,
+                    ),
                     ensure_ascii=False,
                     indent=2,
                 )

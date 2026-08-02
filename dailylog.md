@@ -15,6 +15,13 @@
 
 ## 2026-08-03
 
+### 00:34:00 +08:00 - atr_reclaim shadow candidate outcome 观察链路
+- 类型：代码 / 报告 / 测试 / TODO / 开发计划 / 实验账本 / Obsidian / Git
+- 改动：新增 `paper_shadow_candidate_observations` 与 `paper_shadow_counterfactual_outcomes` 两张观察表；daily/import 阶段记录候选级 observation 并初始化三线 counterfactual outcome；4h update 只读推进 counterfactual outcome；新增 `paper shadow-candidate-observations` 与 `paper shadow-counterfactual-outcomes` 查看入口，并让 maturity/reconciliation 报告显示 candidate/outcome 计数。
+- 影响：前向 shadow observation 后续可以同时保留候选级样本和计划级样本，便于将来区分直接过滤、容量路径和候选质量；该链路不控制 paper，不修改 `config/settings.toml`，当前真实库新表为 0 条，需等待下一次 daily/import 自然产生新样本。
+- 验证：已运行 `python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status`、`python main.py paper shadow-candidate-observations --limit 5`、`python main.py paper shadow-counterfactual-outcomes --limit 5`、`python main.py paper shadow-maturity --no-obsidian`、`python main.py paper shadow-reconciliation --no-obsidian`。
+- Git：本次提交 `Add paper shadow candidate outcomes`
+
 ### 00:25:31 +08:00 - atr_reclaim shadow gate 只读复核
 - 类型：报告 / 状态复核 / Git
 - 改动：运行 `python main.py paper shadow-reconciliation --no-obsidian` 与 `python main.py paper shadow-maturity --no-obsidian`，生成 `reports/2026-08-03/paper_shadow_reconciliation_2026-08-03_demo_v3.md` 与 `reports/2026-08-03/paper_shadow_maturity_review_2026-08-03_demo_v3.md`。

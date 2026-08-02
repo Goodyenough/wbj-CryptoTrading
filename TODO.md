@@ -8,6 +8,7 @@
 - [x] 确认当前样本状态为 `candidate_context_only_wait_for_plan_linked_samples`：已有 15 条 candidate-level rows，但没有 plan-linked decision rows 或 mature terminal outcomes。
 - [x] 等待正常 4h/daily 自动任务后复查 shadow 状态：截至 `2026-08-02 23:26 +08:00`，已有 105 条 decisions、21 个 opportunities、45 条 plan-linked decision rows；三线齐全，`controls_paper rows=0`，但 `mature terminal opportunities=0`。
 - [x] 复核 `2026-08-03 00:10 +08:00` 正常 4h 自动任务：任务成功且生成 8/3 报告；`complete opportunities=21`、`independent symbols=13`、`controls_paper rows=0`、`incomplete opportunities=0` 仍达标，但 `mature terminal opportunities=0`，且 `ONDOUSDT` 因 `API_DELAY_SKIPPED` 保持 `WATCHING`。
+- [x] 补强 prospective shadow 观察基础设施：新增 `paper_shadow_candidate_observations` 与 `paper_shadow_counterfactual_outcomes`，后续 daily/import 会记录候选级 observation，并为 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 初始化 counterfactual outcomes；4h update 只读推进这些 outcomes，不控制 paper。
 - [ ] 等待 `paper_plan:9734a33dea2e`（`ONDOUSDT`）或后续 plan-linked opportunities 达到 terminal paper status；当前 pre-attribution gate 仍未通过，因为 mature terminal opportunities `0 < 5`。
 - [ ] 只有在 pre-attribution gate 达标后，才开始只读 direct filtering 与 capacity/path attribution；未达标前不解释 `0.35` 有效性。
 - [ ] 下一轮正式 challenger 研究暂不启动，等 shadow logging/reconciliation 稳定后，再优先选择 candidate ranking / full-capacity opportunity cost 方向。

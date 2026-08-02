@@ -513,6 +513,34 @@ def load_paper_shadow_decisions(path: Path, opportunity_id: str | None = None, l
         return [dict(row) for row in connection.execute(sql, tuple(params)).fetchall()]
 
 
+def load_paper_shadow_candidate_observations(path: Path, scan_id: str | None = None, limit: int = 200) -> list[dict]:
+    sql = "SELECT * FROM paper_shadow_candidate_observations"
+    params: list[object] = []
+    if scan_id:
+        sql += " WHERE scan_id = ?"
+        params.append(scan_id)
+    sql += " ORDER BY scan_time DESC, source_rank LIMIT ?"
+    params.append(limit)
+    with connect_db(path) as connection:
+        return [dict(row) for row in connection.execute(sql, tuple(params)).fetchall()]
+
+
+def load_paper_shadow_counterfactual_outcomes(
+    path: Path,
+    observation_id: str | None = None,
+    limit: int = 200,
+) -> list[dict]:
+    sql = "SELECT * FROM paper_shadow_counterfactual_outcomes"
+    params: list[object] = []
+    if observation_id:
+        sql += " WHERE observation_id = ?"
+        params.append(observation_id)
+    sql += " ORDER BY updated_at DESC, observation_id, line_name LIMIT ?"
+    params.append(limit)
+    with connect_db(path) as connection:
+        return [dict(row) for row in connection.execute(sql, tuple(params)).fetchall()]
+
+
 def export_paper_db(path: Path, output_dir: Path) -> list[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     beijing = timezone(timedelta(hours=8))
@@ -522,6 +550,8 @@ def export_paper_db(path: Path, output_dir: Path) -> list[Path]:
         ("paper_events", "paper_events", "event_time"),
         ("paper_snapshots", "paper_snapshots", "snapshot_time"),
         ("paper_shadow_decisions", "paper_shadow_decisions", "decision_time"),
+        ("paper_shadow_candidate_observations", "paper_shadow_candidate_observations", "scan_time"),
+        ("paper_shadow_counterfactual_outcomes", "paper_shadow_counterfactual_outcomes", "updated_at"),
     ]
     paths: list[Path] = []
     with connect_db(path) as connection:

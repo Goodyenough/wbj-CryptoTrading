@@ -1,6 +1,17 @@
 # CryptoTradingSystem 实验账本
 
-更新时间：2026-08-03 00:18 +08:00
+更新时间：2026-08-03 00:34 +08:00
+
+## 2026-08-03 atr_reclaim shadow candidate outcome infrastructure
+
+- 检查名：`atr_reclaim_shadow_candidate_outcome_infrastructure_2026_08_03`。
+- 问题：prospective shadow observation 是否需要在 plan-linked rows 之外，额外保存候选级 observation 与不控制 paper 的 counterfactual outcomes，便于后续区分直接过滤、容量路径和候选质量。
+- 变更：新增 `paper_shadow_candidate_observations` 与 `paper_shadow_counterfactual_outcomes`；daily/import 阶段为 scan candidates 记录候选级 observation，并初始化 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三条 counterfactual outcome；4h update 只读推进 outcomes，不改变真实 paper plan。
+- 查看入口：新增 `python main.py paper shadow-candidate-observations` 与 `python main.py paper shadow-counterfactual-outcomes`；`paper shadow-maturity` 与 `paper shadow-reconciliation` 报告新增 candidate/outcome 计数。
+- 当前真实库状态：新表当前为 0 条，这是预期现象，因为该结构不会倒填旧 scan，只会从后续 daily/import 开始积累。
+- 验证：`python tests\test_database.py`、`python tests\test_paper_shadow_replay.py`、`python -m compileall main.py src tests`、`python main.py db status` 均通过；新 CLI 在真实库上可运行。
+- 结论：`infrastructure_ready_waiting_for_new_daily_import`。这是观察基础设施增强，不是 `0.35` 有效性证据。
+- 决策：不修改 `config/settings.toml`；不授权 `0.35` 控制 paper；pre-attribution gate 仍以 mature terminal opportunities 为硬门槛。
 
 ## 2026-08-03 atr_reclaim shadow gate v3 check
 

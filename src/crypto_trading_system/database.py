@@ -27,6 +27,9 @@ REQUIRED_OBSERVATION_INDEXES = {
     "idx_snapshot_plan_time",
     "idx_shadow_decision_time",
     "idx_shadow_opportunity_line",
+    "idx_shadow_candidate_scan_symbol",
+    "idx_shadow_outcome_observation_line",
+    "idx_shadow_outcome_maturity",
 }
 REQUIRED_OBSERVATION_TABLES = {
     "runs",
@@ -36,6 +39,8 @@ REQUIRED_OBSERVATION_TABLES = {
     "paper_events",
     "paper_snapshots",
     "paper_shadow_decisions",
+    "paper_shadow_candidate_observations",
+    "paper_shadow_counterfactual_outcomes",
 }
 OBSERVATION_UTC_COLUMNS = {
     "schema_metadata": ("updated_at",),
@@ -46,6 +51,14 @@ OBSERVATION_UTC_COLUMNS = {
     "paper_events": ("event_time", "kline_time", "created_at"),
     "paper_snapshots": ("snapshot_time", "created_at"),
     "paper_shadow_decisions": ("decision_time", "kline_time", "created_at"),
+    "paper_shadow_candidate_observations": ("scan_time", "created_at", "updated_at"),
+    "paper_shadow_counterfactual_outcomes": (
+        "created_at",
+        "updated_at",
+        "entry_triggered_at",
+        "terminal_at",
+        "last_observed_at",
+    ),
 }
 
 
@@ -271,6 +284,77 @@ def init_observation_db(path: Path) -> None:
                 UNIQUE(opportunity_id, line_name, decision_time, kline_time)
             );
 
+            CREATE TABLE IF NOT EXISTS paper_shadow_candidate_observations (
+                observation_id TEXT PRIMARY KEY,
+                account_name TEXT NOT NULL,
+                run_id TEXT,
+                scan_id TEXT NOT NULL,
+                scan_time TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                source_rank INTEGER NOT NULL,
+                scanner_action TEXT,
+                score REAL,
+                market_regime TEXT,
+                sample_level TEXT NOT NULL DEFAULT 'candidate_level',
+                signal_density INTEGER,
+                active_positions INTEGER,
+                max_active_positions INTEGER,
+                capacity_state TEXT,
+                would_be_blocked_by_capacity INTEGER NOT NULL DEFAULT 0,
+                price REAL,
+                entry_low REAL,
+                entry_high REAL,
+                stop_loss REAL,
+                tp1 REAL,
+                tp2 REAL,
+                atr_4h REAL,
+                rsi_1h REAL,
+                rsi_4h REAL,
+                ema20_4h REAL,
+                ema50_4h REAL,
+                ema20_1d REAL,
+                ema50_1d REAL,
+                pct_24h REAL,
+                pct_3d REAL,
+                pct_7d REAL,
+                quote_volume_24h REAL,
+                volume_ratio_24h REAL,
+                high_low_range_24h REAL,
+                raw_json TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(run_id) REFERENCES runs(run_id),
+                UNIQUE(account_name, scan_id, symbol)
+            );
+
+            CREATE TABLE IF NOT EXISTS paper_shadow_counterfactual_outcomes (
+                outcome_id TEXT PRIMARY KEY,
+                observation_id TEXT NOT NULL,
+                account_name TEXT NOT NULL,
+                run_id TEXT,
+                line_name TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                would_enter INTEGER NOT NULL DEFAULT 0,
+                entry_triggered_at TEXT,
+                entry_price_assumption REAL,
+                first_terminal_event TEXT,
+                terminal_at TEXT,
+                terminal_price REAL,
+                realized_r REAL,
+                mfe_r REAL,
+                mae_r REAL,
+                bars_observed INTEGER NOT NULL DEFAULT 0,
+                maturity_state TEXT NOT NULL DEFAULT 'not_entered',
+                right_censored INTEGER NOT NULL DEFAULT 1,
+                last_observed_at TEXT,
+                raw_json TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(observation_id) REFERENCES paper_shadow_candidate_observations(observation_id),
+                FOREIGN KEY(run_id) REFERENCES runs(run_id),
+                UNIQUE(observation_id, line_name)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_runs_type_started ON runs(run_type, started_at);
             CREATE INDEX IF NOT EXISTS idx_runs_status_started ON runs(status, started_at);
             CREATE INDEX IF NOT EXISTS idx_plans_symbol_status ON paper_plans(symbol, status);
@@ -282,6 +366,9 @@ def init_observation_db(path: Path) -> None:
             CREATE INDEX IF NOT EXISTS idx_snapshot_plan_time ON paper_snapshots(plan_id, snapshot_time);
             CREATE INDEX IF NOT EXISTS idx_shadow_decision_time ON paper_shadow_decisions(decision_time);
             CREATE INDEX IF NOT EXISTS idx_shadow_opportunity_line ON paper_shadow_decisions(opportunity_id, line_name);
+            CREATE INDEX IF NOT EXISTS idx_shadow_candidate_scan_symbol ON paper_shadow_candidate_observations(scan_id, symbol);
+            CREATE INDEX IF NOT EXISTS idx_shadow_outcome_observation_line ON paper_shadow_counterfactual_outcomes(observation_id, line_name);
+            CREATE INDEX IF NOT EXISTS idx_shadow_outcome_maturity ON paper_shadow_counterfactual_outcomes(maturity_state, right_censored);
             """
         )
         scan_columns = [
