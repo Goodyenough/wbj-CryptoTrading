@@ -1,6 +1,18 @@
 # CryptoTradingSystem 实验账本
 
-更新时间：2026-07-31 11:42 +08:00
+更新时间：2026-08-03 00:18 +08:00
+
+## 2026-08-03 atr_reclaim prospective shadow 00:10 check
+
+- 检查名：`atr_reclaim_prospective_shadow_0010_check_2026_08_03`。
+- 问题：正常 4h 自动任务后，前向 shadow 样本是否已经达到 pre-attribution gate，是否可以开始解释 `atr_reclaim_0_35` 的 direct filtering 或 capacity/path 价值。
+- 当前状态：`CryptoTrading_4H_PaperUpdate` 上次运行 `2026-08-03 00:10:01`，结果 `0`；`CryptoTrading_DailyPaperUpdate` 上次运行 `2026-08-02 20:05:01`，结果 `0`；最新数据库 run 为 `20260802_161002_442f70b2`，`paper_4h_update`，状态 `success`。
+- 样本：最新 8/3 maturity/reconciliation 报告显示 `decisions=105`、`opportunities=21`、`candidate-only rows=60`、`plan-linked decision rows=45`、`mature terminal rows=0`、`right-censored open rows=45`、`right-censored ratio=100.00%`。
+- 数据洁净度：`complete opportunities=21`，`incomplete opportunities=0`，`controls_paper rows=0`，`mismatch opportunities=0`，`independent symbols=13`。
+- 运行细节：当前 open plan 为 `ONDOUSDT`，仍是 `WATCHING`；本轮报告记录 `API_DELAY_SKIPPED`，原因是 24h ticker 不可用并触发 HTTP 451，状态更新被跳过。
+- 结论：`decision_samples_not_mature` / `reconciliation_waiting_for_terminal_outcomes`。除 `mature terminal opportunities=0 < 5` 外，其余 pre-attribution gate 项均已满足；当前仍不能做 direct filtering 或 capacity/path attribution。
+- 决策：继续等待正常自动任务；不修改 `config/settings.toml`；不部署 `atr_reclaim_0_35`；不启动新 challenger。
+- 下一步：等待 `ONDOUSDT` 或后续 plan-linked opportunities 达到 terminal paper status；只有 `mature terminal opportunities >= 5` 后才允许进入只读归因。
 
 ## 2026-08-02 atr_reclaim prospective shadow progress check
 

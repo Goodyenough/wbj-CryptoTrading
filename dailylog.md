@@ -15,6 +15,13 @@
 
 ## 2026-08-03
 
+### 00:18:54 +08:00 - atr_reclaim shadow 00:10 自动运行复核
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Obsidian / Git
+- 改动：复核 `2026-08-03 00:10 +08:00` 正常 4h 自动任务产物，纳入 `reports/2026-08-03/paper_4h_update_0010_demo_v1.md`、`paper_4h_dashboard_0010_demo_v1.md`、`paper_shadow_maturity_review_2026-08-03_demo_v2.md` 和 `paper_shadow_reconciliation_2026-08-03_demo_v2.md`；同步更新 `TODO.md`、`开发计划.md`、`EXPERIMENT_LEDGER.md` 和 Obsidian 实验日志。
+- 影响：确认项目仍处于 `Stage 3 - Wait For The Pre-Attribution Gate`；除 `mature terminal opportunities=0 < 5` 外，其余 gate 项达标，`atr_reclaim_0_35` 仍不能归因、不能部署，也不启动新 challenger。
+- 验证：已检查计划文件、8/3 maturity/reconciliation 报告、`python main.py db status`、Windows 计划任务状态和 `config/settings.toml` diff；配置无变更，4h 自动任务结果为 `0`。
+- Git：本次提交 `Record atr reclaim 00:10 shadow check`
+
 ### 00:03:59 +08:00 - atr_reclaim shadow 当前进度确认
 - 类型：报告 / 状态复核 / Git
 - 改动：根据 `atr_reclaim_incumbent_challenger_plan_2026-07-30_v1_zh-CN.md` 复核当前项目状态，生成 `reports/2026-08-03/paper_shadow_maturity_review_2026-08-03_demo_v1.md` 与 `reports/2026-08-03/paper_shadow_reconciliation_2026-08-03_demo_v1.md`。
