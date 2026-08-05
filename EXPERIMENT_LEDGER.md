@@ -1,6 +1,17 @@
 # CryptoTradingSystem 实验账本
 
-更新时间：2026-08-03 00:34 +08:00
+更新时间：2026-08-05 23:28 +08:00
+
+## 2026-08-05 atr_reclaim prospective shadow daily progress check
+
+- 检查名：`atr_reclaim_prospective_shadow_daily_progress_check_2026_08_05`。
+- 问题：8 月 5 日 daily/import 是否按计划产生新的前向 shadow 样本，是否已经达到 pre-attribution gate。
+- 当前状态：`CryptoTrading_DailyPaperUpdate` 最近运行 `2026-08-05 22:21:12 +08:00`，结果 `0`；最新数据库 run 为 `20260805_142117_1c0e47c5`，`daily_full`，状态 `success`。`CryptoTrading_4H_PaperUpdate` 最近任务返回 `2147946720`（`0x800710E0`，operator/admin refused request），需等下一次 4h 任务确认是否恢复。
+- 样本：`paper_shadow_decisions=123`、`opportunities=26`、`candidate-only rows=75`、`plan-linked decision rows=48`、`mature terminal rows=0`、`right-censored open rows=48`。
+- 新观察链路：`paper_shadow_candidate_observations=5`，`paper_shadow_counterfactual_outcomes=15`，`terminal counterfactual outcomes=0`。这说明 8 月 3 日新增的候选级 observation/outcome 链路已经在真实 daily/import 中开始自然写入。
+- 数据洁净度：`complete opportunities=26`，`incomplete opportunities=0`，`controls_paper rows=0`，`mismatch opportunities=0`，`independent symbols=15`。
+- 结论：`decision_samples_not_mature` / `reconciliation_waiting_for_terminal_outcomes`。计划有推进，但 `mature terminal opportunities=0 < 5`，仍不能开始 direct filtering 或 capacity/path attribution。
+- 决策：继续等待 terminal paper statuses；不修改 `config/settings.toml`；不部署 `atr_reclaim_0_35`；不启动新 challenger；单独观察 4h 计划任务下次是否恢复。
 
 ## 2026-08-03 atr_reclaim shadow gate v6 wait check
 

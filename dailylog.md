@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-08-05
+
+### 23:28:17 +08:00 - atr_reclaim shadow 8月5日进度复核
+- 类型：报告 / TODO / 开发计划 / 实验账本 / Obsidian / Git
+- 改动：复核 8 月 3-5 日自然任务产物，生成并纳入 `reports/2026-08-05/paper_shadow_maturity_review_2026-08-05_demo_v2.md` 与 `reports/2026-08-05/paper_shadow_reconciliation_2026-08-05_demo_v2.md`，同时归档 8 月 3-5 日未提交报告；同步更新 `TODO.md`、`开发计划.md`、`EXPERIMENT_LEDGER.md` 和 Obsidian 实验日志。
+- 影响：确认 daily/import 已成功写入新的候选级 observation/outcome 样本：`candidate observations=5`、`counterfactual outcomes=15`；但 `mature terminal opportunities=0 < 5`，pre-attribution gate 仍未通过，不能归因、部署 `0.35` 或启动新 challenger。另记录 `CryptoTrading_4H_PaperUpdate` 最近 `LastTaskResult=2147946720`（`0x800710E0`）需下轮复核。
+- 验证：已运行 `Get-ScheduledTask`、`python main.py db status`、`python main.py paper shadow-candidate-observations --limit 10`、`python main.py paper shadow-counterfactual-outcomes --limit 10`、`python main.py paper shadow-maturity --no-obsidian`、`python main.py paper shadow-reconciliation --no-obsidian`；`config/settings.toml` 无变更。
+- Git：本次提交 `Record atr reclaim Aug 5 shadow progress`
+
 ## 2026-08-03
 
 ### 00:35:14 +08:00 - atr_reclaim shadow gate v6 等待检查
