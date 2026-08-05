@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-08-06
+
+### 00:07:53 +08:00 - Windows 休眠唤醒任务统一入口
+- 类型：脚本 / 文档 / TODO / Git
+- 改动：将 `scripts/install_daily_task.ps1` 与 `scripts/install_4h_paper_task.ps1` 的计划任务动作改为直接调用统一入口 `scripts/run_logged_paper_task.ps1 -Mode daily|paper_4h`，不再通过 daily/4h `.bat` 包装层注册；为两个任务补齐 `WakeToRun`、`StartWhenAvailable`、失败后每 5 分钟重试 3 次和 `MultipleInstances IgnoreNew`，daily 设置 2 小时上限，4h 保持 30 分钟上限。
+- 影响：Windows 可以在睡眠状态下按计划唤醒并执行同一个脚本的不同模式；后续如果取消休眠，只需修改系统电源策略，不需要改交易脚本。4h 触发时间仍为 00:10、04:10、08:10、12:10、16:10，不新增 20 点附近触发器；用户已确认 daily 20:05 后下一次 4h 为 00:10，暂不增加跨任务互斥锁。
+- 验证：已运行 PowerShell parser 检查，`scripts/run_logged_paper_task.ps1`、`scripts/install_daily_task.ps1`、`scripts/install_4h_paper_task.ps1` 均 `parse_ok`；已验证 `New-ScheduledTaskSettingsSet` 支持 `WakeToRun`、`StartWhenAvailable`、`RestartCount`、`RestartInterval`、`ExecutionTimeLimit` 和 `MultipleInstances IgnoreNew`；当前 PowerShell 非管理员，未实际覆盖注册 Windows 任务；不手动触发真实 daily/4h 交易流程，避免污染 paper 观察样本。
+- Git：待提交
+
 ## 2026-08-05
 
 ### 23:28:17 +08:00 - atr_reclaim shadow 8月5日进度复核

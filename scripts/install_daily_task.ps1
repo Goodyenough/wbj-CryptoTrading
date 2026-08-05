@@ -6,10 +6,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$batchPath = Join-Path $projectRoot "scripts\daily_paper_update.bat"
+$taskScriptPath = Join-Path $projectRoot "scripts\run_logged_paper_task.ps1"
 
-if (-not (Test-Path -LiteralPath $batchPath)) {
-    throw "Cannot find daily batch script: $batchPath"
+if (-not (Test-Path -LiteralPath $taskScriptPath)) {
+    throw "Cannot find unified paper task script: $taskScriptPath"
 }
 
 $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -21,15 +21,23 @@ if (-not $isAdmin) {
 }
 
 $trigger = New-ScheduledTaskTrigger -Daily -At $At
-$action = New-ScheduledTaskAction -Execute $batchPath -WorkingDirectory $projectRoot
+$action = New-ScheduledTaskAction `
+    -Execute "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" `
+    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$taskScriptPath`" -Mode daily" `
+    -WorkingDirectory $projectRoot
 $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
 
 $settings = New-ScheduledTaskSettingsSet `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
-    -StartWhenAvailable
+    -WakeToRun `
+    -StartWhenAvailable `
+    -RestartCount 3 `
+    -RestartInterval (New-TimeSpan -Minutes 5) `
+    -ExecutionTimeLimit (New-TimeSpan -Hours 2) `
+    -MultipleInstances IgnoreNew
 
-$description = "Run CryptoTrading daily scan, paper update, and paper report every day at $At."
+$description = "Wake the PC and run the unified CryptoTrading paper task script in daily mode every day at $At."
 
 Register-ScheduledTask `
     -TaskName $TaskName `

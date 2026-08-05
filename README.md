@@ -71,7 +71,14 @@ python main.py paper cycle --run-type paper_4h_update --account demo
 
 模拟盘当前以 `paper_plans` 和 `paper_events` 作为结构化主数据层。`paper_trades` 和 `paper_trade_events` 仅保留为兼容镜像；paper update、paper report 和 observation dashboard 不依赖 legacy 行即可工作。
 
-Windows daily 与 4h 批处理统一通过 `scripts/run_logged_paper_task.ps1` 执行，日志以 UTF-8 写入并原样传递 Python 退出码；检测到历史 UTF-16 日志时会先归档，避免多种编码追加到同一文件。
+Windows daily 与 4h 批处理统一通过 `scripts/run_logged_paper_task.ps1` 执行，日志以 UTF-8 写入并原样传递 Python 退出码；检测到历史 UTF-16 日志时会先归档，避免多种编码追加到同一文件。任务计划程序只负责按时启动同一个脚本的不同模式：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_logged_paper_task.ps1 -Mode daily
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_logged_paper_task.ps1 -Mode paper_4h
+```
+
+`scripts\install_daily_task.ps1` 与 `scripts\install_4h_paper_task.ps1` 会把计划任务动作直接指向这个统一脚本，并设置唤醒运行、错过后立即运行、失败后每 5 分钟重试 3 次、同任务不启动新实例。取消 Windows 休眠时不需要改交易脚本，只需调整系统电源策略。
 
 检查 5 天门槛：
 

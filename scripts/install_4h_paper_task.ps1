@@ -6,11 +6,11 @@ param(
 $ErrorActionPreference = "Stop"
 
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$batchPath = Join-Path $projectRoot "scripts\paper_4h_update.bat"
+$taskScriptPath = Join-Path $projectRoot "scripts\run_logged_paper_task.ps1"
 $pythonPath = "C:\Users\10537\miniconda3\envs\ppt-master\python.exe"
 
-if (-not (Test-Path -LiteralPath $batchPath)) {
-    throw "Cannot find 4h paper update batch script: $batchPath"
+if (-not (Test-Path -LiteralPath $taskScriptPath)) {
+    throw "Cannot find unified paper task script: $taskScriptPath"
 }
 
 if (-not (Test-Path -LiteralPath $pythonPath)) {
@@ -37,8 +37,8 @@ if (-not $isAdmin) {
 }
 
 $action = New-ScheduledTaskAction `
-    -Execute "$env:SystemRoot\System32\cmd.exe" `
-    -Argument "/d /c `"`"$batchPath`"`"" `
+    -Execute "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" `
+    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$taskScriptPath`" -Mode paper_4h" `
     -WorkingDirectory $projectRoot
 $triggers = @(
     New-ScheduledTaskTrigger -Daily -At "00:10"
@@ -51,10 +51,14 @@ $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interac
 $settings = New-ScheduledTaskSettingsSet `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
+    -WakeToRun `
+    -StartWhenAvailable `
+    -RestartCount 3 `
+    -RestartInterval (New-TimeSpan -Minutes 5) `
     -ExecutionTimeLimit (New-TimeSpan -Minutes 30) `
     -MultipleInstances IgnoreNew
 
-$description = "Update existing CryptoTrading paper plans at closed 4h candle intervals; never scans or creates plans."
+$description = "Wake the PC and run the unified CryptoTrading paper task script in paper_4h mode at closed 4h candle intervals; never scans or creates plans."
 
 Register-ScheduledTask `
     -TaskName $TaskName `
