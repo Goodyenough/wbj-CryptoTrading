@@ -22,6 +22,13 @@
 - 验证：已运行 PowerShell parser 检查，`scripts/run_logged_paper_task.ps1`、`scripts/install_daily_task.ps1`、`scripts/install_4h_paper_task.ps1` 均 `parse_ok`；已验证 `New-ScheduledTaskSettingsSet` 支持 `WakeToRun`、`StartWhenAvailable`、`RestartCount`、`RestartInterval`、`ExecutionTimeLimit` 和 `MultipleInstances IgnoreNew`；当前 PowerShell 非管理员，未实际覆盖注册 Windows 任务；不手动触发真实 daily/4h 交易流程，避免污染 paper 观察样本。
 - Git：`4edb503` - `Unify scheduled paper task entrypoint`
 
+### 00:10:56 +08:00 - 00:10 自动 4h 报告归档
+- 类型：报告 / Git
+- 改动：00:10 计划任务自然生成 `reports/2026-08-06/paper_4h_update_0010_demo_v1.md`、`paper_4h_dashboard_0010_demo_v1.md`、`paper_shadow_maturity_review_2026-08-06_demo_v1.md` 与 `paper_shadow_reconciliation_2026-08-06_demo_v1.md`，在按规则 staging `reports/` 时随日志修正提交。
+- 影响：这是既有 Windows 任务的自然运行产物，不是手动触发；未修改策略配置，未增加新实验。
+- 验证：已读取 `paper_4h_update_0010_demo_v1.md`，确认 `Run type=paper_4h_update`、`Run ID=20260805_161003_24cbf66d`、数据来源为 SQLite。
+- Git：`e991858` - `Record scheduled task entrypoint commit hash`
+
 ## 2026-08-05
 
 ### 23:28:17 +08:00 - atr_reclaim shadow 8月5日进度复核
