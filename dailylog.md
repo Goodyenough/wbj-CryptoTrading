@@ -36,7 +36,7 @@
 - 改动：Windows 电源设置截图确认已接通电源时 `15 分钟`关闭屏幕、`15 分钟`进入睡眠、`30 分钟`进入休眠；`powercfg /query SCHEME_CURRENT SUB_SLEEP RTCWAKE` 显示当前高性能电源方案的“允许使用唤醒定时器”交流/直流设置均为 `0x00000001`，即启用。后续真实闭环测试方法：手动或自动进入睡眠后等待下一次 4h 任务，醒来后运行 `Get-ScheduledTaskInfo -TaskName CryptoTrading_4H_PaperUpdate`，确认 `LastRunTime` 更新且 `LastTaskResult=0`；同时可运行 `powercfg /lastwake` 与 `powercfg /waketimers` 检查唤醒来源和待触发唤醒定时器。
 - 影响：取消休眠时不需要修改交易脚本或任务入口，只需在 Windows `设置 -> 系统 -> 电源 -> 屏幕、睡眠和休眠超时` 中把“进入睡眠状态”和“休眠”改为“从不”或更长时间；也可保留任务计划继续按时运行。若后续只想关闭自动唤醒但保留任务，可在任务计划程序中取消两个任务的“唤醒计算机运行此任务”，或用安装脚本重新注册前先移除/调整 `WakeToRun`。若要暂停自动运行，可在任务计划程序禁用 `CryptoTrading_4H_PaperUpdate` 或 `CryptoTrading_DailyPaperUpdate`，恢复时再启用或重跑安装脚本。
 - 验证：已由用户贴出 `Get-ScheduledTaskInfo` 和 `Get-ScheduledTask ... Settings` 输出确认 4h 与 daily 任务最近运行结果均为 `0`、下一次运行时间正确、唤醒与重试设置生效；已由用户贴出 `powercfg /query SCHEME_CURRENT SUB_SLEEP RTCWAKE` 输出确认唤醒定时器启用。
-- Git：待提交
+- Git：`6cc77a2` - `Document sleep wake task operations`
 
 ## 2026-08-05
 
