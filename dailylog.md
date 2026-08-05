@@ -29,6 +29,15 @@
 - 验证：已读取 `paper_4h_update_0010_demo_v1.md`，确认 `Run type=paper_4h_update`、`Run ID=20260805_161003_24cbf66d`、数据来源为 SQLite。
 - Git：`e991858` - `Record scheduled task entrypoint commit hash`
 
+### 00:23:58 +08:00 - Windows 休眠与自动唤醒操作记录
+- 类型：运维文档 / Git
+- 改动：确认采用“电脑平时自动睡眠，Windows 任务计划程序按 daily/4h 时间唤醒执行统一脚本，脚本结束后由系统电源策略再次睡眠”的方案。当前任务入口为 `scripts/run_logged_paper_task.ps1`，daily 模式命令为 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_logged_paper_task.ps1 -Mode daily`，4h 模式命令为 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_logged_paper_task.ps1 -Mode paper_4h`。任务安装命令需在管理员 PowerShell 中从项目根目录执行：`powershell -ExecutionPolicy Bypass -File ".\scripts\install_daily_task.ps1"` 与 `powershell -ExecutionPolicy Bypass -File ".\scripts\install_4h_paper_task.ps1"`；如果 5 天稳定性门槛因已知历史失败阻挡，而用户明确接受最近 1 天成功作为临时门槛，可用 `powershell -ExecutionPolicy Bypass -File ".\scripts\install_4h_paper_task.ps1" -RequiredStableDays 1`。
+- 改动：本次用户实际用 `-RequiredStableDays 1` 成功安装 `CryptoTrading_4H_PaperUpdate`，稳定性检查只取 `2026-08-05` 的 `daily_full` run `20260805_142117_1c0e47c5`，`ready_for_4h_task=true`。4h 触发器为 `00:10`、`04:10`、`08:10`、`12:10`、`16:10`；`CryptoTrading_DailyPaperUpdate` 下一次为 `2026-08-06 20:05:00`，`CryptoTrading_4H_PaperUpdate` 下一次为 `2026-08-06 04:10:00`。两个任务设置均确认：`WakeToRun=True`、`StartWhenAvailable=True`、`RestartCount=3`、`RestartInterval=PT5M`、`MultipleInstances=IgnoreNew`、`RunOnlyIfIdle=False`，4h `ExecutionTimeLimit=PT30M`，daily `ExecutionTimeLimit=PT2H`。
+- 改动：Windows 电源设置截图确认已接通电源时 `15 分钟`关闭屏幕、`15 分钟`进入睡眠、`30 分钟`进入休眠；`powercfg /query SCHEME_CURRENT SUB_SLEEP RTCWAKE` 显示当前高性能电源方案的“允许使用唤醒定时器”交流/直流设置均为 `0x00000001`，即启用。后续真实闭环测试方法：手动或自动进入睡眠后等待下一次 4h 任务，醒来后运行 `Get-ScheduledTaskInfo -TaskName CryptoTrading_4H_PaperUpdate`，确认 `LastRunTime` 更新且 `LastTaskResult=0`；同时可运行 `powercfg /lastwake` 与 `powercfg /waketimers` 检查唤醒来源和待触发唤醒定时器。
+- 影响：取消休眠时不需要修改交易脚本或任务入口，只需在 Windows `设置 -> 系统 -> 电源 -> 屏幕、睡眠和休眠超时` 中把“进入睡眠状态”和“休眠”改为“从不”或更长时间；也可保留任务计划继续按时运行。若后续只想关闭自动唤醒但保留任务，可在任务计划程序中取消两个任务的“唤醒计算机运行此任务”，或用安装脚本重新注册前先移除/调整 `WakeToRun`。若要暂停自动运行，可在任务计划程序禁用 `CryptoTrading_4H_PaperUpdate` 或 `CryptoTrading_DailyPaperUpdate`，恢复时再启用或重跑安装脚本。
+- 验证：已由用户贴出 `Get-ScheduledTaskInfo` 和 `Get-ScheduledTask ... Settings` 输出确认 4h 与 daily 任务最近运行结果均为 `0`、下一次运行时间正确、唤醒与重试设置生效；已由用户贴出 `powercfg /query SCHEME_CURRENT SUB_SLEEP RTCWAKE` 输出确认唤醒定时器启用。
+- Git：待提交
+
 ## 2026-08-05
 
 ### 23:28:17 +08:00 - atr_reclaim shadow 8月5日进度复核
