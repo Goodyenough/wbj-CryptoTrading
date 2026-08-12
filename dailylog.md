@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-08-13
+
+### 00:21:00 +08:00 - 创建详细项目交接文档
+- 类型：文档 / 报告 / Git
+- 改动：在 `handoff.md` 顶部新增 `2026-08-13 00:21 +08:00` 交接章节，完整记录项目目标、`atr_reclaim_0_35` 的 incumbent/challenger 口径、六个研究优先级、历史容量研究结论、prospective shadow 数据表和样本层级、当前 4h/daily 自动任务、pre-attribution gate、当前数据库样本、全部未完成事项、下一会话可直接执行的只读命令以及不可违反的研究声明。保留旧 handoff 历史章节不变。
+- 影响：新会话可以直接从当前事实接续，不需要重新解释 `candidate-only`、`plan-linked decision`、`terminal counterfactual outcome` 和严格 `mature terminal opportunity` 的区别；明确当前 `terminal counterfactual outcomes=6` 仍不等于 `mature terminal opportunities=5`，当前 gate 仍为 `0/5`。
+- 验证：已运行 `python main.py db status`、`python main.py paper shadow-maturity --no-obsidian`、`python main.py paper shadow-reconciliation --no-obsidian`、`Get-ScheduledTaskInfo -TaskName 'CryptoTrading_4H_PaperUpdate'`、`Get-ScheduledTaskInfo -TaskName 'CryptoTrading_DailyPaperUpdate'`；最新报告为 `reports/2026-08-13/paper_shadow_maturity_review_2026-08-13_demo_v2.md` 和 `reports/2026-08-13/paper_shadow_reconciliation_2026-08-13_demo_v1.md`；确认未修改 `config/settings.toml`，未写入 `data/crypto_trading.db`。
+- Git：待提交
+
 ## 2026-08-12
 
 ### 23:40:09 +08:00 - 项目状态回顾与 shadow 进度复核
