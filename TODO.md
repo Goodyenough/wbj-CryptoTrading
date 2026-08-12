@@ -2,6 +2,17 @@
 
 ## 2026-07-31 atr_reclaim prospective shadow 执行计划
 
+## 2026-08-13 candidate -> plan-level 漏斗诊断
+
+- [x] 新增 `paper_shadow_funnel_events` 诊断表、索引和幂等事件写入。
+- [x] 覆盖 candidate observation、import evaluation、plan creation/conflict、replacement archive、4h evaluation/skip、reclaim pending、state transition 和 terminal reached。
+- [x] 新增 `python main.py paper shadow-funnel-audit --account demo --days 30 --no-obsidian`，输出 Markdown/JSON 报告。
+- [x] 使用临时 SQLite fixture 验证成功导入、重复导入和 coverage verdict；确认不改变 paper 状态机。
+- [x] 真实 30 日首轮审计：覆盖满足；verdict=`mixed_causes`，存在执行跳过信号和 terminal plan 与 terminal shadow outcome 的关联缺口。
+- [ ] 在连续新增至少 7 个自然日数据后复跑 funnel audit，确认 `ticker_error` / `kline_error` 是否仍为主要断点。
+- [ ] 单独审计 terminal plan 与 shadow observation 的关联缺口；不得放宽 maturity gate 或将 candidate outcome 伪装成 plan-level outcome。
+- [ ] 若漏斗审计连续确认存在真实关联缺陷，再另立修复任务；在此之前不启动新 ATR 阈值、capacity replacement 或入场因子实验。
+
 - [x] 写入完整计划更新：`reports/2026-07-31/atr_reclaim_execution_plan_update_2026-07-31_v1.md`。
 - [x] 确认 `atr_reclaim_0_35` 定位为 `provisional_research_incumbent`，不是 paper deployment，也不是 real-money deployment。
 - [x] 确认保留独立 `atr_reclaim_0_35_shadow` 对照线，用于长期比较 `atr_reclaim_0_35_shadow vs reference_baseline`。

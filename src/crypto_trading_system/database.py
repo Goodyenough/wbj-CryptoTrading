@@ -10,7 +10,7 @@ import subprocess
 import uuid
 
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 BUSY_TIMEOUT_MS = 30_000
 TERMINAL_PLAN_STATUSES = {"CLOSED", "STOPPED", "EXPIRED", "INVALIDATED", "ARCHIVED"}
 REQUIRED_OBSERVATION_INDEXES = {
@@ -30,6 +30,9 @@ REQUIRED_OBSERVATION_INDEXES = {
     "idx_shadow_candidate_scan_symbol",
     "idx_shadow_outcome_observation_line",
     "idx_shadow_outcome_maturity",
+    "idx_shadow_funnel_event_time",
+    "idx_shadow_funnel_plan",
+    "idx_shadow_funnel_scan_symbol",
 }
 REQUIRED_OBSERVATION_TABLES = {
     "runs",
@@ -41,6 +44,7 @@ REQUIRED_OBSERVATION_TABLES = {
     "paper_shadow_decisions",
     "paper_shadow_candidate_observations",
     "paper_shadow_counterfactual_outcomes",
+    "paper_shadow_funnel_events",
 }
 OBSERVATION_UTC_COLUMNS = {
     "schema_metadata": ("updated_at",),
@@ -58,6 +62,10 @@ OBSERVATION_UTC_COLUMNS = {
         "entry_triggered_at",
         "terminal_at",
         "last_observed_at",
+    ),
+    "paper_shadow_funnel_events": (
+        "event_time",
+        "created_at",
     ),
 }
 
@@ -355,6 +363,39 @@ def init_observation_db(path: Path) -> None:
                 UNIQUE(observation_id, line_name)
             );
 
+            CREATE TABLE IF NOT EXISTS paper_shadow_funnel_events (
+                event_id TEXT PRIMARY KEY,
+                event_key TEXT NOT NULL UNIQUE,
+                run_id TEXT,
+                account_name TEXT NOT NULL,
+                scan_id TEXT,
+                symbol TEXT,
+                source_rank INTEGER,
+                observation_id TEXT,
+                plan_id TEXT,
+                event_time TEXT NOT NULL,
+                stage TEXT NOT NULL CHECK(stage IN (
+                    'candidate_observed',
+                    'import_evaluated',
+                    'plan_created',
+                    'plan_duplicate_or_skipped',
+                    'plan_archived_by_replacement',
+                    'plan_update_evaluated',
+                    'plan_update_skipped',
+                    'state_transition',
+                    'terminal_reached'
+                )),
+                event_type TEXT NOT NULL,
+                reason_code TEXT,
+                old_status TEXT,
+                new_status TEXT,
+                raw_json TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(run_id) REFERENCES runs(run_id),
+                FOREIGN KEY(plan_id) REFERENCES paper_plans(plan_id),
+                FOREIGN KEY(observation_id) REFERENCES paper_shadow_candidate_observations(observation_id)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_runs_type_started ON runs(run_type, started_at);
             CREATE INDEX IF NOT EXISTS idx_runs_status_started ON runs(status, started_at);
             CREATE INDEX IF NOT EXISTS idx_plans_symbol_status ON paper_plans(symbol, status);
@@ -369,6 +410,9 @@ def init_observation_db(path: Path) -> None:
             CREATE INDEX IF NOT EXISTS idx_shadow_candidate_scan_symbol ON paper_shadow_candidate_observations(scan_id, symbol);
             CREATE INDEX IF NOT EXISTS idx_shadow_outcome_observation_line ON paper_shadow_counterfactual_outcomes(observation_id, line_name);
             CREATE INDEX IF NOT EXISTS idx_shadow_outcome_maturity ON paper_shadow_counterfactual_outcomes(maturity_state, right_censored);
+            CREATE INDEX IF NOT EXISTS idx_shadow_funnel_event_time ON paper_shadow_funnel_events(event_time, stage);
+            CREATE INDEX IF NOT EXISTS idx_shadow_funnel_plan ON paper_shadow_funnel_events(plan_id, event_time);
+            CREATE INDEX IF NOT EXISTS idx_shadow_funnel_scan_symbol ON paper_shadow_funnel_events(scan_id, symbol, event_time);
             """
         )
         scan_columns = [

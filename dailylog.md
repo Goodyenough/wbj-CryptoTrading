@@ -15,6 +15,13 @@
 
 ## 2026-08-13
 
+### 01:35:00 +08:00 - 新增 candidate 到 plan-level 漏斗诊断链路
+- 类型：代码 / 测试 / 报告 / Git
+- 改动：新增 `paper_shadow_funnel_events` v3 数据表及索引；在 `paper_trader.py` 为 candidate observation、import 判定、plan 创建/冲突、WATCHING 替换归档、4h 评估/跳过、reclaim pending、状态转移和终态写入幂等漏斗事件；新增 `python main.py paper shadow-funnel-audit --account demo --days 30 --no-obsidian`，输出 Markdown/JSON 诊断报告；新增数据库级幂等和 coverage 测试。
+- 影响：不改变 `config/settings.toml`、`max_active_positions`、`atr_reclaim_0_35`、paper 入场行为或 maturity 定义；历史缺失事件只在审计报告中标记为 `reconstructed_from_existing_data`，不补造样本、不改变 gate。
+- 验证：`python -m compileall -q main.py src tests` 通过；临时 SQLite 端到端 smoke test 通过，重复导入产生 `plan_duplicate_or_skipped` 且不重复创建计划；`python main.py db status` 显示 schema v3、表/索引/FK/UTC 检查通过；最终真实 30 日审计报告 `reports/2026-08-13/paper_shadow_funnel_audit_2026-08-13_demo_v6.md` verdict=`mixed_causes`，覆盖满足但存在 34 次 update skip 和 1 个 terminal plan 无 terminal shadow outcome；`pytest` 未执行，因为当前 Python 3.11/3.12 环境均未安装 pytest，且测试模块导入需要缺失的 `tzdata`。
+- Git：待提交
+
 ### 00:21:00 +08:00 - 创建详细项目交接文档
 - 类型：文档 / 报告 / Git
 - 改动：在 `handoff.md` 顶部新增 `2026-08-13 00:21 +08:00` 交接章节，完整记录项目目标、`atr_reclaim_0_35` 的 incumbent/challenger 口径、六个研究优先级、历史容量研究结论、prospective shadow 数据表和样本层级、当前 4h/daily 自动任务、pre-attribution gate、当前数据库样本、全部未完成事项、下一会话可直接执行的只读命令以及不可违反的研究声明。保留旧 handoff 历史章节不变。

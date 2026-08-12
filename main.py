@@ -41,6 +41,7 @@ from crypto_trading_system.paper_shadow_experiments import EXPERIMENTS, write_sh
 from crypto_trading_system.paper_shadow_maturity import write_shadow_maturity_report
 from crypto_trading_system.paper_shadow_reconciliation import write_shadow_reconciliation_report
 from crypto_trading_system.paper_shadow_replay import write_shadow_replay_report
+from crypto_trading_system.paper_shadow_funnel import write_shadow_funnel_audit_report
 from crypto_trading_system.reports import write_scan_reports
 from crypto_trading_system.research_tools import (
     build_experiment_index,
@@ -579,6 +580,19 @@ def build_parser() -> argparse.ArgumentParser:
         default=3,
         help="Minimum independent symbols required before attribution.",
     )
+
+    paper_shadow_funnel = paper_subparsers.add_parser(
+        "shadow-funnel-audit",
+        help="Audit the candidate -> plan -> terminal paper-shadow funnel without changing strategy state.",
+    )
+    paper_shadow_funnel.add_argument("--account", default=None, help="Paper account name. Defaults to settings.")
+    paper_shadow_funnel.add_argument(
+        "--days",
+        type=int,
+        default=30,
+        help="UTC lookback window. Reports insufficient coverage until at least 7 days, 5 daily runs, and 20 4h runs exist.",
+    )
+    paper_shadow_funnel.add_argument("--no-obsidian", action="store_true", help="Write only project reports.")
 
     paper_export = paper_subparsers.add_parser("db-export", help="Export plans, events, and snapshots as CSV.")
     paper_export.add_argument("--output-dir", default="exports", help="CSV output directory.")
@@ -1494,6 +1508,28 @@ def main() -> None:
             print(f"incomplete_opportunities={review.incomplete_opportunity_count}")
             for path in report_paths:
                 print(f"report={path}")
+
+        if args.paper_command == "shadow-funnel-audit":
+            original_obsidian = settings.output.obsidian_dir
+            if args.no_obsidian:
+                settings.output.obsidian_dir = None
+            audit, report_paths, json_path = write_shadow_funnel_audit_report(
+                settings,
+                account_name=args.account,
+                days=args.days,
+                include_obsidian=not args.no_obsidian,
+            )
+            settings.output.obsidian_dir = original_obsidian
+            print("paper_shadow_funnel_audit=completed")
+            print(f"verdict={audit['verdict']}")
+            print(f"reason={audit['reason']}")
+            print(f"candidate_observations={audit['funnel_counts']['candidate_observations']}")
+            print(f"plan_level_plans_created={audit['funnel_counts']['plan_level_plans_created']}")
+            print(f"mature_terminal_plans={audit['funnel_counts']['mature_terminal_plans']}")
+            print(f"coverage_ok={audit['coverage']['coverage_ok']}")
+            for path in report_paths:
+                print(f"report={path}")
+            print(f"json={json_path}")
 
         if args.paper_command == "db-export":
             for path in export_paper_db(settings.output.database_path, Path(args.output_dir)):

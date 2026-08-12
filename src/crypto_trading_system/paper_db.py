@@ -552,6 +552,7 @@ def export_paper_db(path: Path, output_dir: Path) -> list[Path]:
         ("paper_shadow_decisions", "paper_shadow_decisions", "decision_time"),
         ("paper_shadow_candidate_observations", "paper_shadow_candidate_observations", "scan_time"),
         ("paper_shadow_counterfactual_outcomes", "paper_shadow_counterfactual_outcomes", "updated_at"),
+        ("paper_shadow_funnel_events", "paper_shadow_funnel_events", "event_time"),
     ]
     paths: list[Path] = []
     with connect_db(path) as connection:

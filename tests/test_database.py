@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import gc
+from datetime import datetime
 import json
 from pathlib import Path
 import sqlite3
@@ -30,6 +31,7 @@ from crypto_trading_system.paper_shadow_reconciliation import (
     build_shadow_reconciliation_review,
     write_shadow_reconciliation_report,
 )
+from crypto_trading_system.paper_shadow_funnel import build_shadow_funnel_audit, write_shadow_funnel_audit_report
 from crypto_trading_system import paper_trader as paper_trader_module
 from crypto_trading_system.paper_trader import (
     _insert_paper_trade,
@@ -631,6 +633,63 @@ def test_add_from_scan_writes_plan_created_once() -> None:
         "research_incumbent",
     }
     assert {row["maturity_state"] for row in outcomes} == {"not_entered"}
+
+
+def test_shadow_funnel_records_candidate_import_plan_and_is_idempotent() -> None:
+    path = _temp_db()
+    init_db(path)
+    _seed_scan_and_run(path)
+    payload = {
+        "action": "BUY_CANDIDATE",
+        "symbol": "TESTUSDT",
+        "base_asset": "TEST",
+        "setup": "test setup",
+        "verdict": "test verdict",
+        "entry_low": 100.0,
+        "entry_high": 105.0,
+        "stop_loss": 90.0,
+        "take_profit_1": 120.0,
+        "take_profit_2": 135.0,
+        "risk_reward_1": 2.0,
+        "risk_reward_2": 3.0,
+        "price": 103.0,
+    }
+    with connect_db(path) as connection:
+        connection.execute(
+            """
+            INSERT INTO scan_candidates(
+                scan_id, rank, symbol, base_asset, verdict, score, payload_json
+            ) VALUES ('scan1', 1, 'TESTUSDT', 'TEST', 'test verdict', 1.0, ?)
+            """,
+            (json.dumps(payload),),
+        )
+    settings = _settings_for(path)
+    add_from_scan(settings, scan_id="scan1", run_id="run1")
+    add_from_scan(settings, scan_id="scan1", run_id="run1")
+    with connect_db(path) as connection:
+        rows = connection.execute(
+            "SELECT stage, event_type, reason_code FROM paper_shadow_funnel_events ORDER BY event_time, event_id"
+        ).fetchall()
+    assert {row["stage"] for row in rows} == {"candidate_observed", "import_evaluated", "plan_created"}
+    assert len(rows) == 3
+
+
+def test_shadow_funnel_audit_marks_insufficient_coverage_without_changing_state() -> None:
+    path = _temp_db()
+    init_db(path)
+    settings = _settings_for(path)
+    settings.output.reports_dir = path.parent / "reports"
+    settings.output.obsidian_dir = None
+    audit = build_shadow_funnel_audit(settings, days=7, now=datetime.fromisoformat("2026-06-19T00:00:00+00:00"))
+    assert audit["verdict"] == "insufficient_observation_coverage"
+    _, paths, json_path = write_shadow_funnel_audit_report(
+        settings,
+        days=7,
+        now=datetime.fromisoformat("2026-06-19T00:00:00+00:00"),
+        include_obsidian=False,
+    )
+    assert paths and paths[0].exists()
+    assert json_path.exists()
     assert {row["right_censored"] for row in outcomes} == {1}
 
 

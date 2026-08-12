@@ -32,6 +32,75 @@ ALLOWED_TRANSITIONS = {
     "ARCHIVED": {"ARCHIVED"},
 }
 
+FUNNEL_STAGES = {
+    "candidate_observed",
+    "import_evaluated",
+    "plan_created",
+    "plan_duplicate_or_skipped",
+    "plan_archived_by_replacement",
+    "plan_update_evaluated",
+    "plan_update_skipped",
+    "state_transition",
+    "terminal_reached",
+}
+
+
+def _record_funnel_event(
+    connection: sqlite3.Connection,
+    *,
+    event_key: str,
+    run_id: str | None,
+    account_name: str,
+    scan_id: str | None = None,
+    symbol: str | None = None,
+    source_rank: int | None = None,
+    observation_id: str | None = None,
+    plan_id: str | None = None,
+    event_time: str | None = None,
+    stage: str,
+    event_type: str,
+    reason_code: str | None = None,
+    old_status: str | None = None,
+    new_status: str | None = None,
+    raw_json: dict | None = None,
+) -> None:
+    """Best-effort, idempotent diagnostic event; never changes paper behavior."""
+    if stage not in FUNNEL_STAGES:
+        raise ValueError(f"Unknown paper shadow funnel stage: {stage}")
+    timestamp = event_time or _utc_now()
+    try:
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO paper_shadow_funnel_events(
+                event_id, event_key, run_id, account_name, scan_id, symbol, source_rank,
+                observation_id, plan_id, event_time, stage, event_type, reason_code,
+                old_status, new_status, raw_json, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                hashlib.sha256(event_key.encode("utf-8")).hexdigest()[:24],
+                event_key,
+                run_id,
+                account_name,
+                scan_id,
+                symbol,
+                source_rank,
+                observation_id,
+                plan_id,
+                timestamp,
+                stage,
+                event_type,
+                reason_code,
+                old_status,
+                new_status,
+                json.dumps(raw_json or {}, ensure_ascii=False, sort_keys=True),
+                timestamp,
+            ),
+        )
+    except sqlite3.Error:
+        # Diagnostics must not change the existing paper state machine.
+        return
+
 
 def _utc_now() -> str:
     return utc_now()
@@ -550,6 +619,21 @@ def _record_candidate_observation(
             updated_at=excluded.updated_at
         """,
         values,
+    )
+    _record_funnel_event(
+        connection,
+        event_key=f"candidate_observed:{account_name}:{scan_id}:{symbol}",
+        run_id=run_id,
+        account_name=account_name,
+        scan_id=scan_id,
+        symbol=symbol,
+        source_rank=source_rank,
+        observation_id=observation_id,
+        event_time=scan_time,
+        stage="candidate_observed",
+        event_type="CANDIDATE_OBSERVED",
+        reason_code="candidate_recorded",
+        raw_json={"scanner_action": action, "sample_level": "candidate_level"},
     )
     for line_name in ("reference_baseline", "atr_reclaim_0_35_shadow", "research_incumbent"):
         outcome_key = f"{observation_id}:{line_name}"
@@ -1106,6 +1190,22 @@ def _archive_replaced_watching_trades(
         old_trade.closed_at_utc = now
         old_trade.notes = f"Archived because scan {replacement_scan_id} created a newer WATCHING plan for {symbol}."
         _save_trade_update(connection, old_trade, expected_status="WATCHING")
+        _record_funnel_event(
+            connection,
+            event_key=f"plan_archived_by_replacement:{old_trade.paper_trade_id}:{replacement_scan_id}",
+            run_id=run_id,
+            account_name=account_name,
+            scan_id=replacement_scan_id,
+            symbol=symbol,
+            plan_id=old_trade.paper_trade_id,
+            event_time=now,
+            stage="plan_archived_by_replacement",
+            event_type="PLAN_ARCHIVED_BY_REPLACEMENT",
+            reason_code="newer_same_symbol_watching_plan",
+            old_status="WATCHING",
+            new_status="ARCHIVED",
+            raw_json={"replacement_scan_id": replacement_scan_id},
+        )
         _record_event(
             connection,
             old_trade,
@@ -1189,9 +1289,37 @@ def add_from_scan(
             )
             action = str(payload.get("action", "WATCH_ONLY")).upper()
             if action not in allowed_actions:
+                _record_funnel_event(
+                    connection,
+                    event_key=f"import_evaluated:{account}:{chosen_scan_id}:{payload['symbol']}:action_not_allowed",
+                    run_id=run_id,
+                    account_name=account,
+                    scan_id=chosen_scan_id,
+                    symbol=str(payload["symbol"]),
+                    source_rank=int(row["rank"]),
+                    event_time=scan_time,
+                    stage="import_evaluated",
+                    event_type="IMPORT_EVALUATED",
+                    reason_code="action_not_allowed",
+                    raw_json={"action": action, "allowed_actions": sorted(allowed_actions)},
+                )
                 skipped += 1
                 skipped_action += 1
                 continue
+            _record_funnel_event(
+                connection,
+                event_key=f"import_evaluated:{account}:{chosen_scan_id}:{payload['symbol']}:action_allowed",
+                run_id=run_id,
+                account_name=account,
+                scan_id=chosen_scan_id,
+                symbol=str(payload["symbol"]),
+                source_rank=int(row["rank"]),
+                event_time=scan_time,
+                stage="import_evaluated",
+                event_type="IMPORT_EVALUATED",
+                reason_code="action_allowed",
+                raw_json={"action": action, "allowed_actions": sorted(allowed_actions)},
+            )
             archived += _archive_replaced_watching_trades(
                 connection,
                 account,
@@ -1232,6 +1360,22 @@ def add_from_scan(
             )
             if _insert_paper_trade(connection, trade, payload):
                 _sync_paper_plan(connection, trade, run_id=run_id, payload=payload)
+                _record_funnel_event(
+                    connection,
+                    event_key=f"plan_created:{trade.paper_trade_id}",
+                    run_id=run_id,
+                    account_name=account,
+                    scan_id=chosen_scan_id,
+                    symbol=trade.symbol,
+                    source_rank=trade.source_rank,
+                    plan_id=trade.paper_trade_id,
+                    event_time=now,
+                    stage="plan_created",
+                    event_type="PLAN_CREATED",
+                    reason_code="inserted",
+                    old_status=None,
+                    new_status="WATCHING",
+                )
                 _record_event(
                     connection,
                     trade,
@@ -1251,6 +1395,19 @@ def add_from_scan(
                 )
                 added += 1
             else:
+                _record_funnel_event(
+                    connection,
+                    event_key=f"plan_duplicate_or_skipped:{account}:{chosen_scan_id}:{payload['symbol']}:{run_id or 'no-run'}:{row['rank']}",
+                    run_id=run_id,
+                    account_name=account,
+                    scan_id=chosen_scan_id,
+                    symbol=str(payload["symbol"]),
+                    source_rank=int(row["rank"]),
+                    event_time=now,
+                    stage="plan_duplicate_or_skipped",
+                    event_type="PLAN_INSERT_SKIPPED",
+                    reason_code="insert_conflict",
+                )
                 skipped += 1
 
     return {
@@ -1391,6 +1548,23 @@ def update_paper_trades(
             trade.updated_at_utc = now
             trade.notes = f"24h ticker unavailable; state update skipped: {type(exc).__name__}: {exc}"
             with connect_db(settings.output.database_path) as connection:
+                _record_funnel_event(
+                    connection,
+                    event_key=f"plan_update_skipped:{run_id}:{trade.paper_trade_id}:ticker_error",
+                    run_id=run_id,
+                    account_name=account,
+                    scan_id=trade.source_scan_id,
+                    symbol=trade.symbol,
+                    source_rank=trade.source_rank,
+                    plan_id=trade.paper_trade_id,
+                    event_time=now,
+                    stage="plan_update_skipped",
+                    event_type="PLAN_UPDATE_SKIPPED",
+                    reason_code="ticker_error",
+                    old_status=trade.status,
+                    new_status=trade.status,
+                    raw_json={"error_type": type(exc).__name__, "error": str(exc)},
+                )
                 _record_event(
                     connection,
                     trade,
@@ -1437,6 +1611,22 @@ def update_paper_trades(
             if current_price is None:
                 trade.notes = f"{trade.notes} | No ticker price found during update."
                 with connect_db(settings.output.database_path) as connection:
+                    _record_funnel_event(
+                        connection,
+                        event_key=f"plan_update_skipped:{run_id}:{trade.paper_trade_id}:missing_price",
+                        run_id=run_id,
+                        account_name=account,
+                        scan_id=trade.source_scan_id,
+                        symbol=trade.symbol,
+                        source_rank=trade.source_rank,
+                        plan_id=trade.paper_trade_id,
+                        event_time=now,
+                        stage="plan_update_skipped",
+                        event_type="PLAN_UPDATE_SKIPPED",
+                        reason_code="missing_price",
+                        old_status=trade.status,
+                        new_status=trade.status,
+                    )
                     _save_trade_update(connection, trade, expected_status=trade.status)
                     if run_id is not None:
                         _write_snapshot(connection, trade, run_id, now)
@@ -1452,6 +1642,23 @@ def update_paper_trades(
                 trade.updated_at_utc = now
                 trade.notes = f"4h kline unavailable; state update skipped: {type(exc).__name__}: {exc}"
                 with connect_db(settings.output.database_path) as connection:
+                    _record_funnel_event(
+                        connection,
+                        event_key=f"plan_update_skipped:{run_id}:{trade.paper_trade_id}:kline_error",
+                        run_id=run_id,
+                        account_name=account,
+                        scan_id=trade.source_scan_id,
+                        symbol=trade.symbol,
+                        source_rank=trade.source_rank,
+                        plan_id=trade.paper_trade_id,
+                        event_time=now,
+                        stage="plan_update_skipped",
+                        event_type="PLAN_UPDATE_SKIPPED",
+                        reason_code="kline_error",
+                        old_status=trade.status,
+                        new_status=trade.status,
+                        raw_json={"error_type": type(exc).__name__, "error": str(exc)},
+                    )
                     _record_event(
                         connection,
                         trade,
@@ -1473,6 +1680,22 @@ def update_paper_trades(
                 continue
             if needs_closed_4h and not closed_4h:
                 with connect_db(settings.output.database_path) as connection:
+                    _record_funnel_event(
+                        connection,
+                        event_key=f"plan_update_skipped:{run_id}:{trade.paper_trade_id}:no_closed_4h",
+                        run_id=run_id,
+                        account_name=account,
+                        scan_id=trade.source_scan_id,
+                        symbol=trade.symbol,
+                        source_rank=trade.source_rank,
+                        plan_id=trade.paper_trade_id,
+                        event_time=now,
+                        stage="plan_update_skipped",
+                        event_type="PLAN_UPDATE_SKIPPED",
+                        reason_code="no_closed_4h",
+                        old_status=trade.status,
+                        new_status=trade.status,
+                    )
                     _record_event(
                         connection,
                         trade,
@@ -1526,6 +1749,28 @@ def update_paper_trades(
                     trade.updated_at_utc = now
                     trade.notes = "Watching: entry zone touched, but 4h close has not reclaimed entry_high."
                     with connect_db(settings.output.database_path) as connection:
+                        _record_funnel_event(
+                            connection,
+                            event_key=f"plan_update_evaluated:{run_id}:{trade.paper_trade_id}:{last_closed_time or 'reclaim_pending'}:reclaim_pending",
+                            run_id=run_id,
+                            account_name=account,
+                            scan_id=trade.source_scan_id,
+                            symbol=trade.symbol,
+                            source_rank=trade.source_rank,
+                            plan_id=trade.paper_trade_id,
+                            event_time=now,
+                            stage="plan_update_evaluated",
+                            event_type="PLAN_UPDATE_EVALUATED",
+                            reason_code="reclaim_pending",
+                            old_status=old_status,
+                            new_status=old_status,
+                            raw_json={
+                                "kline_time": last_closed_time,
+                                "current_price": current_price,
+                                "last_4h_close": last_close,
+                                "entry_high": trade.entry_high,
+                            },
+                        )
                         _save_trade_update(connection, trade, expected_status=old_status)
                         _record_event(
                             connection,
@@ -1556,6 +1801,24 @@ def update_paper_trades(
 
             old_status = trade.status
             old_stop = trade.stop_loss
+            with connect_db(settings.output.database_path) as connection:
+                _record_funnel_event(
+                    connection,
+                    event_key=f"plan_update_evaluated:{run_id}:{trade.paper_trade_id}:{last_closed_time or 'ticker'}:state_step",
+                    run_id=run_id,
+                    account_name=account,
+                    scan_id=trade.source_scan_id,
+                    symbol=trade.symbol,
+                    source_rank=trade.source_rank,
+                    plan_id=trade.paper_trade_id,
+                    event_time=now,
+                    stage="plan_update_evaluated",
+                    event_type="PLAN_UPDATE_EVALUATED",
+                    reason_code="closed_4h_available" if needs_closed_4h else "ticker_update",
+                    old_status=old_status,
+                    new_status=old_status,
+                    raw_json={"kline_time": last_closed_time, "current_price": current_price},
+                )
             had_reclaim_pending = False
             if old_status == "WATCHING":
                 with connect_db(settings.output.database_path) as connection:
@@ -1599,6 +1862,23 @@ def update_paper_trades(
                         new_stop=trade.stop_loss,
                         kline_time=last_closed_time,
                         structured_event_type=structured_type,
+                    )
+                    _record_funnel_event(
+                        connection,
+                        event_key=f"state_transition:{trade.paper_trade_id}:{event.event_type}:{event.event_time_utc}",
+                        run_id=run_id,
+                        account_name=account,
+                        scan_id=trade.source_scan_id,
+                        symbol=trade.symbol,
+                        source_rank=trade.source_rank,
+                        plan_id=trade.paper_trade_id,
+                        event_time=event.event_time_utc,
+                        stage="terminal_reached" if trade.status in CLOSED_STATUSES else "state_transition",
+                        event_type=event.event_type,
+                        reason_code=structured_type,
+                        old_status=old_status,
+                        new_status=trade.status,
+                        raw_json={"message": event.message, "price": event.price},
                     )
                 if run_id is not None:
                     _write_snapshot(connection, trade, run_id, now)
