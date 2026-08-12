@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-08-12
+
+### 23:40:09 +08:00 - 项目状态回顾与 shadow 进度复核
+- 类型：报告 / TODO / Git
+- 改动：复核 8 月 6 日至 8 月 12 日自动任务产物，生成 `reports/2026-08-12/paper_shadow_maturity_review_2026-08-12_demo_v4.md` 与 `reports/2026-08-12/paper_shadow_reconciliation_2026-08-12_demo_v4.md`，并归档期间未提交的自动 4h/daily 报告；同步更新 `TODO.md`，确认 `CryptoTrading_4H_PaperUpdate` 已恢复正常。
+- 影响：当前 `daily_full` 与 `paper_4h_update` 最近任务结果均为 `0`；shadow decisions 增至 216 条、opportunities 增至 41 个、candidate observations 增至 20 条、counterfactual outcomes 增至 60 条，其中 terminal counterfactual outcomes 为 3；但 plan-linked `mature terminal opportunities=0 < 5`，pre-attribution gate 仍未通过，不能开始 `0.35` 归因、部署或新 challenger。
+- 验证：已运行 `python main.py db status`、`python main.py paper shadow-maturity --no-obsidian`、`python main.py paper shadow-reconciliation --no-obsidian`、`Get-ScheduledTaskInfo -TaskName CryptoTrading_4H_PaperUpdate` 与 `Get-ScheduledTaskInfo -TaskName CryptoTrading_DailyPaperUpdate`。
+- Git：待提交
+
 ## 2026-08-06
 
 ### 00:07:53 +08:00 - Windows 休眠唤醒任务统一入口
