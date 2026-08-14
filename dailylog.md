@@ -62,6 +62,16 @@
 - 验证：使用 UTF-8 读取讨论文件确认 §16 后为 §17；使用 `rg` 核对源码和配置；`git status` 确认既有脚本与 `data/` 仍未纳入本次变更。
 - Git：`ef86924`（讨论文件变更）；本次日志补记随后的提交另行记录。
 
+### 01:47:56 +08:00 - 定位 paper 数据样本偏少的主要原因
+- 类型：研究诊断 / 文档 / 数据库只读诊断 / Git
+- 改动：汇总今天对 scanner、data-quality gate、CoinGecko/CMC provider warning 和 Binance 主数据检查路径的核对结果，记录可进入 paper plan 的有效样本偏少的原因；本次只更新 `dailylog.md`，未修改代码或配置。
+- 结果：最近 30 日窗口有 24 次 scan、120 个候选，最终 `BUY_CANDIDATE=0`；其中 10 个候选满足 scanner 的入场条件，但全部因 `strict_data_quality_for_buy=true` 且为非 `DATA_OK` 被降级为 `WATCH_ONLY`。窗口状态为 `DATA_WARNING=111`、`DATA_OK=6`、`DATA_ERROR=3`。历史 305 个有质量状态候选中，`DATA_WARNING=273`，其中 259 个包含 CMC 符号多匹配告警（`259/273≈94.9%`），另有 CoinGecko 429/请求失败、CoinGecko 多匹配、价格差异和 24h 涨跌幅差异等重叠原因。
+- 结论：当前 paper 有效样本偏少的直接原因是严格数据质量 gate 把大量候选拦截在 `BUY_CANDIDATE -> PLAN_CREATED` 之前；现有证据不支持把原因归结为 importer 丢单或单一策略条件过严。CMC 多匹配更可能是过度保守的身份告警，但不能直接视为假问题；429 表示外部验证未完成，价格差异和 `DATA_ERROR` 仍需保留阻断能力。
+- 关键风险：`data_validation.py` 的 `_binance_check()` 当前恒定返回 `DATA_OK`，`_overall_status()` 只统计 external provider；因此在补齐 Binance 主数据健康检查和结构化 severity 之前，不能直接把 mapping/429 warning 降为非阻断，否则可能缺少 Binance 数据异常的安全闸门。
+- 影响：不关闭 `strict_data_quality_for_buy`，不修改 `config/settings.toml`、策略参数、gate 或 CMC 映射；暂不把本次诊断当作策略实验结论，也不手工放行候选。后续如需推进，应单独审批“Binance 主数据健康检查 + 结构化 warning severity + provider 告警分级”的数据链路变更，并在验收后开启新的 clean observation epoch。
+- 验证：使用 SQLite read-only URI 重算候选状态和 warning 分类；读取 `data_validation.py` 核对 `_binance_check()` 与 `_overall_status()`；确认未写入 `data/crypto_trading.db`，未纳入既有 `scripts/run_logged_paper_task.ps1` 和 `data/` 变更。
+- Git：待提交
+
 ## 2026-08-13
 
 ### 01:35:00 +08:00 - 新增 candidate 到 plan-level 漏斗诊断链路
