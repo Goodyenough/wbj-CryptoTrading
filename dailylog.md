@@ -54,6 +54,14 @@
 - 验证：SQLite 使用 read-only URI；重新读取 UTF-8 讨论文件确认 §14 后为 §15；`git status` 确认未纳入既有 `scripts/run_logged_paper_task.ps1` 和 `data/` 变更。
 - Git：`7d3222e`（讨论文件变更）；本次日志补记随后的提交另行记录。
 
+### 01:03:44 +08:00 - 复核 Claude §16 并收紧立项边界
+- 类型：文档 / 研究讨论 / 数据库只读诊断 / Git
+- 改动：核对 `cmc_id_overrides` 的配置解析、当前 `settings.toml` 的实际配置、CMC `market_check` 的成功/跳过/失败路径以及 `provider_asset_id` 的记录位置；在 `0814-与GPT讨论.md` 末尾追加 §17。
+- 结果：确认诊断可以收口为 `A+ + CMC identity/mapping 基础设施假设待验证`，但把“裸 symbol 查询”限定为成功返回且无 override 的 CMC 查询；明确最低 `cmc_rank` 结果不能直接批量固化为白名单，`symbol + quote("USDT")` 仍是待验证假设。
+- 影响：不修改 `handoff.md`、`TODO.md`、`config/settings.toml`、策略参数、strict gate 或数据链路；当前仅记录待负责人批准的独立变更边界，`time-to-gate` 保持 `deferred, not closed`。
+- 验证：使用 UTF-8 读取讨论文件确认 §16 后为 §17；使用 `rg` 核对源码和配置；`git status` 确认既有脚本与 `data/` 仍未纳入本次变更。
+- Git：待提交
+
 ## 2026-08-13
 
 ### 01:35:00 +08:00 - 新增 candidate 到 plan-level 漏斗诊断链路
