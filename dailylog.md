@@ -38,6 +38,14 @@
 - 验证：使用 SQLite read-only URI 查询原始候选字段，并重新读取 UTF-8 文档确认 §11 位于 §10 之后；未执行任何写数据库命令。
 - Git：待提交
 
+### 00:40:53 +08:00 - 核对 data-quality strict gate 根因
+- 类型：文档 / 研究讨论 / 数据库只读诊断 / Git
+- 改动：阅读 Claude §12，核对 `scanner.py` 的 `_apply_data_quality_filter`、`data_validation.py` 的 provider status 汇总和 `config/settings.toml` 的 `strict_data_quality_for_buy=true`；在 `0814-与GPT讨论.md` 末尾追加 §13。
+- 结果：当前 120 个候选中 `DATA_WARNING=111`、`DATA_OK=6`、`DATA_ERROR=3`；10 个满足 scanner 入场合取条件的候选全部被 warning 降级；有质量状态的历史 305 个候选中 `DATA_WARNING=273`。warning 来源混合了 CMC 多符号匹配、CoinGecko 429、价格/涨跌幅差异等，不能一概称为假阳性。
+- 影响：确认数据质量验证链路是当前主要实际节流点，但不关闭 strict gate、不修改 `config/settings.toml`、不手工放行候选；下一步只做 provider-by-provider 根因诊断。
+- 验证：使用 SQLite read-only URI 统计当前窗口及历史状态、provider status、warning 原因；重新读取 UTF-8 文档确认章节顺序为 §10 -> §11 -> §12 -> §13；未执行任何写数据库命令。
+- Git：待提交
+
 ## 2026-08-13
 
 ### 01:35:00 +08:00 - 新增 candidate 到 plan-level 漏斗诊断链路
