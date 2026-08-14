@@ -52,7 +52,7 @@
 - 结果：确认 CMC 映射是最大 warning 来源，但修正统计为：全部 305 条中 CMC mapping=261、CoinGecko 请求失败=53、CoinGecko mapping=27、price diff=21、24h diff=12；仅 273 条 `DATA_WARNING` 中分别为 259、51、26、16、10。指出“确定性选择”不等于“身份已确认”，warning 降低不能单独作为验收标准。
 - 影响：保留 A+，收紧为 `A+ + CMC identity/mapping 基础设施假设待验证`；不修改策略参数、strict gate、`config/settings.toml`，不手工放行候选；把显式 `provider_id` 映射、可复现审计记录和新 observation epoch 列为待审批的独立基础设施变更。
 - 验证：SQLite 使用 read-only URI；重新读取 UTF-8 讨论文件确认 §14 后为 §15；`git status` 确认未纳入既有 `scripts/run_logged_paper_task.ps1` 和 `data/` 变更。
-- Git：待提交
+- Git：`7d3222e`（讨论文件变更）；本次日志补记随后的提交另行记录。
 
 ## 2026-08-13
 
