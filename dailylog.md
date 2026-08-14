@@ -20,7 +20,7 @@
 - 改动：新增 `DataQualityIssue`、`CLEAN/DEGRADED/BLOCKED` 质量状态和 provider identity 状态；补齐 Binance ticker/K 线健康检查；将 CMC/CoinGecko 多匹配、429/暂时不可用标记为 paper 可观察的非阻断问题；价格差异、24h 差异和 Binance 主数据异常继续阻断。scanner/verify 显式使用 `validation_mode="paper"`，Paper import 增加 blocked 二次防护；新增 `data_quality_issues` 表、paper observation 字段、报告/funnel 分级统计和 `tests/test_data_quality_validation.py`。
 - 影响：保持 `strict_data_quality_for_buy=true`、策略参数和外部价格阈值不变；降级候选可以进入 paper，但明确标记为非 clean 样本；历史 scan 不倒填，后续从新 observation epoch 开始统计。
 - 验证：所有源码和测试文件 `py_compile` 通过；专门数据质量测试 `9 passed`，报告字段集成检查通过；完整 pytest 为 `159 passed, 7 failed`，失败项均为已有基线/用户未提交改动相关，不涉及本次新增数据质量测试；`git diff --check` 通过。
-- Git：核心实现已提交，commit `4107027`；本日志引用通过后续文档提交补齐。
+- Git：核心实现 commit `4107027`；日志和报告 commit `a4809fa`。
 
 ## 2026-08-15
 
