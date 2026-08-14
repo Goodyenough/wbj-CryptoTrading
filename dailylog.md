@@ -22,6 +22,14 @@
 - 验证：使用 UTF-8 重新读取追加内容；确认新增章节标题和结论存在；只读核对 `config/settings.toml` 的 `import_actions=["BUY_CANDIDATE"]`、`add_from_scan` action 过滤、4h cycle 不执行 scan/import，以及 `paper_shadow_funnel.py` 的 `pipeline_signals` 判定。
 - Git：待提交
 
+### 00:19:46 +08:00 - 补充 Claude 回复后的只读核对结论
+- 类型：文档 / 研究讨论 / 数据库只读诊断 / Git
+- 改动：在 `0814-与GPT讨论.md` 末尾追加对 Claude 第 8 节回复的再补充；只读查询 funnel 窗口的 `market_scans`/`scan_candidates`、唯一 terminal shadow 缺口对应的 `WLDUSDT` legacy plan，以及 7 个 failed runs 的任务阶段和错误类型。
+- 结果：24 次 scan、120 个候选、`buy_candidate_count=0`；唯一缺口为 `616e1bbfd4c6`（`WLDUSDT`，`backfill_legacy_v1`，无 shadow）；5 次 daily scan 失败、2 次 4h update 失败。将 legacy linkage gap 标记为已解释，并把 time-to-gate 保留为 `deferred, not closed`。
+- 影响：继续采用 A+；不修改策略、gate、paper 状态或数据库；后续只在网络修复后的清洁 observation epoch 中重新统计 `BUY_CANDIDATE -> PLAN_CREATED -> terminal`。
+- 验证：数据库使用 SQLite read-only URI 查询；重新读取 UTF-8 文档并确认章节顺序为 §7 -> §8 -> §9；未执行任何写数据库命令。
+- Git：待提交
+
 ## 2026-08-13
 
 ### 01:35:00 +08:00 - 新增 candidate 到 plan-level 漏斗诊断链路
