@@ -70,7 +70,7 @@
 - 关键风险：`data_validation.py` 的 `_binance_check()` 当前恒定返回 `DATA_OK`，`_overall_status()` 只统计 external provider；因此在补齐 Binance 主数据健康检查和结构化 severity 之前，不能直接把 mapping/429 warning 降为非阻断，否则可能缺少 Binance 数据异常的安全闸门。
 - 影响：不关闭 `strict_data_quality_for_buy`，不修改 `config/settings.toml`、策略参数、gate 或 CMC 映射；暂不把本次诊断当作策略实验结论，也不手工放行候选。后续如需推进，应单独审批“Binance 主数据健康检查 + 结构化 warning severity + provider 告警分级”的数据链路变更，并在验收后开启新的 clean observation epoch。
 - 验证：使用 SQLite read-only URI 重算候选状态和 warning 分类；读取 `data_validation.py` 核对 `_binance_check()` 与 `_overall_status()`；确认未写入 `data/crypto_trading.db`，未纳入既有 `scripts/run_logged_paper_task.ps1` 和 `data/` 变更。
-- Git：待提交
+- Git：`ee6c2b4`；本次日志 hash 补记随后的提交另行记录。
 
 ## 2026-08-13
 
