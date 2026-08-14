@@ -30,6 +30,14 @@
 - 验证：数据库使用 SQLite read-only URI 查询；重新读取 UTF-8 文档并确认章节顺序为 §7 -> §8 -> §9；未执行任何写数据库命令。
 - Git：待提交
 
+### 00:29:00 +08:00 - 修正 scanner 低吞吐原因的过度归因
+- 类型：文档 / 研究讨论 / 数据库只读诊断 / Git
+- 改动：阅读 Claude §10 后核对 `scanner.py` 的资格判断，并按 `market_regime` 与 `distance_to_support_pct` 重新统计 120 个候选；在 `0814-与GPT讨论.md` 末尾追加 §11。
+- 结果：确认 `RISK_ON=0` 和 RISK_OFF 降级规则成立，但 `NEUTRAL` 中仍有 45 个候选距离 ≤4%（最终 `WATCH_ONLY=41`、`REJECT=4`），因此不能把 0 个 `BUY_CANDIDATE` 归因于单一距离阈值；更准确的是多条件合取门槛与市场状态共同造成低吞吐。
+- 影响：不修改 `distance_to_support`、RISK_OFF 规则、`config/settings.toml` 或 gate；time-to-gate 未来必须基于联合资格漏斗估算。
+- 验证：使用 SQLite read-only URI 查询原始候选字段，并重新读取 UTF-8 文档确认 §11 位于 §10 之后；未执行任何写数据库命令。
+- Git：待提交
+
 ## 2026-08-13
 
 ### 01:35:00 +08:00 - 新增 candidate 到 plan-level 漏斗诊断链路
