@@ -9,11 +9,11 @@ import uuid
 
 from .config import Settings
 from .data_validation import cross_validate_candidates
-from .data_quality import filter_tickers, tradable_spot_symbols
+from .data_quality import filter_tickers, tradable_spot_symbols, validate_binance_primary_data
 from .indicators import atr, ema, macd, percent_change, rsi
 from .market_data import BinanceClient
 from .market_regime import MarketRegime, classify_market_regime
-from .models import RawTicker, ScanResult, TradeCandidate
+from .models import DataQualityIssue, RawTicker, ScanResult, TradeCandidate
 from .risk import reward_to_risk
 
 
@@ -423,15 +423,24 @@ def _detect_market_regime(client: BinanceClient, settings: Settings, limitations
         )
 
 
-def _apply_data_quality_filter(candidates: list[TradeCandidate], settings: Settings) -> list[TradeCandidate]:
+def _apply_data_quality_filter(
+    candidates: list[TradeCandidate],
+    settings: Settings,
+    validation_mode: str = "strict",
+) -> list[TradeCandidate]:
     if not settings.analysis.data_quality_filter_enabled:
         return candidates
+    if validation_mode not in {"paper", "strict"}:
+        raise ValueError(f"Unsupported validation_mode={validation_mode!r}")
     filtered: list[TradeCandidate] = []
     for candidate in candidates:
         if (
             settings.analysis.strict_data_quality_for_buy
             and candidate.action == "BUY_CANDIDATE"
-            and candidate.data_quality_status != "DATA_OK"
+            and (
+                candidate.data_quality_state not in {"CLEAN", "DEGRADED"}
+                or (validation_mode == "strict" and candidate.data_quality_state != "CLEAN")
+            )
         ):
             filtered.append(
                 replace(
@@ -440,16 +449,24 @@ def _apply_data_quality_filter(candidates: list[TradeCandidate], settings: Setti
                     verdict="只观察",
                     risks=[
                         *candidate.risks,
-                        f"数据交叉验证状态为 {candidate.data_quality_status}，买入候选降级为观察",
+                        f"数据质量状态为 {candidate.data_quality_state}，买入候选降级为观察",
                     ],
                 )
             )
         else:
+            if candidate.data_quality_state == "DEGRADED":
+                degraded_risk = "Paper mode allows degraded validation; candidate is excluded from clean-data samples."
+                if degraded_risk not in candidate.risks:
+                    candidate = replace(candidate, risks=[*candidate.risks, degraded_risk])
             filtered.append(candidate)
     return filtered
 
 
-def run_market_scan(settings: Settings, progress: Callable[[str], None] | None = None) -> ScanResult:
+def run_market_scan(
+    settings: Settings,
+    progress: Callable[[str], None] | None = None,
+    validation_mode: str = "strict",
+) -> ScanResult:
     client = BinanceClient(
         settings.market.base_url,
         timeout_seconds=settings.market.request_timeout_seconds,
@@ -482,6 +499,7 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
         progress(f"analyzing {len(raw_tickers)} filtered symbols")
 
     candidates: list[TradeCandidate] = []
+    primary_issues_by_symbol: dict[str, list[DataQualityIssue]] = {}
     limitations: list[str] = [
         "交易信号仍以 Binance 现货公开 K 线为主源；外部数据源用于一致性复核。",
         "结果是研究和模拟盘计划，不是确定收益或实盘下单指令。",
@@ -533,6 +551,15 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
                 benchmark_pct_24h=benchmark_pct_24h,
             )
             if candidate is not None:
+                primary_issues_by_symbol[candidate.symbol] = validate_binance_primary_data(
+                    ticker,
+                    {"1h": k1h, "4h": k4h, "1d": k1d},
+                    {
+                        "1h": 168,
+                        "4h": 120,
+                        "1d": max(100, settings.analysis.min_history_days),
+                    },
+                )
                 candidates.append(candidate)
                 if progress is not None:
                     progress(f"candidate found: {ticker.symbol} score={candidate.score:.2f}")
@@ -547,8 +574,17 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
     validation_pool = candidates[:pool_size]
     if progress is not None:
         progress(f"cross-checking {len(validation_pool)} candidate validation pool")
-    checked_pool, validation_notes = cross_validate_candidates(settings, validation_pool, progress=progress)
-    checked_pool = _apply_data_quality_filter(checked_pool, settings)
+    checked_pool, validation_notes = cross_validate_candidates(
+        settings,
+        validation_pool,
+        progress=progress,
+        primary_issues_by_symbol={
+            candidate.symbol: primary_issues_by_symbol[candidate.symbol]
+            for candidate in validation_pool
+            if candidate.symbol in primary_issues_by_symbol
+        },
+    )
+    checked_pool = _apply_data_quality_filter(checked_pool, settings, validation_mode=validation_mode)
     ranked = _rank_final_candidates(checked_pool, settings.market.top_n)
     limitations.extend(validation_notes)
     if progress is not None:
@@ -566,4 +602,5 @@ def run_market_scan(settings: Settings, progress: Callable[[str], None] | None =
         ),
         limitations=limitations,
         candidates=ranked,
+        validation_mode=validation_mode,
     )

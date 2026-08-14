@@ -834,6 +834,26 @@ def build_opportunity_funnel(
             (start_text, end_text),
         ).fetchall()
         action_counts = {str(row["action"]): int(row["count"]) for row in action_rows}
+        quality_rows = connection.execute(
+            """
+            SELECT c.payload_json
+            FROM scan_candidates c
+            JOIN market_scans m ON m.scan_id = c.scan_id
+            WHERE m.scan_time >= ? AND m.scan_time <= ?
+            """,
+            (start_text, end_text),
+        ).fetchall()
+        quality_counts: Counter[str] = Counter()
+        quality_buy_counts: Counter[str] = Counter()
+        for row in quality_rows:
+            try:
+                payload = json.loads(row["payload_json"] or "{}")
+            except (TypeError, ValueError, json.JSONDecodeError):
+                payload = {}
+            state = str(payload.get("data_quality_state") or "NOT_CHECKED").upper()
+            quality_counts[state] += 1
+            if str(payload.get("action") or "").upper() == "BUY_CANDIDATE":
+                quality_buy_counts[state] += 1
         risk_off_blocked = connection.execute(
             """
             SELECT COUNT(DISTINCT c.scan_id || ':' || c.symbol) AS count
@@ -912,6 +932,11 @@ def build_opportunity_funnel(
     reject_count = action_counts.get("REJECT", 0)
     rows = [
         FunnelRow("scanned_candidates", scanned_count, 0, 0, None, "scan_id+symbol", "all scan candidates in the window"),
+        FunnelRow("clean_data_candidates", quality_counts.get("CLEAN", 0), 0, 0, _rate(quality_counts.get("CLEAN", 0), scanned_count), "scan_id+symbol", "candidates with CLEAN data validation state"),
+        FunnelRow("degraded_data_candidates", quality_counts.get("DEGRADED", 0), 0, 0, _rate(quality_counts.get("DEGRADED", 0), scanned_count), "scan_id+symbol", "candidates allowed in paper but excluded from clean samples"),
+        FunnelRow("blocked_data_candidates", quality_counts.get("BLOCKED", 0), 0, 0, _rate(quality_counts.get("BLOCKED", 0), scanned_count), "scan_id+symbol", "candidates blocked by a data-quality issue"),
+        FunnelRow("clean_buy_candidates", quality_buy_counts.get("CLEAN", 0), 0, 0, _rate(quality_buy_counts.get("CLEAN", 0), quality_counts.get("CLEAN", 0)), "scan_id+symbol", "BUY_CANDIDATE candidates with CLEAN data"),
+        FunnelRow("degraded_buy_candidates", quality_buy_counts.get("DEGRADED", 0), 0, 0, _rate(quality_buy_counts.get("DEGRADED", 0), quality_counts.get("DEGRADED", 0)), "scan_id+symbol", "BUY_CANDIDATE candidates with DEGRADED external validation"),
         FunnelRow("buy_candidates", buy_count, 0, 0, _rate(buy_count, scanned_count), "scan_id+symbol", "candidates allowed to become plans"),
         FunnelRow("watch_only_candidates", watch_count, 0, 0, _rate(watch_count, scanned_count), "scan_id+symbol", "defensive or lower-confidence candidates"),
         FunnelRow("reject_candidates", reject_count, 0, 0, _rate(reject_count, scanned_count), "scan_id+symbol", "rejected scan candidates"),

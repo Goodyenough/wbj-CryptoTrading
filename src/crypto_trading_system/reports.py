@@ -140,8 +140,8 @@ def _append_candidate_table(lines: list[str], candidates: list[TradeCandidate]) 
 def _append_data_cross_check_summary(lines: list[str], candidates: list[TradeCandidate]) -> None:
     lines.extend(
         [
-            "| Rank | Coin | Data Status | Max Price Diff | Max 24h Diff | Message |",
-            "|---:|---|---|---:|---:|---|",
+            "| Rank | Coin | State | Identity | Max Price Diff | Max 24h Diff | Issue Codes | Message |",
+            "|---:|---|---|---|---:|---:|---|---|",
         ]
     )
     for candidate in candidates:
@@ -155,13 +155,16 @@ def _append_data_cross_check_summary(lines: list[str], candidates: list[TradeCan
             for check in candidate.data_checks
             if check.provider != "Binance" and check.pct_24h_diff is not None
         ]
+        issue_codes = sorted({issue.code for issue in candidate.data_quality_issues})
         lines.append(
             "| "
             f"{candidate.rank} | "
             f"`{candidate.base_asset}` | "
-            f"{candidate.data_quality_status} | "
+            f"{candidate.data_quality_state} ({candidate.data_quality_status}) | "
+            f"{candidate.external_identity_status} | "
             f"{_fmt_diff_pct(max(price_diffs) if price_diffs else None)} | "
             f"{_fmt_point_diff(max(pct_diffs) if pct_diffs else None)} | "
+            f"{', '.join(issue_codes) or 'none'} | "
             f"{candidate.data_quality_message} |"
         )
 
@@ -169,18 +172,21 @@ def _append_data_cross_check_summary(lines: list[str], candidates: list[TradeCan
 def _append_data_cross_check_table(lines: list[str], candidate: TradeCandidate) -> None:
     lines.extend(
         [
-            "| Source | Status | Asset ID | Price | 24h Change | 24h Volume | Price Diff | 24h Diff | Updated | Message |",
-            "|---|---|---|---:|---:|---:|---:|---:|---|---|",
+            "| Source | Status | Identity | Blocking | Asset ID | Price | 24h Change | 24h Volume | Price Diff | 24h Diff | Updated | Issue Codes | Message |",
+            "|---|---|---|---:|---|---:|---:|---:|---:|---:|---|---|---|",
         ]
     )
     if not candidate.data_checks:
-        lines.append("| n/a | DATA_NOT_CHECKED | n/a | n/a | n/a | n/a | n/a | n/a | n/a | No cross-check data recorded. |")
+        lines.append("| n/a | DATA_NOT_CHECKED | NOT_CHECKED | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | No cross-check data recorded. |")
         return
     for check in candidate.data_checks:
+        issue_codes = sorted({issue.code for issue in check.issues})
         lines.append(
             "| "
             f"{check.provider} | "
             f"{check.status} | "
+            f"{check.identity_status} | "
+            f"{'yes' if check.blocking else 'no'} | "
             f"{check.provider_asset_id or 'n/a'} | "
             f"{_fmt_optional(check.price_usd)} | "
             f"{_fmt_pct(check.pct_24h)} | "
@@ -188,6 +194,7 @@ def _append_data_cross_check_table(lines: list[str], candidate: TradeCandidate) 
             f"{_fmt_diff_pct(check.price_diff_pct)} | "
             f"{_fmt_point_diff(check.pct_24h_diff)} | "
             f"{check.last_updated or check.fetched_at_utc} | "
+            f"{', '.join(issue_codes) or 'none'} | "
             f"{check.message} |"
         )
 
@@ -317,6 +324,7 @@ def generate_scan_report(
         f"- 报告时间：{_local_timestamp(result.timestamp_utc)}",
         f"- Run ID：`{run_id or 'n/a'}`",
         f"- Run type：`{run_type}`",
+        f"- Data validation mode：`{result.validation_mode}`",
         "- 数据来源：SQLite",
         *version_summary,
         f"- 扫描 ID：{result.scan_id}",
@@ -385,7 +393,7 @@ def generate_scan_report(
                 f"- 入选原因：{candidate.setup}；24h {_fmt_pct(candidate.pct_24h)}，7d {_fmt_pct(candidate.pct_7d)}，4h RSI {rsi_text}，24h 成交额 {volume_text}。",
                 f"- 交易失效条件：{candidate.invalidation}。",
                 f"- 主要风险：{'；'.join(candidate.risks)}。",
-                f"- 数据交叉验证：{candidate.data_quality_status}；{candidate.data_quality_message}",
+                f"- 数据交叉验证：{candidate.data_quality_state} / {candidate.data_quality_status}；身份={candidate.external_identity_status}；{candidate.data_quality_message}",
                 "",
                 "#### 可点击人工验证",
                 "",

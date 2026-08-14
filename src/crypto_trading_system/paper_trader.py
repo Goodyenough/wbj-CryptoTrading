@@ -549,6 +549,9 @@ def _record_candidate_observation(
         "symbol": symbol,
         "source_rank": source_rank,
         "scanner_action": action,
+        "data_quality_state": str(payload.get("data_quality_state", "NOT_CHECKED")),
+        "data_quality_status": str(payload.get("data_quality_status", "DATA_NOT_CHECKED")),
+        "external_identity_status": str(payload.get("external_identity_status", "NOT_CHECKED")),
         "score": _candidate_float(payload, "score"),
         "market_regime": market_regime,
         "signal_density": signal_density,
@@ -583,7 +586,8 @@ def _record_candidate_observation(
         """
         INSERT INTO paper_shadow_candidate_observations(
             observation_id, account_name, run_id, scan_id, scan_time, symbol, source_rank,
-            scanner_action, score, market_regime, sample_level, signal_density,
+            scanner_action, data_quality_state, data_quality_status, external_identity_status,
+            score, market_regime, sample_level, signal_density,
             active_positions, max_active_positions, capacity_state, would_be_blocked_by_capacity,
             price, entry_low, entry_high, stop_loss, tp1, tp2, atr_4h, rsi_1h, rsi_4h,
             ema20_4h, ema50_4h, ema20_1d, ema50_1d, pct_24h, pct_3d, pct_7d,
@@ -591,7 +595,8 @@ def _record_candidate_observation(
             created_at, updated_at
         ) VALUES (
             :observation_id, :account_name, :run_id, :scan_id, :scan_time, :symbol, :source_rank,
-            :scanner_action, :score, :market_regime, 'candidate_level', :signal_density,
+            :scanner_action, :data_quality_state, :data_quality_status, :external_identity_status,
+            :score, :market_regime, 'candidate_level', :signal_density,
             :active_positions, :max_active_positions, :capacity_state, :would_be_blocked_by_capacity,
             :price, :entry_low, :entry_high, :stop_loss, :tp1, :tp2, :atr_4h, :rsi_1h, :rsi_4h,
             :ema20_4h, :ema50_4h, :ema20_1d, :ema50_1d, :pct_24h, :pct_3d, :pct_7d,
@@ -601,6 +606,9 @@ def _record_candidate_observation(
         ON CONFLICT(account_name, scan_id, symbol) DO UPDATE SET
             run_id=COALESCE(excluded.run_id, paper_shadow_candidate_observations.run_id),
             scanner_action=excluded.scanner_action,
+            data_quality_state=excluded.data_quality_state,
+            data_quality_status=excluded.data_quality_status,
+            external_identity_status=excluded.external_identity_status,
             score=excluded.score,
             market_regime=COALESCE(excluded.market_regime, paper_shadow_candidate_observations.market_regime),
             signal_density=excluded.signal_density,
@@ -633,7 +641,13 @@ def _record_candidate_observation(
         stage="candidate_observed",
         event_type="CANDIDATE_OBSERVED",
         reason_code="candidate_recorded",
-        raw_json={"scanner_action": action, "sample_level": "candidate_level"},
+        raw_json={
+            "scanner_action": action,
+            "data_quality_state": values["data_quality_state"],
+            "data_quality_status": values["data_quality_status"],
+            "external_identity_status": values["external_identity_status"],
+            "sample_level": "candidate_level",
+        },
     )
     for line_name in ("reference_baseline", "atr_reclaim_0_35_shadow", "research_incumbent"):
         outcome_key = f"{observation_id}:{line_name}"
@@ -1235,6 +1249,7 @@ def add_from_scan(
     added = 0
     skipped = 0
     skipped_action = 0
+    skipped_data_quality = 0
     archived = 0
     allowed_actions = {action.upper() for action in settings.paper.import_actions}
 
@@ -1288,6 +1303,29 @@ def add_from_scan(
                 source_rank=int(row["rank"]),
             )
             action = str(payload.get("action", "WATCH_ONLY")).upper()
+            data_quality_state = str(payload.get("data_quality_state", "")).upper()
+            if data_quality_state == "BLOCKED":
+                _record_funnel_event(
+                    connection,
+                    event_key=f"import_evaluated:{account}:{chosen_scan_id}:{payload['symbol']}:data_quality_blocked",
+                    run_id=run_id,
+                    account_name=account,
+                    scan_id=chosen_scan_id,
+                    symbol=str(payload["symbol"]),
+                    source_rank=int(row["rank"]),
+                    event_time=scan_time,
+                    stage="import_evaluated",
+                    event_type="IMPORT_EVALUATED",
+                    reason_code="data_quality_blocked",
+                    raw_json={
+                        "action": action,
+                        "data_quality_state": data_quality_state,
+                        "data_quality_issues": payload.get("data_quality_issues", []),
+                    },
+                )
+                skipped += 1
+                skipped_data_quality += 1
+                continue
             if action not in allowed_actions:
                 _record_funnel_event(
                     connection,
@@ -1416,6 +1454,7 @@ def add_from_scan(
         "added": added,
         "skipped": skipped,
         "skipped_action": skipped_action,
+        "skipped_data_quality": skipped_data_quality,
         "import_actions": sorted(allowed_actions),
         "archived": archived,
     }

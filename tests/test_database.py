@@ -107,7 +107,7 @@ def test_database_init_is_idempotent_and_configured() -> None:
     init_db(path)
     init_db(path)
     status = database_status(path)
-    assert status["schema_version"] == "2"
+    assert status["schema_version"] == "3"
     assert status["journal_mode"] == "wal"
     assert status["synchronous"] == 1
     assert status["foreign_keys"] == 1
@@ -1518,7 +1518,7 @@ def test_stability_audit_rejects_schema_version_mismatch() -> None:
     audit = audit_database_stability(path, reports_dir, required_days=5)
     assert audit["ready_for_4h_task"] is False
     assert audit["database_health_errors"] == [
-        {"field": "schema_version", "expected": "2", "observed": "999"}
+        {"field": "schema_version", "expected": "3", "observed": "999"}
     ]
 
 

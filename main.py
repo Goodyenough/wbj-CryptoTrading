@@ -618,7 +618,7 @@ def _progress(message: str) -> None:
 
 
 def _run_scan_and_write(settings, include_obsidian: bool, progress=None, run_id: str | None = None):
-    result = run_market_scan(settings, progress=progress)
+    result = run_market_scan(settings, progress=progress, validation_mode="paper")
     if progress is not None:
         progress("saving scan result to SQLite")
     init_db(settings.output.database_path)
@@ -808,6 +808,7 @@ def main() -> None:
             print(f"paper_added={summary['added']}")
             print(f"paper_skipped={summary['skipped']}")
             print(f"paper_skipped_action={summary.get('skipped_action', 0)}")
+            print(f"paper_skipped_data_quality={summary.get('skipped_data_quality', 0)}")
             print(f"paper_archived={summary['archived']}")
             print(f"paper_updated={len(updated)}")
             print("candidate_summary:")
@@ -835,9 +836,9 @@ def main() -> None:
                 print(f"shadow_reconciliation_report={path}")
 
     if args.command == "verify":
-        result = verify_symbol(settings, args.symbol, progress=_progress)
+        result = verify_symbol(settings, args.symbol, progress=_progress, validation_mode="paper")
         _progress("running context market scan for comparison")
-        context = run_market_scan(settings, progress=_progress)
+        context = run_market_scan(settings, progress=_progress, validation_mode="paper")
         result.context_candidates = context.candidates
         result.limitations.append(
             f"本报告同时附带当前大盘扫描候选，来源 scan_id={context.scan_id}。"

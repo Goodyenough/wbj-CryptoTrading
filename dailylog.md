@@ -15,6 +15,15 @@
 
 ## 2026-08-15
 
+### 02:23:03 +08:00 - 实施数据质量结构化分级与 Paper 降级观察
+- 类型：代码 / 数据库 / 测试 / 项目文档 / Git
+- 改动：新增 `DataQualityIssue`、`CLEAN/DEGRADED/BLOCKED` 质量状态和 provider identity 状态；补齐 Binance ticker/K 线健康检查；将 CMC/CoinGecko 多匹配、429/暂时不可用标记为 paper 可观察的非阻断问题；价格差异、24h 差异和 Binance 主数据异常继续阻断。scanner/verify 显式使用 `validation_mode="paper"`，Paper import 增加 blocked 二次防护；新增 `data_quality_issues` 表、paper observation 字段、报告/funnel 分级统计和 `tests/test_data_quality_validation.py`。
+- 影响：保持 `strict_data_quality_for_buy=true`、策略参数和外部价格阈值不变；降级候选可以进入 paper，但明确标记为非 clean 样本；历史 scan 不倒填，后续从新 observation epoch 开始统计。
+- 验证：所有源码和测试文件 `py_compile` 通过；专门数据质量测试 `9 passed`，报告字段集成检查通过；完整 pytest 为 `159 passed, 7 failed`，失败项均为已有基线/用户未提交改动相关，不涉及本次新增数据质量测试；`git diff --check` 通过。
+- Git：待提交
+
+## 2026-08-15
+
 ### 00:08:59 +08:00 - 补充 0814 GPT 讨论文件的复核意见
 - 类型：文档 / 研究讨论 / Git
 - 改动：阅读 `0814-与GPT讨论.md`、`handoff.md`、2026-08-14 shadow maturity/reconciliation 报告及 funnel、paper import/update 实现；在讨论文件末尾追加“我的看法”，区分 scanner qualification、`add_from_scan` 导入、plan 状态推进和 terminal shadow linkage，并说明对 Claude 意见的同意处与需要进一步讨论之处。

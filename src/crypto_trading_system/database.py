@@ -33,6 +33,7 @@ REQUIRED_OBSERVATION_INDEXES = {
     "idx_shadow_funnel_event_time",
     "idx_shadow_funnel_plan",
     "idx_shadow_funnel_scan_symbol",
+    "idx_data_quality_issues_scan_symbol",
 }
 REQUIRED_OBSERVATION_TABLES = {
     "runs",
@@ -45,6 +46,7 @@ REQUIRED_OBSERVATION_TABLES = {
     "paper_shadow_candidate_observations",
     "paper_shadow_counterfactual_outcomes",
     "paper_shadow_funnel_events",
+    "data_quality_issues",
 }
 OBSERVATION_UTC_COLUMNS = {
     "schema_metadata": ("updated_at",),
@@ -301,6 +303,9 @@ def init_observation_db(path: Path) -> None:
                 symbol TEXT NOT NULL,
                 source_rank INTEGER NOT NULL,
                 scanner_action TEXT,
+                data_quality_state TEXT,
+                data_quality_status TEXT,
+                external_identity_status TEXT,
                 score REAL,
                 market_regime TEXT,
                 sample_level TEXT NOT NULL DEFAULT 'candidate_level',
@@ -455,6 +460,13 @@ def init_observation_db(path: Path) -> None:
         ]
         for definition in plan_columns:
             _add_column(connection, "paper_plans", definition)
+        observation_columns = [
+            "data_quality_state TEXT",
+            "data_quality_status TEXT",
+            "external_identity_status TEXT",
+        ]
+        for definition in observation_columns:
+            _add_column(connection, "paper_shadow_candidate_observations", definition)
         connection.execute(
             "CREATE INDEX IF NOT EXISTS idx_scan_candidates_symbol ON scan_candidates(symbol)"
         )

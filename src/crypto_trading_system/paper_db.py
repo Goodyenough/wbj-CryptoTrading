@@ -421,6 +421,27 @@ def build_paper_db_summary(path: Path, limit: int = 10) -> dict:
             FROM market_scans
             """
         ).fetchone()
+        data_quality_counts = {
+            str(row["data_quality_state"] or "NOT_CHECKED"): int(row["count"])
+            for row in connection.execute(
+                """
+                SELECT data_quality_state, COUNT(*) AS count
+                FROM paper_shadow_candidate_observations
+                GROUP BY data_quality_state
+                """
+            ).fetchall()
+        }
+        data_quality_buy_counts = {
+            str(row["data_quality_state"] or "NOT_CHECKED"): int(row["count"])
+            for row in connection.execute(
+                """
+                SELECT data_quality_state, COUNT(*) AS count
+                FROM paper_shadow_candidate_observations
+                WHERE scanner_action = 'BUY_CANDIDATE'
+                GROUP BY data_quality_state
+                """
+            ).fetchall()
+        }
         plan_count = int(connection.execute("SELECT COUNT(*) FROM paper_plans").fetchone()[0])
         run_type_rows = connection.execute(
             """
@@ -486,6 +507,8 @@ def build_paper_db_summary(path: Path, limit: int = 10) -> dict:
         "run_type_summary": run_type_summary,
         "holding_hours": holding_rows,
         "snapshot_counts_utc_hour": snapshot_counts,
+        "data_quality_counts": data_quality_counts,
+        "data_quality_buy_counts": data_quality_buy_counts,
     }
 
 

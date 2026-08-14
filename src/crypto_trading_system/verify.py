@@ -7,13 +7,18 @@ import uuid
 
 from .config import Settings
 from .data_validation import cross_validate_candidates
-from .data_quality import tradable_spot_symbols
+from .data_quality import tradable_spot_symbols, validate_binance_primary_data
 from .market_data import BinanceClient
 from .models import RawTicker, ScanResult
-from .scanner import _analyze_ticker
+from .scanner import _analyze_ticker, _apply_data_quality_filter
 
 
-def verify_symbol(settings: Settings, symbol: str, progress: Callable[[str], None] | None = None) -> ScanResult:
+def verify_symbol(
+    settings: Settings,
+    symbol: str,
+    progress: Callable[[str], None] | None = None,
+    validation_mode: str = "strict",
+) -> ScanResult:
     normalized = symbol.upper().replace("/", "").replace("-", "").replace("_", "")
     client = BinanceClient(
         settings.market.base_url,
@@ -71,7 +76,18 @@ def verify_symbol(settings: Settings, symbol: str, progress: Callable[[str], Non
         raise ValueError(f"{normalized} did not produce a valid trade plan under current rules")
 
     candidate = replace(candidate, rank=1)
-    candidates, validation_notes = cross_validate_candidates(settings, [candidate], progress=progress)
+    primary_issues = validate_binance_primary_data(
+        raw,
+        {"1h": k1h, "4h": k4h, "1d": k1d},
+        {"1h": 168, "4h": 120, "1d": max(100, settings.analysis.min_history_days)},
+    )
+    candidates, validation_notes = cross_validate_candidates(
+        settings,
+        [candidate],
+        progress=progress,
+        primary_issues_by_symbol={candidate.symbol: primary_issues},
+    )
+    candidates = _apply_data_quality_filter(candidates, settings, validation_mode=validation_mode)
     now = datetime.now(timezone.utc)
     return ScanResult(
         scan_id=f"verify_{uuid.uuid4().hex[:8]}",
@@ -84,4 +100,5 @@ def verify_symbol(settings: Settings, symbol: str, progress: Callable[[str], Non
             *validation_notes,
         ],
         candidates=candidates,
+        validation_mode=validation_mode,
     )

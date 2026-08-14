@@ -1,5 +1,15 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-08-15 数据质量分级变更
+
+- [x] 补齐 scanner/verify 的 Binance 主数据健康检查：缺失、过期、重复、缺口、非法 OHLCV、零成交量和极端波动硬阻断。
+- [x] 引入结构化 `DataQualityIssue`、`CLEAN / DEGRADED / BLOCKED` 状态和 provider identity 状态。
+- [x] 将 CMC/CoinGecko 多匹配、429/暂时不可用降为 paper 可观察的 `DEGRADED`，价格/24h 差异继续阻断。
+- [x] 增加 Paper import 的 blocked 数据质量二次保护、SQLite issue 记录、报告和 funnel 分级统计。
+- [x] 补充数据质量单元测试和 Paper 导入防护测试。
+- [ ] 以新 validation policy 开启 observation epoch，连续收集至少 7 个自然日数据。
+- [ ] 复核 degraded 候选的身份不确定比例、plan 创建率和后续 terminal 结果；不得把 BUY 数量增加直接作为策略成功结论。
+
 ## 2026-07-31 atr_reclaim prospective shadow 执行计划
 
 ## 2026-08-13 candidate -> plan-level 漏斗诊断

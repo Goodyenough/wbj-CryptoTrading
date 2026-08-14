@@ -4,6 +4,16 @@ from dataclasses import dataclass, field
 
 
 @dataclass
+class DataQualityIssue:
+    provider: str
+    code: str
+    severity: str
+    blocking: bool
+    message: str
+    context: dict[str, str | int | float] = field(default_factory=dict)
+
+
+@dataclass
 class DataSourceCheck:
     provider: str
     status: str
@@ -18,6 +28,9 @@ class DataSourceCheck:
     pct_24h_diff: float | None
     volume_note: str
     message: str
+    blocking: bool = False
+    identity_status: str = "NOT_CHECKED"
+    issues: list[DataQualityIssue] = field(default_factory=list)
 
 
 @dataclass
@@ -77,6 +90,9 @@ class TradeCandidate:
     data_quality_message: str = "Data cross-check has not run."
     data_checks: list[DataSourceCheck] = field(default_factory=list)
     action: str = "WATCH_ONLY"
+    data_quality_state: str = "NOT_CHECKED"
+    data_quality_issues: list[DataQualityIssue] = field(default_factory=list)
+    external_identity_status: str = "NOT_CHECKED"
 
 
 @dataclass
@@ -88,6 +104,7 @@ class ScanResult:
     limitations: list[str]
     candidates: list[TradeCandidate]
     context_candidates: list[TradeCandidate] = field(default_factory=list)
+    validation_mode: str = "strict"
 
 
 @dataclass

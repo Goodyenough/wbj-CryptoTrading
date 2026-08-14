@@ -147,6 +147,26 @@ def init_db(path: Path) -> None:
         )
         connection.execute(
             """
+            CREATE TABLE IF NOT EXISTS data_quality_issues (
+                issue_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                scan_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                provider TEXT NOT NULL,
+                issue_code TEXT NOT NULL,
+                severity TEXT NOT NULL,
+                blocking INTEGER NOT NULL,
+                message TEXT NOT NULL,
+                context_json TEXT NOT NULL,
+                FOREIGN KEY (scan_id) REFERENCES scan_runs(scan_id)
+            )
+            """
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_data_quality_issues_scan_symbol "
+            "ON data_quality_issues (scan_id, symbol)"
+        )
+        connection.execute(
+            """
             CREATE TABLE IF NOT EXISTS kline_cache (
                 source TEXT NOT NULL,
                 symbol TEXT NOT NULL,
@@ -283,6 +303,7 @@ def save_scan_result(path: Path, result: ScanResult, run_id: str | None = None) 
         )
         connection.execute("DELETE FROM scan_candidates WHERE scan_id = ?", (result.scan_id,))
         connection.execute("DELETE FROM data_cross_checks WHERE scan_id = ?", (result.scan_id,))
+        connection.execute("DELETE FROM data_quality_issues WHERE scan_id = ?", (result.scan_id,))
         for candidate in result.candidates:
             connection.execute(
                 """
@@ -328,6 +349,25 @@ def save_scan_result(path: Path, result: ScanResult, run_id: str | None = None) 
                         check.message,
                     ),
                 )
+                for issue in check.issues:
+                    connection.execute(
+                        """
+                        INSERT INTO data_quality_issues (
+                            scan_id, symbol, provider, issue_code, severity,
+                            blocking, message, context_json
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            result.scan_id,
+                            candidate.symbol,
+                            issue.provider,
+                            issue.code,
+                            issue.severity,
+                            1 if issue.blocking else 0,
+                            issue.message,
+                            json.dumps(issue.context, ensure_ascii=False, sort_keys=True),
+                        ),
+                    )
         if run_id is not None:
             actions = [str(candidate.action) for candidate in result.candidates]
             market_regime = _market_regime_from_limitations(result.limitations)
