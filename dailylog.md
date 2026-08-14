@@ -60,7 +60,7 @@
 - 结果：确认诊断可以收口为 `A+ + CMC identity/mapping 基础设施假设待验证`，但把“裸 symbol 查询”限定为成功返回且无 override 的 CMC 查询；明确最低 `cmc_rank` 结果不能直接批量固化为白名单，`symbol + quote("USDT")` 仍是待验证假设。
 - 影响：不修改 `handoff.md`、`TODO.md`、`config/settings.toml`、策略参数、strict gate 或数据链路；当前仅记录待负责人批准的独立变更边界，`time-to-gate` 保持 `deferred, not closed`。
 - 验证：使用 UTF-8 读取讨论文件确认 §16 后为 §17；使用 `rg` 核对源码和配置；`git status` 确认既有脚本与 `data/` 仍未纳入本次变更。
-- Git：待提交
+- Git：`ef86924`（讨论文件变更）；本次日志补记随后的提交另行记录。
 
 ## 2026-08-13
 
