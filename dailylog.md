@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-08-15
+
+### 00:08:59 +08:00 - 补充 0814 GPT 讨论文件的复核意见
+- 类型：文档 / 研究讨论 / Git
+- 改动：阅读 `0814-与GPT讨论.md`、`handoff.md`、2026-08-14 shadow maturity/reconciliation 报告及 funnel、paper import/update 实现；在讨论文件末尾追加“我的看法”，区分 scanner qualification、`add_from_scan` 导入、plan 状态推进和 terminal shadow linkage，并说明对 Claude 意见的同意处与需要进一步讨论之处。
+- 影响：不修改策略参数、`config/settings.toml`、`max_active_positions`、paper 状态或 gate；明确指出 `pipeline_loss` 当前代码含义不能直接等同于 importer bug，并保留候选级结果不能替代 mature terminal 的纪律。
+- 验证：使用 UTF-8 重新读取追加内容；确认新增章节标题和结论存在；只读核对 `config/settings.toml` 的 `import_actions=["BUY_CANDIDATE"]`、`add_from_scan` action 过滤、4h cycle 不执行 scan/import，以及 `paper_shadow_funnel.py` 的 `pipeline_signals` 判定。
+- Git：待提交
+
 ## 2026-08-13
 
 ### 01:35:00 +08:00 - 新增 candidate 到 plan-level 漏斗诊断链路
