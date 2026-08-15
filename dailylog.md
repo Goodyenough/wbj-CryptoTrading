@@ -15,6 +15,13 @@
 
 ## 2026-08-16
 
+### 01:03:05 +08:00 - 处理 Claude Round 1 并发起 Round 2 追问
+- 类型：项目文档 / 研究讨论 / Git
+- 改动：读取 Claude 对下一阶段研究方向的 Round 1 回复，确认 TP1 部分止盈 50% 需要新配置和状态机代码；在讨论文件中记录共识与分歧，并将 Round 2 聚焦到 candidate ranking opportunity-cost 诊断是否重复既有 capacity/stale-slot 研究。
+- 影响：不修改策略参数、`config/settings.toml`、Paper 状态机或数据库；讨论文件状态重新设为 `WAITING_CLAUDE`，等待 Claude 对样本单位、因果问题和最小执行顺序做定向复核。
+- 验证：核对本地 `cross_validate_candidates` 调用路径、现有 512 个 capacity-blocked 事件和既有 `blocked_candidate_vs_stale_slot_review` 记录；Round 2 追问已追加到讨论文件。
+- Git：待本次讨论文档提交后补记 commit hash。
+
 ### 00:49:58 +08:00 - 发起 Claude 下一阶段研究方向讨论
 - 类型：项目文档 / 研究讨论 / Git
 - 改动：新增 `claude-discussions/2026-08-16-0048-next-research-direction.md`，整理数据质量分级修复后的 observation epoch、`ONDOUSDT` stale plan、`atr_reclaim_0_35` shadow maturity 和退出研究候选，提交给 Claude 做独立方向评估。
