@@ -20,7 +20,7 @@
 - 变更：更新 `开发计划.md`，将 2026-08-16 至 2026-08-22 的 observation epoch 拆为“今天可完成”和“必须等待观察窗口”两类；记录已完成的 ONDOUSDT 只读审计与回放链路耦合检查，并明确 TP1 50% 仅准备实验卡片、不实现代码；同步将 ONDO 只读审计标记为完成到 `TODO.md`。
 - 决策：保持 `atr_reclaim_0_35` 冻结，不修改 `config/settings.toml`，不启动 ranking、capacity replacement 或 TP1 生产实验；最终判断延后至 2026-08-22 后。
 - 验证：人工复核开发计划中的命令、研究问题、固定口径和支持/否定/证据不足标准；本次仅修改项目文档与 TODO，没有运行策略实验。
-- Git：待提交
+- Git：`48f62a2` - `docs: add seven-day observation development plan`
 
 ### 01:21:00 +08:00 - 将七日 observation epoch 执行清单写入 TODO
 - 类型：项目文档 / TODO / Git
