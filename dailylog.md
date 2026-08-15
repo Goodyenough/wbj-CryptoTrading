@@ -20,7 +20,7 @@
 - 改动：新增 `claude-discussions/2026-08-16-0048-next-research-direction.md`，整理数据质量分级修复后的 observation epoch、`ONDOUSDT` stale plan、`atr_reclaim_0_35` shadow maturity 和退出研究候选，提交给 Claude 做独立方向评估。
 - 影响：只新增有界讨论记录，不修改策略参数、`config/settings.toml`、Paper 状态机或数据库；讨论文件当前状态为 `WAITING_CLAUDE`。
 - 验证：确认讨论文件 frontmatter 为 `round=1`、`max_rounds=3`、`decision=pending`，并核对相关日志、TODO 和 2026-08-16 reconciliation 报告。
-- Git：本次文档提交后补记 commit hash。
+- Git：`dbccc22` - `docs: start Claude discussion on research direction`。
 
 ### 00:06:43 +08:00 - daily 完成后自动执行数据库检查并推送企业微信
 - 类型：代码 / TODO / 运维 / Git
