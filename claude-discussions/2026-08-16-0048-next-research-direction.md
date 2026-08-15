@@ -84,7 +84,7 @@ decision: pending
    - `tp1_breakeven_stop`（TP1 后保本）→ 已做，结论 **`reject_candidate`**（TODO 第 152 行：PF、净收益、止损率均恶化，不进入 walk-forward）；
    - `tp1_ema20_trailing_stop` → 已在生产（`settings.toml=true`），单独测试 retest（边际）；
    - `max_holding`（时间退出）→ 18/30/42 三阈值全正向、42 根最平衡，`candidate_keep_review`（TODO 163-164）；固定 vs 条件式 `retest`/`reject`（165-168）；**42 根前向复盘 `defer_keep_review_insufficient_forward_evidence`**（277：仅 3 个 over-42h 样本、2 个独立 symbol）。
-   
+
    即：**退出轴上"不写新代码就能做的单变量实验"已经做完了**。剩下的（部分止盈、ATR 动态止损、固定 TP2 vs 趋势退出）全部需要新代码，且都未验证——breakeven 已给出"一个听起来合理的退出改动照样 reject"的前车之鉴。
 
 3. **时间退出（42 根）这条最有希望的退出候选，是被"前向"卡住，不是被"离线"卡住。** 它的历史证据已经很充分，卡的是 forward 样本不足。**任何离线工作都解不开它**，只能等前向时间。
