@@ -20,7 +20,7 @@
 - 改动：新增 `reports/2026-08-16/tp1_partial_take_profit_50_experiment_card_2026-08-16_v1.md`，冻结系统目标、唯一研究问题、`research_incumbent` baseline、50% partial variant、Binance Spot/4h/动态 universe/两个固定窗口、手续费滑点、容量和 same-bar 语义；补充组合层、机制层、capacity-path 分层证据以及支持/否定/证据不足标准。
 - 影响：明确当前 TP1 只标记 `TP1_HIT`、尚未减少 `quantity`；将 partial exit 实现前的数量、现金、费用、PnL、幂等和状态机要求写清楚。实验卡片状态为 `gated_not_approved`，不执行回测、不修改 `config/settings.toml`、不接入 Paper。
 - 验证：只读核对 `trade_state.py`、`backtest/replay.py`、`backtest/costs.py`、`config/settings.toml` 和既有 TP1 A/B 报告；确认卡片包含固定样本、成本、执行语义和预先判定标准。
-- Git：待提交
+- Git：`07d2286` - `docs: add TP1 partial exit experiment card`
 
 ### 01:25:40 +08:00 - 明确七日 observation epoch 开发计划与今日可收口事项
 - 类型：TODO / 开发计划 / Git
