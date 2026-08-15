@@ -2,6 +2,13 @@
 
 ## 2026-08-15 数据质量分级变更
 
+- [ ] **2026-08-16 至 2026-08-22：执行新 validation policy 的 7 天 observation epoch**。本阶段不修改 `config/settings.toml`，不启动新的 ATR、ranking、capacity replacement 或 TP1 策略实验。
+  - [ ] 每日记录观察表：daily/4h 运行健康、`CLEAN / DEGRADED / BLOCKED`、`BUY_CANDIDATE`、`PLAN_CREATED`、`skipped_data_quality`、RISK 状态和 mature terminal。
+  - [ ] 每日运行 `python main.py db status`、`python main.py paper db-summary --limit 20`、`python main.py paper shadow-maturity --no-obsidian` 和 `python main.py paper shadow-reconciliation --no-obsidian`；在 2026-08-19 和 2026-08-22 运行 `python main.py paper shadow-funnel-audit --account demo --days 7 --no-obsidian`。
+  - [ ] 只读审计 `ONDOUSDT` 计划 `9734a33dea2e`：统计 `RECLAIM_PENDING` 与 `API_DELAY_SKIPPED`，核对价格/`entry_high`/stop、`watch_expiry_bars` 适用性、重复事件和状态迁移；不得手动关闭计划或制造 terminal outcome。
+  - [ ] 准备但不实现 TP1 部分止盈 50% 实验卡片：写明唯一研究问题、baseline/variant、固定 symbols/日期窗口/4h 执行口径/手续费/滑点/容量、支持/否定/证据不足标准，以及需要新增的状态机和测试；未经批准不得写入生产配置或代码。
+- [ ] **2026-08-22 后完成 observation epoch 决策**：若数据健康且 mature terminal 仍为 0，再提交 TP1 实验卡片审批；若发现数据/状态机问题，先修复并重启 observation epoch；若 mature terminal 开始快速增加，优先完成 `reference_baseline`、`atr_reclaim_0_35_shadow`、`research_incumbent` 三线归因。不得仅因 BUY 数量少就判定修复失败。
+
 - [x] 补齐 scanner/verify 的 Binance 主数据健康检查：缺失、过期、重复、缺口、非法 OHLCV、零成交量和极端波动硬阻断。
 - [x] 引入结构化 `DataQualityIssue`、`CLEAN / DEGRADED / BLOCKED` 状态和 provider identity 状态。
 - [x] 将 CMC/CoinGecko 多匹配、429/暂时不可用降为 paper 可观察的 `DEGRADED`，价格/24h 差异继续阻断。

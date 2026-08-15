@@ -15,6 +15,13 @@
 
 ## 2026-08-16
 
+### 01:21:00 +08:00 - 将七日 observation epoch 执行清单写入 TODO
+- 类型：项目文档 / TODO / Git
+- 改动：在 `TODO.md` 新增 2026-08-16 至 2026-08-22 的 observation epoch 任务组，记录每日数据质量与 shadow 健康检查、`ONDOUSDT` 只读状态审计、TP1 部分止盈 50% 实验卡片准备，以及 2026-08-22 后的分支决策门。
+- 影响：把本次 Claude 讨论形成的 4 项行动转为可追踪任务；不修改 `config/settings.toml`、策略参数、Paper 状态机、数据库或生产代码。
+- 验证：确认 `TODO.md` 包含每日命令、2026-08-19/22 funnel audit、`ONDOUSDT` 计划 ID、不得制造 terminal outcome 和 TP1 实验审批边界；提交前执行 `git diff --check`。
+- Git：本次文档提交后补记 commit hash。
+
 ### 01:14:39 +08:00 - 完成 Claude 下一阶段研究方向讨论并收口
 - 类型：项目文档 / 研究讨论 / 只读诊断 / Git
 - 改动：在 `claude-discussions/2026-08-16-0048-next-research-direction.md` 追加 Claude Round 1、Round 2 和 GPT 最终归纳，将讨论状态收口为 `DONE`、结论为 `retest`。补充只读核查：`ONDOUSDT` 事件以真实 `RECLAIM_PENDING` 为主；历史 `backtest/replay` 主路径读取 K 线，不调用外部 provider cross-validation；candidate-ranking 诊断与既有 Stage 4 capacity 研究重复，予以放弃。
