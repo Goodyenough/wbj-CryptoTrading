@@ -20,7 +20,7 @@
 - 改动：扩展 `scripts/run_logged_paper_task.ps1` 的 `daily` 分支：daily 主流程成功后依次运行 `python main.py db status` 和 `python main.py paper db-summary --limit 20`；完整命令输出写入 `logs/daily_paper_update.log`，企业微信通知增加数据库健康、数据质量分级和 Paper 汇总摘要。检查失败时 daily 仍不重跑，但通知标记为 `completed with post-check warnings`；`paper_4h` 分支保持不执行这两个检查。
 - 影响：增加运行后可观测性，不修改策略参数、validation policy、Paper 状态机或数据库业务数据。
 - 验证：PowerShell parser 通过；在不运行 daily 主流程的情况下，实际调用两个只读检查均返回 `ExitCode=0`，摘要解析成功；`git diff --check` 待提交前复核。
-- Git：待提交
+- Git：代码实现 commit `8f400c8`；日志引用通过后续文档提交补齐。
 
 ## 2026-08-15
 
