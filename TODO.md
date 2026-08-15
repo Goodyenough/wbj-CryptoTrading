@@ -9,6 +9,7 @@
 - [x] 补充数据质量单元测试和 Paper 导入防护测试。
 - [ ] 以新 validation policy 开启 observation epoch，连续收集至少 7 个自然日数据。
 - [ ] 复核 degraded 候选的身份不确定比例、plan 创建率和后续 terminal 结果；不得把 BUY 数量增加直接作为策略成功结论。
+- [ ] **2026-08-22 后核查数据质量分级是否正常**：统计新 observation epoch 中 `CLEAN / DEGRADED / BLOCKED` 候选、`BUY_CANDIDATE`、`PLAN_CREATED` 和 `skipped_data_quality`；确认 CMC 多匹配、429/暂时不可用等非致命 warning 进入 `DEGRADED` 后没有被错误阻断，同时确认价格差异、Binance 主数据异常等真正阻断项仍被拦截。验收依据写入 `dailylog.md` 和对应报告，不能只看 BUY 数量。
 
 ## 2026-07-31 atr_reclaim prospective shadow 执行计划
 

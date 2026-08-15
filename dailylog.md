@@ -15,6 +15,13 @@
 
 ## 2026-08-15
 
+### 23:53:56 +08:00 - 增加数据质量 7 天后核查任务并提交讨论记录
+- 类型：项目文档 / TODO / Git
+- 改动：在 `TODO.md` 增加 2026-08-22 后的 observation epoch 核查任务，明确检查 `CLEAN / DEGRADED / BLOCKED` 分布、`BUY_CANDIDATE`、`PLAN_CREATED`、`skipped_data_quality`，以及非致命 warning 是否仍被错误阻断；将现有 `0814-与GPT讨论.md` 讨论记录纳入 Git 提交。
+- 影响：只增加后续核查任务并保存讨论历史，不修改策略参数、gate、validation policy 或数据库运行数据。
+- 验证：确认 TODO 包含 7 天后核查日期和验收标准；提交前执行 `git diff --check`。
+- Git：待提交
+
 ### 02:23:03 +08:00 - 实施数据质量结构化分级与 Paper 降级观察
 - 类型：代码 / 数据库 / 测试 / 项目文档 / Git
 - 改动：新增 `DataQualityIssue`、`CLEAN/DEGRADED/BLOCKED` 质量状态和 provider identity 状态；补齐 Binance ticker/K 线健康检查；将 CMC/CoinGecko 多匹配、429/暂时不可用标记为 paper 可观察的非阻断问题；价格差异、24h 差异和 Binance 主数据异常继续阻断。scanner/verify 显式使用 `validation_mode="paper"`，Paper import 增加 blocked 二次防护；新增 `data_quality_issues` 表、paper observation 字段、报告/funnel 分级统计和 `tests/test_data_quality_validation.py`。
