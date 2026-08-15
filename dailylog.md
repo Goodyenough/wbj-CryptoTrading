@@ -15,6 +15,13 @@
 
 ## 2026-08-16
 
+### 01:14:39 +08:00 - 完成 Claude 下一阶段研究方向讨论并收口
+- 类型：项目文档 / 研究讨论 / 只读诊断 / Git
+- 改动：在 `claude-discussions/2026-08-16-0048-next-research-direction.md` 追加 Claude Round 1、Round 2 和 GPT 最终归纳，将讨论状态收口为 `DONE`、结论为 `retest`。补充只读核查：`ONDOUSDT` 事件以真实 `RECLAIM_PENDING` 为主；历史 `backtest/replay` 主路径读取 K 线，不调用外部 provider cross-validation；candidate-ranking 诊断与既有 Stage 4 capacity 研究重复，予以放弃。
+- 影响：冻结 ATR 0.35，不启动新的 ranking 或 TP1 部分止盈代码；后续先完成新 validation policy 的 7 天 observation epoch 和 2026-08-22 数据质量/funnel 验收，再决定是否提交 TP1 实验卡片。未修改策略配置、数据库、Paper 状态机或生产代码。
+- 验证：讨论文件 frontmatter 为 `status=DONE`、`decision=retest`；SQLite 使用 read-only URI 查询 `ONDOUSDT` 计划事件；源码只读核对 `scanner.py`、`verify.py`、`backtest/replay.py` 和 `paper_shadow_replay.py` 的数据质量调用关系。
+- Git：本条日志与讨论收口文档提交后补记 commit hash。
+
 ### 01:03:05 +08:00 - 处理 Claude Round 1 并发起 Round 2 追问
 - 类型：项目文档 / 研究讨论 / Git
 - 改动：读取 Claude 对下一阶段研究方向的 Round 1 回复，确认 TP1 部分止盈 50% 需要新配置和状态机代码；在讨论文件中记录共识与分歧，并将 Round 2 聚焦到 candidate ranking opportunity-cost 诊断是否重复既有 capacity/stale-slot 研究。
