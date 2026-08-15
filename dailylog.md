@@ -20,7 +20,7 @@
 - 改动：在 `TODO.md` 增加 2026-08-22 后的 observation epoch 核查任务，明确检查 `CLEAN / DEGRADED / BLOCKED` 分布、`BUY_CANDIDATE`、`PLAN_CREATED`、`skipped_data_quality`，以及非致命 warning 是否仍被错误阻断；将现有 `0814-与GPT讨论.md` 讨论记录纳入 Git 提交。
 - 影响：只增加后续核查任务并保存讨论历史，不修改策略参数、gate、validation policy 或数据库运行数据。
 - 验证：确认 TODO 包含 7 天后核查日期和验收标准；提交前执行 `git diff --check`。
-- Git：待提交
+- Git：文档提交 `19df4f8`；日志引用通过后续提交补齐。
 
 ### 02:23:03 +08:00 - 实施数据质量结构化分级与 Paper 降级观察
 - 类型：代码 / 数据库 / 测试 / 项目文档 / Git
