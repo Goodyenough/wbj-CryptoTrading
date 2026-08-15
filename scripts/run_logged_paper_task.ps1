@@ -128,14 +128,112 @@ else:
     }
 }
 
-function Send-TaskNotification([string]$Status, [int]$ExitCode, [string]$ExtraLine, [string]$DatabaseLine) {
+function ConvertTo-CompactJson([object]$Value) {
+    if ($null -eq $Value) {
+        return "{}"
+    }
+    return ($Value | ConvertTo-Json -Compress -Depth 8)
+}
+
+function Get-PostCheckSummary([string]$CheckName, [int]$ExitCode, [object]$ParsedOutput, [string]$ParseError) {
+    if ($ExitCode -ne 0) {
+        return "${CheckName}: failed exit_code=$ExitCode"
+    }
+    if ($null -eq $ParsedOutput) {
+        return "${CheckName}: failed to parse JSON output detail=$ParseError"
+    }
+
+    if ($CheckName -eq "db status") {
+        $latestRun = if ($null -ne $ParsedOutput.latest_run) {
+            "$($ParsedOutput.latest_run.run_id)/$($ParsedOutput.latest_run.status)"
+        } else {
+            "none"
+        }
+        return (
+            "db status: schema=$($ParsedOutput.schema_version) " +
+            "tables_ok=$($ParsedOutput.tables_ok) " +
+            "indexes_ok=$($ParsedOutput.indexes_ok) " +
+            "foreign_keys=$($ParsedOutput.foreign_keys) " +
+            "latest_run=$latestRun " +
+            "open_plans=$($ParsedOutput.open_plan_count)"
+        )
+    }
+
+    $observation = $ParsedOutput.observation_totals
+    return (
+        "paper db-summary: data_quality_counts=$(ConvertTo-CompactJson $ParsedOutput.data_quality_counts) " +
+        "data_quality_buy_counts=$(ConvertTo-CompactJson $ParsedOutput.data_quality_buy_counts) " +
+        "scans=$($observation.scan_count) " +
+        "candidates=$($observation.candidate_count) " +
+        "buy_candidates=$($observation.buy_candidate_count) " +
+        "paper_plans=$($observation.paper_plan_count)"
+    )
+}
+
+function Invoke-PostDailyCheck([string]$CheckName, [string[]]$CommandArgs) {
+    $commandText = "python " + ($CommandArgs -join " ")
+    Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] post_daily_check start name=$CheckName command=$commandText"
+    $outputLines = New-Object System.Collections.Generic.List[string]
+    & $python @CommandArgs 2>&1 | ForEach-Object {
+        $line = $_.ToString()
+        $outputLines.Add($line)
+        Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] [$CheckName] $line"
+    }
+    $exitCode = $LASTEXITCODE
+    $parsedOutput = $null
+    $parseError = $null
+    $rawOutput = ($outputLines -join "`n").Trim()
+    if ($exitCode -eq 0 -and -not [string]::IsNullOrWhiteSpace($rawOutput)) {
+        try {
+            $parsedOutput = $rawOutput | ConvertFrom-Json
+        }
+        catch {
+            $parseError = $_.Exception.Message
+            $jsonStart = $rawOutput.IndexOf("{")
+            $jsonEnd = $rawOutput.LastIndexOf("}")
+            if ($jsonStart -ge 0 -and $jsonEnd -gt $jsonStart) {
+                try {
+                    $parsedOutput = $rawOutput.Substring($jsonStart, $jsonEnd - $jsonStart + 1) | ConvertFrom-Json
+                    $parseError = $null
+                }
+                catch {
+                    $parseError = $_.Exception.Message
+                }
+            }
+        }
+    }
+    $summary = Get-PostCheckSummary $CheckName $exitCode $parsedOutput $parseError
+    Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] post_daily_check complete name=$CheckName exit_code=$exitCode summary=$summary"
+    return [pscustomobject]@{
+        Name = $CheckName
+        ExitCode = $exitCode
+        Summary = $summary
+        Succeeded = ($exitCode -eq 0 -and $null -ne $parsedOutput)
+    }
+}
+
+function Invoke-DailyPostChecks {
+    if ($Mode -ne "daily") {
+        return @()
+    }
+    return @(
+        (Invoke-PostDailyCheck "db status" @("main.py", "db", "status")),
+        (Invoke-PostDailyCheck "paper db-summary" @("main.py", "paper", "db-summary", "--limit", "20"))
+    )
+}
+
+function Send-TaskNotification([string]$Status, [int]$ExitCode, [string]$ExtraLine, [string]$DatabaseLine, [string[]]$PostCheckSummaries) {
     $webhookUrl = Get-NotifyWebhookUrl
     if ([string]::IsNullOrWhiteSpace($webhookUrl)) {
         Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] notification skipped: no WeCom webhook env var"
         return
     }
 
-    $statusText = if ($Status -eq "success") { "completed" } else { "failed" }
+    $statusText = switch ($Status) {
+        "success" { "completed"; break }
+        "warning" { "completed with post-check warnings"; break }
+        default { "failed" }
+    }
     $title = "CryptoTrading $label $statusText"
     $lines = @(
         "## $title",
@@ -150,6 +248,12 @@ function Send-TaskNotification([string]$Status, [int]$ExitCode, [string]$ExtraLi
     }
     if (-not [string]::IsNullOrWhiteSpace($DatabaseLine)) {
         $lines += "- $DatabaseLine"
+    }
+    if ($null -ne $PostCheckSummaries -and @($PostCheckSummaries).Count -gt 0) {
+        $lines += "### post-daily checks"
+        foreach ($summary in $PostCheckSummaries) {
+            $lines += "- $summary"
+        }
     }
     $body = @{
         msgtype = "markdown"
@@ -195,6 +299,15 @@ if ($exitCode -ne 0) {
 foreach ($step in $successSteps) {
     Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] $step"
 }
+$postDailyChecks = @(Invoke-DailyPostChecks)
+$postCheckSummaries = @($postDailyChecks | ForEach-Object { $_.Summary })
+$postCheckFailures = @($postDailyChecks | Where-Object { -not $_.Succeeded })
+$notificationStatus = if ($postCheckFailures.Count -gt 0) { "warning" } else { "success" }
+if ($postCheckFailures.Count -gt 0) {
+    Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] post-daily checks completed with warnings count=$($postCheckFailures.Count)"
+} elseif ($postDailyChecks.Count -gt 0) {
+    Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] post-daily checks completed successfully count=$($postDailyChecks.Count)"
+}
 Write-LogLine "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')] === $label complete ==="
-Send-TaskNotification "success" 0 "See $logPath" $databaseLine
+Send-TaskNotification $notificationStatus 0 "See $logPath" $databaseLine $postCheckSummaries
 exit 0
