@@ -20,7 +20,7 @@
 - 改动：新增 `scripts/review_atr_shadow_evidence.py`、配对边界测试、冻结窗口原始证据与报告；更新仓库及 Obsidian 记忆。
 - 原因：用前轮缺口审计后的证据层级复核原规则与 0.35，避免将同时点拒绝当作独立策略收益。
 - 验证：273 个三线配对重算一致、12 个 entry 的 close/ATR 独立验证通过；4 项边界测试通过；源码确认 plan-level 观察终止和 candidate 执行差异。未修改生产配置、paper 状态或数据库业务记录，未运行新策略 A/B。
-- Git：`audit: review trusted ATR shadow decision evidence`（本次提交主题）；不纳入已有 runner 改动及本地数据状态。
+- Git：`36413a8` - `audit: review trusted ATR shadow decision evidence`；hash 补记随 `docs: record ATR evidence review commit` 提交；不纳入已有 runner 改动及本地数据状态。
 
 ## 2026-10-09
 
