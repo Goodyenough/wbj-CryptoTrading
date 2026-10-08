@@ -20,7 +20,8 @@
 - 事实：审计期间原有任务自然触发，调度返回 0，run `20261008_161003_02252b4f` success（00:10:03–00:10:41），日志 updated=14 并生成四份新报告；不是本次审计脚本触发。daily 尚无新成功记录。
 - 改动：更新 TODO 区分 4h 单次恢复成功与 daily 待验证，补记审计 commit hash。
 - 验证：scheduler、日志、SQLite runs 三方一致。
-- Git：`docs: record gap audit commit and recovered four-hour run`。
+- Git：`d455163` - `docs: record gap audit commit and recovered four-hour run`。
+- 后续补记：报告和 TODO 固定原 8 个退出样本，另 4 个持仓中的 ZRO 已自然转为 STOPPED，仍待缺口审计；验证为只读核对 plan 状态，随 `docs: clarify remaining gap audit cohort` 提交。
 
 ### 00:13:07 +08:00 - 完成 8 笔已退出交易的跨空档审计
 - 类型：审计脚本 / 测试 / 报告与行情证据 / TODO / 开发计划 / 实验账本 / Git。
