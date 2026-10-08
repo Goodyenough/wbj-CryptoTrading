@@ -1,5 +1,13 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-08 数据收集状态复核
+
+- [x] 只读核对 08-16 后的采集覆盖、数据质量分级和 shadow 成熟度；报告：`reports/2026-10-08/data_collection_status_review_2026-10-08_v1.md`。
+- [ ] 排查 10-08 daily/4h 调度返回 `3221225786` 与日志仅 start，恢复既有采集并确认新的业务记录。
+- [ ] 独立审计 8 个跨采集空档的已退出计划及 4 个未平仓计划，标注缺失行情对状态路径的影响；不得直接改写 paper 历史。
+- [ ] 收口原 08-16–08-22 observation epoch 验收：该周任务记录齐全，但有 2 个 API skip；核查 35 candidates / 8 plans / 12 BLOCKED 的完整证据。
+- [ ] gate 已达数量门槛（15 terminal，其中 7 ARCHIVED）；先完成缺口审计，再推进既有三线归因。旧条目中的“terminal=0、继续等样本”是历史状态，不再作为当前判断。保持 ATR 冻结及 TP1 实验未批准。
+
 ## 2026-08-15 数据质量分级变更
 
 - [ ] **2026-08-16 至 2026-08-22：执行新 validation policy 的 7 天 observation epoch**。本阶段不修改 `config/settings.toml`，不启动新的 ATR、ranking、capacity replacement 或 TP1 策略实验。
