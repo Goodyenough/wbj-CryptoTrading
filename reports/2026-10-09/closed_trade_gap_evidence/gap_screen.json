@@ -1,0 +1,600 @@
+[
+  {
+    "plan_id": "ecdc3e95f224",
+    "symbol": "UNIUSDT",
+    "original_status": "CLOSED",
+    "original_gross_pnl": 275.7987725952568,
+    "entry": "2026-08-24T12:07:11Z",
+    "exit": "2026-09-03T12:17:21Z",
+    "gaps": [
+      {
+        "start": "2026-08-25T04:10:06Z",
+        "end": "2026-08-25T12:06:50Z",
+        "hours": 7.946,
+        "frozen_stop": 3.686855,
+        "tp1": 5.519282697567074,
+        "tp2": 6.130091930089431,
+        "whole_hour_bars": 7,
+        "low": 4.285,
+        "high": 4.448,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-08-27T04:10:03Z",
+        "end": "2026-08-27T12:07:42Z",
+        "hours": 7.961,
+        "frozen_stop": 3.686855,
+        "tp1": 5.519282697567074,
+        "tp2": 6.130091930089431,
+        "whole_hour_bars": 7,
+        "low": 4.334,
+        "high": 4.515,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-08-28T12:06:24Z",
+        "end": "2026-09-03T12:17:21Z",
+        "hours": 144.183,
+        "frozen_stop": 3.686855,
+        "tp1": 5.519282697567074,
+        "tp2": 6.130091930089431,
+        "whole_hour_bars": 143,
+        "low": 4.348,
+        "high": 6.38,
+        "first_stop_touch": null,
+        "first_tp1_touch": {
+          "open_utc": "2026-09-01T05:00:00+00:00",
+          "close_utc": "2026-09-01T05:59:59.999000+00:00",
+          "ohlc": [
+            "5.37700000",
+            "5.60900000",
+            "5.36700000",
+            "5.59300000"
+          ]
+        },
+        "first_tp2_touch": {
+          "open_utc": "2026-09-02T04:00:00+00:00",
+          "close_utc": "2026-09-02T04:59:59.999000+00:00",
+          "ohlc": [
+            "6.05100000",
+            "6.35400000",
+            "6.04200000",
+            "6.25600000"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "plan_id": "bffd2fdd7e2b",
+    "symbol": "ETHUSDT",
+    "original_status": "CLOSED",
+    "original_gross_pnl": 268.6259468567925,
+    "entry": "2026-08-26T00:10:04Z",
+    "exit": "2026-09-21T20:10:03Z",
+    "gaps": [
+      {
+        "start": "2026-08-27T04:10:03Z",
+        "end": "2026-08-27T12:07:42Z",
+        "hours": 7.961,
+        "frozen_stop": 2320.37435,
+        "tp1": 2641.592189318164,
+        "tp2": 2748.6648024242186,
+        "whole_hour_bars": 7,
+        "low": 2481.74,
+        "high": 2566.53,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-08-28T12:06:24Z",
+        "end": "2026-09-03T12:17:21Z",
+        "hours": 144.183,
+        "frozen_stop": 2320.37435,
+        "tp1": 2641.592189318164,
+        "tp2": 2748.6648024242186,
+        "whole_hour_bars": 143,
+        "low": 2356.41,
+        "high": 2534.98,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-04T08:10:02Z",
+        "end": "2026-09-04T16:10:02Z",
+        "hours": 8.0,
+        "frozen_stop": 2320.37435,
+        "tp1": 2641.592189318164,
+        "tp2": 2748.6648024242186,
+        "whole_hour_bars": 7,
+        "low": 2431.61,
+        "high": 2546.66,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-05T12:06:06Z",
+        "end": "2026-09-06T01:36:06Z",
+        "hours": 13.5,
+        "frozen_stop": 2320.37435,
+        "tp1": 2641.592189318164,
+        "tp2": 2748.6648024242186,
+        "whole_hour_bars": 12,
+        "low": 2450.0,
+        "high": 2493.57,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-08T08:10:02Z",
+        "end": "2026-09-09T16:10:04Z",
+        "hours": 32.001,
+        "frozen_stop": 2320.37435,
+        "tp1": 2641.592189318164,
+        "tp2": 2748.6648024242186,
+        "whole_hour_bars": 31,
+        "low": 2441.68,
+        "high": 2523.3,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-09T20:10:03Z",
+        "end": "2026-09-21T16:10:04Z",
+        "hours": 284.0,
+        "frozen_stop": 2320.37435,
+        "tp1": 2641.592189318164,
+        "tp2": 2748.6648024242186,
+        "whole_hour_bars": 283,
+        "low": 2358.88,
+        "high": 2765.43,
+        "first_stop_touch": null,
+        "first_tp1_touch": {
+          "open_utc": "2026-09-11T13:00:00+00:00",
+          "close_utc": "2026-09-11T13:59:59.999000+00:00",
+          "ohlc": [
+            "2511.22000000",
+            "2647.91000000",
+            "2490.49000000",
+            "2629.62000000"
+          ]
+        },
+        "first_tp2_touch": {
+          "open_utc": "2026-09-21T09:00:00+00:00",
+          "close_utc": "2026-09-21T09:59:59.999000+00:00",
+          "ohlc": [
+            "2696.27000000",
+            "2749.98000000",
+            "2691.94000000",
+            "2720.77000000"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "plan_id": "0a265e9f2163",
+    "symbol": "TAOUSDT",
+    "original_status": "CLOSED",
+    "original_gross_pnl": 259.59276571748694,
+    "entry": "2026-08-26T12:06:38Z",
+    "exit": "2026-09-21T20:10:03Z",
+    "gaps": [
+      {
+        "start": "2026-08-27T04:10:03Z",
+        "end": "2026-08-27T12:07:42Z",
+        "hours": 7.961,
+        "frozen_stop": 210.79,
+        "tp1": 272.5770269694072,
+        "tp2": 293.17270262587624,
+        "whole_hour_bars": 7,
+        "low": 235.4,
+        "high": 261.3,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-08-28T12:06:24Z",
+        "end": "2026-09-03T12:17:21Z",
+        "hours": 144.183,
+        "frozen_stop": 210.79,
+        "tp1": 272.5770269694072,
+        "tp2": 293.17270262587624,
+        "whole_hour_bars": 143,
+        "low": 214.9,
+        "high": 248.3,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-04T08:10:02Z",
+        "end": "2026-09-04T16:10:02Z",
+        "hours": 8.0,
+        "frozen_stop": 210.79,
+        "tp1": 272.5770269694072,
+        "tp2": 293.17270262587624,
+        "whole_hour_bars": 7,
+        "low": 220.0,
+        "high": 232.2,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-05T12:06:06Z",
+        "end": "2026-09-06T01:36:06Z",
+        "hours": 13.5,
+        "frozen_stop": 210.79,
+        "tp1": 272.5770269694072,
+        "tp2": 293.17270262587624,
+        "whole_hour_bars": 12,
+        "low": 232.3,
+        "high": 238.9,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-08T08:10:02Z",
+        "end": "2026-09-09T16:10:04Z",
+        "hours": 32.001,
+        "frozen_stop": 210.79,
+        "tp1": 272.5770269694072,
+        "tp2": 293.17270262587624,
+        "whole_hour_bars": 31,
+        "low": 249.5,
+        "high": 269.9,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-09T20:10:03Z",
+        "end": "2026-09-21T16:10:04Z",
+        "hours": 284.0,
+        "frozen_stop": 210.79,
+        "tp1": 272.5770269694072,
+        "tp2": 293.17270262587624,
+        "whole_hour_bars": 283,
+        "low": 213.4,
+        "high": 290.9,
+        "first_stop_touch": null,
+        "first_tp1_touch": {
+          "open_utc": "2026-09-19T15:00:00+00:00",
+          "close_utc": "2026-09-19T15:59:59.999000+00:00",
+          "ohlc": [
+            "271.40000000",
+            "273.60000000",
+            "269.60000000",
+            "270.90000000"
+          ]
+        },
+        "first_tp2_touch": null
+      }
+    ]
+  },
+  {
+    "plan_id": "d6075516aea8",
+    "symbol": "BNBUSDT",
+    "original_status": "STOPPED",
+    "original_gross_pnl": 123.02970521863004,
+    "entry": "2026-08-27T12:07:42Z",
+    "exit": "2026-09-07T16:10:03Z",
+    "gaps": [
+      {
+        "start": "2026-08-28T12:06:24Z",
+        "end": "2026-09-03T12:17:21Z",
+        "hours": 144.183,
+        "frozen_stop": 677.68,
+        "tp1": 757.3756777610968,
+        "tp2": 787.6707048715407,
+        "whole_hour_bars": 143,
+        "low": 674.6,
+        "high": 715.57,
+        "first_stop_touch": {
+          "open_utc": "2026-09-01T18:00:00+00:00",
+          "close_utc": "2026-09-01T18:59:59.999000+00:00",
+          "ohlc": [
+            "682.95000000",
+            "683.35000000",
+            "674.60000000",
+            "679.48000000"
+          ]
+        },
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-04T08:10:02Z",
+        "end": "2026-09-04T16:10:02Z",
+        "hours": 8.0,
+        "frozen_stop": 677.68,
+        "tp1": 757.3756777610968,
+        "tp2": 787.6707048715407,
+        "whole_hour_bars": 7,
+        "low": 708.88,
+        "high": 727.35,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-05T12:06:06Z",
+        "end": "2026-09-06T01:36:06Z",
+        "hours": 13.5,
+        "frozen_stop": 677.68,
+        "tp1": 757.3756777610968,
+        "tp2": 787.6707048715407,
+        "whole_hour_bars": 12,
+        "low": 758.94,
+        "high": 780.64,
+        "first_stop_touch": null,
+        "first_tp1_touch": {
+          "open_utc": "2026-09-05T13:00:00+00:00",
+          "close_utc": "2026-09-05T13:59:59.999000+00:00",
+          "ohlc": [
+            "763.16000000",
+            "767.76000000",
+            "758.94000000",
+            "760.91000000"
+          ]
+        },
+        "first_tp2_touch": null
+      }
+    ]
+  },
+  {
+    "plan_id": "4f2f0f1fa0e7",
+    "symbol": "ETHUSDT",
+    "original_status": "STOPPED",
+    "original_gross_pnl": 164.48747024786257,
+    "entry": "2026-09-03T16:10:04Z",
+    "exit": "2026-09-23T16:10:05Z",
+    "gaps": [
+      {
+        "start": "2026-09-04T08:10:02Z",
+        "end": "2026-09-04T16:10:02Z",
+        "hours": 8.0,
+        "frozen_stop": 2378.4204,
+        "tp1": 2745.526527418897,
+        "tp2": 2867.895236558529,
+        "whole_hour_bars": 7,
+        "low": 2431.61,
+        "high": 2546.66,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-05T12:06:06Z",
+        "end": "2026-09-06T01:36:06Z",
+        "hours": 13.5,
+        "frozen_stop": 2378.4204,
+        "tp1": 2745.526527418897,
+        "tp2": 2867.895236558529,
+        "whole_hour_bars": 12,
+        "low": 2450.0,
+        "high": 2493.57,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-08T08:10:02Z",
+        "end": "2026-09-09T16:10:04Z",
+        "hours": 32.001,
+        "frozen_stop": 2378.4204,
+        "tp1": 2745.526527418897,
+        "tp2": 2867.895236558529,
+        "whole_hour_bars": 31,
+        "low": 2441.68,
+        "high": 2523.3,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-09T20:10:03Z",
+        "end": "2026-09-21T16:10:04Z",
+        "hours": 284.0,
+        "frozen_stop": 2378.4204,
+        "tp1": 2745.526527418897,
+        "tp2": 2867.895236558529,
+        "whole_hour_bars": 283,
+        "low": 2358.88,
+        "high": 2765.43,
+        "first_stop_touch": {
+          "open_utc": "2026-09-15T18:00:00+00:00",
+          "close_utc": "2026-09-15T18:59:59.999000+00:00",
+          "ohlc": [
+            "2441.20000000",
+            "2446.88000000",
+            "2358.88000000",
+            "2403.14000000"
+          ]
+        },
+        "first_tp1_touch": {
+          "open_utc": "2026-09-21T09:00:00+00:00",
+          "close_utc": "2026-09-21T09:59:59.999000+00:00",
+          "ohlc": [
+            "2696.27000000",
+            "2749.98000000",
+            "2691.94000000",
+            "2720.77000000"
+          ]
+        },
+        "first_tp2_touch": null
+      }
+    ]
+  },
+  {
+    "plan_id": "2d74b7ff6191",
+    "symbol": "ADAUSDT",
+    "original_status": "CLOSED",
+    "original_gross_pnl": 256.25454234114136,
+    "entry": "2026-09-06T20:10:03Z",
+    "exit": "2026-09-23T00:10:03Z",
+    "gaps": [
+      {
+        "start": "2026-09-08T08:10:02Z",
+        "end": "2026-09-09T16:10:04Z",
+        "hours": 32.001,
+        "frozen_stop": 0.2059635,
+        "tp1": 0.2407958425592272,
+        "tp2": 0.2524066234123029,
+        "whole_hour_bars": 31,
+        "low": 0.2135,
+        "high": 0.2321,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-09T20:10:03Z",
+        "end": "2026-09-21T16:10:04Z",
+        "hours": 284.0,
+        "frozen_stop": 0.2059635,
+        "tp1": 0.2407958425592272,
+        "tp2": 0.2524066234123029,
+        "whole_hour_bars": 283,
+        "low": 0.1903,
+        "high": 0.2488,
+        "first_stop_touch": {
+          "open_utc": "2026-09-10T16:00:00+00:00",
+          "close_utc": "2026-09-10T16:59:59.999000+00:00",
+          "ohlc": [
+            "0.20960000",
+            "0.21000000",
+            "0.20560000",
+            "0.20830000"
+          ]
+        },
+        "first_tp1_touch": {
+          "open_utc": "2026-09-21T09:00:00+00:00",
+          "close_utc": "2026-09-21T09:59:59.999000+00:00",
+          "ohlc": [
+            "0.23720000",
+            "0.24130000",
+            "0.23620000",
+            "0.23710000"
+          ]
+        },
+        "first_tp2_touch": null
+      }
+    ]
+  },
+  {
+    "plan_id": "5ff6dab72dfa",
+    "symbol": "BTCUSDT",
+    "original_status": "STOPPED",
+    "original_gross_pnl": 135.2385401855433,
+    "entry": "2026-09-06T20:10:03Z",
+    "exit": "2026-09-24T04:10:03Z",
+    "gaps": [
+      {
+        "start": "2026-09-08T08:10:02Z",
+        "end": "2026-09-09T16:10:04Z",
+        "hours": 32.001,
+        "frozen_stop": 76468.0913,
+        "tp1": 85786.04522628392,
+        "tp2": 89217.48703533529,
+        "whole_hour_bars": 31,
+        "low": 77620.01,
+        "high": 79760.0,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-09T20:10:03Z",
+        "end": "2026-09-21T16:10:04Z",
+        "hours": 284.0,
+        "frozen_stop": 76468.0913,
+        "tp1": 85786.04522628392,
+        "tp2": 89217.48703533529,
+        "whole_hour_bars": 283,
+        "low": 74967.97,
+        "high": 86344.7,
+        "first_stop_touch": {
+          "open_utc": "2026-09-10T23:00:00+00:00",
+          "close_utc": "2026-09-10T23:59:59.999000+00:00",
+          "ohlc": [
+            "76836.45000000",
+            "76876.31000000",
+            "76464.00000000",
+            "76568.72000000"
+          ]
+        },
+        "first_tp1_touch": {
+          "open_utc": "2026-09-21T13:00:00+00:00",
+          "close_utc": "2026-09-21T13:59:59.999000+00:00",
+          "ohlc": [
+            "85323.00000000",
+            "85845.27000000",
+            "84778.00000000",
+            "85466.34000000"
+          ]
+        },
+        "first_tp2_touch": null
+      }
+    ]
+  },
+  {
+    "plan_id": "549cfdd6bdc4",
+    "symbol": "DOGEUSDT",
+    "original_status": "STOPPED",
+    "original_gross_pnl": 97.41397967867591,
+    "entry": "2026-09-08T08:10:02Z",
+    "exit": "2026-09-23T16:10:05Z",
+    "gaps": [
+      {
+        "start": "2026-09-08T08:10:02Z",
+        "end": "2026-09-09T16:10:04Z",
+        "hours": 32.001,
+        "frozen_stop": 0.0825233,
+        "tp1": 0.10034319999235758,
+        "tp2": 0.10628316665647677,
+        "whole_hour_bars": 31,
+        "low": 0.088,
+        "high": 0.09159,
+        "first_stop_touch": null,
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      },
+      {
+        "start": "2026-09-09T20:10:03Z",
+        "end": "2026-09-21T16:10:04Z",
+        "hours": 284.0,
+        "frozen_stop": 0.0825233,
+        "tp1": 0.10034319999235758,
+        "tp2": 0.10628316665647677,
+        "whole_hour_bars": 283,
+        "low": 0.07831,
+        "high": 0.09818,
+        "first_stop_touch": {
+          "open_utc": "2026-09-10T12:00:00+00:00",
+          "close_utc": "2026-09-10T12:59:59.999000+00:00",
+          "ohlc": [
+            "0.08512000",
+            "0.08547000",
+            "0.08229000",
+            "0.08376000"
+          ]
+        },
+        "first_tp1_touch": null,
+        "first_tp2_touch": null
+      }
+    ]
+  }
+]

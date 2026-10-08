@@ -13,6 +13,15 @@
 - Git：
 ```
 
+## 2026-10-09
+
+### 00:13:07 +08:00 - 完成 8 笔已退出交易的跨空档审计
+- 类型：审计脚本 / 测试 / 报告与行情证据 / TODO / 开发计划 / 实验账本 / Git。
+- 改动：新增 `scripts/audit_closed_trade_gaps.py`、边界测试及逐笔审计报告/raw evidence；更新 TODO、开发计划、实验账本和 Obsidian 记忆。
+- 原因：确认停机是否改变已有 paper 终态；3 笔漏记止损、1 笔 TP2 延迟。未修改生产策略、配置或业务库，未替用户重启任务或发送通知。
+- 验证：SQLite mode=ro；行情网格/OHLC 检查；原始 baseline 8/8 状态、退出时间和毛损益一致；4 种关键分钟报价复核；3 项边界测试通过；diff 检查。
+- Git：本次提交 `audit: inspect eight closed trades across collection gaps`；既有脚本改动和本地数据库状态不纳入。
+
 ## 2026-10-08
 
 ### 23:54:53 +08:00 - 明确候选过度阻断修复已生效

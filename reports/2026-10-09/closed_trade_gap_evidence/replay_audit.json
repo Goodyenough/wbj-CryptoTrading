@@ -1,0 +1,3055 @@
+[
+  {
+    "plan_id": "ecdc3e95f224",
+    "symbol": "UNIUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 275.7987725952568,
+    "baseline": {
+      "status": "CLOSED",
+      "closed_at": "2026-09-03T12:17:21Z",
+      "exit_price": 6.130091930089431,
+      "gross_pnl": 275.7987725952568,
+      "events": [
+        {
+          "time": "2026-09-03T12:17:21Z",
+          "event": "CLOSED",
+          "price": 6.130091930089431,
+          "kind": "actual",
+          "quote": 6.208,
+          "quote_basis": "recorded_snapshot",
+          "stop": 3.686855
+        }
+      ]
+    },
+    "missed_4h_slots": 32,
+    "sensitivities": {
+      "open": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-02T04:10:00Z",
+        "exit_price": 6.130091930089431,
+        "gross_pnl": 275.7987725952568,
+        "events": [
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 5.0071155997243935,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 5.519282697567074,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.144935118854797,
+            "kind": "missed_4h",
+            "quote": 5.6745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.144935118854797
+          },
+          {
+            "time": "2026-09-01T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.194190925848798,
+            "kind": "missed_4h",
+            "quote": 5.678,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.194190925848798
+          },
+          {
+            "time": "2026-09-02T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.245148678277055,
+            "kind": "missed_4h",
+            "quote": 5.8765,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.245148678277055
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.314308380253085,
+            "kind": "missed_4h",
+            "quote": 6.187,
+            "quote_basis": "minute_open",
+            "stop": 5.314308380253085
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "CLOSED",
+            "price": 6.130091930089431,
+            "kind": "missed_4h",
+            "quote": 6.187,
+            "quote_basis": "minute_open",
+            "stop": 5.314308380253085
+          }
+        ]
+      },
+      "high": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-02T04:10:00Z",
+        "exit_price": 6.130091930089431,
+        "gross_pnl": 275.7987725952568,
+        "events": [
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 5.0071155997243935,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 5.519282697567074,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.144935118854797,
+            "kind": "missed_4h",
+            "quote": 5.6745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.144935118854797
+          },
+          {
+            "time": "2026-09-01T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.194190925848798,
+            "kind": "missed_4h",
+            "quote": 5.678,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.194190925848798
+          },
+          {
+            "time": "2026-09-02T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.245148678277055,
+            "kind": "missed_4h",
+            "quote": 5.8765,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.245148678277055
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.314308380253085,
+            "kind": "missed_4h",
+            "quote": 6.194,
+            "quote_basis": "minute_high",
+            "stop": 5.314308380253085
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "CLOSED",
+            "price": 6.130091930089431,
+            "kind": "missed_4h",
+            "quote": 6.194,
+            "quote_basis": "minute_high",
+            "stop": 5.314308380253085
+          }
+        ]
+      },
+      "low": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-02T04:10:00Z",
+        "exit_price": 6.130091930089431,
+        "gross_pnl": 275.7987725952568,
+        "events": [
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 5.0071155997243935,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 5.519282697567074,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.144935118854797,
+            "kind": "missed_4h",
+            "quote": 5.6745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.144935118854797
+          },
+          {
+            "time": "2026-09-01T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.194190925848798,
+            "kind": "missed_4h",
+            "quote": 5.678,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.194190925848798
+          },
+          {
+            "time": "2026-09-02T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.245148678277055,
+            "kind": "missed_4h",
+            "quote": 5.8765,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.245148678277055
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.314308380253085,
+            "kind": "missed_4h",
+            "quote": 6.17,
+            "quote_basis": "minute_low",
+            "stop": 5.314308380253085
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "CLOSED",
+            "price": 6.130091930089431,
+            "kind": "missed_4h",
+            "quote": 6.17,
+            "quote_basis": "minute_low",
+            "stop": 5.314308380253085
+          }
+        ]
+      },
+      "close": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-02T04:10:00Z",
+        "exit_price": 6.130091930089431,
+        "gross_pnl": 275.7987725952568,
+        "events": [
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 5.0071155997243935,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 5.519282697567074,
+            "kind": "missed_4h",
+            "quote": 5.745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.0071155997243935
+          },
+          {
+            "time": "2026-09-01T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.144935118854797,
+            "kind": "missed_4h",
+            "quote": 5.6745,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.144935118854797
+          },
+          {
+            "time": "2026-09-01T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.194190925848798,
+            "kind": "missed_4h",
+            "quote": 5.678,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.194190925848798
+          },
+          {
+            "time": "2026-09-02T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.245148678277055,
+            "kind": "missed_4h",
+            "quote": 5.8765,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 5.245148678277055
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 5.314308380253085,
+            "kind": "missed_4h",
+            "quote": 6.174,
+            "quote_basis": "minute_close",
+            "stop": 5.314308380253085
+          },
+          {
+            "time": "2026-09-02T04:10:00Z",
+            "event": "CLOSED",
+            "price": 6.130091930089431,
+            "kind": "missed_4h",
+            "quote": 6.174,
+            "quote_basis": "minute_close",
+            "stop": 5.314308380253085
+          }
+        ]
+      }
+    }
+  },
+  {
+    "plan_id": "bffd2fdd7e2b",
+    "symbol": "ETHUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 268.6259468567925,
+    "baseline": {
+      "status": "CLOSED",
+      "closed_at": "2026-09-21T20:10:03Z",
+      "exit_price": 2748.6648024242186,
+      "gross_pnl": 268.6259468567925,
+      "events": [
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_EMA_TRAILING_ACTIVATED",
+          "price": 2622.9135290748195,
+          "kind": "actual",
+          "quote": 2747.52,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2622.9135290748195
+        },
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_HIT",
+          "price": 2641.592189318164,
+          "kind": "actual",
+          "quote": 2747.52,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2622.9135290748195
+        },
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2638.0494868804667,
+          "kind": "actual",
+          "quote": 2770.45,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2638.0494868804667
+        },
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "CLOSED",
+          "price": 2748.6648024242186,
+          "kind": "actual",
+          "quote": 2770.45,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2638.0494868804667
+        }
+      ]
+    },
+    "missed_4h_slots": 97,
+    "sensitivities": {
+      "open": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 2748.6648024242186,
+        "gross_pnl": 268.6259468567925,
+        "events": [
+          {
+            "time": "2026-09-19T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2518.9278924085133,
+            "kind": "missed_4h",
+            "quote": 2641.7,
+            "quote_basis": "minute_open",
+            "stop": 2518.9278924085133
+          },
+          {
+            "time": "2026-09-19T16:10:00Z",
+            "event": "TP1_HIT",
+            "price": 2641.592189318164,
+            "kind": "missed_4h",
+            "quote": 2641.7,
+            "quote_basis": "minute_open",
+            "stop": 2518.9278924085133
+          },
+          {
+            "time": "2026-09-19T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2526.746622343571,
+            "kind": "missed_4h",
+            "quote": 2636.42,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2526.746622343571
+          },
+          {
+            "time": "2026-09-20T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2534.6725194466294,
+            "kind": "missed_4h",
+            "quote": 2629.475,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2534.6725194466294
+          },
+          {
+            "time": "2026-09-20T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2537.8104103742785,
+            "kind": "missed_4h",
+            "quote": 2582.2,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2537.8104103742785
+          },
+          {
+            "time": "2026-09-20T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2540.4569947192786,
+            "kind": "missed_4h",
+            "quote": 2577.05,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2540.4569947192786
+          },
+          {
+            "time": "2026-09-20T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2550.6335644098904,
+            "kind": "missed_4h",
+            "quote": 2627.45,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2550.6335644098904
+          },
+          {
+            "time": "2026-09-20T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2560.8902148358966,
+            "kind": "missed_4h",
+            "quote": 2636.525,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2560.8902148358966
+          },
+          {
+            "time": "2026-09-21T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2571.8910479507,
+            "kind": "missed_4h",
+            "quote": 2675.845,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2571.8910479507
+          },
+          {
+            "time": "2026-09-21T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2583.658470017637,
+            "kind": "missed_4h",
+            "quote": 2661.895,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2583.658470017637
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2593.0429749152872,
+            "kind": "missed_4h",
+            "quote": 2687.0249999999996,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2593.0429749152872
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 2748.6648024242186,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          }
+        ]
+      },
+      "high": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 2748.6648024242186,
+        "gross_pnl": 268.6259468567925,
+        "events": [
+          {
+            "time": "2026-09-19T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2518.9278924085133,
+            "kind": "missed_4h",
+            "quote": 2646.01,
+            "quote_basis": "minute_high",
+            "stop": 2518.9278924085133
+          },
+          {
+            "time": "2026-09-19T16:10:00Z",
+            "event": "TP1_HIT",
+            "price": 2641.592189318164,
+            "kind": "missed_4h",
+            "quote": 2646.01,
+            "quote_basis": "minute_high",
+            "stop": 2518.9278924085133
+          },
+          {
+            "time": "2026-09-19T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2526.746622343571,
+            "kind": "missed_4h",
+            "quote": 2636.42,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2526.746622343571
+          },
+          {
+            "time": "2026-09-20T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2534.6725194466294,
+            "kind": "missed_4h",
+            "quote": 2629.475,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2534.6725194466294
+          },
+          {
+            "time": "2026-09-20T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2537.8104103742785,
+            "kind": "missed_4h",
+            "quote": 2582.2,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2537.8104103742785
+          },
+          {
+            "time": "2026-09-20T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2540.4569947192786,
+            "kind": "missed_4h",
+            "quote": 2577.05,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2540.4569947192786
+          },
+          {
+            "time": "2026-09-20T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2550.6335644098904,
+            "kind": "missed_4h",
+            "quote": 2627.45,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2550.6335644098904
+          },
+          {
+            "time": "2026-09-20T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2560.8902148358966,
+            "kind": "missed_4h",
+            "quote": 2636.525,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2560.8902148358966
+          },
+          {
+            "time": "2026-09-21T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2571.8910479507,
+            "kind": "missed_4h",
+            "quote": 2675.845,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2571.8910479507
+          },
+          {
+            "time": "2026-09-21T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2583.658470017637,
+            "kind": "missed_4h",
+            "quote": 2661.895,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2583.658470017637
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2593.0429749152872,
+            "kind": "missed_4h",
+            "quote": 2687.0249999999996,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2593.0429749152872
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 2748.6648024242186,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          }
+        ]
+      },
+      "low": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 2748.6648024242186,
+        "gross_pnl": 268.6259468567925,
+        "events": [
+          {
+            "time": "2026-09-21T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2571.8910479507,
+            "kind": "missed_4h",
+            "quote": 2675.845,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2571.8910479507
+          },
+          {
+            "time": "2026-09-21T00:10:00Z",
+            "event": "TP1_HIT",
+            "price": 2641.592189318164,
+            "kind": "missed_4h",
+            "quote": 2675.845,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2571.8910479507
+          },
+          {
+            "time": "2026-09-21T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2583.658470017637,
+            "kind": "missed_4h",
+            "quote": 2661.895,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2583.658470017637
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2593.0429749152872,
+            "kind": "missed_4h",
+            "quote": 2687.0249999999996,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2593.0429749152872
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 2748.6648024242186,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          }
+        ]
+      },
+      "close": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 2748.6648024242186,
+        "gross_pnl": 268.6259468567925,
+        "events": [
+          {
+            "time": "2026-09-19T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2518.9278924085133,
+            "kind": "missed_4h",
+            "quote": 2645.98,
+            "quote_basis": "minute_close",
+            "stop": 2518.9278924085133
+          },
+          {
+            "time": "2026-09-19T16:10:00Z",
+            "event": "TP1_HIT",
+            "price": 2641.592189318164,
+            "kind": "missed_4h",
+            "quote": 2645.98,
+            "quote_basis": "minute_close",
+            "stop": 2518.9278924085133
+          },
+          {
+            "time": "2026-09-19T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2526.746622343571,
+            "kind": "missed_4h",
+            "quote": 2636.42,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2526.746622343571
+          },
+          {
+            "time": "2026-09-20T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2534.6725194466294,
+            "kind": "missed_4h",
+            "quote": 2629.475,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2534.6725194466294
+          },
+          {
+            "time": "2026-09-20T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2537.8104103742785,
+            "kind": "missed_4h",
+            "quote": 2582.2,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2537.8104103742785
+          },
+          {
+            "time": "2026-09-20T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2540.4569947192786,
+            "kind": "missed_4h",
+            "quote": 2577.05,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2540.4569947192786
+          },
+          {
+            "time": "2026-09-20T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2550.6335644098904,
+            "kind": "missed_4h",
+            "quote": 2627.45,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2550.6335644098904
+          },
+          {
+            "time": "2026-09-20T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2560.8902148358966,
+            "kind": "missed_4h",
+            "quote": 2636.525,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2560.8902148358966
+          },
+          {
+            "time": "2026-09-21T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2571.8910479507,
+            "kind": "missed_4h",
+            "quote": 2675.845,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2571.8910479507
+          },
+          {
+            "time": "2026-09-21T04:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2583.658470017637,
+            "kind": "missed_4h",
+            "quote": 2661.895,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2583.658470017637
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2593.0429749152872,
+            "kind": "missed_4h",
+            "quote": 2687.0249999999996,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 2593.0429749152872
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 2748.6648024242186,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          }
+        ]
+      }
+    }
+  },
+  {
+    "plan_id": "0a265e9f2163",
+    "symbol": "TAOUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 259.59276571748694,
+    "baseline": {
+      "status": "CLOSED",
+      "closed_at": "2026-09-21T20:10:03Z",
+      "exit_price": 293.17270262587624,
+      "gross_pnl": 259.59276571748694,
+      "events": [
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_EMA_TRAILING_ACTIVATED",
+          "price": 261.49930394228744,
+          "kind": "actual",
+          "quote": 287.9,
+          "quote_basis": "recorded_snapshot",
+          "stop": 261.49930394228744
+        },
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_HIT",
+          "price": 272.5770269694072,
+          "kind": "actual",
+          "quote": 287.9,
+          "quote_basis": "recorded_snapshot",
+          "stop": 261.49930394228744
+        },
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 266.0880022212967,
+          "kind": "actual",
+          "quote": 306.2,
+          "quote_basis": "recorded_snapshot",
+          "stop": 266.0880022212967
+        },
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "CLOSED",
+          "price": 293.17270262587624,
+          "kind": "actual",
+          "quote": 306.2,
+          "quote_basis": "recorded_snapshot",
+          "stop": 266.0880022212967
+        }
+      ]
+    },
+    "missed_4h_slots": 97,
+    "sensitivities": {
+      "open": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 293.17270262587624,
+        "gross_pnl": 259.59276571748694,
+        "events": [
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 255.09170227425815,
+            "kind": "missed_4h",
+            "quote": 273.3,
+            "quote_basis": "minute_open",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 272.5770269694072,
+            "kind": "missed_4h",
+            "quote": 273.3,
+            "quote_basis": "minute_open",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 261.49930394228744,
+            "kind": "actual",
+            "quote": 287.9,
+            "quote_basis": "recorded_snapshot",
+            "stop": 261.49930394228744
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 266.0880022212967,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 293.17270262587624,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          }
+        ]
+      },
+      "high": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 293.17270262587624,
+        "gross_pnl": 259.59276571748694,
+        "events": [
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 255.09170227425815,
+            "kind": "missed_4h",
+            "quote": 273.5,
+            "quote_basis": "minute_high",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 272.5770269694072,
+            "kind": "missed_4h",
+            "quote": 273.5,
+            "quote_basis": "minute_high",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 261.49930394228744,
+            "kind": "actual",
+            "quote": 287.9,
+            "quote_basis": "recorded_snapshot",
+            "stop": 261.49930394228744
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 266.0880022212967,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 293.17270262587624,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          }
+        ]
+      },
+      "low": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 293.17270262587624,
+        "gross_pnl": 259.59276571748694,
+        "events": [
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 255.09170227425815,
+            "kind": "missed_4h",
+            "quote": 272.6,
+            "quote_basis": "minute_low",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 272.5770269694072,
+            "kind": "missed_4h",
+            "quote": 272.6,
+            "quote_basis": "minute_low",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 261.49930394228744,
+            "kind": "actual",
+            "quote": 287.9,
+            "quote_basis": "recorded_snapshot",
+            "stop": 261.49930394228744
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 266.0880022212967,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 293.17270262587624,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          }
+        ]
+      },
+      "close": {
+        "status": "CLOSED",
+        "closed_at": "2026-09-21T20:10:03Z",
+        "exit_price": 293.17270262587624,
+        "gross_pnl": 259.59276571748694,
+        "events": [
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 255.09170227425815,
+            "kind": "missed_4h",
+            "quote": 272.8,
+            "quote_basis": "minute_close",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T08:10:00Z",
+            "event": "TP1_HIT",
+            "price": 272.5770269694072,
+            "kind": "missed_4h",
+            "quote": 272.8,
+            "quote_basis": "minute_close",
+            "stop": 255.09170227425815
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 261.49930394228744,
+            "kind": "actual",
+            "quote": 287.9,
+            "quote_basis": "recorded_snapshot",
+            "stop": 261.49930394228744
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 266.0880022212967,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "CLOSED",
+            "price": 293.17270262587624,
+            "kind": "actual",
+            "quote": 306.2,
+            "quote_basis": "recorded_snapshot",
+            "stop": 266.0880022212967
+          }
+        ]
+      }
+    }
+  },
+  {
+    "plan_id": "d6075516aea8",
+    "symbol": "BNBUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 123.02970521863004,
+    "baseline": {
+      "status": "STOPPED",
+      "closed_at": "2026-09-07T16:10:03Z",
+      "exit_price": 741.9571610440092,
+      "gross_pnl": 123.02970521863004,
+      "events": [
+        {
+          "time": "2026-09-06T01:36:06Z",
+          "event": "TP1_EMA_TRAILING_ACTIVATED",
+          "price": 727.6555145978269,
+          "kind": "actual",
+          "quote": 765.95,
+          "quote_basis": "recorded_snapshot",
+          "stop": 727.6555145978269
+        },
+        {
+          "time": "2026-09-06T01:36:06Z",
+          "event": "TP1_HIT",
+          "price": 757.3756777610968,
+          "kind": "actual",
+          "quote": 765.95,
+          "quote_basis": "recorded_snapshot",
+          "stop": 727.6555145978269
+        },
+        {
+          "time": "2026-09-06T04:10:04Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 730.7508027313721,
+          "kind": "actual",
+          "quote": 764.76,
+          "quote_basis": "recorded_snapshot",
+          "stop": 730.7508027313721
+        },
+        {
+          "time": "2026-09-06T08:10:02Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 732.2836124865668,
+          "kind": "actual",
+          "quote": 756.69,
+          "quote_basis": "recorded_snapshot",
+          "stop": 732.2836124865668
+        },
+        {
+          "time": "2026-09-06T12:13:07Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 734.1129632149156,
+          "kind": "actual",
+          "quote": 757.92,
+          "quote_basis": "recorded_snapshot",
+          "stop": 734.1129632149156
+        },
+        {
+          "time": "2026-09-06T16:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 734.9679120582474,
+          "kind": "actual",
+          "quote": 745.33,
+          "quote_basis": "recorded_snapshot",
+          "stop": 734.9679120582474
+        },
+        {
+          "time": "2026-09-06T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 736.3828059193445,
+          "kind": "actual",
+          "quote": 749.56,
+          "quote_basis": "recorded_snapshot",
+          "stop": 736.3828059193445
+        },
+        {
+          "time": "2026-09-07T00:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 738.4518538417634,
+          "kind": "actual",
+          "quote": 755.08,
+          "quote_basis": "recorded_snapshot",
+          "stop": 738.4518538417634
+        },
+        {
+          "time": "2026-09-07T04:10:04Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 739.727901692196,
+          "kind": "actual",
+          "quote": 746.43,
+          "quote_basis": "recorded_snapshot",
+          "stop": 739.727901692196
+        },
+        {
+          "time": "2026-09-07T08:10:02Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 741.051858687995,
+          "kind": "actual",
+          "quote": 745.39,
+          "quote_basis": "recorded_snapshot",
+          "stop": 741.051858687995
+        },
+        {
+          "time": "2026-09-07T12:06:52Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 741.9571610440092,
+          "kind": "actual",
+          "quote": 745.73,
+          "quote_basis": "recorded_snapshot",
+          "stop": 741.9571610440092
+        },
+        {
+          "time": "2026-09-07T16:10:03Z",
+          "event": "STOPPED",
+          "price": 741.9571610440092,
+          "kind": "actual",
+          "quote": 736.45,
+          "quote_basis": "recorded_snapshot",
+          "stop": 741.9571610440092
+        }
+      ]
+    },
+    "missed_4h_slots": 33,
+    "sensitivities": {
+      "open": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-07T16:10:03Z",
+        "exit_price": 741.9571610440092,
+        "gross_pnl": 123.02970521863004,
+        "events": [
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 718.2777563412366,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_HIT",
+            "price": 757.3756777610968,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 723.7617943758003,
+            "kind": "missed_4h",
+            "quote": 771.86,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 723.7617943758003
+          },
+          {
+            "time": "2026-09-06T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 727.6555145978269,
+            "kind": "missed_4h",
+            "quote": 767.485,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 727.6555145978269
+          },
+          {
+            "time": "2026-09-06T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 730.7508027313721,
+            "kind": "actual",
+            "quote": 764.76,
+            "quote_basis": "recorded_snapshot",
+            "stop": 730.7508027313721
+          },
+          {
+            "time": "2026-09-06T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 732.2836124865668,
+            "kind": "actual",
+            "quote": 756.69,
+            "quote_basis": "recorded_snapshot",
+            "stop": 732.2836124865668
+          },
+          {
+            "time": "2026-09-06T12:13:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.1129632149156,
+            "kind": "actual",
+            "quote": 757.92,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.1129632149156
+          },
+          {
+            "time": "2026-09-06T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.9679120582474,
+            "kind": "actual",
+            "quote": 745.33,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.9679120582474
+          },
+          {
+            "time": "2026-09-06T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 736.3828059193445,
+            "kind": "actual",
+            "quote": 749.56,
+            "quote_basis": "recorded_snapshot",
+            "stop": 736.3828059193445
+          },
+          {
+            "time": "2026-09-07T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 738.4518538417634,
+            "kind": "actual",
+            "quote": 755.08,
+            "quote_basis": "recorded_snapshot",
+            "stop": 738.4518538417634
+          },
+          {
+            "time": "2026-09-07T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 739.727901692196,
+            "kind": "actual",
+            "quote": 746.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 739.727901692196
+          },
+          {
+            "time": "2026-09-07T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.051858687995,
+            "kind": "actual",
+            "quote": 745.39,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.051858687995
+          },
+          {
+            "time": "2026-09-07T12:06:52Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 745.73,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          },
+          {
+            "time": "2026-09-07T16:10:03Z",
+            "event": "STOPPED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 736.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          }
+        ]
+      },
+      "high": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-07T16:10:03Z",
+        "exit_price": 741.9571610440092,
+        "gross_pnl": 123.02970521863004,
+        "events": [
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 718.2777563412366,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_HIT",
+            "price": 757.3756777610968,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 723.7617943758003,
+            "kind": "missed_4h",
+            "quote": 771.86,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 723.7617943758003
+          },
+          {
+            "time": "2026-09-06T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 727.6555145978269,
+            "kind": "missed_4h",
+            "quote": 767.485,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 727.6555145978269
+          },
+          {
+            "time": "2026-09-06T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 730.7508027313721,
+            "kind": "actual",
+            "quote": 764.76,
+            "quote_basis": "recorded_snapshot",
+            "stop": 730.7508027313721
+          },
+          {
+            "time": "2026-09-06T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 732.2836124865668,
+            "kind": "actual",
+            "quote": 756.69,
+            "quote_basis": "recorded_snapshot",
+            "stop": 732.2836124865668
+          },
+          {
+            "time": "2026-09-06T12:13:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.1129632149156,
+            "kind": "actual",
+            "quote": 757.92,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.1129632149156
+          },
+          {
+            "time": "2026-09-06T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.9679120582474,
+            "kind": "actual",
+            "quote": 745.33,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.9679120582474
+          },
+          {
+            "time": "2026-09-06T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 736.3828059193445,
+            "kind": "actual",
+            "quote": 749.56,
+            "quote_basis": "recorded_snapshot",
+            "stop": 736.3828059193445
+          },
+          {
+            "time": "2026-09-07T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 738.4518538417634,
+            "kind": "actual",
+            "quote": 755.08,
+            "quote_basis": "recorded_snapshot",
+            "stop": 738.4518538417634
+          },
+          {
+            "time": "2026-09-07T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 739.727901692196,
+            "kind": "actual",
+            "quote": 746.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 739.727901692196
+          },
+          {
+            "time": "2026-09-07T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.051858687995,
+            "kind": "actual",
+            "quote": 745.39,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.051858687995
+          },
+          {
+            "time": "2026-09-07T12:06:52Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 745.73,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          },
+          {
+            "time": "2026-09-07T16:10:03Z",
+            "event": "STOPPED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 736.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          }
+        ]
+      },
+      "low": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-07T16:10:03Z",
+        "exit_price": 741.9571610440092,
+        "gross_pnl": 123.02970521863004,
+        "events": [
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 718.2777563412366,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_HIT",
+            "price": 757.3756777610968,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 723.7617943758003,
+            "kind": "missed_4h",
+            "quote": 771.86,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 723.7617943758003
+          },
+          {
+            "time": "2026-09-06T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 727.6555145978269,
+            "kind": "missed_4h",
+            "quote": 767.485,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 727.6555145978269
+          },
+          {
+            "time": "2026-09-06T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 730.7508027313721,
+            "kind": "actual",
+            "quote": 764.76,
+            "quote_basis": "recorded_snapshot",
+            "stop": 730.7508027313721
+          },
+          {
+            "time": "2026-09-06T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 732.2836124865668,
+            "kind": "actual",
+            "quote": 756.69,
+            "quote_basis": "recorded_snapshot",
+            "stop": 732.2836124865668
+          },
+          {
+            "time": "2026-09-06T12:13:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.1129632149156,
+            "kind": "actual",
+            "quote": 757.92,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.1129632149156
+          },
+          {
+            "time": "2026-09-06T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.9679120582474,
+            "kind": "actual",
+            "quote": 745.33,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.9679120582474
+          },
+          {
+            "time": "2026-09-06T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 736.3828059193445,
+            "kind": "actual",
+            "quote": 749.56,
+            "quote_basis": "recorded_snapshot",
+            "stop": 736.3828059193445
+          },
+          {
+            "time": "2026-09-07T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 738.4518538417634,
+            "kind": "actual",
+            "quote": 755.08,
+            "quote_basis": "recorded_snapshot",
+            "stop": 738.4518538417634
+          },
+          {
+            "time": "2026-09-07T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 739.727901692196,
+            "kind": "actual",
+            "quote": 746.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 739.727901692196
+          },
+          {
+            "time": "2026-09-07T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.051858687995,
+            "kind": "actual",
+            "quote": 745.39,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.051858687995
+          },
+          {
+            "time": "2026-09-07T12:06:52Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 745.73,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          },
+          {
+            "time": "2026-09-07T16:10:03Z",
+            "event": "STOPPED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 736.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          }
+        ]
+      },
+      "close": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-07T16:10:03Z",
+        "exit_price": 741.9571610440092,
+        "gross_pnl": 123.02970521863004,
+        "events": [
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 718.2777563412366,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T16:10:00Z",
+            "event": "TP1_HIT",
+            "price": 757.3756777610968,
+            "kind": "missed_4h",
+            "quote": 772.55,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 718.2777563412366
+          },
+          {
+            "time": "2026-09-05T20:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 723.7617943758003,
+            "kind": "missed_4h",
+            "quote": 771.86,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 723.7617943758003
+          },
+          {
+            "time": "2026-09-06T00:10:00Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 727.6555145978269,
+            "kind": "missed_4h",
+            "quote": 767.485,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 727.6555145978269
+          },
+          {
+            "time": "2026-09-06T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 730.7508027313721,
+            "kind": "actual",
+            "quote": 764.76,
+            "quote_basis": "recorded_snapshot",
+            "stop": 730.7508027313721
+          },
+          {
+            "time": "2026-09-06T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 732.2836124865668,
+            "kind": "actual",
+            "quote": 756.69,
+            "quote_basis": "recorded_snapshot",
+            "stop": 732.2836124865668
+          },
+          {
+            "time": "2026-09-06T12:13:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.1129632149156,
+            "kind": "actual",
+            "quote": 757.92,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.1129632149156
+          },
+          {
+            "time": "2026-09-06T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 734.9679120582474,
+            "kind": "actual",
+            "quote": 745.33,
+            "quote_basis": "recorded_snapshot",
+            "stop": 734.9679120582474
+          },
+          {
+            "time": "2026-09-06T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 736.3828059193445,
+            "kind": "actual",
+            "quote": 749.56,
+            "quote_basis": "recorded_snapshot",
+            "stop": 736.3828059193445
+          },
+          {
+            "time": "2026-09-07T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 738.4518538417634,
+            "kind": "actual",
+            "quote": 755.08,
+            "quote_basis": "recorded_snapshot",
+            "stop": 738.4518538417634
+          },
+          {
+            "time": "2026-09-07T04:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 739.727901692196,
+            "kind": "actual",
+            "quote": 746.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 739.727901692196
+          },
+          {
+            "time": "2026-09-07T08:10:02Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.051858687995,
+            "kind": "actual",
+            "quote": 745.39,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.051858687995
+          },
+          {
+            "time": "2026-09-07T12:06:52Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 745.73,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          },
+          {
+            "time": "2026-09-07T16:10:03Z",
+            "event": "STOPPED",
+            "price": 741.9571610440092,
+            "kind": "actual",
+            "quote": 736.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 741.9571610440092
+          }
+        ]
+      }
+    }
+  },
+  {
+    "plan_id": "4f2f0f1fa0e7",
+    "symbol": "ETHUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 164.48747024786257,
+    "baseline": {
+      "status": "STOPPED",
+      "closed_at": "2026-09-23T16:10:05Z",
+      "exit_price": 2702.337146862676,
+      "gross_pnl": 164.48747024786257,
+      "events": [
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_EMA_TRAILING_ACTIVATED",
+          "price": 2622.9135290748195,
+          "kind": "actual",
+          "quote": 2747.52,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2622.9135290748195
+        },
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_HIT",
+          "price": 2745.526527418897,
+          "kind": "actual",
+          "quote": 2747.52,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2622.9135290748195
+        },
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2638.0494868804667,
+          "kind": "actual",
+          "quote": 2770.45,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2638.0494868804667
+        },
+        {
+          "time": "2026-09-22T00:10:04Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2653.9899763832964,
+          "kind": "actual",
+          "quote": 2771.12,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2653.9899763832964
+        },
+        {
+          "time": "2026-09-22T04:10:06Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2662.6072812974016,
+          "kind": "actual",
+          "quote": 2737.84,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2662.6072812974016
+        },
+        {
+          "time": "2026-09-22T08:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2668.661157221014,
+          "kind": "actual",
+          "quote": 2732.66,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2668.661157221014
+        },
+        {
+          "time": "2026-09-22T12:07:07Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2675.727537924013,
+          "kind": "actual",
+          "quote": 2745.24,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2675.727537924013
+        },
+        {
+          "time": "2026-09-22T16:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2680.075600955878,
+          "kind": "actual",
+          "quote": 2737.79,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2680.075600955878
+        },
+        {
+          "time": "2026-09-22T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2684.7119920017894,
+          "kind": "actual",
+          "quote": 2750.43,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2684.7119920017894
+        },
+        {
+          "time": "2026-09-23T00:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2690.6419878882775,
+          "kind": "actual",
+          "quote": 2752.46,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2690.6419878882775
+        },
+        {
+          "time": "2026-09-23T04:10:05Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2697.5502969827385,
+          "kind": "actual",
+          "quote": 2776.16,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2697.5502969827385
+        },
+        {
+          "time": "2026-09-23T08:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2700.963814951075,
+          "kind": "actual",
+          "quote": 2743.12,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2700.963814951075
+        },
+        {
+          "time": "2026-09-23T12:06:31Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 2702.337146862676,
+          "kind": "actual",
+          "quote": 2724.36,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2702.337146862676
+        },
+        {
+          "time": "2026-09-23T16:10:05Z",
+          "event": "STOPPED",
+          "price": 2702.337146862676,
+          "kind": "actual",
+          "quote": 2664.47,
+          "quote_basis": "recorded_snapshot",
+          "stop": 2702.337146862676
+        }
+      ]
+    },
+    "missed_4h_slots": 66,
+    "sensitivities": {
+      "open": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-23T16:10:05Z",
+        "exit_price": 2702.337146862676,
+        "gross_pnl": 164.48747024786257,
+        "events": [
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_HIT",
+            "price": 2745.526527418897,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-22T00:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2653.9899763832964,
+            "kind": "actual",
+            "quote": 2771.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2653.9899763832964
+          },
+          {
+            "time": "2026-09-22T04:10:06Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2662.6072812974016,
+            "kind": "actual",
+            "quote": 2737.84,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2662.6072812974016
+          },
+          {
+            "time": "2026-09-22T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2668.661157221014,
+            "kind": "actual",
+            "quote": 2732.66,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2668.661157221014
+          },
+          {
+            "time": "2026-09-22T12:07:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2675.727537924013,
+            "kind": "actual",
+            "quote": 2745.24,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2675.727537924013
+          },
+          {
+            "time": "2026-09-22T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2680.075600955878,
+            "kind": "actual",
+            "quote": 2737.79,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2680.075600955878
+          },
+          {
+            "time": "2026-09-22T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2684.7119920017894,
+            "kind": "actual",
+            "quote": 2750.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2684.7119920017894
+          },
+          {
+            "time": "2026-09-23T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2690.6419878882775,
+            "kind": "actual",
+            "quote": 2752.46,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2690.6419878882775
+          },
+          {
+            "time": "2026-09-23T04:10:05Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2697.5502969827385,
+            "kind": "actual",
+            "quote": 2776.16,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2697.5502969827385
+          },
+          {
+            "time": "2026-09-23T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2700.963814951075,
+            "kind": "actual",
+            "quote": 2743.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2700.963814951075
+          },
+          {
+            "time": "2026-09-23T12:06:31Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2724.36,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          },
+          {
+            "time": "2026-09-23T16:10:05Z",
+            "event": "STOPPED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2664.47,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          }
+        ]
+      },
+      "high": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-23T16:10:05Z",
+        "exit_price": 2702.337146862676,
+        "gross_pnl": 164.48747024786257,
+        "events": [
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_HIT",
+            "price": 2745.526527418897,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-22T00:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2653.9899763832964,
+            "kind": "actual",
+            "quote": 2771.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2653.9899763832964
+          },
+          {
+            "time": "2026-09-22T04:10:06Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2662.6072812974016,
+            "kind": "actual",
+            "quote": 2737.84,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2662.6072812974016
+          },
+          {
+            "time": "2026-09-22T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2668.661157221014,
+            "kind": "actual",
+            "quote": 2732.66,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2668.661157221014
+          },
+          {
+            "time": "2026-09-22T12:07:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2675.727537924013,
+            "kind": "actual",
+            "quote": 2745.24,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2675.727537924013
+          },
+          {
+            "time": "2026-09-22T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2680.075600955878,
+            "kind": "actual",
+            "quote": 2737.79,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2680.075600955878
+          },
+          {
+            "time": "2026-09-22T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2684.7119920017894,
+            "kind": "actual",
+            "quote": 2750.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2684.7119920017894
+          },
+          {
+            "time": "2026-09-23T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2690.6419878882775,
+            "kind": "actual",
+            "quote": 2752.46,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2690.6419878882775
+          },
+          {
+            "time": "2026-09-23T04:10:05Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2697.5502969827385,
+            "kind": "actual",
+            "quote": 2776.16,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2697.5502969827385
+          },
+          {
+            "time": "2026-09-23T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2700.963814951075,
+            "kind": "actual",
+            "quote": 2743.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2700.963814951075
+          },
+          {
+            "time": "2026-09-23T12:06:31Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2724.36,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          },
+          {
+            "time": "2026-09-23T16:10:05Z",
+            "event": "STOPPED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2664.47,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          }
+        ]
+      },
+      "low": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-23T16:10:05Z",
+        "exit_price": 2702.337146862676,
+        "gross_pnl": 164.48747024786257,
+        "events": [
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_HIT",
+            "price": 2745.526527418897,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-22T00:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2653.9899763832964,
+            "kind": "actual",
+            "quote": 2771.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2653.9899763832964
+          },
+          {
+            "time": "2026-09-22T04:10:06Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2662.6072812974016,
+            "kind": "actual",
+            "quote": 2737.84,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2662.6072812974016
+          },
+          {
+            "time": "2026-09-22T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2668.661157221014,
+            "kind": "actual",
+            "quote": 2732.66,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2668.661157221014
+          },
+          {
+            "time": "2026-09-22T12:07:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2675.727537924013,
+            "kind": "actual",
+            "quote": 2745.24,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2675.727537924013
+          },
+          {
+            "time": "2026-09-22T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2680.075600955878,
+            "kind": "actual",
+            "quote": 2737.79,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2680.075600955878
+          },
+          {
+            "time": "2026-09-22T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2684.7119920017894,
+            "kind": "actual",
+            "quote": 2750.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2684.7119920017894
+          },
+          {
+            "time": "2026-09-23T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2690.6419878882775,
+            "kind": "actual",
+            "quote": 2752.46,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2690.6419878882775
+          },
+          {
+            "time": "2026-09-23T04:10:05Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2697.5502969827385,
+            "kind": "actual",
+            "quote": 2776.16,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2697.5502969827385
+          },
+          {
+            "time": "2026-09-23T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2700.963814951075,
+            "kind": "actual",
+            "quote": 2743.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2700.963814951075
+          },
+          {
+            "time": "2026-09-23T12:06:31Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2724.36,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          },
+          {
+            "time": "2026-09-23T16:10:05Z",
+            "event": "STOPPED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2664.47,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          }
+        ]
+      },
+      "close": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-23T16:10:05Z",
+        "exit_price": 2702.337146862676,
+        "gross_pnl": 164.48747024786257,
+        "events": [
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_EMA_TRAILING_ACTIVATED",
+            "price": 2622.9135290748195,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T16:10:04Z",
+            "event": "TP1_HIT",
+            "price": 2745.526527418897,
+            "kind": "actual",
+            "quote": 2747.52,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2622.9135290748195
+          },
+          {
+            "time": "2026-09-21T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2638.0494868804667,
+            "kind": "actual",
+            "quote": 2770.45,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2638.0494868804667
+          },
+          {
+            "time": "2026-09-22T00:10:04Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2653.9899763832964,
+            "kind": "actual",
+            "quote": 2771.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2653.9899763832964
+          },
+          {
+            "time": "2026-09-22T04:10:06Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2662.6072812974016,
+            "kind": "actual",
+            "quote": 2737.84,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2662.6072812974016
+          },
+          {
+            "time": "2026-09-22T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2668.661157221014,
+            "kind": "actual",
+            "quote": 2732.66,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2668.661157221014
+          },
+          {
+            "time": "2026-09-22T12:07:07Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2675.727537924013,
+            "kind": "actual",
+            "quote": 2745.24,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2675.727537924013
+          },
+          {
+            "time": "2026-09-22T16:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2680.075600955878,
+            "kind": "actual",
+            "quote": 2737.79,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2680.075600955878
+          },
+          {
+            "time": "2026-09-22T20:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2684.7119920017894,
+            "kind": "actual",
+            "quote": 2750.43,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2684.7119920017894
+          },
+          {
+            "time": "2026-09-23T00:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2690.6419878882775,
+            "kind": "actual",
+            "quote": 2752.46,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2690.6419878882775
+          },
+          {
+            "time": "2026-09-23T04:10:05Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2697.5502969827385,
+            "kind": "actual",
+            "quote": 2776.16,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2697.5502969827385
+          },
+          {
+            "time": "2026-09-23T08:10:03Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2700.963814951075,
+            "kind": "actual",
+            "quote": 2743.12,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2700.963814951075
+          },
+          {
+            "time": "2026-09-23T12:06:31Z",
+            "event": "TP1_EMA_TRAILING_RAISED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2724.36,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          },
+          {
+            "time": "2026-09-23T16:10:05Z",
+            "event": "STOPPED",
+            "price": 2702.337146862676,
+            "kind": "actual",
+            "quote": 2664.47,
+            "quote_basis": "recorded_snapshot",
+            "stop": 2702.337146862676
+          }
+        ]
+      }
+    }
+  },
+  {
+    "plan_id": "2d74b7ff6191",
+    "symbol": "ADAUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 256.25454234114136,
+    "baseline": {
+      "status": "CLOSED",
+      "closed_at": "2026-09-23T00:10:03Z",
+      "exit_price": 0.2524066234123029,
+      "gross_pnl": 256.25454234114136,
+      "events": [
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_EMA_TRAILING_ACTIVATED",
+          "price": 0.22685283814357185,
+          "kind": "actual",
+          "quote": 0.2447,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.22685283814357185
+        },
+        {
+          "time": "2026-09-21T16:10:04Z",
+          "event": "TP1_HIT",
+          "price": 0.2407958425592272,
+          "kind": "actual",
+          "quote": 0.2447,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.22685283814357185
+        },
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.228888683830297,
+          "kind": "actual",
+          "quote": 0.2445,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.228888683830297
+        },
+        {
+          "time": "2026-09-22T00:10:04Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.23081632861307785,
+          "kind": "actual",
+          "quote": 0.2446,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.23081632861307785
+        },
+        {
+          "time": "2026-09-22T04:10:06Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.23219052490988834,
+          "kind": "actual",
+          "quote": 0.2499,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.23219052490988834
+        },
+        {
+          "time": "2026-09-22T08:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.23324334405417493,
+          "kind": "actual",
+          "quote": 0.246,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.23324334405417493
+        },
+        {
+          "time": "2026-09-22T12:07:07Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.23435674294661177,
+          "kind": "actual",
+          "quote": 0.2457,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.23435674294661177
+        },
+        {
+          "time": "2026-09-22T16:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.23583927674168684,
+          "kind": "actual",
+          "quote": 0.2496,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.23583927674168684
+        },
+        {
+          "time": "2026-09-22T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.23713697515438523,
+          "kind": "actual",
+          "quote": 0.2516,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.23713697515438523
+        },
+        {
+          "time": "2026-09-23T00:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.2385572776775109,
+          "kind": "actual",
+          "quote": 0.2554,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.2385572776775109
+        },
+        {
+          "time": "2026-09-23T00:10:03Z",
+          "event": "CLOSED",
+          "price": 0.2524066234123029,
+          "kind": "actual",
+          "quote": 0.2554,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.2385572776775109
+        }
+      ]
+    },
+    "missed_4h_slots": 63,
+    "sensitivities": {
+      "open": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-11T00:10:00Z",
+        "exit_price": 0.2059635,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-11T00:10:00Z",
+            "event": "STOPPED",
+            "price": 0.2059635,
+            "kind": "missed_4h",
+            "quote": 0.2059,
+            "quote_basis": "minute_open",
+            "stop": 0.2059635
+          }
+        ]
+      },
+      "high": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-14T00:10:00Z",
+        "exit_price": 0.2059635,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-14T00:10:00Z",
+            "event": "STOPPED",
+            "price": 0.2059635,
+            "kind": "missed_4h",
+            "quote": 0.20365,
+            "quote_basis": "whole_hour_threshold_invariant",
+            "stop": 0.2059635
+          }
+        ]
+      },
+      "low": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-11T00:10:00Z",
+        "exit_price": 0.2059635,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-11T00:10:00Z",
+            "event": "STOPPED",
+            "price": 0.2059635,
+            "kind": "missed_4h",
+            "quote": 0.2059,
+            "quote_basis": "minute_low",
+            "stop": 0.2059635
+          }
+        ]
+      },
+      "close": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-11T00:10:00Z",
+        "exit_price": 0.2059635,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-11T00:10:00Z",
+            "event": "STOPPED",
+            "price": 0.2059635,
+            "kind": "missed_4h",
+            "quote": 0.2059,
+            "quote_basis": "minute_close",
+            "stop": 0.2059635
+          }
+        ]
+      }
+    },
+    "whole_minute_stop_proof": {
+      "time": "2026-09-14T00:10:00Z",
+      "minute_high": 0.2042,
+      "initial_stop": 0.2059635,
+      "ohlc": [
+        "0.20420000",
+        "0.20420000",
+        "0.20400000",
+        "0.20410000"
+      ]
+    }
+  },
+  {
+    "plan_id": "5ff6dab72dfa",
+    "symbol": "BTCUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 135.2385401855433,
+    "baseline": {
+      "status": "STOPPED",
+      "closed_at": "2026-09-24T04:10:03Z",
+      "exit_price": 84250.97886779171,
+      "gross_pnl": 135.2385401855433,
+      "events": [
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_ACTIVATED",
+          "price": 81840.19732901159,
+          "kind": "actual",
+          "quote": 86702.95,
+          "quote_basis": "recorded_snapshot",
+          "stop": 81840.19732901159
+        },
+        {
+          "time": "2026-09-21T20:10:03Z",
+          "event": "TP1_HIT",
+          "price": 85786.04522628392,
+          "kind": "actual",
+          "quote": 86702.95,
+          "quote_basis": "recorded_snapshot",
+          "stop": 81840.19732901159
+        },
+        {
+          "time": "2026-09-22T00:10:04Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 82383.2265936184,
+          "kind": "actual",
+          "quote": 86346.18,
+          "quote_basis": "recorded_snapshot",
+          "stop": 82383.2265936184
+        },
+        {
+          "time": "2026-09-22T04:10:06Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 82674.76782770295,
+          "kind": "actual",
+          "quote": 85616.24,
+          "quote_basis": "recorded_snapshot",
+          "stop": 82674.76782770295
+        },
+        {
+          "time": "2026-09-22T08:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 82883.83392128022,
+          "kind": "actual",
+          "quote": 85498.01,
+          "quote_basis": "recorded_snapshot",
+          "stop": 82883.83392128022
+        },
+        {
+          "time": "2026-09-22T12:07:07Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 83134.23874306487,
+          "kind": "actual",
+          "quote": 85995.79,
+          "quote_basis": "recorded_snapshot",
+          "stop": 83134.23874306487
+        },
+        {
+          "time": "2026-09-22T16:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 83335.12718748876,
+          "kind": "actual",
+          "quote": 86268.01,
+          "quote_basis": "recorded_snapshot",
+          "stop": 83335.12718748876
+        },
+        {
+          "time": "2026-09-22T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 83526.72685564915,
+          "kind": "actual",
+          "quote": 86226.08,
+          "quote_basis": "recorded_snapshot",
+          "stop": 83526.72685564915
+        },
+        {
+          "time": "2026-09-23T00:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 83737.26106437133,
+          "kind": "actual",
+          "quote": 86234.85,
+          "quote_basis": "recorded_snapshot",
+          "stop": 83737.26106437133
+        },
+        {
+          "time": "2026-09-23T04:10:05Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 83961.25864619424,
+          "kind": "actual",
+          "quote": 86844.39,
+          "quote_basis": "recorded_snapshot",
+          "stop": 83961.25864619424
+        },
+        {
+          "time": "2026-09-23T08:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 84112.48290660014,
+          "kind": "actual",
+          "quote": 86193.44,
+          "quote_basis": "recorded_snapshot",
+          "stop": 84112.48290660014
+        },
+        {
+          "time": "2026-09-23T12:06:31Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 84220.94316025215,
+          "kind": "actual",
+          "quote": 85511.03,
+          "quote_basis": "recorded_snapshot",
+          "stop": 84220.94316025215
+        },
+        {
+          "time": "2026-09-24T04:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 84250.97886779171,
+          "kind": "actual",
+          "quote": 83934.01,
+          "quote_basis": "recorded_snapshot",
+          "stop": 84250.97886779171
+        },
+        {
+          "time": "2026-09-24T04:10:03Z",
+          "event": "STOPPED",
+          "price": 84250.97886779171,
+          "kind": "actual",
+          "quote": 83934.01,
+          "quote_basis": "recorded_snapshot",
+          "stop": 84250.97886779171
+        }
+      ]
+    },
+    "missed_4h_slots": 63,
+    "sensitivities": {
+      "open": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T16:10:00Z",
+        "exit_price": 76468.0913,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T16:10:00Z",
+            "event": "STOPPED",
+            "price": 76468.0913,
+            "kind": "missed_4h",
+            "quote": 76330.99,
+            "quote_basis": "minute_open",
+            "stop": 76468.0913
+          }
+        ]
+      },
+      "high": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T16:10:00Z",
+        "exit_price": 76468.0913,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T16:10:00Z",
+            "event": "STOPPED",
+            "price": 76468.0913,
+            "kind": "missed_4h",
+            "quote": 76400.0,
+            "quote_basis": "minute_high",
+            "stop": 76468.0913
+          }
+        ]
+      },
+      "low": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T16:10:00Z",
+        "exit_price": 76468.0913,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T16:10:00Z",
+            "event": "STOPPED",
+            "price": 76468.0913,
+            "kind": "missed_4h",
+            "quote": 76330.99,
+            "quote_basis": "minute_low",
+            "stop": 76468.0913
+          }
+        ]
+      },
+      "close": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T16:10:00Z",
+        "exit_price": 76468.0913,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T16:10:00Z",
+            "event": "STOPPED",
+            "price": 76468.0913,
+            "kind": "missed_4h",
+            "quote": 76339.23,
+            "quote_basis": "minute_close",
+            "stop": 76468.0913
+          }
+        ]
+      }
+    },
+    "whole_minute_stop_proof": {
+      "time": "2026-09-15T16:10:00Z",
+      "minute_high": 76400.0,
+      "initial_stop": 76468.0913,
+      "ohlc": [
+        "76330.99000000",
+        "76400.00000000",
+        "76330.99000000",
+        "76339.23000000"
+      ]
+    }
+  },
+  {
+    "plan_id": "549cfdd6bdc4",
+    "symbol": "DOGEUSDT",
+    "baseline_reproduces": true,
+    "original_gross_pnl": 97.41397967867591,
+    "baseline": {
+      "status": "STOPPED",
+      "closed_at": "2026-09-23T16:10:05Z",
+      "exit_price": 0.09526972842591308,
+      "gross_pnl": 97.41397967867591,
+      "events": [
+        {
+          "time": "2026-09-22T04:10:06Z",
+          "event": "TP1_EMA_TRAILING_ACTIVATED",
+          "price": 0.09148501009096005,
+          "kind": "actual",
+          "quote": 0.10447,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09148501009096005
+        },
+        {
+          "time": "2026-09-22T04:10:06Z",
+          "event": "TP1_HIT",
+          "price": 0.10034319999235758,
+          "kind": "actual",
+          "quote": 0.10447,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09148501009096005
+        },
+        {
+          "time": "2026-09-22T08:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09198855677932549,
+          "kind": "actual",
+          "quote": 0.09915,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09198855677932549
+        },
+        {
+          "time": "2026-09-22T12:07:07Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09233109584226737,
+          "kind": "actual",
+          "quote": 0.0981,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09233109584226737
+        },
+        {
+          "time": "2026-09-22T16:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09277071584370711,
+          "kind": "actual",
+          "quote": 0.09956,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09277071584370711
+        },
+        {
+          "time": "2026-09-22T20:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09312966060694874,
+          "kind": "actual",
+          "quote": 0.09982,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09312966060694874
+        },
+        {
+          "time": "2026-09-23T00:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09364934493858013,
+          "kind": "actual",
+          "quote": 0.10044,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09364934493858013
+        },
+        {
+          "time": "2026-09-23T04:10:05Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09449794081169882,
+          "kind": "actual",
+          "quote": 0.10379,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09449794081169882
+        },
+        {
+          "time": "2026-09-23T08:10:03Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09498705319799877,
+          "kind": "actual",
+          "quote": 0.10086,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09498705319799877
+        },
+        {
+          "time": "2026-09-23T12:06:31Z",
+          "event": "TP1_EMA_TRAILING_RAISED",
+          "price": 0.09526972842591308,
+          "kind": "actual",
+          "quote": 0.09929,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09526972842591308
+        },
+        {
+          "time": "2026-09-23T16:10:05Z",
+          "event": "STOPPED",
+          "price": 0.09526972842591308,
+          "kind": "actual",
+          "quote": 0.09319,
+          "quote_basis": "recorded_snapshot",
+          "stop": 0.09526972842591308
+        }
+      ]
+    },
+    "missed_4h_slots": 63,
+    "sensitivities": {
+      "open": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T08:10:00Z",
+        "exit_price": 0.0825233,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T08:10:00Z",
+            "event": "STOPPED",
+            "price": 0.0825233,
+            "kind": "missed_4h",
+            "quote": 0.08238,
+            "quote_basis": "minute_open",
+            "stop": 0.0825233
+          }
+        ]
+      },
+      "high": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T08:10:00Z",
+        "exit_price": 0.0825233,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T08:10:00Z",
+            "event": "STOPPED",
+            "price": 0.0825233,
+            "kind": "missed_4h",
+            "quote": 0.08238,
+            "quote_basis": "minute_high",
+            "stop": 0.0825233
+          }
+        ]
+      },
+      "low": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T08:10:00Z",
+        "exit_price": 0.0825233,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T08:10:00Z",
+            "event": "STOPPED",
+            "price": 0.0825233,
+            "kind": "missed_4h",
+            "quote": 0.08232,
+            "quote_basis": "minute_low",
+            "stop": 0.0825233
+          }
+        ]
+      },
+      "close": {
+        "status": "STOPPED",
+        "closed_at": "2026-09-15T08:10:00Z",
+        "exit_price": 0.0825233,
+        "gross_pnl": -100.0,
+        "events": [
+          {
+            "time": "2026-09-15T08:10:00Z",
+            "event": "STOPPED",
+            "price": 0.0825233,
+            "kind": "missed_4h",
+            "quote": 0.08234,
+            "quote_basis": "minute_close",
+            "stop": 0.0825233
+          }
+        ]
+      }
+    },
+    "whole_minute_stop_proof": {
+      "time": "2026-09-15T08:10:00Z",
+      "minute_high": 0.08238,
+      "initial_stop": 0.0825233,
+      "ohlc": [
+        "0.08238000",
+        "0.08238000",
+        "0.08232000",
+        "0.08234000"
+      ]
+    }
+  }
+]
