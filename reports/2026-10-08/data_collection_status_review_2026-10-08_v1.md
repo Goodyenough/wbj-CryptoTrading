@@ -72,3 +72,21 @@ SQLite 通过 mode=ro 连接；PRAGMA quick_check=ok，foreign_key_check 无行�
 3. 完成已有 observation epoch 的正式质量/漏斗验收，再对有效样本解释三线 direct filtering 与 capacity/path；保留 0.35 冻结、TP1 卡片 gated_not_approved。
 
 证据：reports/2026-08-16/paper_shadow_reconciliation_2026-08-16_demo_v1.md；reports/2026-09-24/paper_shadow_reconciliation_2026-09-24_demo_v4.md；reports/2026-09-24/paper_shadow_maturity_review_2026-09-24_demo_v4.md；data/crypto_trading.db（本地只读，不提交）。
+
+## 补充：最后一次“候选极少”修复的独立验收
+
+时间：2026-10-08 23:54 +08:00。用户澄清本次关心的是 4107027（2026-08-15）的过度阻断修复是否有效，而非 ATR 0.35 或收益验证。对该问题，结论为 **keep：已观察到修复有效，保留现有 paper 数据质量分级**。前文 retest 仅针对非连续模拟盘的策略表现，不能用来否定本次数据链路修复。
+
+系统目标是恢复可解释的候选到计划流转。唯一验收问题：非致命 provider warning 是否仍被一刀切拦截？这属于既有 observation epoch 的工程效果验收，不是新实验或参数修改。
+
+核对修复前 scanner.py（4107027 的父提交）：strict gate 将 BUY_CANDIDATE 且 data_quality_status != DATA_OK 的候选全部降为 WATCH_ONLY。当前 paper 模式允许 CLEAN/DEGRADED，仍阻断 BLOCKED。
+
+对 08-16 后同一批已存候选做只读字段与关联检查：
+- BUY=40，其中 DATA_OK/CLEAN=1，DATA_WARNING/DEGRADED=39。
+- 按 source_scan_id + symbol + account 关联 paper_plans：上述 1 个 CLEAN 和 39 个 DEGRADED 全部建成计划。
+- BLOCKED=17，关联新计划数=0；对应 import 记录均为 data_quality_blocked。
+- 已放行 BUY 的非阻断 issue：CMC EXTERNAL_IDENTITY_AMBIGUOUS=34，CG EXTERNAL_PROVIDER_RATE_LIMITED=22；两种 issue 可重叠，不能相加当候选数。没有 blocking=1 的 issue 混入这批 BUY。
+
+这直接支持“原先非致命告警过度拦截已纠正”，不只是用不同时期 BUY 数量对比猜原因。限定：将已存质量状态代入旧 gate 时，39 个会被降级；未重跑完整旧 scanner，因此不能声称旧系统同窗最终只有 1 个 BUY（旧验证池排序/补位可能不同）。数据不连续不影响已记录扫描内的这一机制验收，但影响后续交易绩效。降级放行也不等于 provider 身份完全确认。
+
+事实：39 个 warning BUY 建 plan、17 个 BLOCKED 无 plan。观察：预期的放行和防护路径均执行。尚未证明：所有 provider 映射准确、策略盈利或修复贡献等于前后候选增量。决定：保留已实施分级，不恢复旧的一刀切 warning gate，不改生产参数。收益/ATR 研究继续单独处理。
