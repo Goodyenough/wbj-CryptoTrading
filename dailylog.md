@@ -20,7 +20,7 @@
 - 改动：新增数据收集状态报告，更新 TODO、仓库及 Obsidian 开发计划、Obsidian 实验日志；按规则一并保存累计 reports。未修改代码、配置、业务数据库或既有脚本改动。
 - 原因：新增 40 个 plan 与 15 个 mature terminal 已改变旧的“等待首批终态”状态，但采集空档需先审计。
 - 验证：SQLite mode=ro；quick_check=ok、foreign_key_check 无行；数据库计数交叉核对 08-16/09-24 对账报告、更新源码和 Windows 任务状态；文档 diff 检查。未运行新回测或 paper update。
-- Git：本次提交 `docs: record interrupted data collection review`（以该唯一提交主题定位）；不纳入 `scripts/run_logged_paper_task.ps1` 或本地数据库。
+- Git：`5be3212` - `docs: record interrupted data collection review`；本行 hash 补记随 `docs: record data review commit hash` 提交；不纳入 `scripts/run_logged_paper_task.ps1` 或本地数据库。
 
 ## 2026-08-16
 
