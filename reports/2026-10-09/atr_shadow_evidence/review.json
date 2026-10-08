@@ -1,0 +1,276 @@
+{
+  "decision_rows": 819,
+  "paired_moments": 273,
+  "unique_plan_count": 29,
+  "baseline_accept_moments": 12,
+  "atr_accept_moments": 0,
+  "joint_reject_moments": 261,
+  "margin_min": 0.008713811818532233,
+  "margin_max": 0.27780302447252314,
+  "accepted_data_quality": {
+    "DEGRADED": 12
+  },
+  "accepted_capacity": {
+    "capacity_available": 6,
+    "at_capacity": 6
+  },
+  "clean_paired_terminal_performance_count": 0,
+  "accepted_reviews": [
+    {
+      "plan_id": "ecdc3e95f224",
+      "symbol": "UNIUSDT",
+      "decision_time": "2026-08-24T12:07:11Z",
+      "margin_atr": 0.054560868444801694,
+      "extra_close_needed": 0.06830974777458376,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "capacity_available",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "CLOSED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\UNIUSDT_1787558400000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": 275.7987725952568,
+      "verified_missed_stop": false
+    },
+    {
+      "plan_id": "bffd2fdd7e2b",
+      "symbol": "ETHUSDT",
+      "decision_time": "2026-08-26T00:10:04Z",
+      "margin_atr": 0.03521035506162484,
+      "extra_close_needed": 14.374419436618155,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "capacity_available",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "CLOSED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\ETHUSDT_1787688000000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": 268.6259468567925,
+      "verified_missed_stop": false
+    },
+    {
+      "plan_id": "0a265e9f2163",
+      "symbol": "TAOUSDT",
+      "decision_time": "2026-08-26T12:06:38Z",
+      "margin_atr": 0.018583228489277338,
+      "extra_close_needed": 2.3625281283407276,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "capacity_available",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "CLOSED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\TAOUSDT_1787731200000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": 259.59276571748694,
+      "verified_missed_stop": false
+    },
+    {
+      "plan_id": "d6075516aea8",
+      "symbol": "BNBUSDT",
+      "decision_time": "2026-08-27T12:07:42Z",
+      "margin_atr": 0.02078475017159043,
+      "extra_close_needed": 3.161407013352232,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "capacity_available",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "STOPPED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\BNBUSDT_1787817600000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": 123.02970521863004,
+      "verified_missed_stop": false
+    },
+    {
+      "plan_id": "56474a1c8879",
+      "symbol": "TRXUSDT",
+      "decision_time": "2026-08-28T00:10:03Z",
+      "margin_atr": 0.035299262098267295,
+      "extra_close_needed": 0.0006204100261491541,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "capacity_available",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "ENTERED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\TRXUSDT_1787860800000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_not_closed_at_fixed_cutoff",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "right_censored_at_cutoff_unreviewed"
+    },
+    {
+      "plan_id": "4f2f0f1fa0e7",
+      "symbol": "ETHUSDT",
+      "decision_time": "2026-09-03T16:10:04Z",
+      "margin_atr": 0.12571781828656559,
+      "extra_close_needed": 9.513249140492007,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "at_capacity",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "STOPPED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\ETHUSDT_1788436800000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": 164.48747024786257,
+      "verified_missed_stop": false
+    },
+    {
+      "plan_id": "d058835e1b0f",
+      "symbol": "SOLUSDT",
+      "decision_time": "2026-09-03T16:10:04Z",
+      "margin_atr": 0.27780302447252314,
+      "extra_close_needed": 0.14857106178189383,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "capacity_available",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "ENTERED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\SOLUSDT_1788436800000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_not_closed_at_fixed_cutoff",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "right_censored_at_cutoff_unreviewed"
+    },
+    {
+      "plan_id": "2d74b7ff6191",
+      "symbol": "ADAUSDT",
+      "decision_time": "2026-09-06T20:10:03Z",
+      "margin_atr": 0.008713811818532233,
+      "extra_close_needed": 0.0017186197333423914,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "at_capacity",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "CLOSED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\ADAUSDT_1788710400000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": -100.0,
+      "verified_missed_stop": true
+    },
+    {
+      "plan_id": "5ff6dab72dfa",
+      "symbol": "BTCUSDT",
+      "decision_time": "2026-09-06T20:10:03Z",
+      "margin_atr": 0.028406177638379958,
+      "extra_close_needed": 172.91410698764957,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "at_capacity",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "STOPPED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\BTCUSDT_1788710400000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": -100.0,
+      "verified_missed_stop": true
+    },
+    {
+      "plan_id": "549cfdd6bdc4",
+      "symbol": "DOGEUSDT",
+      "decision_time": "2026-09-08T08:10:02Z",
+      "margin_atr": 0.09674042651381637,
+      "extra_close_needed": 0.0004846302838353439,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "at_capacity",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "STOPPED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\DOGEUSDT_1788840000000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_has_collection_gaps_only_partial_reconstruction",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "gap_affected_fixed_entry_reconstruction",
+      "baseline_conditional_gross_pnl": -100.0,
+      "verified_missed_stop": true
+    },
+    {
+      "plan_id": "67ed9d733634",
+      "symbol": "ZROUSDT",
+      "decision_time": "2026-09-21T20:10:03Z",
+      "margin_atr": 0.18878124999999943,
+      "extra_close_needed": 0.008107000000000086,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "at_capacity",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "TP1_HIT",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\ZROUSDT_1790006400000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_not_closed_at_fixed_cutoff",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "right_censored_at_cutoff_unreviewed"
+    },
+    {
+      "plan_id": "94119a9f7aee",
+      "symbol": "AAVEUSDT",
+      "decision_time": "2026-09-23T12:06:31Z",
+      "margin_atr": 0.10669746851547111,
+      "extra_close_needed": 1.28289949101341,
+      "baseline_accept": true,
+      "atr_accept": false,
+      "capacity": "at_capacity",
+      "data_quality": "DEGRADED",
+      "status_at_cutoff": "ENTERED",
+      "independent_bar_check": "reports\\2026-10-09\\atr_shadow_evidence\\AAVEUSDT_1790150400000_4h.json",
+      "performance_exclusions": [
+        "no_independent_plan_decisions_after_baseline_entry",
+        "baseline_not_closed_at_fixed_cutoff",
+        "not_a_clean_provider_sample"
+      ],
+      "clean_paired_terminal_performance_eligible": false,
+      "baseline_outcome_class": "right_censored_at_cutoff_unreviewed"
+    }
+  ]
+}

@@ -1,5 +1,12 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-09 ATR 0.35 可信证据复核
+
+- [x] 完成 273 个三线配对时点、12 次实际入场的规则重算与独立 K 线验证；报告 `reports/2026-10-09/atr_0_35_trusted_evidence_review_2026-10-09_v1.md`。
+- [x] 区分 plan-level 入场后停止观察与 candidate-level 不同口径虚拟路径；本批无合格配对终态收益样本，不给 0.35 胜负结论。
+- [ ] 编写独立 shadow 生命周期与执行口径一致性的工程方案/验收：入场后独立追踪、同成交/EMA trailing/容量口径、缺口标识；尚未实施，不改变生产参数。
+- [ ] 配对路径与采集可信后再做净收益和容量贡献归因；当前 `retest / insufficient_paired_forward_evidence`，ATR 保持冻结。
+
 ## 2026-10-08 数据收集状态复核
 
 - [x] 单独验收 08-15 候选过度阻断修复：39 个 DATA_WARNING/DEGRADED BUY 全部建 plan，17 个 BLOCKED 无 plan；结论 keep 现有分级。非连续收益验证仍未通过，两者分开记录。
