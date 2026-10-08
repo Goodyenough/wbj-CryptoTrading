@@ -15,12 +15,19 @@
 
 ## 2026-10-09
 
+### 00:14:34 +08:00 - 确认 00:10 自动 4h 任务已完成
+- 类型：运维状态 / TODO / Git。
+- 事实：审计期间原有任务自然触发，调度返回 0，run `20261008_161003_02252b4f` success（00:10:03–00:10:41），日志 updated=14 并生成四份新报告；不是本次审计脚本触发。daily 尚无新成功记录。
+- 改动：更新 TODO 区分 4h 单次恢复成功与 daily 待验证，补记审计 commit hash。
+- 验证：scheduler、日志、SQLite runs 三方一致。
+- Git：`docs: record gap audit commit and recovered four-hour run`。
+
 ### 00:13:07 +08:00 - 完成 8 笔已退出交易的跨空档审计
 - 类型：审计脚本 / 测试 / 报告与行情证据 / TODO / 开发计划 / 实验账本 / Git。
 - 改动：新增 `scripts/audit_closed_trade_gaps.py`、边界测试及逐笔审计报告/raw evidence；更新 TODO、开发计划、实验账本和 Obsidian 记忆。
 - 原因：确认停机是否改变已有 paper 终态；3 笔漏记止损、1 笔 TP2 延迟。未修改生产策略、配置或业务库，未替用户重启任务或发送通知。
 - 验证：SQLite mode=ro；行情网格/OHLC 检查；原始 baseline 8/8 状态、退出时间和毛损益一致；4 种关键分钟报价复核；3 项边界测试通过；diff 检查。
-- Git：本次提交 `audit: inspect eight closed trades across collection gaps`；既有脚本改动和本地数据库状态不纳入。
+- Git：`8c518f4` - `audit: inspect eight closed trades across collection gaps`；既有脚本改动和本地数据库状态不纳入。
 
 ## 2026-10-08
 
