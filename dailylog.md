@@ -7,7 +7,7 @@
 - 改动：新增可选confirmation_close诊断模式、只读缓存固定历史runner及账目汇总脚本；冻结旧逐日币池/配置/源码hash并跑完8分支。同步实验账本、当前策略文档及仓库/Obsidian开发计划和实验日志；把ATR后续优化复用到任务51 todo，任务120复核完成待验收。此前用户追加TODO时尚未收口的报告与工程记录本次补齐。
 - 原因：隔离收盘确认后回填entry_high对ATR收益判断的影响，并保留用户“以后再改”的安排。生产配置、paper/forward算法未改；既有runner改动不纳入提交。
 - 验证：针对性52通过，含源码审计60通过/1个既有fixture失败；最终全量188通过/5个既有失败，无新增失败。8分支逐笔费用、现金与期末权益一致，收盘模式无同根退出；数据/代码hash及完整结果留档。实验判断详见EXPERIMENT_LEDGER，不在本日志展开。
-- Git：提交主题 `research: complete fixed-history ATR execution sensitivity review`；提交hash和推送结果在后续收口记录补充。本地数据库不提交，reports一并提交。
+- Git：`dd2ace9` - `research: complete fixed-history ATR execution sensitivity review`，已成功推送origin/main；本地数据库未提交，reports一并提交。任务120已移至in_review（v4），任务51保持todo。本条hash/状态回填另以文档提交保存。
 
 ## 2026-10-09
 
