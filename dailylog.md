@@ -2229,4 +2229,4 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 验证：`python -m pytest tests/test_scanner_regime.py tests/test_paper_shadow_forward.py -q`（13 passed）；扩展审计套件 35 passed、1 个既有 `research_tools.py` fixture 缺失失败（`min_bars`），未由本次改动引入；未修改生产参数或业务库历史状态。
 - 报告：`reports/2026-10-09/execution_contract_v1.md`、`reports/2026-10-09/auto_run_coverage_2026-10-09_v1.md`。
 - Taskboard：`CRYPTOTRADIN-13`、`CRYPTOTRADIN-14`、`CRYPTOTRADIN-12` -> `in_review`。
-- Git：实现与文档待本次提交；随后更新本行记录最终 commit 并 push。
+- Git：实现与文档已提交 `83f855d`；本次日志修订随后单独提交并 push。
