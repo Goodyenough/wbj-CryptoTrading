@@ -20,7 +20,7 @@
 - 改动：在项目复盘报告及 Obsidian 镜像中补记 `90aeb31` 独立 shadow 生命周期最小实现、测试和推送状态，修正“仍为并行草稿”的过时描述。
 - 原因：复盘后续工程切片已完成，报告必须区分复盘时点与当前状态，避免计划和实际进度不一致。
 - 验证：核对 `git log`、`TODO.md`、契约与测试输出；未修改生产策略参数、旧 paper 记录或用户脚本。
-- Git：待本次提交补记；推送当前分支。
+- Git：`87cbdc3` - `docs: sync retrospective with shadow lifecycle status`；本次两次 `git push origin main` 均因 `schannel: failed to receive handshake, SSL/TLS connection failed` 失败，当前远端停在 `a7f06b8`，待网络恢复后重试。
 
 ### 12:41:14 +08:00 - 完成独立 ATR shadow 前向生命周期最小切片
 - 类型：代码 / 数据库 schema / 测试 / 研究契约 / TODO / 开发计划 / Git。
