@@ -20,7 +20,7 @@
 - 改动：新增 `paper_forward_epochs`、`paper_forward_ticks` 与 `paper_shadow_forward.py`；接入 daily/4h paper 运行和 `paper shadow-forward` 状态命令。baseline 与 ATR 0.35 独立维护持仓、现金、费用、容量及退出；每个闭合 4h 档只推进一次；缺档、过期或非法行情标记 `GAP_AFFECTED` 并右删失。新增契约 `reports/2026-10-09/independent_shadow_contract_2026-10-09_v1.md` 和状态机测试；未改生产策略参数或旧 paper 记录。
 - 原因：旧 plan-level shadow 在原 paper 入场后停止，无法回答 ATR 0.35 独立晚入场后的完整路径；需要先补齐可重复、可隔离的可信前向观察，再做收益裁决。
 - 验证：独立 shadow 测试 2 项通过；trade state/checkpoint/audit 30 项通过；现有 4h cycle 幂等回归通过；`python -m py_compile` 通过。数据库 schema 从 `3` 升为 `4`。当前尚无自然前向样本，报告 verdict 仍为 `insufficient_paired_forward_evidence`。
-- Git：`90aeb31` - `feat: add independent forward shadow lifecycle`；既有 `scripts/run_logged_paper_task.ps1` 用户修改和本地数据库状态不纳入。
+- Git：`90aeb31` - `feat: add independent forward shadow lifecycle`；补记提交 `b055969` - `docs: record independent shadow lifecycle commit`。`git push origin main` 因网络 Schannel handshake 失败（`SSL/TLS connection failed`）未完成；既有 `scripts/run_logged_paper_task.ps1` 用户修改和本地数据库状态不纳入。
 
 ## 2026-10-09
 
