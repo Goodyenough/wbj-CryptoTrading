@@ -2222,3 +2222,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 影响：三线候选级 logging 链路已开始积累且结构完整，但还没有 plan-linked decision rows 或 mature terminal opportunities；不能做 direct filtering / capacity-path attribution，不能升级 `0.35`。
 - 验证：`python main.py db status` 通过，最新 4h run `20260731_001002_b39e3bc4` success；`CryptoTrading_DailyPaperUpdate` 与 `CryptoTrading_4H_PaperUpdate` 最近运行结果均为 0；`config/settings.toml` 无改动。
 - Git：待提交。
+### 2026-10-09 23:26:31 +08:00 - 三项执行任务收口（待用户复核）
+- 类型：代码 / 报告 / 测试 / TODO / 开发计划 / Taskboard / Git
+- 改动：`scanner.py` 固化单次 `signal_as_of_ms` 与已闭合 K 线 60 秒缓冲；修复 `UNKNOWN` regime 放行 `BUY_CANDIDATE` 的回退冲突；`paper_shadow_forward.py` 将 scanner/regime 与信号配置纳入 policy fingerprint；新增执行契约和 daily/4h 覆盖审计报告；同步更新 `TODO.md`、`开发计划.md`。
+- 结果：`UNKNOWN` 阻止所有新买入（含 core/large-cap），`NEUTRAL` 与关闭过滤器行为保持；调度器 daily/4h 最近运行成功，但 2 条 stale `running`、逐计划 API skip 和 0 个 paired closed trade 使连续覆盖仍为 `partial_pass / insufficient_continuous_coverage`。三项 Taskboard issue 已写验证评论并移到 `in_review`，未标 `done`。
+- 验证：`python -m pytest tests/test_scanner_regime.py tests/test_paper_shadow_forward.py -q`（13 passed）；扩展审计套件 35 passed、1 个既有 `research_tools.py` fixture 缺失失败（`min_bars`），未由本次改动引入；未修改生产参数或业务库历史状态。
+- 报告：`reports/2026-10-09/execution_contract_v1.md`、`reports/2026-10-09/auto_run_coverage_2026-10-09_v1.md`。
+- Taskboard：`CRYPTOTRADIN-13`、`CRYPTOTRADIN-14`、`CRYPTOTRADIN-12` -> `in_review`。
+- Git：实现与文档待本次提交；随后更新本行记录最终 commit 并 push。

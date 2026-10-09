@@ -62,6 +62,8 @@ def _dt(value):
 def policy(settings):
     files = [Path(__file__), Path(__file__).with_name("trade_state.py"),
              Path(__file__).with_name("indicators.py"),
+             Path(__file__).with_name("scanner.py"),
+             Path(__file__).with_name("market_regime.py"),
              Path(__file__).parent / "backtest" / "costs.py"]
     return {
         "version": "sampled_quote_v1", "controls_paper": False,
@@ -70,6 +72,9 @@ def policy(settings):
         "initial_equity": settings.paper.account_equity,
         "risk_per_trade_pct": settings.paper.risk_per_trade_pct,
         "backtest": asdict(settings.backtest),
+        "signal_analysis": asdict(settings.analysis),
+        "signal_market": {key: getattr(settings.market, key) for key in (
+            "quote_asset", "min_quote_volume", "min_trades", "max_universe", "top_n", "exclude_bases")},
         "breakeven": settings.analysis.tp1_move_stop_to_breakeven_enabled,
         "ema_trailing": settings.analysis.tp1_ema_trailing_stop_enabled,
         "execution": "one_current_quote_per_closed_4h_bar_no_intrabar_protection",

@@ -16,10 +16,10 @@
 
 - [x] 完成整体技术路线、实验历史和重大疏漏复盘；纯内存复现移动止损旧价记账及 UNKNOWN regime 放行问题，未修改实现。
 - [ ] **P0 / 10-09–10-10**：冻结代码/配置/数据/执行语义基线，收口 08-16–08-22 旧 epoch；完成 TRX/ZRO/AAVE/SOL 四笔固定 cohort 缺口审计。
-- [ ] **P0 / 10-09–10-10**：验证 daily 下一次自动运行，核对 4h 逐计划覆盖和 2 条 stale running；10-09 12:11 已有四次 4h success，不能替代多日健康验收。
-- [ ] **P0 / 10-09–10-11**：定稿执行契约：closed-bar 指标、signal/decision/fill、止损生效顺序、定时交易/常驻保护单、缺口隔离与恢复、重复运行幂等；NEUTRAL 预期单列确认。
+- [ ] **P0 / 10-09–10-10 / CRYPTOTRADIN-12 / in_review**：daily/4h 调度已恢复且近期 run success；但仍有 2 条 stale `running`，近期 4h 有 `ticker_error`/`kline_error` 逐计划 skip，连续覆盖尚未通过。报告：`reports/2026-10-09/auto_run_coverage_2026-10-09_v1.md`。
+- [ ] **P0 / 10-09–10-11 / CRYPTOTRADIN-13 / in_review**：执行契约 v1 已落地，明确 closed-bar、signal/decision/fill、止损顺序、缺口隔离和 shadow 口径；代码与报告待用户复核。报告：`reports/2026-10-09/execution_contract_v1.md`。
 - [x] **P0 / 10-09 提前完成 / CRYPTOTRADIN-15**：修复 replay 旧 `stop_fill` 计价及收盘 EMA 反判本根 low 的时序，调用层回归通过；旧历史结果待任务2重算。
-- [ ] **P0 / 10-11–10-13**：修复 `UNKNOWN / allows_alt_buy=False` 仍可生成 `BUY_CANDIDATE` 的回退契约冲突，统计旧 UNKNOWN 暴露；不顺带改变 NEUTRAL 策略。
+- [ ] **P0 / 10-11–10-13 / CRYPTOTRADIN-14 / in_review**：已修复 `UNKNOWN / allows_alt_buy=False` 仍放行 `BUY_CANDIDATE` 的回退冲突；core/large-cap 也不例外，NEUTRAL/关闭过滤器行为保持不变。针对性测试通过；历史库未发现旧 UNKNOWN scan，未回写历史。
 - [x] **P1 / 10-09**：完成独立 shadow 生命周期最小切片及配对一致性验收：baseline 入场/退出后 ATR 线仍可等待、独立入场/退出；统一成交/EMA/费用/缺口口径。实现与契约见 `src/crypto_trading_system/paper_shadow_forward.py`、`reports/2026-10-09/independent_shadow_contract_2026-10-09_v1.md`。
 - [ ] **P1 / 10-10 起**：等待自然 daily/4h 运行产生新 independent shadow tick；只把连续、无 `GAP_AFFECTED` 的 epoch 纳入后续配对收益裁决。
 - [ ] **P1**：明确 paper/shadow 的账户现金、仓位和容量约束范围；完整组合账本未完成时，只认证单计划诊断，capacity contribution 保持 n/a。

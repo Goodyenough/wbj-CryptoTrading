@@ -261,8 +261,11 @@ def _analyze_ticker(
         (core_symbol and risk_off_core_buy_enabled)
         or (large_cap_symbol and risk_off_large_cap_buy_enabled)
     )
-    market_regime_risk = not market_regime_allows_buy and not (
-        market_regime_status != "RISK_OFF" or exempt_in_risk_off
+    # UNKNOWN is a failed data gate, not a RISK_OFF exception. Keep the existing
+    # NEUTRAL strategy unchanged; a disabled filter passes None/True.
+    market_regime_risk = market_regime_status == "UNKNOWN" or (
+        not market_regime_allows_buy and market_regime_status == "RISK_OFF"
+        and not exempt_in_risk_off
     )
     if market_regime_risk:
         score -= 10
@@ -327,6 +330,8 @@ def _analyze_ticker(
         risks.append("日线趋势未完全确认")
     if market_regime_risk:
         risks.append("BTC/ETH 大盘环境未确认强势，山寨币买入信号降级")
+        if market_regime_status == "UNKNOWN":
+            risks.append("UNKNOWN：大盘数据不足或检测失败，禁止新增买入候选（含核心币）。")
     if ticker.pct_24h <= 0:
         risks.append("24h 动量未确认")
     if pct_7d is not None and pct_7d <= 0:
@@ -387,15 +392,26 @@ def _analyze_ticker(
     )
 
 
-def _detect_market_regime(client: BinanceClient, settings: Settings, limitations: list[str], progress: Callable[[str], None] | None) -> MarketRegime | None:
+def _fetch_closed_klines(client, symbol: str, interval: str, count: int, as_of_ms: int) -> list[list]:
+    """Freeze indicators at scan start, keeping a 60s publication buffer.
+
+    Two extra rows cover an in-progress bar and a just-closed buffered bar.
+    Filtering must not silently remove the 168th hourly / 180th daily sample.
+    """
+    rows = client.klines(symbol, interval, min(1000, count + 2))
+    return [row for row in rows if int(row[6]) <= as_of_ms - 60_000][-count:]
+
+
+def _detect_market_regime(client: BinanceClient, settings: Settings, limitations: list[str], progress: Callable[[str], None] | None, *, as_of_ms: int | None = None) -> MarketRegime | None:
     if not settings.analysis.market_regime_filter_enabled:
         limitations.append("大盘环境过滤未启用。")
         return None
     try:
         if progress is not None:
             progress("checking BTC/ETH market regime")
-        btc_1d = client.klines("BTCUSDT", "1d", max(80, settings.analysis.min_history_days))
-        eth_1d = client.klines("ETHUSDT", "1d", max(80, settings.analysis.min_history_days))
+        as_of_ms = as_of_ms if as_of_ms is not None else int(datetime.now(timezone.utc).timestamp() * 1000)
+        btc_1d = _fetch_closed_klines(client, "BTCUSDT", "1d", max(80, settings.analysis.min_history_days), as_of_ms)
+        eth_1d = _fetch_closed_klines(client, "ETHUSDT", "1d", max(80, settings.analysis.min_history_days), as_of_ms)
         regime = classify_market_regime(
             btc_1d,
             eth_1d,
@@ -510,7 +526,9 @@ def run_market_scan(
             f"{settings.analysis.validation_pool_max}) 的候选，再按 action + score 补足最终名单。"
         ),
     ]
-    market_regime = _detect_market_regime(client, settings, limitations, progress)
+    signal_as_of_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    limitations.append(f"指标截止：{datetime.fromtimestamp(signal_as_of_ms / 1000, tz=timezone.utc).isoformat()}；仅使用此前至少60秒已闭合K线，ticker为扫描时点观测。")
+    market_regime = _detect_market_regime(client, settings, limitations, progress, as_of_ms=signal_as_of_ms)
     market_regime_allows_buy = True if market_regime is None else market_regime.allows_alt_buy
     market_regime_status = None if market_regime is None else market_regime.status
     ticker_by_symbol = {ticker.symbol: ticker for ticker in raw_tickers}
@@ -526,9 +544,9 @@ def run_market_scan(
         try:
             if progress is not None:
                 progress(f"analyzing {index}/{total} {ticker.symbol}")
-            k1h = client.klines(ticker.symbol, "1h", 168)
-            k4h = client.klines(ticker.symbol, "4h", 120)
-            k1d = client.klines(ticker.symbol, "1d", max(100, settings.analysis.min_history_days))
+            k1h = _fetch_closed_klines(client, ticker.symbol, "1h", 168, signal_as_of_ms)
+            k4h = _fetch_closed_klines(client, ticker.symbol, "4h", 120, signal_as_of_ms)
+            k1d = _fetch_closed_klines(client, ticker.symbol, "1d", max(100, settings.analysis.min_history_days), signal_as_of_ms)
             candidate = _analyze_ticker(
                 ticker,
                 k1h,
