@@ -3,7 +3,8 @@
 ## 加速验证任务：2026-10-09
 
 - [x] **任务 1 / CRYPTOTRADIN-15 / 用户已确认，done**：修复历史 replay 移动止损计价与 EMA 生效时序；本根使用已生效 stop，收盘 EMA 从下一根生效；统一成交/费用/现金，并补齐入场当根 TP2 退出结算。37项针对性回归通过。报告：`reports/2026-10-09/replay_stop_execution_fix_2026-10-09_v1.md`。
-- [ ] **任务 2 / CRYPTOTRADIN-120 / 待执行，依赖任务 1**：固定历史数据复核原规则与 ATR 0.35。唯一问题：减少的损失是否抵消错过机会的损失？执行前固定窗口、币池、版本、成本、容量及入场时序，解决或隔离 reclaim 同根收盘确认后按 entry_high 成交的限制；支持标准为跨窗口方向一致且不依赖少数赢家，否定为持续恶化，口径不一致/样本不足/结论对假设敏感则为证据不足。已研究窗口只作 diagnostic，不作新样本外证明；本次仅登记，不运行。
+- [x] **任务 2 / CRYPTOTRADIN-120 / 复核完成，待验收**：固定8个分支已全部完成并对账；确认收盘口径两个窗口净收益均下降，ATR保持retest。报告：`reports/2026-10-09/atr_fixed_history/report.md`。生产配置冻结。
+- [ ] **后续 / CRYPTOTRADIN-51 / todo，用户要求留待以后**：复核ATR减少部分亏损、同时错失盈利的取舍；按单变量卡片研究，不承诺降低整体回撤。目前不启动优化。
 
 ## 当前执行队列：2026-10-09 至 2026-10-22
 
@@ -94,7 +95,7 @@
 
 - [x] 完成 `replacement_closure_audit`：复用 Stage 1 JSON 与 Stage 4 Raw Summary 做去重、stale-trade 集中度、first-event-per-stale-trade、exclude 2025-07、exclude same-bar ambiguous 与 cluster bootstrap；结论 `paused_no_stable_executable_edge`，capacity replacement 分支冻结，不进入 Stage 5 shadow replacement。
 - [x] 生成 `stage_a_to_e_execution_review`：整合 Stage A-E gate，确认 Stage B/C/D 证据已由既有 `atr_reclaim_0_35` A/B、交易级归因和阈值敏感性报告覆盖；Stage E 因 gate failed 不启动，下一优先级回到 capacity-neutral entry-quality retest。
-- [ ] 后续如继续 entry-quality 研究，只允许提出单变量 retest 卡片；不得把 `atr_reclaim_0_35` 与 replacement、relative strength 或其它过滤器叠加后直接实验。
+- [ ] **CRYPTOTRADIN-51**：后续如继续 entry-quality 研究，只允许提出单变量 retest 卡片；纳入ATR避免亏损与错失盈利、成交时序敏感性。本次仅登记，留待以后；不得与replacement、relative strength或其它过滤器叠加后直接实验。
 
 ## 策略优化路线图
 

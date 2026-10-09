@@ -804,9 +804,7 @@ def run_backtest_replay(
                 _sync_record(item)
                 continue
 
-            raw_entry = item.paper.entry_high
-            if entry_timing == "confirmation_close":
-                raw_entry = close
+            raw_entry = close if entry_timing == "confirmation_close" else item.paper.entry_high
             if entry_timing == "confirmation_close" and not (
                 item.paper.stop_loss < raw_entry < item.paper.take_profit_2
             ):
@@ -842,8 +840,7 @@ def run_backtest_replay(
                         trade_id=item.record.trade_id,
                         signal_time_utc=bar_time,
                         decision_time_utc=bar_time,
-                        fill_time_assumption=("same_bar_entry_high_plus_slippage_after_reclaim_close"
-                                              if entry_timing == "legacy_same_bar" else "confirmation_close"),
+                        fill_time_assumption=entry_timing,
                         block_reason="max_active_positions",
                         candidate_rank=watching.index(item) + 1,
                         active_count_before_decision=len(active_before_decision),

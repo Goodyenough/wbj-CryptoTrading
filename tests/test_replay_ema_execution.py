@@ -123,7 +123,8 @@ def test_entry_bar_exit_books_both_fills_once(settings, exit_kind):
 
 
 @pytest.mark.parametrize("same_bar_target", [False, True])
-def test_run_backtest_replay_wires_causal_ema_and_cash(monkeypatch, settings, same_bar_target):
+@pytest.mark.parametrize("entry_timing", ["legacy_same_bar", "confirmation_close"])
+def test_run_backtest_replay_wires_causal_ema_and_cash(monkeypatch, settings, same_bar_target, entry_timing):
     """Exercise real replay plan/entry/exit loops; stub only market/scanner inputs."""
     start = ms("2026-01-01T00:00:00")
     duration = interval_ms("4h")
@@ -131,7 +132,7 @@ def test_run_backtest_replay_wires_causal_ema_and_cash(monkeypatch, settings, sa
     for iv, count in [("1h", 200), ("4h", 90), ("1d", 250)]:
         step_ms = interval_ms(iv)
         data[iv] = [make_kline(start - i * step_ms, 114, step_ms) for i in range(count, 0, -1)]
-    ranges = [(104, 106, 102, 105), (104, 140 if same_bar_target else 125, 100, 122),
+    ranges = [(104, 106, 102, 105), (104, 140 if same_bar_target else 125, 89 if entry_timing == "confirmation_close" else 100, 122),
               (120, 125, 115, 122), (116, 119, 110, 116)]
     for index, (o, h, l, c) in enumerate(ranges):
         data["4h"].append([start + index * duration, o, h, l, c, 100, start + (index + 1) * duration - 1])
@@ -149,15 +150,22 @@ def test_run_backtest_replay_wires_causal_ema_and_cash(monkeypatch, settings, sa
     monkeypatch.setattr(replay, "fetch_klines_cached", lambda settings, symbol, interval, *args, **kwargs:
                         KlineFetchResult(symbol=symbol, interval=interval, klines=data[interval], issues=[], fetched_from_api=0))
     monkeypatch.setattr(replay, "batch_load_klines_cached", lambda *args, **kwargs: {"TESTUSDT": data})
-    result = replay.run_backtest_replay(settings, ["TESTUSDT"], "2026-01-01", "2026-01-01T16:00:00+00:00")
+    result = replay.run_backtest_replay(settings, ["TESTUSDT"], "2026-01-01", "2026-01-01T16:00:00+00:00", entry_timing=entry_timing)
     assert len(result.trades) == 1
     trade = result.trades[0]
-    assert trade.status == ("CLOSED" if same_bar_target else "STOPPED")
+    assert trade.status == ("CLOSED" if same_bar_target and entry_timing == "legacy_same_bar" else "STOPPED")
     assert trade.exit_fee > 0 and trade.entry_fee > 0
     assert result.cash == pytest.approx(result.initial_equity + trade.net_pnl)
     assert result.final_equity == pytest.approx(result.cash)
     assert trade.net_pnl == pytest.approx(trade.gross_pnl - trade.entry_fee - trade.exit_fee)
-    if same_bar_target:
+    if entry_timing == "confirmation_close":
+        assert trade.entry_price_raw == 122
+        assert trade.closed_at_utc == "2026-01-01T16:00:00+00:00"
+        assert trade.exit_price_raw == 116  # next-bar gap through the activated stop
+        at_entry = [e["event_type"] for e in trade.events if e["event_time_utc"] == trade.entered_at_utc]
+        assert at_entry == ["ENTERED"]  # previous high 140 cannot take profit after entry
+        assert result.equity_curve[1].intrabar_equity_low == result.equity_curve[1].equity
+    elif same_bar_target:
         assert trade.exit_price_raw == 135
     else:
         # TP1 on bar 1 survives its earlier low, raised stop from bar 2 is used on bar 3.

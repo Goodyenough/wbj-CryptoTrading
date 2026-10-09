@@ -1,5 +1,30 @@
 # Handoff — 2026-06-12 00:00 +08:00
 
+## 2026-10-09 23:03 +08:00
+
+### 项目目录
+`D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects`，main。
+
+### 任务背景
+用户要求加速ATR研究：Taskboard任务15修复历史执行错误，任务120固定历史重算；用户最新要求ATR优化留到以后并询问下一步。
+
+### 已完成的工作
+- 任务15已验收done，修复commit `207cac4`；验收文档commit `5d78633`已推送。
+- 任务120已完成8分支历史诊断及现金/费用对账，报告`reports/2026-10-09/atr_fixed_history/report.md`。新增可选confirmation_close诊断，默认legacy不变；最终188测试通过/5项既有失败。
+- 确认收盘净收益：早窗4.72%→1.50%，近窗-1.51%→-10.20%；近窗MDD17.71%→20.21%。结论retest，不宣称ATR一定降低整体风险。
+- 用户的后续优化要求已复用CRYPTOTRADIN-51 todo，本次不执行。任务120收口送审；具体本轮提交hash见dailylog和git log。
+- 仓库及Obsidian实验日志/计划、TODO、策略文档已同步；20:05 daily报告success，20:09独立shadow ACTIVE、0机会，尚无完整前向收益对照。
+
+### 尚未完成的事项
+成交执行契约、UNKNOWN放行修复、逐计划/多日自然daily/4h覆盖验收、存量TRX/ZRO/AAVE/SOL缺口审计、paper完整组合约束。ATR优化留到以后，未授权生产调参；不要重新跑固定8分支。
+
+### 下一步直接执行指令
+先`git status --short`、`git log -3 --oneline`，读`reports/2026-10-09/atr_fixed_history/report.md`与TODO顶部。用户确认继续时优先明确signal/decision/fill/stop可执行时序和UNKNOWN修复范围；不要把理想收盘模式当实盘契约。
+Taskboard CLI：`node 'C:/Users/10537/Documents/Codex/2026-08-13/https-github-com-chuspeeism-dashi-taskboard/work/dashi-taskboard/cli/taskctl.mjs' issue get CRYPTOTRADIN-120 --json`。所有看板操作用taskctl，先get/comments，版本并发保护，用户验收后才能done。
+
+### 重要声明
+保留既有`scripts/run_logged_paper_task.ps1`修改，不纳入本轮提交。数据DB不提交。executed_replay.py.txt对应实际执行源码hash；最终源码仅展开等价条件并恢复legacy审计标签。两个窗口已反复研究，只是diagnostic；存续币偏差、maker费用及零延迟理想收盘假设限制外推。Obsidian真实路径`D:\MyNotebook-Obsidian\CryptoTradingSystem`。
+
 
 ## 2026-08-13 00:21 +08:00
 

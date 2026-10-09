@@ -6,7 +6,7 @@
 
 整体架构保留，当前主线为执行正确性、独立 shadow 生命周期与连续采集。完整复盘与两周计划见 [2026-10-09 项目复盘](reports/2026-10-09/project_retrospective_and_two_week_plan_2026-10-09_v1.md)。
 
-已复现两项实现问题：replay 抬升 EMA stop 后仍可能按旧 stop fill 成交；regime `UNKNOWN / allows_alt_buy=False` 仍可能放行 BUY。另有收盘确认后同 bar 回填 entry_high、当前 EMA 反判先前 low、live 未闭合指标与历史闭合指标不同等时序问题。影响范围待审计，含这些路径的旧绩效不能作为已验证收益。本次仅记录，未修复代码或改变默认参数。
+10-09已修复replay stop成交与收盘EMA下一根生效，任务15获用户验收；regime `UNKNOWN / allows_alt_buy=False` 放行BUY问题仍待修复。新增confirmation_close研究诊断模式并完成8分支固定历史复核：两个窗口中ATR0.35的净收益优势均随成交时序改变而反转，近窗回撤扩大，结论retest。该模式为理想零延迟收盘成交，不代表实际可成交；默认仍为legacy_same_bar。下一优先级是可执行的信号/成交/止损契约与连续采集，生产策略参数冻结。完整依据见 `reports/2026-10-09/atr_fixed_history/report.md`。
 
 paper 目前是定时 ticker 计划观察，未实现与 backtest 相同的现金/容量/费用组合约束；candidate counterfactual 未传 EMA trailing，并非完整同口径对照。共享 `trade_state.py` 只统一了部分状态转换。三线记录也不代表三个独立组合：原 paper 入场后 plan-level 观察会停止，而 incumbent 与 ATR shadow 当前定义相同。
 
