@@ -15,6 +15,14 @@
 
 ## 2026-10-09
 
+### 12:37:29 +08:00 - 完成整体技术路线复盘与两周工作计划
+- 类型：只读实现复核 / 研究报告 / TODO / 路线图 / Obsidian记忆 / Git。
+- 改动：新增项目全程复盘和10-09至10-22计划；更新SYSTEM_OVERVIEW、RESEARCH_ROADMAP、EXPERIMENT_LEDGER、TODO、仓库及Obsidian开发计划与实验日志；保留历史证据，并保存本次会话期间自动生成的reports。
+- 原因：确认历史收益的执行与可比性限制，把优先级转为stop计价/因果顺序、UNKNOWN回退、独立shadow和连续采集；新增试验冻结。
+- 验证：两处纯内存样例复现；三个独立复核方向交叉检查；报告内复现命令再次通过、30个本地引用存在；最新12:11运行与已提交ATR审计交叉核对；git diff --check。未运行新策略回测、未修改生产代码/配置/业务数据库。
+- Git：`docs: review technical roadmap and plan two-week reliability work`（本次提交主题；提交后补记hash）；已有scripts/run_logged_paper_task.ps1修改、本地data状态及并行独立shadow契约/实现/测试草稿不纳入。
+
+
 ### 00:24:17 +08:00 - 完成 ATR 0.35 可信证据复核
 - 类型：只读审计脚本 / 测试 / 报告 / TODO / 开发计划 / 实验账本 / Git。
 - 改动：新增 `scripts/review_atr_shadow_evidence.py`、配对边界测试、冻结窗口原始证据与报告；更新仓库及 Obsidian 记忆。

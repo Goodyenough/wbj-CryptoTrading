@@ -1,6 +1,16 @@
 # CryptoTradingSystem 系统总览
 
-更新时间：2026-07-26 18:00 +08:00
+更新时间：2026-10-09 +08:00
+
+## 当前解释边界（2026-10-09 总体复盘）
+
+整体架构保留，当前主线为执行正确性、独立 shadow 生命周期与连续采集。完整复盘与两周计划见 [2026-10-09 项目复盘](reports/2026-10-09/project_retrospective_and_two_week_plan_2026-10-09_v1.md)。
+
+已复现两项实现问题：replay 抬升 EMA stop 后仍可能按旧 stop fill 成交；regime `UNKNOWN / allows_alt_buy=False` 仍可能放行 BUY。另有收盘确认后同 bar 回填 entry_high、当前 EMA 反判先前 low、live 未闭合指标与历史闭合指标不同等时序问题。影响范围待审计，含这些路径的旧绩效不能作为已验证收益。本次仅记录，未修复代码或改变默认参数。
+
+paper 目前是定时 ticker 计划观察，未实现与 backtest 相同的现金/容量/费用组合约束；candidate counterfactual 未传 EMA trailing，并非完整同口径对照。共享 `trade_state.py` 只统一了部分状态转换。三线记录也不代表三个独立组合：原 paper 入场后 plan-level 观察会停止，而 incumbent 与 ATR shadow 当前定义相同。
+
+ATR 0.35 自 7 月末冻结为 `provisional_research_incumbent`，不是部署或已获证实的优势。最新审计273配对时点，原规则12次实际入场均被同时点拒绝，但另一线后续独立路径未被等价记录；本批合格配对终态为0。数据分级修复keep、ATR收益证据不足、执行修复优先三项结论分别成立。
 
 ## 1. 系统当前在解决什么问题
 
@@ -27,7 +37,7 @@ CryptoTradingSystem 当前不是自动实盘机器人，而是一个本地加密
 | TP1 / 趋势确认 | TP1 不是立即平仓收益，而是确认趋势推进到第一目标 | 事实：当前回测中 TP1 touched 只作为状态推进 |
 | EMA trailing / 移动止损 | TP1 后用 EMA20 抬高止损，减少盈利后完全回吐 | 决策：`tp1_ema_trailing_stop_enabled=true` 已在默认配置中启用 |
 | Max holding / 最大持仓时间 | 处理入场后长期未触发 TP1 的停滞交易，降低资金占用和拖延亏损 | 候选：42 根 4h 固定退出表现较平衡，但尚未写入默认配置 |
-| Position sizing | 按账户资金和单笔风险控制仓位 | 事实：默认单笔风险 1%，组合活跃风险上限 5% |
+| Position sizing | 按账户资金和单笔风险控制仓位 | 回测：单笔风险1%、组合上限5%；paper仅逐计划sizing，不能声称已实施同一组合上限 |
 
 当前最重要的风险是：策略由多层过滤和退出规则组成，部分规则已有候选证据，但还没有形成一份足够稳定的“优势来源归因”。因此后续研究应优先解释优势来自哪里，而不是继续叠加规则。
 
@@ -39,8 +49,8 @@ CryptoTradingSystem 当前不是自动实盘机器人，而是一个本地加密
 | `data_quality.py` | 初筛可交易标的 | exchange info、ticker、配置过滤条件 | 可扫描交易对 | 排除稳定币、杠杆币、低成交额、低交易数 |
 | `scanner.py` | 生成候选交易计划 | 行情、EMA、RSI、MACD、ATR、成交量、regime、数据质量 | `TradeCandidate`、`BUY_CANDIDATE` / `WAIT_PULLBACK` / `WATCH_ONLY` / `REJECT` | 趋势、支撑距离、动量、波动、数据质量打分 |
 | `market_regime.py` | 判断是否适合开仓 | BTC/ETH 日线 EMA、7d 涨跌 | `RISK_ON` / `NEUTRAL` / `RISK_OFF` | 弱市中山寨币风险更高 |
-| `data_validation.py` | 验证行情一致性 | Binance 候选、CoinGecko、CoinMarketCap | `DATA_OK` / `DATA_WARNING` / `DATA_ERROR` | 避免错误映射或异常价格污染信号 |
-| `trade_state.py` | 统一交易状态推进 | 计划、K 线 high/low/close、入场/止损/TP 配置 | `WATCHING`、`ENTERED`、`TP1_HIT`、`STOPPED`、`CLOSED` 等事件 | 回测和模拟盘共用核心状态机 |
+| `data_validation.py` | 验证行情一致性 | Binance候选、CoinGecko、CoinMarketCap | legacy DATA状态 + `CLEAN / DEGRADED / BLOCKED`结构化issues | paper允许非致命DEGRADED，阻断BLOCKED；身份未确认仍显式保留 |
+| `trade_state.py` | 统一部分交易状态推进 | 计划、K线或点价、入场/止损/TP配置 | 生命周期事件 | 共享函数，但输入时序与费用/容量仍不一致；EMA stop计价待修 |
 | `paper_trader.py` | 模拟盘跟踪 | 扫描计划、当前行情、账户配置 | paper plans、events、snapshots、报告 | 验证真实运行链路和信号频率 |
 | `backtest/replay.py` | 历史回放 | 历史 K 线、扫描规则、状态机 | 回测交易明细 | 决策只使用已收盘 K 线，降低未来函数风险 |
 | `backtest/runner.py` | 回测运行与报告 | 回测结果、指标、benchmark | Markdown 报告、SQLite 记录 | 固化假设、成本、指标和配置快照 |
@@ -69,13 +79,13 @@ CryptoTradingSystem 当前不是自动实盘机器人，而是一个本地加密
 | TP1 后 EMA20 trailing | `tp1_ema_trailing_stop_enabled=true` |
 | Regime 阈值 | BTC 7d <= `-3%`、ETH 7d <= `-5%`，且要求两者趋势 |
 | 相对强度门槛 | 默认关闭：`relative_strength_soft_gate_enabled=false` |
-| ATR reclaim 门槛 | 默认关闭：`entry_reclaim_min_atr_enabled=false`；`atr_reclaim_0_35` 人工路径复盘后降为 `retest_path_dependent`，尚未部署 |
+| ATR reclaim 门槛 | 默认关闭；0.35冻结为 `provisional_research_incumbent`，当前 `insufficient_paired_forward_evidence`，未部署 |
 | 最大持仓时间 | 默认未启用：`max_holding_bars_without_tp1=0` |
 | 回测成本 | maker 4 bps、taker 10 bps、entry slippage 5 bps、stop slippage 10 bps |
 | Intrabar 假设 | `stop_first` |
-| 单笔风险 | `1%` |
-| 最大活跃仓位 | `5` |
-| 组合活跃风险上限 | `5%` |
+| 单笔风险 | 配置为 `1%`；paper以固定账户权益逐计划计算 |
+| 最大活跃仓位 | backtest执行 `5`；paper/shadow当前不能视为等价组合 |
+| 组合活跃风险上限 | backtest执行 `5%`；不是paper账户层已验收能力 |
 
 ## 5. 数据流
 
@@ -120,4 +130,4 @@ flowchart TD
 1. 用 `risk_off_core_buy_enabled=false` 限制弱市开仓。
 2. 用 `entry_reclaim_close_enabled=true` 避免首次触碰入场区间就接入。
 3. 用 `tp1_ema_trailing_stop_enabled=true` 替代简单 TP1 后保本。
-4. 继续研究但尚未部署：`max_holding_bars_without_tp1=42`、`relative_strength_soft_gate`、`entry_reclaim_min_atr=0.35`；其中 `atr_reclaim_0_35` 已降为 `retest_path_dependent`，容量复核显示满仓和长持仓确实影响路径，但证据不足以修改仓位上限或排序。容量 replacement 分支已完成 `signal_fill_timing_audit -> blocked_entry_event_export -> replay_consistency_audit -> stale_slot_continuation_review -> blocked_candidate_vs_stale_slot_review`：旧仓继续占槽偏弱，但真实 rank1 blocked candidate 对最老 pre-TP1 stale slot 的 R42 对比不稳定（mean `0.309`、median `-0.223`、positive ratio `42.9%`、trimmed mean 约 `0.001`），结论 `replacement_edge_not_supported`。因此不进入 shadow replacement，不部署 replacement，不提高 `max_active_positions`。
+4. 暂缓新研究/部署：固定42、relative strength、TP1 50%、ranking/replacement。0.35保留为冻结研究参照；先完成执行与独立对照验收，再解释优势。容量replacement已收口：R42 mean `0.309`、median `-0.223`、positive ratio `42.9%`、trimmed mean约0，且事件集中在少数旧仓簇；不提高 `max_active_positions`。
