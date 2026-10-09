@@ -1,5 +1,10 @@
 # CryptoTradingSystem 待办清单
 
+## 加速验证任务：2026-10-09
+
+- [x] **任务 1 / CRYPTOTRADIN-15 / 工程完成，待看板确认**：修复历史 replay 移动止损计价与 EMA 生效时序；本根使用已生效 stop，收盘 EMA 从下一根生效；统一成交/费用/现金，并补齐入场当根 TP2 退出结算。37项针对性回归通过。报告：`reports/2026-10-09/replay_stop_execution_fix_2026-10-09_v1.md`。
+- [ ] **任务 2 / CRYPTOTRADIN-120 / 待执行，依赖任务 1**：固定历史数据复核原规则与 ATR 0.35。唯一问题：减少的损失是否抵消错过机会的损失？执行前固定窗口、币池、版本、成本、容量及入场时序，解决或隔离 reclaim 同根收盘确认后按 entry_high 成交的限制；支持标准为跨窗口方向一致且不依赖少数赢家，否定为持续恶化，口径不一致/样本不足/结论对假设敏感则为证据不足。已研究窗口只作 diagnostic，不作新样本外证明；本次仅登记，不运行。
+
 ## 当前执行队列：2026-10-09 至 2026-10-22
 
 本节是当前优先级。下方按日期保留的旧任务与 Priority 1–4 是历史/候选积压，不是并行启动授权；旧的 `terminal=0`、阈值敏感性和等待 08-22 条目不再作为当前行动。完整验收见 `reports/2026-10-09/project_retrospective_and_two_week_plan_2026-10-09_v1.md`。
@@ -8,7 +13,7 @@
 - [ ] **P0 / 10-09–10-10**：冻结代码/配置/数据/执行语义基线，收口 08-16–08-22 旧 epoch；完成 TRX/ZRO/AAVE/SOL 四笔固定 cohort 缺口审计。
 - [ ] **P0 / 10-09–10-10**：验证 daily 下一次自动运行，核对 4h 逐计划覆盖和 2 条 stale running；10-09 12:11 已有四次 4h success，不能替代多日健康验收。
 - [ ] **P0 / 10-09–10-11**：定稿执行契约：closed-bar 指标、signal/decision/fill、止损生效顺序、定时交易/常驻保护单、缺口隔离与恢复、重复运行幂等；NEUTRAL 预期单列确认。
-- [ ] **P0 / 10-11–10-13**：修复并回归验证 replay 抬升止损后仍用旧 `stop_fill` 计价，以及本 bar 收盘 EMA 反判本 bar low 的因果顺序；旧历史结果标记待复核。
+- [x] **P0 / 10-09 提前完成 / CRYPTOTRADIN-15**：修复 replay 旧 `stop_fill` 计价及收盘 EMA 反判本根 low 的时序，调用层回归通过；旧历史结果待任务2重算。
 - [ ] **P0 / 10-11–10-13**：修复 `UNKNOWN / allows_alt_buy=False` 仍可生成 `BUY_CANDIDATE` 的回退契约冲突，统计旧 UNKNOWN 暴露；不顺带改变 NEUTRAL 策略。
 - [x] **P1 / 10-09**：完成独立 shadow 生命周期最小切片及配对一致性验收：baseline 入场/退出后 ATR 线仍可等待、独立入场/退出；统一成交/EMA/费用/缺口口径。实现与契约见 `src/crypto_trading_system/paper_shadow_forward.py`、`reports/2026-10-09/independent_shadow_contract_2026-10-09_v1.md`。
 - [ ] **P1 / 10-10 起**：等待自然 daily/4h 运行产生新 independent shadow tick；只把连续、无 `GAP_AFFECTED` 的 epoch 纳入后续配对收益裁决。

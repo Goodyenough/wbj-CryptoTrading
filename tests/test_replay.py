@@ -175,7 +175,8 @@ def test_force_time_exit_marks_closed_trade() -> None:
 def _make_sim_trade(entry_price: float = 105.0, stop_loss: float = 90.0) -> "_SimTrade":
     from crypto_trading_system.models import PaperTrade
     paper = PaperTrade(
-        plan_id="test",
+        paper_trade_id="test",
+        account_name="backtest",
         source_scan_id="scan",
         source_rank=1,
         symbol="TESTUSDT",
@@ -252,7 +253,7 @@ def test_conditional_time_exit_fires_when_below_entry() -> None:
         bar_time="2026-01-03T00:00:00+00:00",
     )
     assert item.paper.status == "TIME_EXIT"
-    assert item.paper.events[-1]["event_type"] == "TIME_EXIT"
+    assert item.record.events[-1]["event_type"] == "TIME_EXIT"
 
 
 def test_dynamic_universe_requires_btc_timeline() -> None:

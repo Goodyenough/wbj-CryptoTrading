@@ -50,9 +50,9 @@ CryptoTradingSystem 当前不是自动实盘机器人，而是一个本地加密
 | `scanner.py` | 生成候选交易计划 | 行情、EMA、RSI、MACD、ATR、成交量、regime、数据质量 | `TradeCandidate`、`BUY_CANDIDATE` / `WAIT_PULLBACK` / `WATCH_ONLY` / `REJECT` | 趋势、支撑距离、动量、波动、数据质量打分 |
 | `market_regime.py` | 判断是否适合开仓 | BTC/ETH 日线 EMA、7d 涨跌 | `RISK_ON` / `NEUTRAL` / `RISK_OFF` | 弱市中山寨币风险更高 |
 | `data_validation.py` | 验证行情一致性 | Binance候选、CoinGecko、CoinMarketCap | legacy DATA状态 + `CLEAN / DEGRADED / BLOCKED`结构化issues | paper允许非致命DEGRADED，阻断BLOCKED；身份未确认仍显式保留 |
-| `trade_state.py` | 统一部分交易状态推进 | 计划、K线或点价、入场/止损/TP配置 | 生命周期事件 | 共享函数，但输入时序与费用/容量仍不一致；EMA stop计价待修 |
+| `trade_state.py` | 统一部分交易状态推进 | 计划、K线或点价、入场/止损/TP配置 | 生命周期事件 | 历史 replay 包装层已隔离收盘 EMA 的下一根生效；paper/forward 仍为点价采样语义 |
 | `paper_trader.py` | 模拟盘跟踪 | 扫描计划、当前行情、账户配置 | paper plans、events、snapshots、报告 | 验证真实运行链路和信号频率 |
-| `backtest/replay.py` | 历史回放 | 历史 K 线、扫描规则、状态机 | 回测交易明细 | 决策只使用已收盘 K 线，降低未来函数风险 |
+| `backtest/replay.py` | 历史回放 | 历史 K 线、扫描规则、状态机 | 回测交易明细 | 10-09 修复 stop 触发/成交与费用现金一致性；本根收盘 EMA 下一根生效；reclaim 同根入场假设仍待处理，旧收益须重算 |
 | `backtest/runner.py` | 回测运行与报告 | 回测结果、指标、benchmark | Markdown 报告、SQLite 记录 | 固化假设、成本、指标和配置快照 |
 | `abtest.py` | 单变量 A/B | 默认配置、实验 override、同一 universe/区间 | baseline vs variant 报告 | 限制 override 白名单，降低不可归因修改 |
 | `abtest_summary.py` | 多窗口汇总 | 已生成 A/B 报告 | 跨窗口结论 | 检查样本不足、窗口重叠、universe 偏差 |
