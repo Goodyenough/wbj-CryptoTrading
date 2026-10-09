@@ -10,10 +10,12 @@ import subprocess
 import uuid
 
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 BUSY_TIMEOUT_MS = 30_000
 TERMINAL_PLAN_STATUSES = {"CLOSED", "STOPPED", "EXPIRED", "INVALIDATED", "ARCHIVED"}
 REQUIRED_OBSERVATION_INDEXES = {
+    "idx_forward_active_account",
+    "idx_forward_tick_epoch",
     "idx_runs_type_started",
     "idx_runs_status_started",
     "idx_scan_candidates_symbol",
@@ -36,6 +38,8 @@ REQUIRED_OBSERVATION_INDEXES = {
     "idx_data_quality_issues_scan_symbol",
 }
 REQUIRED_OBSERVATION_TABLES = {
+    "paper_forward_epochs",
+    "paper_forward_ticks",
     "runs",
     "market_scans",
     "scan_candidates",
@@ -49,6 +53,8 @@ REQUIRED_OBSERVATION_TABLES = {
     "data_quality_issues",
 }
 OBSERVATION_UTC_COLUMNS = {
+    "paper_forward_epochs": ("started_at", "updated_at"),
+    "paper_forward_ticks": ("observed_at",),
     "schema_metadata": ("updated_at",),
     "runs": ("started_at", "finished_at", "created_at"),
     "market_scans": ("scan_time", "created_at"),
@@ -420,6 +426,8 @@ def init_observation_db(path: Path) -> None:
             CREATE INDEX IF NOT EXISTS idx_shadow_funnel_scan_symbol ON paper_shadow_funnel_events(scan_id, symbol, event_time);
             """
         )
+        from .paper_shadow_forward import SCHEMA as forward_schema
+        connection.executescript(forward_schema)
         scan_columns = [
             "action TEXT",
             "price REAL",

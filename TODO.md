@@ -10,7 +10,8 @@
 - [ ] **P0 / 10-09–10-11**：定稿执行契约：closed-bar 指标、signal/decision/fill、止损生效顺序、定时交易/常驻保护单、缺口隔离与恢复、重复运行幂等；NEUTRAL 预期单列确认。
 - [ ] **P0 / 10-11–10-13**：修复并回归验证 replay 抬升止损后仍用旧 `stop_fill` 计价，以及本 bar 收盘 EMA 反判本 bar low 的因果顺序；旧历史结果标记待复核。
 - [ ] **P0 / 10-11–10-13**：修复 `UNKNOWN / allows_alt_buy=False` 仍可生成 `BUY_CANDIDATE` 的回退契约冲突，统计旧 UNKNOWN 暴露；不顺带改变 NEUTRAL 策略。
-- [ ] **P1 / 10-14–10-15**：完成独立 shadow 生命周期最小切片及配对一致性验收，baseline 入场后另一线仍可等待/入场/退出；统一成交/EMA/费用/缺口口径。
+- [x] **P1 / 10-09**：完成独立 shadow 生命周期最小切片及配对一致性验收：baseline 入场/退出后 ATR 线仍可等待、独立入场/退出；统一成交/EMA/费用/缺口口径。实现与契约见 `src/crypto_trading_system/paper_shadow_forward.py`、`reports/2026-10-09/independent_shadow_contract_2026-10-09_v1.md`。
+- [ ] **P1 / 10-10 起**：等待自然 daily/4h 运行产生新 independent shadow tick；只把连续、无 `GAP_AFFECTED` 的 epoch 纳入后续配对收益裁决。
 - [ ] **P1**：明确 paper/shadow 的账户现金、仓位和容量约束范围；完整组合账本未完成时，只认证单计划诊断，capacity contribution 保持 n/a。
 - [ ] **P1 / 10-16–10-20**：冻结修复后的执行版本，收集新 epoch；目标至少 7 个完整自然日的 7 daily + 35 scheduled 4h，以及逐计划有效评价/skip 对账；执行版本改变则重新起算。
 - [ ] **P1 / 10-16–10-20**：按预声明协议审计固定历史案例的实现修复影响；建立实验 registry，记录 hash、master、窗口、成本和试验家族，旧窗口统一标 diagnostic。
@@ -23,7 +24,7 @@
 
 - [x] 完成 273 个三线配对时点、12 次实际入场的规则重算与独立 K 线验证；报告 `reports/2026-10-09/atr_0_35_trusted_evidence_review_2026-10-09_v1.md`。
 - [x] 区分 plan-level 入场后停止观察与 candidate-level 不同口径虚拟路径；本批无合格配对终态收益样本，不给 0.35 胜负结论。
-- [ ] 编写独立 shadow 生命周期与执行口径一致性的工程方案/验收：入场后独立追踪、同成交/EMA trailing/容量口径、缺口标识；尚未实施，不改变生产参数。
+- [x] 编写并实施独立 shadow 生命周期与执行口径一致性：入场后独立追踪、同成交/EMA trailing/容量口径、缺口标识；只新增观察记录，不改变生产参数。
 - [ ] 配对路径与采集可信后再做净收益和容量贡献归因；当前 `retest / insufficient_paired_forward_evidence`，ATR 保持冻结。
 
 ## 2026-10-08 数据收集状态复核

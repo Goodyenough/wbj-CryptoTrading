@@ -15,6 +15,15 @@
 
 ## 2026-10-09
 
+### 12:41:14 +08:00 - 完成独立 ATR shadow 前向生命周期最小切片
+- 类型：代码 / 数据库 schema / 测试 / 研究契约 / TODO / 开发计划 / Git。
+- 改动：新增 `paper_forward_epochs`、`paper_forward_ticks` 与 `paper_shadow_forward.py`；接入 daily/4h paper 运行和 `paper shadow-forward` 状态命令。baseline 与 ATR 0.35 独立维护持仓、现金、费用、容量及退出；每个闭合 4h 档只推进一次；缺档、过期或非法行情标记 `GAP_AFFECTED` 并右删失。新增契约 `reports/2026-10-09/independent_shadow_contract_2026-10-09_v1.md` 和状态机测试；未改生产策略参数或旧 paper 记录。
+- 原因：旧 plan-level shadow 在原 paper 入场后停止，无法回答 ATR 0.35 独立晚入场后的完整路径；需要先补齐可重复、可隔离的可信前向观察，再做收益裁决。
+- 验证：独立 shadow 测试 2 项通过；trade state/checkpoint/audit 30 项通过；现有 4h cycle 幂等回归通过；`python -m py_compile` 通过。数据库 schema 从 `3` 升为 `4`。当前尚无自然前向样本，报告 verdict 仍为 `insufficient_paired_forward_evidence`。
+- Git：代码提交后补记 commit hash；既有 `scripts/run_logged_paper_task.ps1` 用户修改和本地数据库状态不纳入。
+
+## 2026-10-09
+
 ### 12:37:29 +08:00 - 完成整体技术路线复盘与两周工作计划
 - 类型：只读实现复核 / 研究报告 / TODO / 路线图 / Obsidian记忆 / Git。
 - 改动：新增项目全程复盘和10-09至10-22计划；更新SYSTEM_OVERVIEW、RESEARCH_ROADMAP、EXPERIMENT_LEDGER、TODO、仓库及Obsidian开发计划与实验日志；保留历史证据，并保存本次会话期间自动生成的reports。

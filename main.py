@@ -26,6 +26,9 @@ from crypto_trading_system.config import load_settings
 from crypto_trading_system.database import database_status, mark_run_failed, tracked_run
 from crypto_trading_system.doctor import run_doctor
 from crypto_trading_system.paper_trader import add_from_scan, generate_paper_report, update_paper_trades
+from crypto_trading_system.paper_shadow_forward import (
+    ensure_epoch, forward_summary, run_forward_shadow, write_forward_report,
+)
 from crypto_trading_system.paper_db import (
     audit_database_stability,
     build_paper_db_summary,
@@ -549,6 +552,9 @@ def build_parser() -> argparse.ArgumentParser:
     paper_shadow_outcomes.add_argument("--observation-id", default=None, help="Optional observation id filter.")
     paper_shadow_outcomes.add_argument("--limit", type=int, default=200, help="Maximum outcomes to show.")
 
+    paper_forward = paper_subparsers.add_parser("shadow-forward", help="Read independent forward shadow status; never advances trading.")
+    paper_forward.add_argument("--account", default=None)
+
     paper_shadow_maturity = paper_subparsers.add_parser(
         "shadow-maturity",
         help="Write a read-only maturity review for paper shadow decision-state logs.",
@@ -645,6 +651,14 @@ def _run_step(run_id: str, step: str):
         raise RuntimeError(f"run_id={run_id} step={step}: {type(exc).__name__}: {exc}") from exc
 
 
+def _run_forward_observation(settings, account_name, run_id):
+    with _run_step(run_id, "independent_forward_shadow"):
+        tick = run_forward_shadow(settings, account_name, run_id=run_id)
+        path = write_forward_report(settings, account_name)
+        print(f"independent_shadow={tick['status']}")
+        print(f"independent_shadow_report={path}")
+
+
 def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_obsidian: bool, settings_path: Path):
     init_db(settings.output.database_path)
     with tracked_run(
@@ -654,6 +668,7 @@ def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_ob
         project_root=PROJECT_ROOT,
         log_path=PROJECT_ROOT / "logs" / "paper_4h_update.log",
     ) as run_id:
+        ensure_epoch(settings, account_name)
         with _run_step(run_id, "paper_update"):
             updated = update_paper_trades(settings, account_name=account_name, run_id=run_id)
         original_obsidian = settings.output.obsidian_dir
@@ -686,6 +701,7 @@ def _run_paper_cycle(settings, *, account_name: str | None, run_type: str, no_ob
                     account_name=account_name,
                     current_run_id=run_id,
                 )
+            _run_forward_observation(settings, account_name, run_id)
         finally:
             settings.output.obsidian_dir = original_obsidian
     return run_id, updated, report_paths, dashboard_paths, maturity_paths, reconciliation_paths
@@ -749,6 +765,7 @@ def main() -> None:
             log_path=PROJECT_ROOT / "logs" / "daily_paper_update.log",
         ) as run_id:
             print(f"run_id={run_id}")
+            ensure_epoch(settings, args.account)
             with _run_step(run_id, "scan"):
                 result, scan_report_paths = _run_scan_and_write(
                     settings,
@@ -799,6 +816,7 @@ def main() -> None:
                         account_name=args.account,
                         current_run_id=run_id,
                     )
+                _run_forward_observation(settings, args.account, run_id)
             finally:
                 settings.output.obsidian_dir = original_obsidian
 
@@ -1472,6 +1490,10 @@ def main() -> None:
                     indent=2,
                 )
             )
+
+        if args.paper_command == "shadow-forward":
+            print(json.dumps(forward_summary(settings, args.account), ensure_ascii=False, indent=2))
+            print(f"report={write_forward_report(settings, args.account)}")
 
         if args.paper_command == "shadow-maturity":
             original_obsidian = settings.output.obsidian_dir
