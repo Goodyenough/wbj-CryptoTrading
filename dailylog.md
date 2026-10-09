@@ -15,6 +15,13 @@
 
 ## 2026-10-09
 
+### 12:48:00 +08:00 - 同步复盘报告的独立 shadow 状态更新
+- 类型：报告 / Obsidian镜像 / Git。
+- 改动：在项目复盘报告及 Obsidian 镜像中补记 `90aeb31` 独立 shadow 生命周期最小实现、测试和推送状态，修正“仍为并行草稿”的过时描述。
+- 原因：复盘后续工程切片已完成，报告必须区分复盘时点与当前状态，避免计划和实际进度不一致。
+- 验证：核对 `git log`、`TODO.md`、契约与测试输出；未修改生产策略参数、旧 paper 记录或用户脚本。
+- Git：待本次提交补记；推送当前分支。
+
 ### 12:41:14 +08:00 - 完成独立 ATR shadow 前向生命周期最小切片
 - 类型：代码 / 数据库 schema / 测试 / 研究契约 / TODO / 开发计划 / Git。
 - 改动：新增 `paper_forward_epochs`、`paper_forward_ticks` 与 `paper_shadow_forward.py`；接入 daily/4h paper 运行和 `paper shadow-forward` 状态命令。baseline 与 ATR 0.35 独立维护持仓、现金、费用、容量及退出；每个闭合 4h 档只推进一次；缺档、过期或非法行情标记 `GAP_AFFECTED` 并右删失。新增契约 `reports/2026-10-09/independent_shadow_contract_2026-10-09_v1.md` 和状态机测试；未改生产策略参数或旧 paper 记录。
