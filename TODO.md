@@ -1,5 +1,9 @@
 # CryptoTradingSystem 待办清单
 
+## 待设计需求：2026-10-09
+
+- [ ] **CRYPTOTRADIN-121 / backlog / 待设计，暂不启动**：设计并开发数据预算机制，评估最新数据留出、约 30 天滚动历史回放及前向数据封存复用。用户尚未想清楚方案；开发前必须回看 Taskboard 关联对话及 [讨论记录](reports/2026-10-09/data_budget_mechanism_deferred_note.md)，先明确窗口/读取规则、已用验证数据登记、回放与自然运行验收的边界，再确定实现；不视为已批准 30 天方案，不改变当前执行优先级。
+
 ## 加速验证任务：2026-10-09
 
 - [x] **任务 1 / CRYPTOTRADIN-15 / 用户已确认，done**：修复历史 replay 移动止损计价与 EMA 生效时序；本根使用已生效 stop，收盘 EMA 从下一根生效；统一成交/费用/现金，并补齐入场当根 TP2 退出结算。37项针对性回归通过。报告：`reports/2026-10-09/replay_stop_execution_fix_2026-10-09_v1.md`。

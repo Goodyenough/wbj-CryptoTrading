@@ -2,6 +2,15 @@
 
 ## 2026-10-09
 
+### 23:15:33 +08:00 - 登记数据预算机制待设计任务
+- 类型：Taskboard / TODO / 讨论记录。
+- 改动：通过 `taskctl` 查重后创建 `CRYPTOTRADIN-121`，状态 `backlog`、标签 `改进,hold`，关联本次 Codex 会话；同步 `TODO.md`，保存 `reports/2026-10-09/data_budget_mechanism_deferred_note.md`。
+- 原因：用户要求留待以后设计开发，并在开发时回看讨论；保留约 30 天滚动窗口、最新数据留出、前向数据封存复用的设想和未决问题，不将讨论当作定稿。
+- 验证：Taskboard 回读任务状态与关联会话，核对讨论记录和 TODO 链接，执行 `git diff --check`；本次仅登记文档，没有运行策略实验。当前阶段和下一优先级不变，无需修改开发计划或实验日志。
+- Git：本次提交主题 `docs: track deferred data budget mechanism design`；提交 `TODO.md`、本条日志及 `reports/`，保留既有 `scripts/run_logged_paper_task.ps1` 修改，数据库不纳入。
+
+## 2026-10-09
+
 ### 23:03:00 +08:00 - 固定历史ATR复核收口与后续TODO登记
 - 类型：研究诊断代码 / 回归 / 报告 / Taskboard / 项目记忆。
 - 改动：新增可选confirmation_close诊断模式、只读缓存固定历史runner及账目汇总脚本；冻结旧逐日币池/配置/源码hash并跑完8分支。同步实验账本、当前策略文档及仓库/Obsidian开发计划和实验日志；把ATR后续优化复用到任务51 todo，任务120复核完成待验收。此前用户追加TODO时尚未收口的报告与工程记录本次补齐。
