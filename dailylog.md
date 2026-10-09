@@ -7,7 +7,7 @@
 - 改动：通过本地 `manage-taskboard` / `taskctl` 领取既有 `CRYPTOTRADIN-15`，新增 `CRYPTOTRADIN-120` 及 blocked_by 依赖；任务1统一 replay 的本根止损检查与下一根 EMA 生效、跳空成交、费用/现金结算，并补齐入场当根 TP2 退出记账；修复两项旧测试 fixture。同步 TODO、SYSTEM_OVERVIEW、RESEARCH_ROADMAP、仓库及 Obsidian 开发计划，保存工程验收报告和自然运行 reports。
 - 原因：用户要求先修正确性、再排期固定历史 ATR 复核。收盘 EMA 回看本根 low 与旧 stop fill 会制造错误退出；本次仅修历史 replay，不改生产参数、paper/forward 状态机或数据库业务记录，不执行任务2。
 - 验证：修改前同一组 replay 集成断言复现两类失败，修改后通过；针对性37通过，全量186通过/5个既有失败（无新增失败）；git diff 检查。旧历史绩效标为待重算，reclaim 同根入场时序限制显式保留。此轮为合成工程回归，未产生新收益实验判断。
-- Git：本次提交主题 `fix: make replay EMA stops causal and settle fills consistently`，提交后补记 hash；既有 runner 改动和本地 DB 不纳入。
+- Git：`207cac4` - `fix: make replay EMA stops causal and settle fills consistently`。`git push origin main` 首次因 GitHub Schannel `SSL/TLS connection failed` 失败，本地提交完整保留；既有 runner 改动和本地 DB 不纳入。
 
 用途：记录 CryptoTradingSystem 每天每次代码或工程文件改动，使用北京时间时间戳。
 
