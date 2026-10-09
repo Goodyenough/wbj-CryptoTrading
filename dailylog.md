@@ -2,6 +2,14 @@
 
 ## 2026-10-09
 
+### 18:00:31 +08:00 - 用户验收 replay 修复
+- 类型：Taskboard / TODO / Git。
+- 改动：用户明确回复“确认”，将 `CRYPTOTRADIN-15` 从 `in_review` 移至 `done`，同步 TODO；`CRYPTOTRADIN-120` 保留 `todo`，依赖项已完成，未启动历史复核。
+- 验证：`taskctl issue get` 回读任务1为 done、任务2为 todo，依赖项状态为 done；本次仅状态同步，无代码改动。
+- Git：本次提交主题 `docs: record accepted replay execution fix`；既有 runner 修改不纳入。
+
+## 2026-10-09
+
 ### 17:35:00 +08:00 - Taskboard 登记加速计划并完成 replay 止损执行修复
 - 类型：代码 / 测试 / 工程报告 / Taskboard / TODO / 开发计划 / Git。
 - 改动：通过本地 `manage-taskboard` / `taskctl` 领取既有 `CRYPTOTRADIN-15`，新增 `CRYPTOTRADIN-120` 及 blocked_by 依赖；任务1统一 replay 的本根止损检查与下一根 EMA 生效、跳空成交、费用/现金结算，并补齐入场当根 TP2 退出记账；修复两项旧测试 fixture。同步 TODO、SYSTEM_OVERVIEW、RESEARCH_ROADMAP、仓库及 Obsidian 开发计划，保存工程验收报告和自然运行 reports。
