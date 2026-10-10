@@ -2,6 +2,15 @@
 
 ## 2026-10-10
 
+### 09:47:33 +08:00 - 发起 Claude 独立评审：基线盈亏归因方向
+- 类型：研究方向讨论 / Claude discussion / 项目文件。
+- 改动：新增 `claude-discussions/2026-10-10-0947-baseline-loss-attribution-next-step.md`，交代项目背景、历史进展、ATR 归因结论、当前严格前向配对证据缺口，并请 Claude 评估是否将“修复后 reference baseline 盈亏归因”作为下一条研究主线。
+- 原因：用户倾向从解释 ATR 作用转向分析原规则自身的盈利/亏损机制，需要外部独立意见挑战该方向，避免把归因报告本身误当成策略改进。
+- 验证：核对 `AGENTS.md`、复盘报告、ATR 交易级归因报告、固定历史复核、最新 shadow reconciliation 和 independent shadow 报告；未修改代码、配置、策略参数、数据库或 TODO。
+- Git：待提交；保留既有 `scripts/run_logged_paper_task.ps1` 工作区修改，不纳入本次提交。
+
+## 2026-10-10
+
 ### 09:08:19 +08:00 - 重新登记四项执行任务
 - 类型：TODO / Taskboard / 项目管理。
 - 改动：按用户要求，将 `CRYPTOTRADIN-11/12/13/14` 对应的四项工作重新写入 `TODO.md` 的 `todo` 清单：四笔存量计划审计、`UNKNOWN` 放行修复、daily/4h 连续运行核验、执行顺序与断档处理。
