@@ -7,8 +7,8 @@
 ## Baseline 盈亏归因三道闸门：2026-10-10
 
 - [x] **CRYPTOTRADIN-122 / done / 闸门 1**：冻结口径并验证 baseline 可复现性。A/B 双跑 8/8 canonical checksum 一致；旧存档到 repaired legacy 的 130 笔共同平仓、7 条 old/new-only 和期末盯市差异全部归入 `stop_or_ema_accounting / scanner_or_signal_set`，`unresolved=0`。报告：`reports/2026-10-10/baseline_attribution_gate_1_2026-10-10_v1.md`；逐笔收口：`reports/2026-10-10/baseline_gate_1_trade_diff_2026-10-10_v1.md`。
-- [ ] **CRYPTOTRADIN-123 / todo / ready / 闸门 2**：前置闸门 1 已完成；清点 baseline clean、闭合、无缺口样本及污染 reason code，真实 N 未知前不预设固定门槛。尚未启动。
-- [ ] **CRYPTOTRADIN-124 / todo / blocked_by CRYPTOTRADIN-123 / 闸门 3**：先做 gross → fee → slippage → capacity → net 成本栈；仅在有明确信号时做 MAE/MFE、止损、持仓时长×regime、TP1/TP2 和容量机制归因。
+- [x] **CRYPTOTRADIN-123 / done / 闸门 2 / C**：完成 repaired `confirmation_close` baseline census：134 笔入场、131 笔完整闭合、0 笔交易期缺口；但 134/134 继承 current-master 幸存者偏差，31 笔还有容量竞逐，且容量组翻转早窗净收益方向。裁决 `C_insufficient_clean_evidence`，不放行闸门 3。报告：`reports/2026-10-10/baseline_attribution_gate_2_2026-10-10_v1.md`。
+- [ ] **CRYPTOTRADIN-124 / todo / hold_by_gate2_C / 闸门 3**：保留任务但不启动。需先由项目所有者选择补 point-in-time 历史 symbol master、等待自然前向 clean 样本，或明确批准将问题缩窄为“当前存续币条件诊断”；未经选择不得做 gross → fee → slippage → capacity → net 成本栈及后续机制归因。
 
 ## 用户指定重新加入 todo：2026-10-10
 

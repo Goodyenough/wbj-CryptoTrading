@@ -1,0 +1,219 @@
+{
+  "capacity_events_available": true,
+  "capacity_rule": "entered trade decision_time has one or more max_active_positions blocked candidates",
+  "execution_timing": "confirmation_close",
+  "fee_available": true,
+  "mae_available": false,
+  "mfe_available": false,
+  "reason_codes": [
+    "gap_filled",
+    "capacity_distorted",
+    "survivorship_suspect",
+    "other"
+  ],
+  "slippage_available": true,
+  "source_sha256": {
+    "reports/2026-10-09/atr_fixed_history_gate1_run_a/2024-07-01_confirmation_close_baseline.json": "e589f10536cf1771523199116d1dfd36b64abf46091333604cd91e1f41000025",
+    "reports/2026-10-09/atr_fixed_history_gate1_run_a/2025-06-01_confirmation_close_baseline.json": "cab46e67662a791ddd5e7581a30651021925011af0079b7de48f07302e9df435"
+  },
+  "strict_clean_definition": [
+    "complete_closed",
+    "not_gap_filled",
+    "not_capacity_distorted",
+    "not_survivorship_suspect",
+    "not_other"
+  ],
+  "survivorship_rule": "all trades inherit cohort-level current-exchangeInfo dynamic-master survivorship limitation declared by the frozen protocol",
+  "task": "CRYPTOTRADIN-123",
+  "total": {
+    "complete_closed": 131,
+    "contaminated": 134,
+    "entered": 134,
+    "strict_clean": 0
+  },
+  "verdict": "C_insufficient_clean_evidence",
+  "windows": {
+    "2024-07-01": {
+      "all_closed": {
+        "count": 80,
+        "losses": 44,
+        "net_pnl": 568.0041026108019,
+        "profit_factor": 1.1197946720987124,
+        "wins": 36
+      },
+      "blocked_entry_events": 560,
+      "capacity_contested_closed": {
+        "count": 17,
+        "losses": 7,
+        "net_pnl": 702.6309600976433,
+        "profit_factor": 1.9102568760159055,
+        "wins": 10
+      },
+      "complete_closed": 80,
+      "contaminated": 83,
+      "entered": 83,
+      "execution_clean_by_month": {
+        "2024-07": 5,
+        "2024-08": 1,
+        "2024-09": 9,
+        "2024-10": 9,
+        "2024-11": 14,
+        "2024-12": 9,
+        "2025-01": 7,
+        "2025-04": 5,
+        "2025-05": 4
+      },
+      "execution_clean_by_regime": {
+        "NEUTRAL": 41,
+        "RISK_ON": 22
+      },
+      "execution_clean_by_symbol": {
+        "AAVEUSDT": 1,
+        "ADAUSDT": 3,
+        "APEUSDT": 1,
+        "ARBUSDT": 2,
+        "ARKMUSDT": 1,
+        "AVAXUSDT": 2,
+        "BEAMXUSDT": 1,
+        "BNBUSDT": 3,
+        "BOMEUSDT": 1,
+        "BONKUSDT": 1,
+        "BTCUSDT": 4,
+        "CRVUSDT": 3,
+        "DOGEUSDT": 2,
+        "ETHFIUSDT": 1,
+        "ETHUSDT": 1,
+        "FETUSDT": 1,
+        "GALAUSDT": 1,
+        "IOUSDT": 1,
+        "JTOUSDT": 1,
+        "LTCUSDT": 2,
+        "OGUSDT": 1,
+        "PEOPLEUSDT": 1,
+        "PEPEUSDT": 2,
+        "RAYUSDT": 1,
+        "RENDERUSDT": 1,
+        "RUNEUSDT": 1,
+        "SEIUSDT": 1,
+        "SHIBUSDT": 1,
+        "SOLUSDT": 3,
+        "SUIUSDT": 2,
+        "TAOUSDT": 2,
+        "TIAUSDT": 1,
+        "TRXUSDT": 2,
+        "TURBOUSDT": 1,
+        "UNIUSDT": 2,
+        "WIFUSDT": 1,
+        "WLDUSDT": 1,
+        "XRPUSDT": 4,
+        "XVGUSDT": 1,
+        "YFIUSDT": 1
+      },
+      "execution_clean_ignoring_survivorship": {
+        "count": 63,
+        "losses": 37,
+        "net_pnl": -134.62685748684137,
+        "profit_factor": 0.9660853346434066,
+        "wins": 26
+      },
+      "gap_affected_trades": 0,
+      "plans": 489,
+      "reason_counts": {
+        "capacity_distorted": 18,
+        "other": 3,
+        "survivorship_suspect": 83
+      },
+      "right_censored": 3,
+      "strict_clean": 0,
+      "strict_clean_by_month": {},
+      "strict_clean_by_regime": {},
+      "strict_clean_by_symbol": {},
+      "unknown_regime": 0
+    },
+    "2025-06-01": {
+      "all_closed": {
+        "count": 51,
+        "losses": 30,
+        "net_pnl": -150.73870564574145,
+        "profit_factor": 0.9515204675782523,
+        "wins": 21
+      },
+      "blocked_entry_events": 612,
+      "capacity_contested_closed": {
+        "count": 13,
+        "losses": 7,
+        "net_pnl": 98.17679850603156,
+        "profit_factor": 1.1297663687301782,
+        "wins": 6
+      },
+      "complete_closed": 51,
+      "contaminated": 51,
+      "entered": 51,
+      "execution_clean_by_month": {
+        "2025-06": 9,
+        "2025-07": 6,
+        "2025-08": 5,
+        "2025-09": 2,
+        "2025-10": 3,
+        "2026-01": 6,
+        "2026-04": 4,
+        "2026-05": 3
+      },
+      "execution_clean_by_regime": {
+        "NEUTRAL": 17,
+        "RISK_OFF": 4,
+        "RISK_ON": 17
+      },
+      "execution_clean_by_symbol": {
+        "ADAUSDT": 1,
+        "APTUSDT": 1,
+        "AVAXUSDT": 1,
+        "BCHUSDT": 1,
+        "BNBUSDT": 3,
+        "BONKUSDT": 1,
+        "BTCUSDT": 2,
+        "CAKEUSDT": 1,
+        "COMPUSDT": 1,
+        "DASHUSDT": 1,
+        "ETHUSDT": 1,
+        "LINKUSDT": 2,
+        "LTCUSDT": 1,
+        "MEMEUSDT": 1,
+        "NEIROUSDT": 1,
+        "PENGUUSDT": 1,
+        "PEPEUSDT": 1,
+        "PYTHUSDT": 1,
+        "ROSEUSDT": 1,
+        "SEIUSDT": 1,
+        "SHIBUSDT": 1,
+        "SOLUSDT": 2,
+        "TAOUSDT": 1,
+        "TONUSDT": 1,
+        "TRBUSDT": 1,
+        "TRXUSDT": 4,
+        "UNIUSDT": 2,
+        "WIFUSDT": 1,
+        "WUSDT": 1
+      },
+      "execution_clean_ignoring_survivorship": {
+        "count": 38,
+        "losses": 23,
+        "net_pnl": -248.915504151773,
+        "profit_factor": 0.8942028051533145,
+        "wins": 15
+      },
+      "gap_affected_trades": 0,
+      "plans": 386,
+      "reason_counts": {
+        "capacity_distorted": 13,
+        "survivorship_suspect": 51
+      },
+      "right_censored": 0,
+      "strict_clean": 0,
+      "strict_clean_by_month": {},
+      "strict_clean_by_regime": {},
+      "strict_clean_by_symbol": {},
+      "unknown_regime": 0
+    }
+  }
+}
