@@ -7,7 +7,7 @@
 - 改动：对 Gate 1 repaired `confirmation_close` baseline 的 134 笔已入场交易逐笔标记 `gap_filled / capacity_distorted / survivorship_suspect / other`，生成 census CSV、summary JSON 和闸门 2 主报告；同步 `TODO.md`、Obsidian 开发计划与实验日志。Taskboard `CRYPTOTRADIN-123` 已完成并落 C，`CRYPTOTRADIN-124` 保持 `todo`、增加 `hold`，未启动闸门 3。
 - 原因：进入成本栈和亏损机制归因前，必须先确认 clean、闭合、无缺口样本的真实 N，以及污染是否主导方向。
 - 验证：独立回读断言确认 134 笔入场、131 笔完整闭合、strict clean 0、`survivorship_suspect=134`、`capacity_distorted=31`、`other=3`、`gap_filled=0`；两个窗口 all-closed P&L 均与 conditional execution-clean 加 capacity-contested 精确闭合；输入 SHA256 与 summary 一致，CSV SHA256 为 `a277a3195ee447c32129cfbca850cd0de5b7c8d1a5c4ba46413567fde20c84cc`，`git diff --check` 通过。未修改生产配置、策略代码或数据库。
-- Git：本次提交主题 `research: complete baseline attribution gate two`；按规则提交 `reports/`，保留用户现有 `scripts/run_logged_paper_task.ps1` 修改及 `data/` 本地状态，不纳入本次提交。
+- Git：`69124f7` - `research: complete baseline attribution gate two`，已成功推送 `origin/main`；按规则提交 `reports/`，保留用户现有 `scripts/run_logged_paper_task.ps1` 修改及 `data/` 本地状态，不纳入本次提交。本条 hash 回填另以文档提交保存。
 
 ### 17:02:00 +08:00 - 完成 baseline 盈亏归因闸门 1
 - 类型：只读研究诊断 / 报告 / TODO / Taskboard / Obsidian 项目记忆。
