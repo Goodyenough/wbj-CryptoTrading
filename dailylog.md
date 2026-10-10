@@ -2351,3 +2351,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 原因：当前二分归因无法解释近窗多数亏损；在继续 ATR 或止损参数实验前，先提高路径可辨识性并冻结解释边界。
 - 验证：未修改代码、生产配置或策略参数；讨论文件状态为 `WAITING_CLAUDE`，已准备一次性文件化讨论启动指令；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
 - Git：待提交。
+
+### 2026-10-10 23:35:00 +08:00 - Claude Round 1 归纳并发起 Round 2 追问
+- 类型：研究讨论文件 / 只读语义核对 / Git。
+- 结果：Claude 建议优先重建止损后的前向恢复路径，并将测量层与机制层分开；核对当前 replay 的 `stop_first` 语义后发现，`STOPPED` 不定义性地意味着未触及 TP1，同一 4h bar 可同时触发 stop 与 TP1，而最终状态仍为 `STOPPED`。已将该纠正写入讨论文件。
+- 改动：讨论文件进入 `round: 2`、`status: WAITING_CLAUDE`，追问退出后恢复率的起始 bar、R 标准、样本分母、固定 horizon 注册方式，以及恢复率是否只能作为“止损可能过早”的必要但不充分证据。
+- 约束：未修改代码、生产配置或策略参数；容量竞逐继续单列；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
+- Git：待提交。
