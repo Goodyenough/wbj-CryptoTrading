@@ -2318,4 +2318,4 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 改动：复用并扩展已有 `CRYPTOTRADIN-89`，更名为“数据基础设施：建设 point-in-time 历史币池并正式重跑闸门 1/2/3”，保持 `backlog`（待立项），优先级调整为 high，补充 symbol lifecycle、历史退市币 OHLCV、按时点查询、确定性/覆盖测试、验收及停止条件；增加其 `blocks CRYPTOTRADIN-124` 关系并同步 `TODO.md`。
 - 原因：闸门 2 的 134/134 笔交易均继承 current-master 幸存者偏差，strict clean N=0；需要把历史币池作为独立数据基础设施项目，验收后再正式重跑三道闸门。
 - 验证：`taskctl issue get CRYPTOTRADIN-89` 返回 `status=backlog`、`priority=high` 且 blocks 包含 `CRYPTOTRADIN-124`；`git diff --check` 通过。仅调整任务定义和项目文档，未启动实施、未运行参数实验、未修改生产配置；按仓库约定随提交一并归档 `reports/` 下已有自然运行产物，不重新评估其结论。
-- Git：待提交。
+- Git：任务定义与 `reports/` 归档提交 `79f7361`（`docs: scope point-in-time universe project`）；本条提交号回填随后单独提交并 push。
