@@ -2283,3 +2283,13 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 原因：第二轮已给出最小字段、报告结构、排序和停止条件，继续讨论的边际价值低；固定交易数阈值暂不预设，待取得真实 clean 样本量后判断是否能支持第二窗口。
 - 验证：未修改代码、生产配置或策略参数；保留现有未提交脚本改动。
 - Git：待提交。
+
+### 2026-10-10 11:36:19 +08:00 - 建立三道 baseline 归因闸门并启动闸门 1
+- 类型：Taskboard / TODO / 开发计划 / 只读固定历史诊断 / 报告 / Git。
+- 改动：创建 `CRYPTOTRADIN-122/123/124` 三项 Taskboard `todo`，设置 123 blocked_by 122、124 blocked_by 123；按用户要求将 122 启动为 `in_progress`。同步 `TODO.md`、`开发计划.md`，新增 `reports/2026-10-10/baseline_attribution_gate_1_2026-10-10_v1.md`。
+- 研究问题：相同修复后口径、代码、配置和数据输入是否产生完全相同的交易/P&L；旧新口径变化是否已足够清楚，可安全进入 clean 样本 census。
+- 执行：复用 `scripts/review_atr_fixed_history.py`，将 A/B 两次输出隔离到 `reports/2026-10-09/atr_fixed_history_gate1_run_a/` 与 `..._run_b/`；只读 SQLite/本地缓存，禁止网络补数，未改生产配置。
+- 结果：两个窗口×两种时序×两条规则共 8 个分支，剥离运行身份字段与运行时间戳后的 canonical checksum 全部一致；两个窗口 input digest 一致。修复后 `confirmation_close` baseline 复现为早窗 80 平仓、+4.7199%、PF 1.1198，近窗 51 平仓、-1.5074%、PF 0.9515。
+- 限制与裁决：旧存档到当前 repaired legacy 的变化幅度已量出，但近窗有 3 old-only、4 new-only 平仓，scanner 演化与 stop/EMA 修复尚未完全拆分；裁决 `determinism_pass_scope_diff_partial`，闸门 1 保持进行中，不放行闸门 2。独立 shadow 两个 epoch 均 `opportunities=0`，当前零配对首先是上游机会真空。
+- 验证：运行脚本 A/B 均 `COMPLETE`；A/B canonical checksum 8/8 PASS，输入文件 SHA256 2/2 PASS；未修改业务代码，未运行策略参数实验。保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动及本地 `data/` 状态。
+- Git：待提交。

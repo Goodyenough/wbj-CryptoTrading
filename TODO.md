@@ -4,6 +4,12 @@
 
 按用户要求，Taskboard 全部 93 条“待认领（todo）”已移至“待立项（backlog）”，待认领现为 0 条。下方未完成条目保留为待立项需求，历史日期与优先级不代表当前执行授权；后续需重新选择立项。已完成任务及现有自动采集调度保持原状态。清单见 `reports/2026-10-10/taskboard_todo_to_backlog.md`。
 
+## Baseline 盈亏归因三道闸门：2026-10-10
+
+- [ ] **CRYPTOTRADIN-122 / in_progress / 闸门 1**：冻结口径并验证 baseline 可复现性。A/B 两次固定历史运行的 8 个分支 canonical checksum 全部一致，确定性通过；旧新变化逐项根因归属仍为 partial，近窗存在 scanner/路径混合项，暂不放行闸门 2。报告：`reports/2026-10-10/baseline_attribution_gate_1_2026-10-10_v1.md`。
+- [ ] **CRYPTOTRADIN-123 / todo / blocked_by CRYPTOTRADIN-122 / 闸门 2**：清点 baseline clean、闭合、无缺口样本及污染 reason code；真实 N 未知前不预设固定门槛。
+- [ ] **CRYPTOTRADIN-124 / todo / blocked_by CRYPTOTRADIN-123 / 闸门 3**：先做 gross → fee → slippage → capacity → net 成本栈；仅在有明确信号时做 MAE/MFE、止损、持仓时长×regime、TP1/TP2 和容量机制归因。
+
 ## 用户指定重新加入 todo：2026-10-10
 
 - [ ] **CRYPTOTRADIN-11 / todo**：审计 `TRX/ZRO/AAVE/SOL` 四笔存量计划，核对跨断档期间的状态迁移、止损/止盈事件和可采信程度。
