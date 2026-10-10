@@ -2319,3 +2319,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 原因：闸门 2 的 134/134 笔交易均继承 current-master 幸存者偏差，strict clean N=0；需要把历史币池作为独立数据基础设施项目，验收后再正式重跑三道闸门。
 - 验证：`taskctl issue get CRYPTOTRADIN-89` 返回 `status=backlog`、`priority=high` 且 blocks 包含 `CRYPTOTRADIN-124`；`git diff --check` 通过。仅调整任务定义和项目文档，未启动实施、未运行参数实验、未修改生产配置；按仓库约定随提交一并归档 `reports/` 下已有自然运行产物，不重新评估其结论。
 - Git：任务定义与 `reports/` 归档提交 `79f7361`（`docs: scope point-in-time universe project`）；本条提交号回填随后单独提交并 push。
+
+### 2026-10-10 22:05:01 +08:00 - 完成当前存续币条件闸门 3-C
+- 类型：只读回测归因 / Taskboard / 报告 / TODO / Obsidian 开发计划与实验日志 / Git。
+- 改动：按用户明确授权创建并执行 `CRYPTOTRADIN-125`，与正式 `CRYPTOTRADIN-124` 分离；新增 Gate 3-C 成本栈报告、机器可读 summary 和 CSV。冻结 Binance Spot USDT、4h `confirmation_close`、current-survivor master、费用/滑点及最多 5 仓；容量只分层，不伪造因果扣减。
+- 结果：非容量竞逐组早窗 raw/net `+33.42/-134.63` USDT，近窗 `-125.90/-248.92` USDT；两窗合计 raw `-92.48`、成本 `291.06`、net `-383.54`。30 笔容量竞逐闭合样本 net `+800.81`，使全体 131 笔 net `+417.27`，说明全体结果高度依赖容量路径。regime 跨窗翻转，MAE/MFE 不可用，裁决 `B_conditional_no_robust_gross_edge / retest`；不形成参数实验卡片，不改生产配置。
+- 验证：summary JSON 可解析；成本栈 CSV 6 行、all-closed N 合计 131；逐笔 `gross_pnl - entry_fee - exit_fee = net_pnl` 最大残差 `5.68e-14`；execution-clean 与 capacity net 分别回对 `-383.542361 / +800.807759`；三份输入 SHA256 与 Gate 2 冻结值一致；`git diff --check` 通过。
+- 报告：`reports/2026-10-10/baseline_attribution_gate_3c_2026-10-10_v1.md`、`baseline_gate_3c_summary_2026-10-10_v1.json`、`baseline_gate_3c_cost_stack_2026-10-10_v1.csv`。
+- Git：待提交。

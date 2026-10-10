@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "task": "CRYPTOTRADIN-125",
+  "verdict": "B_conditional_no_robust_gross_edge",
+  "decision": "retest",
+  "scope": "current-surviving Binance Spot USDT symbols only",
+  "generalizable": false,
+  "production_config_changed": false,
+  "formulas": {
+    "raw_price_pnl": "gross_pnl + slippage_cost",
+    "after_slippage_gross": "gross_pnl",
+    "fees": "entry_fee + exit_fee",
+    "net_pnl": "gross_pnl - fees"
+  },
+  "frozen_execution": {
+    "venue": "Binance Spot USDT",
+    "interval": "4h",
+    "entry_timing": "confirmation_close",
+    "master_source": "Frozen 2026-07-26 daily membership (survivorship biased)",
+    "master_count": 285,
+    "maker_fee_bps": 4.0,
+    "taker_fee_bps": 10.0,
+    "entry_slippage_bps": 5.0,
+    "stop_slippage_bps": 10.0,
+    "max_active_positions": 5,
+    "risk_per_trade_pct": 1.0,
+    "allow_leverage": false
+  },
+  "sample": {
+    "entered": 134,
+    "closed": 131,
+    "right_censored": 3,
+    "gap_affected": 0,
+    "survivorship_suspect": 134,
+    "capacity_distorted_entered": 31,
+    "capacity_contested_closed": 30
+  },
+  "execution_clean_conditional_combined": {
+    "n": 101,
+    "raw_price_pnl": -92.481876,
+    "slippage_plus_fees": 291.060487,
+    "net_pnl": -383.542361
+  },
+  "capacity_contested_combined": {
+    "n": 30,
+    "raw_price_pnl": 873.197893,
+    "slippage_plus_fees": 72.390134,
+    "net_pnl": 800.807759,
+    "causal_interpretation_allowed": false
+  },
+  "bootstrap": {
+    "method": "trade-level resampling with replacement",
+    "iterations": 20000,
+    "seed_family": 20261010,
+    "warning": "Does not model same-day or same-symbol dependence; intervals are descriptive.",
+    "execution_clean_conditional": [
+      {
+        "window_start": "2024-07-01",
+        "n": 63,
+        "raw_mean": 0.530,
+        "raw_mean_ci95": [-32.273, 36.157],
+        "net_mean": -2.137,
+        "net_mean_ci95": [-35.429, 32.605],
+        "mean_r": 0.0053,
+        "mean_r_ci95": [-0.3134, 0.3368]
+      },
+      {
+        "window_start": "2025-06-01",
+        "n": 38,
+        "raw_mean": -3.313,
+        "raw_mean_ci95": [-43.833, 39.853],
+        "net_mean": -6.550,
+        "net_mean_ci95": [-46.328, 36.679],
+        "mean_r": -0.0477,
+        "mean_r_ci95": [-0.4366, 0.3748]
+      }
+    ]
+  },
+  "mechanism_checks": {
+    "regime_cross_window_replicated": false,
+    "holding_bucket_actionable": false,
+    "mae_available": false,
+    "mfe_available": false,
+    "single_variable_experiment_card_created": false
+  },
+  "source_sha256": {
+    "gate_2_census_csv": "a277a3195ee447c32129cfbca850cd0de5b7c8d1a5c4ba46413567fde20c84cc",
+    "early_window_json": "e589f10536cf1771523199116d1dfd36b64abf46091333604cd91e1f41000025",
+    "near_window_json": "cab46e67662a791ddd5e7581a30651021925011af0079b7de48f07302e9df435"
+  }
+}

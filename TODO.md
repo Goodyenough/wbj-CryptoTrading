@@ -8,8 +8,9 @@
 
 - [x] **CRYPTOTRADIN-122 / done / 闸门 1**：冻结口径并验证 baseline 可复现性。A/B 双跑 8/8 canonical checksum 一致；旧存档到 repaired legacy 的 130 笔共同平仓、7 条 old/new-only 和期末盯市差异全部归入 `stop_or_ema_accounting / scanner_or_signal_set`，`unresolved=0`。报告：`reports/2026-10-10/baseline_attribution_gate_1_2026-10-10_v1.md`；逐笔收口：`reports/2026-10-10/baseline_gate_1_trade_diff_2026-10-10_v1.md`。
 - [x] **CRYPTOTRADIN-123 / done / 闸门 2 / C**：完成 repaired `confirmation_close` baseline census：134 笔入场、131 笔完整闭合、0 笔交易期缺口；但 134/134 继承 current-master 幸存者偏差，31 笔还有容量竞逐，且容量组翻转早窗净收益方向。裁决 `C_insufficient_clean_evidence`，不放行闸门 3。报告：`reports/2026-10-10/baseline_attribution_gate_2_2026-10-10_v1.md`。
+- [x] **CRYPTOTRADIN-125 / done / 闸门 3-C / B**：经用户明确批准，将问题缩窄为“当前存续币条件诊断”。非容量竞逐组早窗 raw/net 为 `+33.42/-134.63` USDT，近窗为 `-125.90/-248.92` USDT；成本只在早窗翻转方向，regime/持仓分层不跨窗稳定，裁决 `B_conditional_no_robust_gross_edge`。不形成参数实验卡片，不修改生产配置。报告：`reports/2026-10-10/baseline_attribution_gate_3c_2026-10-10_v1.md`。
 - [ ] **CRYPTOTRADIN-89 / backlog / 待立项 / 数据基础设施**：建设 Binance Spot USDT point-in-time 历史币池，补齐 `listing_time / delisting_time / tradable_from / tradable_to / rename/migration / source / confidence`、历史退市币 OHLCV、时点查询与确定性/覆盖测试；验收后按冻结协议正式重跑闸门 1、2、3。本卡当前只完成立项定义，不代表批准开工，不修改生产配置。
-- [ ] **CRYPTOTRADIN-124 / todo / hold_by_gate2_C_and_CRYPTOTRADIN-89 / 闸门 3**：保留任务但不启动。Taskboard 已增加 `blocked_by CRYPTOTRADIN-89`；只有 point-in-time 历史币池验收、正式重跑闸门 1 通过且正式闸门 2 放行后，才允许做 gross → fee → slippage → capacity → net 成本栈及后续机制归因。
+- [ ] **CRYPTOTRADIN-124 / todo / hold_by_gate2_C_and_CRYPTOTRADIN-89 / 正式闸门 3**：保留任务但不启动。Taskboard 已增加 `blocked_by CRYPTOTRADIN-89`；闸门 3-C 的条件性 B 结论不解除该阻塞。只有 point-in-time 历史币池验收、正式重跑闸门 1 通过且正式闸门 2 放行后，才允许启动正式历史归因。
 
 ## 用户指定重新加入 todo：2026-10-10
 
