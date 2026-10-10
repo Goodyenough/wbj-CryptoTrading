@@ -9,6 +9,12 @@
 - 验证：核对 `AGENTS.md`、复盘报告、ATR 交易级归因报告、固定历史复核、最新 shadow reconciliation 和 independent shadow 报告；未修改代码、配置、策略参数、数据库或 TODO。
 - Git：待提交；保留既有 `scripts/run_logged_paper_task.ps1` 工作区修改，不纳入本次提交。
 
+### 09:48:11 +08:00 - 记录 Claude 评审讨论推送失败
+- 类型：Git / 运维记录。
+- 改动：补记 Claude 讨论文件提交 `0a3488b` 的远程推送结果。
+- 原因：`git push origin main` 再次因 `schannel: failed to receive handshake, SSL/TLS connection failed` 失败；不修改远程配置，不影响本地讨论文件。
+- 验证：本地提交已存在；Claude 仍需读取 `claude-discussions/2026-10-10-0947-baseline-loss-attribution-next-step.md` 并追加回复。
+
 ## 2026-10-10
 
 ### 09:08:19 +08:00 - 重新登记四项执行任务
