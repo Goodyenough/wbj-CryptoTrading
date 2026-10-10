@@ -8,7 +8,8 @@
 
 - [x] **CRYPTOTRADIN-122 / done / 闸门 1**：冻结口径并验证 baseline 可复现性。A/B 双跑 8/8 canonical checksum 一致；旧存档到 repaired legacy 的 130 笔共同平仓、7 条 old/new-only 和期末盯市差异全部归入 `stop_or_ema_accounting / scanner_or_signal_set`，`unresolved=0`。报告：`reports/2026-10-10/baseline_attribution_gate_1_2026-10-10_v1.md`；逐笔收口：`reports/2026-10-10/baseline_gate_1_trade_diff_2026-10-10_v1.md`。
 - [x] **CRYPTOTRADIN-123 / done / 闸门 2 / C**：完成 repaired `confirmation_close` baseline census：134 笔入场、131 笔完整闭合、0 笔交易期缺口；但 134/134 继承 current-master 幸存者偏差，31 笔还有容量竞逐，且容量组翻转早窗净收益方向。裁决 `C_insufficient_clean_evidence`，不放行闸门 3。报告：`reports/2026-10-10/baseline_attribution_gate_2_2026-10-10_v1.md`。
-- [ ] **CRYPTOTRADIN-124 / todo / hold_by_gate2_C / 闸门 3**：保留任务但不启动。需先由项目所有者选择补 point-in-time 历史 symbol master、等待自然前向 clean 样本，或明确批准将问题缩窄为“当前存续币条件诊断”；未经选择不得做 gross → fee → slippage → capacity → net 成本栈及后续机制归因。
+- [ ] **CRYPTOTRADIN-89 / backlog / 待立项 / 数据基础设施**：建设 Binance Spot USDT point-in-time 历史币池，补齐 `listing_time / delisting_time / tradable_from / tradable_to / rename/migration / source / confidence`、历史退市币 OHLCV、时点查询与确定性/覆盖测试；验收后按冻结协议正式重跑闸门 1、2、3。本卡当前只完成立项定义，不代表批准开工，不修改生产配置。
+- [ ] **CRYPTOTRADIN-124 / todo / hold_by_gate2_C_and_CRYPTOTRADIN-89 / 闸门 3**：保留任务但不启动。Taskboard 已增加 `blocked_by CRYPTOTRADIN-89`；只有 point-in-time 历史币池验收、正式重跑闸门 1 通过且正式闸门 2 放行后，才允许做 gross → fee → slippage → capacity → net 成本栈及后续机制归因。
 
 ## 用户指定重新加入 todo：2026-10-10
 
@@ -181,7 +182,7 @@
 - [x] 完成 Dynamic Universe Backtest MVP：每日用已收盘历史 K 线重建 universe，再生成候选交易计划。来源：2026-06-06 universe snapshot smoke test。
 - [x] 增加 K 线无数据负缓存：新上市币在指定历史区间无数据时，不要在后续 dynamic-universe smoke 中反复请求。
 - [ ] 在 K 线缓存足够热之后，不使用 `--source-limit` 跑更大的 dynamic-universe A/B 实验。
-- [ ] 研究 Binance 历史/退市币 symbol master list，降低 dynamic universe 回测中的退市幸存者偏差。
+- [ ] **CRYPTOTRADIN-89 / backlog**：建设 point-in-time 历史币池，降低 dynamic universe 回测中的退市幸存者偏差；完整范围与正式闸门重跑依赖见本文件顶部“Baseline 盈亏归因三道闸门”。
 - [ ] 每次实验只改变一个策略维度。
 - [ ] 每次实验使用同一个 symbol universe 和同一个日期区间。
 - [ ] 对比净收益、最大回撤、胜率、Profit factor、平均 R、止损率和交易次数。

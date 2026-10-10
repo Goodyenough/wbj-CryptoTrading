@@ -2312,3 +2312,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 提交：`d2b1b67 research: start baseline attribution gate one`，包含 Taskboard 对应文档、A/B 固定历史原始产物与闸门 1 报告；未包含 `data/` 或用户原有 `scripts/run_logged_paper_task.ps1` 改动。
 - Push：执行 `git push origin HEAD` 失败：`schannel: failed to receive handshake, SSL/TLS connection failed`。本地提交完整保留，待网络/TLS 恢复后重试。
 - 重试：补记失败原因的提交 `9176fb8` 后再次执行 `git push origin HEAD` 成功，`d2b1b67` 与 `9176fb8` 均已推送至 `origin/main`。
+
+### 2026-10-10 21:53:44 +08:00 - point-in-time 历史币池进入待立项
+- 类型：Taskboard / TODO / 数据基础设施任务定义。
+- 改动：复用并扩展已有 `CRYPTOTRADIN-89`，更名为“数据基础设施：建设 point-in-time 历史币池并正式重跑闸门 1/2/3”，保持 `backlog`（待立项），优先级调整为 high，补充 symbol lifecycle、历史退市币 OHLCV、按时点查询、确定性/覆盖测试、验收及停止条件；增加其 `blocks CRYPTOTRADIN-124` 关系并同步 `TODO.md`。
+- 原因：闸门 2 的 134/134 笔交易均继承 current-master 幸存者偏差，strict clean N=0；需要把历史币池作为独立数据基础设施项目，验收后再正式重跑三道闸门。
+- 验证：`taskctl issue get CRYPTOTRADIN-89` 返回 `status=backlog`、`priority=high` 且 blocks 包含 `CRYPTOTRADIN-124`；`git diff --check` 通过。仅调整任务定义和项目文档，未启动实施、未运行参数实验、未修改生产配置；按仓库约定随提交一并归档 `reports/` 下已有自然运行产物，不重新评估其结论。
+- Git：待提交。
