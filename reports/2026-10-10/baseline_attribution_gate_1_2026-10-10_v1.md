@@ -1,21 +1,21 @@
 # Baseline 盈亏归因闸门 1：可复现性与口径冻结
 
-Taskboard：`CRYPTOTRADIN-122`  
-状态：`in_progress`  
-裁决：`determinism_pass_scope_diff_partial`
+Taskboard：`CRYPTOTRADIN-122`
+状态：`done`
+裁决：`pass_no_unresolved_trade_diff`
 
 ## 白话结论
 
 修复后固定历史 replay 可以稳定复现。完全相同的代码、配置、历史币池和本地 K 线缓存连续运行 A/B 两次，8 个预声明分支剥离随机生成的 `run_id / trade_id / event_id` 和运行时间戳后，业务内容 checksum 全部一致；两个窗口的输入 hash 也完全一致。
 
-但闸门 1 尚未全部通过。现有 runner 能比较旧存档、`legacy_same_bar` 和 `confirmation_close` 的交易及 P&L 变化，却不能把近窗全部差异严格拆成 stop 计价、EMA 时序、scanner 演化等单一根因。近窗旧存档到当前 legacy baseline 出现 3 笔 old-only 和 4 笔 new-only 平仓，现有报告也已声明当前 scanner 与旧研究版本不同。因此现在只能确认“结果可复现”和“变化幅度已量出”，还不能声称“所有变化均已逐项归因”。闸门 2 暂不启动。
+逐笔收口现已完成。两个窗口 130 笔同键平仓的信号、计划和入场字段全部一致；3 笔平仓时点变化由 EMA 收盘更新下一根生效的事件链直接解释，其余共同交易变化仅为浮点尾差或前序权益变化后的仓位/费用/P&L 连锁。近窗 7 条 old/new-only 平仓中，6 条有 `max_active_positions=5` 或同币计划接续证据，1 条 SOL 明确属于 scanner 将计划提前一根 4h bar 后改变 entry/score 的信号集合变化。期末权益差由共同平仓、only 交易和同键未平仓盯市完全闭合，`unresolved=0`。闸门 1 通过；闸门 2 可以按原依赖进入，但本报告不自动启动它。
 
 ## 系统目标、问题与路线图位置
 
 - 系统目标：判断修复后的 reference baseline 在费用、滑点、容量和执行约束下是否存在可信优势。
 - 本闸门唯一问题：相同输入能否得到相同交易与逐笔 P&L，并且旧新口径差异是否足够清楚，能安全进入样本清点。
 - 路线图位置：闸门 1（可复现性与口径冻结）→ 闸门 2（clean 样本 census）→ 闸门 3（成本栈与亏损机制）。
-- 当前决定：确定性检查通过；根因拆解部分通过，`CRYPTOTRADIN-122` 保持 `in_progress`，不放行 `CRYPTOTRADIN-123`。
+- 当前决定：确定性和根因拆解均通过，`CRYPTOTRADIN-122` 完成；`CRYPTOTRADIN-123` 解除前置阻塞，仍保持 `todo`，等待单独启动。
 
 ## 事实、观察、假设、决定
 
@@ -24,7 +24,7 @@ Taskboard：`CRYPTOTRADIN-122`
 - 事实：旧存档到当前 legacy baseline 的早窗交易集合相同；近窗交易集合发生变化。
 - 观察：原始 JSON SHA256 不同，差异来自每次运行随机生成的身份字段和运行时间戳，不是交易路径或 P&L 漂移。
 - 假设：剥离运行身份字段后，业务字段应逐位一致；本次得到支持。
-- 决定：接受可复现性；不接受“旧新差异已完全归因”，闸门 1 继续停留在根因 diff 收口。
+- 决定：接受可复现性与逐笔差异收口；冻结 repaired `confirmation_close` baseline 进入下一道样本 census，不改变生产配置。
 
 ## 冻结戳
 
@@ -82,19 +82,21 @@ Canonical 规则：递归剥离 `run_id`、`trade_id`、`event_id`；只剥离 r
 | 2024-07-01 | 76 → 76 | -2.0854% → -1.9952% | 0.9497 → 0.9516 | +9.01 | 76 个共同平仓；无 old/new-only |
 | 2025-06-01 | 57 → 58 | 3.1141% → 4.5509% | 1.1084 → 1.1423 | +143.68 | 54 个共同平仓；3 old-only、4 new-only |
 
-根因状态：
+根因收口：
 
-- stop 计价 / EMA 时序：修复已由测试和工程报告证明，但当前 A/B runner 的两个 timing 分支都使用修复后引擎，没有同输入的单修复 counterfactual，不能把上述全部 P&L 差异拆给二者。
-- entry timing：`legacy_same_bar` 与 `confirmation_close` 直接比较，结果高度路径敏感。
+- 130 笔共同平仓的信号与入场字段全部一致；早窗为 15 笔完全不变、60 笔记账/资金路径变化、1 笔 EMA 时序变化，近窗为 35 / 17 / 2 笔。
+- 3 笔 EMA 时序变化为 SUI、BNB、PEPE；事件记录均显示旧路径在本根抬升 EMA 后立即触发，新路径从下一根使用新 stop。
+- 近窗 7 条 old/new-only 中，6 条是满 5 仓导致同计划入场换位或后续计划接续；1 条 SOL 是 scanner/signal-set 演化，当前计划比旧计划提前 4 小时且 entry/TP/score 不同。
 - `UNKNOWN`：固定窗口重算的 market-regime 时间轴中 `UNKNOWN=0`，本批没有可归因影响。
 - 断档：8 个分支的 `gap_affected_trades` 均为 0。
-- scanner 演化：近窗出现交易集合变化，且既有报告明确声明当前 scanner 与旧研究版本不同，因此保留为未拆分混合项。
+- 权益对账：早窗 +9.0137、近窗 +143.6756 的最终权益变化均由共同平仓、old/new-only 和同键未平仓盯市闭合。
+- 完整逐笔证据：`reports/2026-10-10/baseline_gate_1_trade_diff_2026-10-10_v1.md`。
 
 ## `paired_closed_trades=0` 并行初查
 
 最新 independent shadow 报告中，旧 `CONFIG_CHANGED` epoch 与当前 `ACTIVE` epoch 的 baseline/ATR 两条线均为 `opportunities=0 / entered=0 / closed_trades=0`。因此当前独立账本的零配对首先是上游机会真空，不是“已有双方平仓但配对键匹配失败”。reconciliation/maturity 报告中的旧 plan-linked rows 属于另一条历史 shadow 证据路径，不能补记为 independent paired closed trades。
 
-该结论只解决当前 independent epoch 的三分诊断；旧 cohort 的逐行配对键审计仍属于后续收口项，不改变闸门 1 当前状态。
+该结论解决当前 independent epoch 的三分诊断：零配对是当前 epoch 上游机会真空，而不是已有双方平仓的配对键 bug。旧 plan-linked cohort 属于另一条历史证据路径，应在闸门 2 按 clean/contaminated 口径处理，不能补记为 independent paired closed trades。
 
 ## 闸门判定
 
@@ -102,9 +104,9 @@ Canonical 规则：递归剥离 `run_id`、`trade_id`、`event_id`；只剥离 r
 - 冻结输入：PASS。
 - 当前执行语义记录：PASS，沿用 `confirmation_close`、已生效 stop 检查、本根收盘 EMA 下一根生效、断档不伪装真实前向表现。
 - 新旧变化幅度：PASS，已量出。
-- 新旧变化逐项根因归属：PARTIAL；近窗仍有 scanner / 路径混合项。
-- 总裁决：`determinism_pass_scope_diff_partial`，闸门 1 保持进行中，闸门 2 不启动。
+- 新旧变化逐项根因归属：PASS；`stop_or_ema_accounting`、`scanner_or_signal_set` 均有证据，`unresolved=0`。
+- 总裁决：`pass_no_unresolved_trade_diff`，闸门 1 完成。
 
 ## 下一步
 
-只补闸门 1 的最小缺口：把旧存档与当前 repaired baseline 的增删改交易清单按 `stop_or_ema_accounting / scanner_or_signal_set / unresolved` 分类；如果无法在不新增策略逻辑的情况下完成，就将闸门 1 正式判为“基础设施阻塞”，再决定是否补最小诊断能力。不得提前进入样本归因或参数实验。
+按依赖进入闸门 2：以 repaired `confirmation_close` baseline 为唯一输入，清点 clean/contaminated、缺口、容量与存续币偏差，先取得真实 N，再判断是否足以进入闸门 3。闸门 1 未修改生产配置，也没有启动新参数实验。

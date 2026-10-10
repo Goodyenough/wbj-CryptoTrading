@@ -2,6 +2,13 @@
 
 ## 2026-10-10
 
+### 17:02:00 +08:00 - 完成 baseline 盈亏归因闸门 1
+- 类型：只读研究诊断 / 报告 / TODO / Taskboard / Obsidian 项目记忆。
+- 改动：逐笔核对旧 run `e1231e5ad711`、`110c51eef593` 与 repaired legacy baseline；新增 `reports/2026-10-10/baseline_gate_1_trade_diff_2026-10-10_v1.md`，将 130 笔共同平仓、7 条 old/new-only 和期末未平仓盯市差异收口为 `stop_or_ema_accounting / scanner_or_signal_set`，`unresolved=0`；更新 Gate 1 主报告与 `TODO.md`，同步 Obsidian 开发计划和实验日志；Taskboard `CRYPTOTRADIN-122` 已移至 `done`，`CRYPTOTRADIN-123` 保持 `todo`、尚未启动。
+- 原因：闸门 1 先前只证明确定性，尚未解释近窗交易集合变化；必须在 baseline 样本 census 前排除未解释漂移。
+- 验证：只读断言确认两个窗口共同/old-only/new-only 分别为 `76/0/0`、`54/3/4`，130/130 共同平仓的信号与入场字段一致，最终权益变化分别为 `+9.0136899948`、`+143.6755556335` USDT；容量证据由当前 `blocked_entry_events` 与 2026-07-27 replay consistency 报告交叉验证；`git diff --check` 通过。未修改生产配置、策略代码或数据库。
+- Git：本次提交主题 `research: complete baseline attribution gate one`；按规则提交 `reports/`，保留用户现有 `scripts/run_logged_paper_task.ps1` 修改和本地数据库状态，不纳入本次提交。
+
 ### 09:47:33 +08:00 - 发起 Claude 独立评审：基线盈亏归因方向
 - 类型：研究方向讨论 / Claude discussion / 项目文件。
 - 改动：新增 `claude-discussions/2026-10-10-0947-baseline-loss-attribution-next-step.md`，交代项目背景、历史进展、ATR 归因结论、当前严格前向配对证据缺口，并请 Claude 评估是否将“修复后 reference baseline 盈亏归因”作为下一条研究主线。
