@@ -2293,3 +2293,7 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 限制与裁决：旧存档到当前 repaired legacy 的变化幅度已量出，但近窗有 3 old-only、4 new-only 平仓，scanner 演化与 stop/EMA 修复尚未完全拆分；裁决 `determinism_pass_scope_diff_partial`，闸门 1 保持进行中，不放行闸门 2。独立 shadow 两个 epoch 均 `opportunities=0`，当前零配对首先是上游机会真空。
 - 验证：运行脚本 A/B 均 `COMPLETE`；A/B canonical checksum 8/8 PASS，输入文件 SHA256 2/2 PASS；未修改业务代码，未运行策略参数实验。保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动及本地 `data/` 状态。
 - Git：待提交。
+
+### 2026-10-10 11:38:35 +08:00 - 闸门 1 阶段提交 push 失败
+- 提交：`d2b1b67 research: start baseline attribution gate one`，包含 Taskboard 对应文档、A/B 固定历史原始产物与闸门 1 报告；未包含 `data/` 或用户原有 `scripts/run_logged_paper_task.ps1` 改动。
+- Push：执行 `git push origin HEAD` 失败：`schannel: failed to receive handshake, SSL/TLS connection failed`。本地提交完整保留，待网络/TLS 恢复后重试。
