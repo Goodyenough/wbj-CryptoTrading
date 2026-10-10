@@ -4,6 +4,13 @@
 
 按用户要求，Taskboard 全部 93 条“待认领（todo）”已移至“待立项（backlog）”，待认领现为 0 条。下方未完成条目保留为待立项需求，历史日期与优先级不代表当前执行授权；后续需重新选择立项。已完成任务及现有自动采集调度保持原状态。清单见 `reports/2026-10-10/taskboard_todo_to_backlog.md`。
 
+## 用户指定重新加入 todo：2026-10-10
+
+- [ ] **CRYPTOTRADIN-11 / todo**：审计 `TRX/ZRO/AAVE/SOL` 四笔存量计划，核对跨断档期间的状态迁移、止损/止盈事件和可采信程度。
+- [ ] **CRYPTOTRADIN-14 / todo**：修复并回归验证 `UNKNOWN` 大盘状态在 `allows_alt_buy=False` 时仍错误放行 `BUY_CANDIDATE` 的问题。
+- [ ] **CRYPTOTRADIN-12 / todo**：完成 daily / 4h 自动任务的连续运行核验，覆盖成功运行、stale `running`、`ticker_error`、`kline_error`、skip 和逐计划覆盖。
+- [ ] **CRYPTOTRADIN-13 / todo**：明确并验证 `signal`、`decision`、`fill`、`stop` 的生效顺序，以及断档后的 paper/shadow 状态处理和收益证据隔离。
+
 ## 待设计需求：2026-10-09
 
 - [ ] **CRYPTOTRADIN-121 / backlog / 待设计，暂不启动**：设计并开发数据预算机制，评估最新数据留出、约 30 天滚动历史回放及前向数据封存复用。用户尚未想清楚方案；开发前必须回看 Taskboard 关联对话及 [讨论记录](reports/2026-10-09/data_budget_mechanism_deferred_note.md)，先明确窗口/读取规则、已用验证数据登记、回放与自然运行验收的边界，再确定实现；不视为已批准 30 天方案，不改变当前执行优先级。
