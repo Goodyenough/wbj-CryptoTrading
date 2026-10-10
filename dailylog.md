@@ -2297,3 +2297,4 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 ### 2026-10-10 11:38:35 +08:00 - 闸门 1 阶段提交 push 失败
 - 提交：`d2b1b67 research: start baseline attribution gate one`，包含 Taskboard 对应文档、A/B 固定历史原始产物与闸门 1 报告；未包含 `data/` 或用户原有 `scripts/run_logged_paper_task.ps1` 改动。
 - Push：执行 `git push origin HEAD` 失败：`schannel: failed to receive handshake, SSL/TLS connection failed`。本地提交完整保留，待网络/TLS 恢复后重试。
+- 重试：补记失败原因的提交 `9176fb8` 后再次执行 `git push origin HEAD` 成功，`d2b1b67` 与 `9176fb8` 均已推送至 `origin/main`。
