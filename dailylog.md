@@ -2236,3 +2236,8 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 原因：记录用户对执行契约、UNKNOWN 修复和自动运行审计交付的验收；连续观察与遗留项保持待办，原审计结论不变。
 - 验证：taskctl 返回三项 status=done、version=5；文档 diff 检查。仅更新任务和文档，不重跑策略测试；按仓库约定随提交归档 reports/ 下自然运行报告，未重新评估报告结论。
 - Git：本次提交 `docs: record acceptance of three execution tasks`；相关实现提交 `83f855d`。
+
+### 2026-10-10 09:02:51 +08:00 - 全部待认领任务退回待立项
+- 改动与原因：按用户明确要求，通过 taskctl 将全部 93 条 todo 移至 backlog；同步 TODO、仓库/Obsidian 开发计划及任务清单报告。
+- 验证：逐条读取当前版本后移动成功；最终查询非归档 todo=0。仅队列与文档调整，无代码变更，不运行策略测试。
+- Git：本次提交 `docs: move all unclaimed tasks to backlog`，包含 reports/；保留原有脚本未提交改动。
