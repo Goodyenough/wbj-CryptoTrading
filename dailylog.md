@@ -1,5 +1,15 @@
 # Daily Log
 
+### 22:33:05 +08:00 - 完成 baseline 交易路径二级归因
+- 类型：只读研究诊断 / MAE-MFE / 报告 / 实验账本 / 项目记忆。
+- 改动：新增 `scripts/attribute_baseline_trade_path.py`，从冻结 `confirmation_close` replay 结果和 Binance 4h `kline_cache` 重建 131 笔完整闭合交易路径；其中 101 笔非容量竞逐、30 笔容量竞逐单列。生成 `reports/2026-10-10/baseline_trade_path_attribution_2026-10-10_v1.{csv,json,md}`。
+- 原因：在不回到 ATR 调参的前提下，区分当前存续币条件样本中的入场质量样路径与退出保护样路径，并验证 regime、退出类型和持仓时长分层。
+- 结果：4h 路径全部成功对齐且覆盖完整；快速 MAE/低早期 MFE 标签早窗 13 笔、近窗 2 笔，足够 MFE 后回吐标签早窗 6 笔、近窗 4 笔（含重叠）；没有跨窗口稳定且占多数的单一机制，裁决 `C_evidence_insufficient_no_stable_dominant_mechanism`。容量组只作对照，不混入机制结论。
+- 验证：`python -m py_compile scripts/attribute_baseline_trade_path.py`、脚本运行 `n=131`、101/30 分组断言、逐笔 census/replay 对齐断言、`git diff --check` 通过；未修改 `config/settings.toml`、生产策略或数据库（数据库只读）。
+- 记忆同步：更新 `EXPERIMENT_LEDGER.md`、`TODO.md`、`开发计划.md` 和 Obsidian `CryptoTrading 实验日志.md`；保留后续 point-in-time 历史币池或自然前向复核边界。
+- 工程卫生：补充 `.gitignore` 对 SQLite `data/*.db-shm` / `data/*.db-wal` 临时文件的忽略，避免本地数据库运行状态进入 Git；不触碰 `data/crypto_trading.db`。
+- Git：待本次文档与报告一并提交；提交后按规则推送 `origin/main`。
+
 ## 2026-10-10
 
 ### 17:20:19 +08:00 - 完成 baseline 盈亏归因闸门 2 census
