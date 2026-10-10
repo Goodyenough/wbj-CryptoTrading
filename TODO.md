@@ -6,6 +6,8 @@
 
 ## Baseline 盈亏归因三道闸门：2026-10-10
 
+综合入口：`reports/2026-10-10/baseline_attribution_gates_1_2_3c_synthesis_2026-10-10_v1.md`。该文档统一解释闸门 1、2、3-C 各自证明了什么、没有证明什么，以及正式闸门 3 为何仍由 point-in-time 历史币池阻塞。
+
 - [x] **CRYPTOTRADIN-122 / done / 闸门 1**：冻结口径并验证 baseline 可复现性。A/B 双跑 8/8 canonical checksum 一致；旧存档到 repaired legacy 的 130 笔共同平仓、7 条 old/new-only 和期末盯市差异全部归入 `stop_or_ema_accounting / scanner_or_signal_set`，`unresolved=0`。报告：`reports/2026-10-10/baseline_attribution_gate_1_2026-10-10_v1.md`；逐笔收口：`reports/2026-10-10/baseline_gate_1_trade_diff_2026-10-10_v1.md`。
 - [x] **CRYPTOTRADIN-123 / done / 闸门 2 / C**：完成 repaired `confirmation_close` baseline census：134 笔入场、131 笔完整闭合、0 笔交易期缺口；但 134/134 继承 current-master 幸存者偏差，31 笔还有容量竞逐，且容量组翻转早窗净收益方向。裁决 `C_insufficient_clean_evidence`，不放行闸门 3。报告：`reports/2026-10-10/baseline_attribution_gate_2_2026-10-10_v1.md`。
 - [x] **CRYPTOTRADIN-125 / done / 闸门 3-C / B**：经用户明确批准，将问题缩窄为“当前存续币条件诊断”。非容量竞逐组早窗 raw/net 为 `+33.42/-134.63` USDT，近窗为 `-125.90/-248.92` USDT；成本只在早窗翻转方向，regime/持仓分层不跨窗稳定，裁决 `B_conditional_no_robust_gross_edge`。不形成参数实验卡片，不修改生产配置。报告：`reports/2026-10-10/baseline_attribution_gate_3c_2026-10-10_v1.md`。

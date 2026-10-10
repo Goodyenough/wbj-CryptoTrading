@@ -2327,3 +2327,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 验证：summary JSON 可解析；成本栈 CSV 6 行、all-closed N 合计 131；逐笔 `gross_pnl - entry_fee - exit_fee = net_pnl` 最大残差 `5.68e-14`；execution-clean 与 capacity net 分别回对 `-383.542361 / +800.807759`；三份输入 SHA256 与 Gate 2 冻结值一致；`git diff --check` 通过。
 - 报告：`reports/2026-10-10/baseline_attribution_gate_3c_2026-10-10_v1.md`、`baseline_gate_3c_summary_2026-10-10_v1.json`、`baseline_gate_3c_cost_stack_2026-10-10_v1.csv`。
 - Git：研究报告与任务状态提交 `0d73fa9`（`research: complete conditional baseline gate three`）；本条提交号回填随后单独提交并 push。
+
+### 2026-10-10 22:13:09 +08:00 - 汇总闸门 1、2、3-C 长期结论
+- 类型：研究文档 / TODO 索引 / Git。
+- 改动：新增 `reports/2026-10-10/baseline_attribution_gates_1_2_3c_synthesis_2026-10-10_v1.md`，按“测量可信度 → clean 证据可推广性 → 当前存续币条件结果”串联三道闸门，并在 `TODO.md` 闸门区增加长期入口。
+- 原因：避免后续把“闸门 1 可复现”“闸门 2 证据不足”和“闸门 3-C 条件性无稳健毛优势”混为同一个策略结论，也避免原始报告分散后难以定位。
+- 验证：逐项回读三份主报告与闸门 1 逐笔差异报告；综合文档不新增指标或实验判断，关键 N、P&L、PF、污染数量和任务状态均与原报告一致；`git diff --check` 通过。
+- Git：待提交。
