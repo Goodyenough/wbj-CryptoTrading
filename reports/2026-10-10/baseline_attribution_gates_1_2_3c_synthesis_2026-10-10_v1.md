@@ -1,8 +1,10 @@
 # Baseline 盈亏归因闸门 1、2、3-C 综合结论
 
-日期：2026-10-10  
-适用范围：Binance Spot USDT、4h、冻结 `confirmation_close` baseline 及 current-survivor symbol master  
-关联任务：`CRYPTOTRADIN-122`、`CRYPTOTRADIN-123`、`CRYPTOTRADIN-125`  
+日期：2026-10-10
+
+适用范围：Binance Spot USDT、4h、冻结 `confirmation_close` baseline 及 current-survivor symbol master
+
+关联任务：`CRYPTOTRADIN-122`、`CRYPTOTRADIN-123`、`CRYPTOTRADIN-125`
 正式历史闸门 3：`CRYPTOTRADIN-124`，仍由 `CRYPTOTRADIN-89` point-in-time 历史币池阻塞
 
 > 这份文档是三道闸门的长期入口。它归纳已经成立的结论、结论边界和下一步，不替代各闸门的逐笔证据。
