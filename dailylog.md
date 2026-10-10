@@ -2326,4 +2326,4 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 结果：非容量竞逐组早窗 raw/net `+33.42/-134.63` USDT，近窗 `-125.90/-248.92` USDT；两窗合计 raw `-92.48`、成本 `291.06`、net `-383.54`。30 笔容量竞逐闭合样本 net `+800.81`，使全体 131 笔 net `+417.27`，说明全体结果高度依赖容量路径。regime 跨窗翻转，MAE/MFE 不可用，裁决 `B_conditional_no_robust_gross_edge / retest`；不形成参数实验卡片，不改生产配置。
 - 验证：summary JSON 可解析；成本栈 CSV 6 行、all-closed N 合计 131；逐笔 `gross_pnl - entry_fee - exit_fee = net_pnl` 最大残差 `5.68e-14`；execution-clean 与 capacity net 分别回对 `-383.542361 / +800.807759`；三份输入 SHA256 与 Gate 2 冻结值一致；`git diff --check` 通过。
 - 报告：`reports/2026-10-10/baseline_attribution_gate_3c_2026-10-10_v1.md`、`baseline_gate_3c_summary_2026-10-10_v1.json`、`baseline_gate_3c_cost_stack_2026-10-10_v1.csv`。
-- Git：待提交。
+- Git：研究报告与任务状态提交 `0d73fa9`（`research: complete conditional baseline gate three`）；本条提交号回填随后单独提交并 push。
