@@ -7,7 +7,13 @@
 - 改动：按用户要求，将 `CRYPTOTRADIN-11/12/13/14` 对应的四项工作重新写入 `TODO.md` 的 `todo` 清单：四笔存量计划审计、`UNKNOWN` 放行修复、daily/4h 连续运行核验、执行顺序与断档处理。
 - 原因：用户要求将当前项目收口任务重新纳入可执行队列，避免被此前批量移入 `backlog` 的操作淹没。
 - 验证：已确认四项对应现有 Taskboard issue；当前 Codex 环境未发现可执行的 `taskctl` 或 `manage-taskboard` 命令，Taskboard 外部状态尚未完成同步；未修改策略配置、业务代码或数据库。
-- Git：待提交；保留既有 `scripts/run_logged_paper_task.ps1` 工作区修改，不纳入本次提交。
+- Git：任务登记提交为 `dd0e1ff`（`docs: requeue four execution tasks`）；推送 `origin/main` 因 `schannel: failed to receive handshake, SSL/TLS connection failed` 失败，保留既有 `scripts/run_logged_paper_task.ps1` 工作区修改，不纳入本次提交。
+
+### 09:08:55 +08:00 - 记录四项任务提交推送失败
+- 类型：Git / 运维记录。
+- 改动：补记提交 `dd0e1ff` 的 `git push origin main` 失败原因。
+- 原因：当前环境与 GitHub 的 HTTPS TLS 握手失败；未强行改用其他远程或覆盖用户配置。
+- 验证：本地提交已存在；待网络或认证恢复后重试推送。
 
 ## 2026-10-09
 
