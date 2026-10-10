@@ -16,12 +16,12 @@
 
 - [x] 完成整体技术路线、实验历史和重大疏漏复盘；纯内存复现移动止损旧价记账及 UNKNOWN regime 放行问题，未修改实现。
 - [ ] **P0 / 10-09–10-10**：冻结代码/配置/数据/执行语义基线，收口 08-16–08-22 旧 epoch；完成 TRX/ZRO/AAVE/SOL 四笔固定 cohort 缺口审计。
-- [ ] **P0 / 10-09–10-10 / CRYPTOTRADIN-12 / in_review**：daily/4h 调度已恢复且近期 run success；但仍有 2 条 stale `running`，近期 4h 有 `ticker_error`/`kline_error` 逐计划 skip，连续覆盖尚未通过。报告：`reports/2026-10-09/auto_run_coverage_2026-10-09_v1.md`。
-- [ ] **P0 / 10-09–10-11 / CRYPTOTRADIN-13 / in_review**：执行契约 v1 已落地，明确 closed-bar、signal/decision/fill、止损顺序、缺口隔离和 shadow 口径；代码与报告待用户复核。报告：`reports/2026-10-09/execution_contract_v1.md`。
+- [x] **P0 / 10-09–10-10 / CRYPTOTRADIN-12 / 2026-10-10 用户已验收，done**：daily/4h 调度已恢复且近期 run success；但仍有 2 条 stale `running`，近期 4h 有 `ticker_error`/`kline_error` 逐计划 skip，连续覆盖尚未通过。报告：`reports/2026-10-09/auto_run_coverage_2026-10-09_v1.md`。
+- [x] **P0 / 10-09–10-11 / CRYPTOTRADIN-13 / 2026-10-10 用户已验收，done**：执行契约 v1 已落地，明确 closed-bar、signal/decision/fill、止损顺序、缺口隔离和 shadow 口径；代码与报告已通过用户验收。报告：`reports/2026-10-09/execution_contract_v1.md`。
 - [x] **P0 / 10-09 提前完成 / CRYPTOTRADIN-15**：修复 replay 旧 `stop_fill` 计价及收盘 EMA 反判本根 low 的时序，调用层回归通过；旧历史结果待任务2重算。
-- [ ] **P0 / 10-11–10-13 / CRYPTOTRADIN-14 / in_review**：已修复 `UNKNOWN / allows_alt_buy=False` 仍放行 `BUY_CANDIDATE` 的回退冲突；core/large-cap 也不例外，NEUTRAL/关闭过滤器行为保持不变。针对性测试通过；历史库未发现旧 UNKNOWN scan，未回写历史。
+- [x] **P0 / 10-11–10-13 / CRYPTOTRADIN-14 / 2026-10-10 用户已验收，done**：已修复 `UNKNOWN / allows_alt_buy=False` 仍放行 `BUY_CANDIDATE` 的回退冲突；core/large-cap 也不例外，NEUTRAL/关闭过滤器行为保持不变。针对性测试通过；历史库未发现旧 UNKNOWN scan，未回写历史。
 - [x] **P1 / 10-09**：完成独立 shadow 生命周期最小切片及配对一致性验收：baseline 入场/退出后 ATR 线仍可等待、独立入场/退出；统一成交/EMA/费用/缺口口径。实现与契约见 `src/crypto_trading_system/paper_shadow_forward.py`、`reports/2026-10-09/independent_shadow_contract_2026-10-09_v1.md`。
-- [ ] **P1 / 10-10 起**：等待自然 daily/4h 运行产生新 independent shadow tick；只把连续、无 `GAP_AFFECTED` 的 epoch 纳入后续配对收益裁决。
+- [ ] **P1 / 10-10 起**：跟进审计遗留的 2 条 stale `running` 及 API skip，等待自然 daily/4h 运行产生新 independent shadow tick；只把连续、无 `GAP_AFFECTED` 的 epoch 纳入后续配对收益裁决。
 - [ ] **P1**：明确 paper/shadow 的账户现金、仓位和容量约束范围；完整组合账本未完成时，只认证单计划诊断，capacity contribution 保持 n/a。
 - [ ] **P1 / 10-16–10-20**：冻结修复后的执行版本，收集新 epoch；目标至少 7 个完整自然日的 7 daily + 35 scheduled 4h，以及逐计划有效评价/skip 对账；执行版本改变则重新起算。
 - [ ] **P1 / 10-16–10-20**：按预声明协议审计固定历史案例的实现修复影响；建立实验 registry，记录 hash、master、窗口、成本和试验家族，旧窗口统一标 diagnostic。

@@ -2230,3 +2230,9 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 报告：`reports/2026-10-09/execution_contract_v1.md`、`reports/2026-10-09/auto_run_coverage_2026-10-09_v1.md`。
 - Taskboard：`CRYPTOTRADIN-13`、`CRYPTOTRADIN-14`、`CRYPTOTRADIN-12` -> `in_review`。
 - Git：实现与文档已提交 `83f855d`；本次日志修订随后单独提交并 push。
+
+### 2026-10-10 08:56:30 +08:00 - 用户验收三项任务
+- 改动：按用户“3条都确认通过”，将 Taskboard CRYPTOTRADIN-13/14/12 改为 done，附验收评论；同步 TODO、仓库与 Obsidian 开发计划。
+- 原因：记录用户对执行契约、UNKNOWN 修复和自动运行审计交付的验收；连续观察与遗留项保持待办，原审计结论不变。
+- 验证：taskctl 返回三项 status=done、version=5；文档 diff 检查。仅更新任务和文档，不重跑策略测试；按仓库约定随提交归档 reports/ 下自然运行报告，未重新评估报告结论。
+- Git：本次提交 `docs: record acceptance of three execution tasks`；相关实现提交 `83f855d`。
