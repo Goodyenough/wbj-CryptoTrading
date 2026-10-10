@@ -8,7 +8,7 @@
 - 验证：`python -m py_compile scripts/attribute_baseline_trade_path.py`、脚本运行 `n=131`、101/30 分组断言、逐笔 census/replay 对齐断言、`git diff --check` 通过；未修改 `config/settings.toml`、生产策略或数据库（数据库只读）。
 - 记忆同步：更新 `EXPERIMENT_LEDGER.md`、`TODO.md`、`开发计划.md` 和 Obsidian `CryptoTrading 实验日志.md`；保留后续 point-in-time 历史币池或自然前向复核边界。
 - 工程卫生：补充 `.gitignore` 对 SQLite `data/*.db-shm` / `data/*.db-wal` 临时文件的忽略，避免本地数据库运行状态进入 Git；不触碰 `data/crypto_trading.db`。
-- Git：待本次文档与报告一并提交；提交后按规则推送 `origin/main`。
+- Git：`4d6a202` - `research: attribute baseline trade paths`，已提交并成功推送 `origin/main`；按规则提交了 `reports/`，保留用户现有 `scripts/run_logged_paper_task.ps1` 修改和 `data/` 本地状态，不纳入本次提交。
 
 ## 2026-10-10
 
