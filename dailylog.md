@@ -1,5 +1,14 @@
 # Daily Log
 
+### 2026-10-11 09:06 +08:00 - 完成短周期交易策略公开资料调研
+- 类型：研究资料 / 文档 / TODO；未执行新策略回测或修改代码配置。
+- 改动：新增 `reports/2026-10-11/short_horizon_strategy_sources_2026-10-11_v1.md`，记录原始论文、固定 commit 的公开策略规则、YouTube 说明审查边界、候选排序及未执行的单变量卡片；TODO 标记调研完成，候选保持待评议。
+- 原因：用户希望寻找适合短周期小幅盈利的策略资料，明早获取可复核结论；避免将公开收益宣传、补仓高胜率或旧基线 unknown 标签当作稳定优势。
+- 验证：核对本地 scanner/成本配置/冻结归因口径；只读获取三个公开仓库的 commit 与相关源文件；代数复核 raw/fill 两种 +5%/−3% 打平门槛，分别约 40.2841%/39.6705%；文档差异检查。未运行外部代码、连接私有交易账户或改写数据库。
+- 范围：研究与回测技能用于来源追溯及成本/样本外审查；视频仅核验可获得说明与关联代码，未声称完整观看。并行代理遇额度中断，由主代理补齐。
+- 记忆：调研不构成回测裁决或采纳新策略，不更新实验账本/Obsidian 实验日志，不调整开发阶段；候选实验尚未立项。
+- Git：本条与报告/TODO 同次提交，提交标题 `research: review short-horizon crypto strategy sources`（实际 hash 见后续提交记录）；按工作区规则一并纳入当日已生成 `reports/`，保留用户 `scripts/run_logged_paper_task.ps1` 修改及本地数据。
+
 ### 22:33:05 +08:00 - 完成 baseline 交易路径二级归因
 - 类型：只读研究诊断 / MAE-MFE / 报告 / 实验账本 / 项目记忆。
 - 改动：新增 `scripts/attribute_baseline_trade_path.py`，从冻结 `confirmation_close` replay 结果和 Binance 4h `kline_cache` 重建 131 笔完整闭合交易路径；其中 101 笔非容量竞逐、30 笔容量竞逐单列。生成 `reports/2026-10-10/baseline_trade_path_attribution_2026-10-10_v1.{csv,json,md}`。
