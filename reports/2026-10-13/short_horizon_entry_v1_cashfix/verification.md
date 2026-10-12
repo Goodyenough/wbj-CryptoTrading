@@ -10,3 +10,4 @@
 - 原生产配置SHA256：`be7ec39ec21f6a838571511cb2cd0e290263031b521a9a07a6fb70164b8ef4bf`。协议SHA256：`9a03a08a50822379086922bc245c38af82c1f98197f1c14f3a16fdc51ddc709a`。
 - 原始数据仅只读导出、生产配置未修改；用户既有 `scripts/run_logged_paper_task.ps1` 修改保留，不纳入提交。
 - 一次验证命令曾引用不存在的 `tests/test_market_regime.py`，未执行任何测试；随后定位真实 `tests/test_scanner_regime.py`，上述51项为实际成功结果。
+- Git归档复核：限定本轮冻结报告为原字节存储，并重新暂存以消除此前自动换行转换；113份冻结报告暂存内容与本地原始字节一致，协议、两窗输入、输入manifest和最终9份执行源码/配置的暂存SHA256闭合。未更改冻结指纹或回测数值。

@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-13 07:17 +08:00 - 固定研究归档字节并补齐交接
+- 类型：归档可复现性 / 文档收尾；没有新增实验或改变策略。
+- 改动：发现首次提交前部分报告已经被Git按旧属性归一化为LF，普通 `git add` 未刷新它们；补充限定路径的CRLF空白检查属性并重新暂存原始字节，保留冻结manifest及原始SHA256不变。追加最新handoff，保留全部历史章节。
+- 原因：保证其他机器取得报告时，协议、输入和执行源码指纹仍能闭合；避免把打包错误误当成数据或结果变化。
+- 验证：113份冻结报告的暂存内容与本地原始字节完全一致；暂存协议、两窗输入、输入manifest和最终执行9份源码/配置SHA256全部通过，`git diff --cached --check` 通过。首次提交前组合命令没有及时阻断失败检查，现已分离检查与提交并显式验证退出码。
+- Git：研究代码及结果提交为 `7ff9229`（`research: compare breakout and reference entries under fixed short exits`）；本次归档/交接补充以 `docs: preserve frozen research bytes and record verification` 提交，再统一推送 `origin/main`。保留用户脚本修改及本地数据库，按规则包含 `reports/`。
+
 ### 2026-10-13 00:32 +08:00 - 完成同短周期退出的入场研究
 - 类型：隔离研究代码 / 测试 / 协议与报告 / 记忆同步。
 - 改动：新增 `research_short_horizon_entries.py`、`short_horizon_core.py`、`audit_short_horizon_entries.py` 和针对性测试；只读冻结SQLite两窗口数据，复用原scanner构造B，比较C的20根新突破；统一next-open、+5%/-3%、48h及成本，输出事件/逐币/账户三层全部分支。
@@ -9,7 +16,7 @@
 - 记忆：更新TODO、EXPERIMENT_LEDGER、SYSTEM_OVERVIEW、仓库开发计划、Obsidian实验日志及开发计划；Obsidian保留历史条目和frontmatter，未做GUI渲染验收。新增历史最小订单/数量步长待立项项，未启动工程。
 - 数据边界：本地两份约419MB冻结数组置于忽略的 `data/research_snapshots/`；生产DB、默认配置及用户既有 `scripts/run_logged_paper_task.ps1` 修改不纳入提交。报告manifest保留hash及复核命令；主账户4笔非零小额订单仍属执行近似限制。
 - 打包验证（07:11 +08:00）：13个报告本地链接无断链、最终运行涉及9个源码/配置hash与当前文件一致；Obsidian两份笔记日期与新增章节核对通过。为本轮冻结文件添加限定路径的Git原字节/行尾保护，避免checkout自动换行破坏SHA256。按规则附带00:10/04:10自然调度reports，它们不是本轮入场实验结果。
-- Git：基于 `b3079ff`；本批以 `research: compare breakout and reference entries under fixed short exits` 提交并按规则推送origin/main，包含 `reports/`；实际提交hash见同主题Git记录。提交前核对暂存范围、文档本地链接与 `git diff --cached --check`。
+- Git：基于 `b3079ff`，已提交 `7ff9229` - `research: compare breakout and reference entries under fixed short exits`，包含 `reports/`；首次打包的换行/指纹问题见07:17补充记录，补充提交后统一推送origin/main。
 
 ### 2026-10-12 23:59 +08:00 - 交接同退出规则下的入场对照研究
 - 类型：会话交接 / 文档 / TODO；本轮未运行实验。

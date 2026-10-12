@@ -1,5 +1,49 @@
 # Handoff — 2026-06-12 00:00 +08:00
 
+## 2026-10-13 07:17 +08:00
+
+### 项目目录
+
+`D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects`，分支 `main`。本节覆盖下方尚未执行研究的旧状态，不覆盖历史记录。
+
+### 任务背景
+
+用户要求读取交接并研究：在完全相同的短周期退出下，突破入场是否比现有入场更能选出净盈利交易。本轮已执行、审计并完成研究，不需要重新跑参数。
+
+### 已完成的工作
+
+- 研究提交 `7ff9229`：隔离研究脚本、冻结协议、双窗口数据指纹、三层对照与完整压力分支；统一下一根开盘、+5%/-3%、48h、费用和滑点，无生产变更。
+- 主答案：不支持升级这版20根4h新突破。早窗B/C平均每笔净收益为-0.1864%/-0.2982%，近窗-0.1645%/-0.6995%；近窗C-B的95%区间全负，早窗跨零。两臂均未建立正优势；登记 `retest / evidence_insufficient_for_positive_edge`，不是自动调参指令。
+- 首次账户审计发现极小浮点余款产生虚小仓位，修正为USDT维度1e-8数值容差。首次代码与结果保留，最终目录为 `reports/2026-10-13/short_horizon_entry_v1_cashfix/`；24份非账户结果不变、主账户收益不变。
+- 51项针对性测试、100个真实时点scanner对照、32,713条跨分支记录审计通过；不是全套测试或32,713个独立样本。
+- 已同步TODO、EXPERIMENT_LEDGER、SYSTEM_OVERVIEW、仓库开发计划、Obsidian实验日志与开发计划。
+- 归档收尾：已修复Git自动换行导致的已暂存报告指纹差异；113份报告原字节、协议/输入manifest/最终9份执行源码指纹核对通过。本节随 `docs: preserve frozen research bytes and record verification` 提交，随后推送origin/main；以Git远程状态核验最终推送是否成功。
+
+### 尚未完成的事项
+
+- 本轮没有待执行的策略实验；禁止从早窗账户少亏推导替换默认策略。
+- 历史LOT_SIZE/MIN_NOTIONAL重建是TODO待立项项，本轮未获准开展。主账户4笔非零小额订单低于10 USDT，故账户层仅为执行近似；10 USDT不是新增交易门槛。
+- 两个开发窗口已重复使用，且币池存在幸存者偏差；本轮结果不能代替未使用样本外，也不能代表所有突破策略。
+
+### 下一步直接执行指令
+
+```powershell
+Set-Location -LiteralPath 'D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects'
+git status --short
+git log -3 --oneline
+git ls-remote origin refs/heads/main
+Get-Content -LiteralPath 'reports/2026-10-13/short_horizon_entry_v1_cashfix/report.md' -Encoding utf8
+```
+
+如仅需复验代码：`python -m pytest tests/test_short_horizon_entry_study.py tests/test_replay_ema_execution.py tests/test_scanner_regime.py -q`。不要再次执行 `prepare/run` 覆盖已冻结结果；程序本身有目录防覆盖保护。若远程尚未含本轮提交，先检查是否推送失败，不要force push。
+
+### 重要声明
+
+- 用户原有 `scripts/run_logged_paper_task.ps1` 的两处 `--no-obsidian` 改动保留且不纳入研究提交。数据库不入Git，生产配置SHA256仍为 `be7ec39ec21f6a838571511cb2cd0e290263031b521a9a07a6fb70164b8ef4bf`。
+- 约419MB原始数组只在忽略目录 `data/research_snapshots/short_horizon_entry_v1/`；换机完整重放需两份npz归档及manifest校验，Git仅含报告/指纹。
+- 00:10/04:10自然调度reports依仓库规则一并提交，不是本轮实验结果；Obsidian笔记已文本核对，未声称GUI渲染验收。
+- 最新可读报告用cashfix目录，不以首次目录计数作为最终结果；研究记录必须区分事实、观察、假设与决策。
+
 ## 2026-10-12 23:59 +08:00
 
 ### 项目目录

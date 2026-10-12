@@ -1,9 +1,9 @@
 /.gitattributes text eol=lf
 config/settings.toml text eol=lf
 # Frozen research inputs and manifests are fingerprinted by exact bytes.
-reports/2026-10-13/short_horizon_entry_protocol_v1.md -text
-reports/2026-10-13/short_horizon_entry_v1/** -text
-reports/2026-10-13/short_horizon_entry_v1_cashfix/** -text
+reports/2026-10-13/short_horizon_entry_protocol_v1.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+reports/2026-10-13/short_horizon_entry_v1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+reports/2026-10-13/short_horizon_entry_v1_cashfix/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 scripts/short_horizon_core.py text eol=lf
 scripts/research_short_horizon_entries.py text eol=lf
 scripts/audit_short_horizon_entries.py text eol=lf
