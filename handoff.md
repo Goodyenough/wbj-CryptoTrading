@@ -1,5 +1,110 @@
 # Handoff — 2026-06-12 00:00 +08:00
 
+## 2026-10-12 23:59 +08:00
+
+### 项目目录
+
+`D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects`。交接前分支 `main`，HEAD `cc78011`，远程 `origin` 为 `https://github.com/Goodyenough/wbj-CryptoTrading.git`。
+
+本节是最新交接；下方 2026-10-09 及更早章节只作历史记录，其中 ATR 主线、旧任务状态不覆盖本节的用户意图。首先读取根目录 `AGENTS.md`。
+
+### 任务背景
+
+用户已完成基线归因讨论和短周期策略公开资料调研，明确提出下一项研究：
+
+> 在完全相同的短周期退出规则下，突破入场是否比现有入场更能选出有净盈利的交易？研究这个问题。
+
+随后用户中断准备工作，并要求“写一个 handoff，我要在新对话中开启这个研究问题”。本轮仅交接，不继续执行实验。新对话可承接该研究授权，不必重新询问是否有必要查 GitHub/YouTube；授权不包含修改生产配置、实盘交易或恢复 ATR 参数搜索。
+
+- **系统目标**：Binance USDT 现货、只做多、无杠杆，在可执行且计入费用/滑点的条件下寻找正净期望，并满足短持仓、愿意放弃后续大涨的收益偏好。
+- **单一问题**：统一短周期退出、币池、过滤、成本、成交和资金约束后，仅替换入场模块，突破是否比现有入场更好，且突破自身是否净盈利？“比原策略少亏”不等于满足目标。
+- **路线图位置**：公开资料筛选之后、新方向首轮条件性实验之前。不是继续证明 ATR 0.35，也不要求先把旧策略所有亏损解释完才允许探索；同时不能声称新方向已解释或治愈旧亏损。
+- **事实**：旧非容量竞逐 baseline 共 101 笔完整闭合交易；早窗 63 笔 raw/net 为 `+33.42/-134.63` USDT，近窗 38 笔为 `-125.90/-248.92` USDT。现有执行/记账修复和旧交易 4h 缺口检查已收口，但不能据此免除新实验的执行/数据检查。
+- **观察**：近窗 23 笔亏损中 17 笔没有被现有入场样/退出样标签解释。用户称之为“unknown 慢性失败组”，这不是已经证实的同一种机制；不能因其事后没涨，就当作入场时可识别的排除条件。
+- **假设**：新突破事件可能更直接选中短期延续机会；固定时间出口符合资金周转偏好，但不自动提高盈利。
+- **决策**：研究比较问题已由用户提出；还没有最终实验协议、实现、结果或部署批准。+5%/-3% 是用户讨论的目标；20 根通道、48 小时是资料报告建议的工作值，须在看结果前一次性冻结，不能称为已选优参数。
+
+### 已完成的工作
+
+1. 公开资料调研已完成并提交：`8d00345 research: review short-horizon crypto strategy sources`；验证/日志回填为 `cc78011 docs: record strategy source review verification`，此前均已推送。完整报告：`reports/2026-10-11/short_horizon_strategy_sources_2026-10-11_v1.md`。下一轮优先完整读取，重点第 7 节候选卡片、第 8 节成本口径；核心论文、固定 commit 的 GitHub、YouTube 说明链接都在报告内，不需从头重查。
+2. 资料结论：简单通道突破优先级来自易解释、易验证和与现有入场区别清楚，不是已证明最赚钱。均值回归是另一候选，暂不混入本轮；补仓/DCA/grinding 的高平仓胜率不能替代总投入、浮亏、成本和持仓风险审计。没有运行外部公开代码；视频只核验可获得说明，未完整观看。
+3. 旧基线证据入口：`reports/2026-10-10/baseline_attribution_gates_1_2_3c_synthesis_2026-10-10_v1.md`、`baseline_attribution_gate_3c_2026-10-10_v1.md`、`baseline_trade_path_attribution_2026-10-10_v1.md`（后二者同目录）。旧路径结论为 `C_evidence_insufficient_no_stable_dominant_mechanism`；101 笔非容量与 30 笔容量竞逐必须分开理解。
+4. 新实验准备仅做了只读检查：读取工作区规则、候选报告和 `crypto-backtest-expert` 技能；查看 Git 状态并定位实现/测试文件。尚未深入审查新实验所需的 replay/scanner 调用链、数据库覆盖和信号提取接口。
+5. **没有为本次问题修改策略代码、配置、数据库，没有运行新回测、A/B、参数搜索或前向实验，也没有产生收益结论。** 本轮新增的是本交接、审计日志及 TODO 状态说明；自然调度生成的 reports 不属于此实验结果。
+
+### 尚未完成的事项
+
+#### 一、在结果出现前冻结完整协议
+
+以资料报告第 7 节为起点，不另开参数网格：
+
+| 项目 | 下一轮应落实的共同口径或差异 |
+|---|---|
+| B 对照 | 原 reference baseline 入场模块，不是默认加上 ATR 0.35 的 incumbent；出口换成共同短周期出口。需核对评分、计划 WATCHING/reclaim 生命周期及扫描节奏，不能只用一个 EMA 条件冒充原入场。 |
+| C 候选 | 4h 收盘 `close[t] > max(high[t-20:t])`，通道不含当前 bar；且前一根没有满足其自己的前 20 根突破条件，形成新事件。它替换原综合评分/reclaim 模块，不再叠加新 RSI/ADX/量能阈值。 |
+| 共同过滤 | 同一冻结币池、流动性、数据质量和 regime 限制。需分清两臂共享的可交易资格与 B 独有的入场评分，不能把 B 的全部入场门槛偷偷保留给 C。 |
+| 成交 | 只读已收盘信息，两臂均在信号后下一根可执行 bar 开盘成交并计滑点。旧 `confirmation_close` 结果不能直接当 B 对照。明确开盘跳空、缺口、首根价格事件和时间出口的先后顺序。 |
+| 共同退出 | 按实际入场成交价 +5% 止盈/-3% 止损，全平；满 48 小时后首个可执行时点全平。无补仓、分批止盈、EMA trailing 或 ATR 动态退出。 |
+| 重复/再入场 | 同币持仓时不加仓；C 退出后必须等待新的突破事件，不重复买持续突破状态。B 的计划去重/再武装规则需忠实提取并写明；信号层与组合层的事件排除分别记账。 |
+| 信号层 | 全量 eligible 事件按等名义本金度量净期望，不先筛选旧 17 个亏损或旧 101 笔交易。不受组合满仓选择影响的机会诊断不得称为可交易净值。 |
+| 组合层 | 两臂分别重放现金与仓位路径，初始 10,000 USDT，单笔风险上限 1%、总风险上限 5%、最多 5 仓、无杠杆且受现金限制。预先冻结同刻信号流动性排序及并列规则，记录容量阻挡。 |
+| 成本 | 报告核对的本地配置为 maker 4 bps、taker 10 bps、入场滑点 5 bps、止损滑点 10 bps；下一轮复核实际源码，明确 TP/SL/时间出口及 entry 的费率。next-open 主动成交沿用 maker entry 偏乐观，必须预先规定共同主动/taker 压力口径。 |
+
+仍需解决：基线入场计划里原 stop/target/RR 是否影响资格与仓位，统一退出后如何保留“原入场”而不引入隐藏变化；历史流动性排序用什么时点可得字段；48h 出口与触价同刻时的执行顺序；缺口、退市、期末删失、同 bar 双触的具体处理；统计区块长度/置信区间及集中度检查的预声明方式。这些是尚未检查的实现问题，不是已经发现的代码缺陷。
+
+#### 二、核实可用数据，再选择最小实现
+
+- 开发诊断窗口：UTC `[2024-07-01, 2025-06-01)` 和 `[2025-06-01, 2026-06-01)`。这些窗口反复使用过，不是未接触样本外；独立确认需另行封存未用样本或自然前向。
+- 旧协议入口：`reports/2026-10-09/atr_fixed_history_protocol_v1.md`。旧 master 为 285 个当时存续币，来源和 hash 必须从协议/实际产物复核，不能声称具有完整 point-in-time 上市退市历史。
+- 新策略会产生新信号和不同的退出时间，必须覆盖全部新路径及预热期，不能沿用“旧 131 笔没有 4h 缺口”证明新样本完整。数据缺口不得默默前填后当真成交。
+- MAE/MFE 不能证明先到哪条线；同 4h bar 双触优先用已可得更细 K 线缩小歧义，否则报告保守/乐观边界，若翻转结论则证据不足。
+- 容量标签按每臂的新组合路径重算；分别报告信号质量与可交易账户表现，不能沿用旧容量标签，也不能假定释放资金后必有更好币。
+- 现有 `kline_cache`/run 产物可望复用，但本轮没有检查 schema、覆盖、快照一致性或完整运行耗时。优先只读访问本地 DB，冻结来源及 hash；不要让自然采集变化悄悄改变同轮比较。
+
+#### 三、验收标准必须先写，再运行
+
+- **支持进入独立验证**：两个窗口均有 C-B 净期望改善，且 C 自身扣成本为正；成本压力、容量隔离、币种/时段集中度检查后仍站得住。收益只在一个窗口好，不算通过；即便通过也不等于部署。
+- **否定冻结候选**：精度足够的结果显示 C 净期望非正，或 B 不劣于 C，或只有违反既定风险/期限才改善。否定本卡片，不外推为所有突破策略都无效。
+- **证据不足**：窗口相反、区间跨零、样本太少或高度相关、少数币/尾部/容量主导、同 bar 顺序或数据问题决定方向；current-survivor 限制必须保留。
+- 同时报告交易数、净期望及不确定性、胜率/平均盈亏/PF、费用拖累、时间退出比例及持仓分布；组合层补充净收益、Sharpe/Sortino、CAGR、最大回撤、暴露/换手及尾部。按币种、regime、周/月、退出类型、时长检查集中度，不能把相关信号当独立抛硬币。
+- 含入场费现金、按实际成交价设置两端且沿用报告成本时，二元算术打平胜率约 39.6705%；**加入时间出口后不再是二元结果，不能拿约 40% 胜率保证不亏。** 手续费配置不是已核验的用户实际账户费率。
+
+### 下一步直接执行指令
+
+新对话先执行以下只读检查，随后给出简短协议/实现边界说明并推进已授权研究，不在本交接轮启动：
+
+```powershell
+Set-Location -LiteralPath 'D:\OneDrive - whut.edu.cn\文档\CryptoTradingPorjects'
+git status --short
+git log -5 --oneline
+Get-Content -LiteralPath AGENTS.md -Raw
+Get-Content -LiteralPath reports/2026-10-11/short_horizon_strategy_sources_2026-10-11_v1.md -Raw
+Get-Content -LiteralPath .codex/skills/crypto-backtest-expert/SKILL.md -Raw
+Get-Content -LiteralPath .codex/skills/crypto-algo-trading/SKILL.md -Raw
+Get-Content -LiteralPath reports/2026-10-09/atr_fixed_history_protocol_v1.md -Raw
+Get-Content -LiteralPath pyproject.toml -Raw
+rg -n 'def |confirmation_close|entry_reclaim|max_holding|watch_expiry|blocked_entry|kline_cache' src/crypto_trading_system/backtest/replay.py src/crypto_trading_system/scanner.py src/crypto_trading_system/trade_state.py scripts/attribute_baseline_trade_path.py
+Get-Content -LiteralPath src/crypto_trading_system/backtest/costs.py -Raw
+```
+
+接着按依赖顺序做：
+
+1. 核对 `backtest/replay.py`、`backtest/runner.py`、`scanner.py`、`trade_state.py`、`config/settings.toml` 及归因脚本的输入输出；确认原入场抽取接口、历史数据可用性和运行环境。按需读取完整函数，不能凭上述搜索片段实现。
+2. 在 `reports/<执行日>/` 写正式实验协议，标识固定版本、数据/窗口/费用/事件时序及预先验收标准。没有现成的新实验命令；不要虚构已存在的 CLI 或运行产物。
+3. 优先隔离研究实现，不改生产默认；复用经检查的模块。测试覆盖无未来信息、前 20 根不含本根、新事件去重、next-open、实际成交价目标、跳空/双触/时间截止、费用与现金对账、容量拒绝、删失/缺口；先小样本验证，再跑两个冻结开发窗口。
+4. 报告先用非技术语言回答“哪种入场更能净赚钱/证据不足”，再给技术指标；区分信号层、组合层、旧基线背景。不得只用胜率或总收益排名给结论。
+5. 真正运行且产生判断后，更新 `EXPERIMENT_LEDGER.md`、当前策略说明、TODO、dailylog 及 Obsidian 实验日志；如阶段/优先级变化，同步仓库和 Obsidian 开发计划。遵循提交及 push 规则。
+
+### 重要声明
+
+- 本轮遵从用户“在新对话开启”的要求，只保存交接。没有后台实验或新研究进程需要继续轮询。
+- 保留用户未提交的 `scripts/run_logged_paper_task.ps1` 修改，不纳入本次交接提交。数据 DB 及 `-shm/-wal` 不提交，不覆盖、不重置工作区。
+- 交接前 `reports/2026-10-11/` 与 `reports/2026-10-12/` 有自然调度新增报告/图表。依 AGENTS 要求随提交纳入 `reports/`；它们不是本轮新策略的回测结果，未做本轮收益验收。
+- 资料报告第 7/9 节和旧 TODO 的“未批准启动”描述对应 10-11 当时状态；用户后续已经提出本研究，当前只因迁移新对话而尚未执行。不要误把旧文案视为必须重新申请相同问题的授权；遇到实质扩大范围再询问。
+- 正式历史归因仍受 point-in-time 币池任务 `CRYPTOTRADIN-89` 阻塞，`CRYPTOTRADIN-124` 的 hold 不被本条件性新策略研究解除。不批量重开工程 backlog，不研究止损后路径来替代本问题。
+- 真实 Obsidian 路径：`D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTrading 实验日志.md`、`D:\MyNotebook-Obsidian\CryptoTradingSystem\CryptoTradingSystem 开发计划.md`。本轮没有实际实验或新阶段验收，不写虚构实验日志，不修改生产设置。
+- 若未来需要 Claude 评审，须依据新用户要求及 `claude-discussion` 技能执行；旧讨论授权不意味着本轮应自动联系 Claude。
+
 ## 2026-10-09 23:03 +08:00
 
 ### 项目目录
