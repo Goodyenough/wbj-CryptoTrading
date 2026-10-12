@@ -1,0 +1,3167 @@
+{
+  "start": "2024-07-01",
+  "end": "2025-06-01",
+  "quality": {
+    "regime_block_bars": 1217,
+    "invalid_zero_or_extreme": 14193,
+    "B_buy_candidate_bars": 2499,
+    "C_breakout_events": 650,
+    "insufficient_history": 4904,
+    "liquidity": 623,
+    "history_gap": 67,
+    "stale": 6,
+    "fast_scanner_parity_checks": 50
+  },
+  "branches": [
+    {
+      "cost": "taker",
+      "policy": "stop_first",
+      "layers": {
+        "all_events": {
+          "B": {
+            "metrics": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.18643559413029664,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2211185423985835,
+              "avg_loss_pct": -2.982084217871472,
+              "profit_factor": 0.897826819814308,
+              "mean_raw_pct": 0.1104295316610056,
+              "mean_fee_pct": 0.1799883831334839,
+              "mean_slippage_pct": 0.11687674265783102,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 1221,
+              "invalidated": 161,
+              "eligible_events": 858,
+              "expired": 202,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 650,
+              "closed_trades": 650,
+              "censored": 0,
+              "mean_net_pct": -0.2981918331760902,
+              "win_rate_pct": 37.38461538461539,
+              "avg_win_pct": 4.424631786018517,
+              "avg_loss_pct": -3.1179612176092344,
+              "profit_factor": 0.8472630959256258,
+              "mean_raw_pct": -0.0034779940340559697,
+              "mean_fee_pct": 0.1791539968212953,
+              "mean_slippage_pct": 0.11555984232075135,
+              "time_exit_pct": 9.692307692307692,
+              "duration_median_hours": 8.0,
+              "duration_p90_hours": 47.10000000000002,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 375,
+                "TIME": 63,
+                "TP": 212
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 650,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -0.9441947233423668,
+              0.35507498580869906
+            ],
+            "c_ci": [
+              -0.8142025216283684,
+              0.17843115279655317
+            ],
+            "delta_ci": [
+              -0.6541196155069842,
+              0.4963519494960758
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "BTCUSDT",
+                "FILUSDT"
+              ],
+              "remaining": {
+                "trades": 579,
+                "closed_trades": 579,
+                "censored": 0,
+                "mean_net_pct": -0.48766145195976024,
+                "win_rate_pct": 35.060449050086355,
+                "avg_win_pct": 4.463847554349959,
+                "avg_loss_pct": -3.160949559089742,
+                "profit_factor": 0.7624300093683247,
+                "mean_raw_pct": -0.19105055326155274,
+                "mean_fee_pct": 0.17981773018618377,
+                "mean_slippage_pct": 0.11679316851203599,
+                "time_exit_pct": 7.599309153713299,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 39.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612409,
+                "tail_p05_pct": -3.2906123876123923,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 354,
+                  "TIME": 44,
+                  "TP": 181
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05",
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 307,
+                "closed_trades": 307,
+                "censored": 0,
+                "mean_net_pct": -0.9210284912464552,
+                "win_rate_pct": 29.315960912052116,
+                "avg_win_pct": 4.347513716450597,
+                "avg_loss_pct": -3.106138162641546,
+                "profit_factor": 0.5805009930387,
+                "mean_raw_pct": -0.6149003942864246,
+                "mean_fee_pct": 0.18327693082559707,
+                "mean_slippage_pct": 0.12285116613444555,
+                "time_exit_pct": 10.423452768729641,
+                "duration_median_hours": 11.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612405,
+                "tail_p05_pct": -3.290612387612393,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 198,
+                  "TIME": 32,
+                  "TP": 77
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "symbol_only": {
+          "B": {
+            "metrics": {
+              "trades": 534,
+              "closed_trades": 534,
+              "censored": 0,
+              "mean_net_pct": -0.3366376129598647,
+              "win_rate_pct": 36.70411985018727,
+              "avg_win_pct": 4.334897962738223,
+              "avg_loss_pct": -3.0455754024179273,
+              "profit_factor": 0.8253704080734389,
+              "mean_raw_pct": -0.03911596170694319,
+              "mean_fee_pct": 0.18019691381150957,
+              "mean_slippage_pct": 0.11732473744142476,
+              "time_exit_pct": 12.359550561797754,
+              "duration_median_hours": 10.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 303,
+                "TIME": 66,
+                "TP": 165
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 766,
+              "invalidated": 102,
+              "eligible_events": 534,
+              "expired": 129,
+              "watching_at_end": 1
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 570,
+              "closed_trades": 570,
+              "censored": 0,
+              "mean_net_pct": -0.23634763336344808,
+              "win_rate_pct": 38.07017543859649,
+              "avg_win_pct": 4.453153310281038,
+              "avg_loss_pct": -3.119128666708642,
+              "profit_factor": 0.8776460151670913,
+              "mean_raw_pct": 0.056693776597471435,
+              "mean_fee_pct": 0.17854254192996621,
+              "mean_slippage_pct": 0.11449886803096564,
+              "time_exit_pct": 9.12280701754386,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 46.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 326,
+                "TIME": 52,
+                "TP": 192
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 570,
+              "same_symbol": 80,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.098258086800474,
+              0.3451458468046279
+            ],
+            "c_ci": [
+              -0.7032778420455328,
+              0.1707845791935171
+            ],
+            "delta_ci": [
+              -0.5880718934336515,
+              0.7357738378920716
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 538,
+                "closed_trades": 538,
+                "censored": 0,
+                "mean_net_pct": -0.402834604369948,
+                "win_rate_pct": 36.059479553903344,
+                "avg_win_pct": 4.4057313954051915,
+                "avg_loss_pct": -3.114642174010579,
+                "profit_factor": 0.7977248911613749,
+                "mean_raw_pct": -0.10630899265526425,
+                "mean_fee_pct": 0.17980697954272643,
+                "mean_slippage_pct": 0.1167186321719696,
+                "time_exit_pct": 9.66542750929368,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 47.30000000000001,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612409,
+                "tail_p05_pct": -3.2906123876123923,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 317,
+                  "TIME": 52,
+                  "TP": 169
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2024-09",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 270,
+                "closed_trades": 270,
+                "censored": 0,
+                "mean_net_pct": -0.7508567390945513,
+                "win_rate_pct": 31.48148148148148,
+                "avg_win_pct": 4.3701886649769675,
+                "avg_loss_pct": -3.1037694923166006,
+                "profit_factor": 0.646930942106623,
+                "mean_raw_pct": -0.4482968947999493,
+                "mean_fee_pct": 0.18198190771940742,
+                "mean_slippage_pct": 0.1205779365752065,
+                "time_exit_pct": 10.0,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612405,
+                "tail_p05_pct": -3.290612387612394,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 169,
+                  "TIME": 27,
+                  "TP": 74
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "portfolio": {
+          "B": {
+            "metrics": {
+              "trades": 322,
+              "closed_trades": 322,
+              "censored": 0,
+              "mean_net_pct": -0.6033159830346446,
+              "win_rate_pct": 33.22981366459627,
+              "avg_win_pct": 4.112947073852192,
+              "avg_loss_pct": -2.950479457857396,
+              "profit_factor": 0.6937545483599237,
+              "mean_raw_pct": -0.29667561508968754,
+              "mean_fee_pct": 0.183548438162464,
+              "mean_slippage_pct": 0.12309192978250595,
+              "time_exit_pct": 17.70186335403727,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612404,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 184,
+                "TIME": 57,
+                "TP": 81
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 493,
+              "invalidated": 71,
+              "eligible_events": 399,
+              "cash_or_risk": 66,
+              "open_plan_budget": 466,
+              "max_positions": 11,
+              "expired": 99,
+              "new_candidate_budget": 176,
+              "watching_at_end": 1
+            },
+            "account": {
+              "final_equity": 6409.7032558879255,
+              "net_return_pct": -35.90296744112075,
+              "cagr_pct": -38.405798779347755,
+              "max_drawdown_pct": 36.47096284960043,
+              "sharpe": -1.7154704734401462,
+              "sortino": -2.2928147064971416,
+              "exposure_pct": 17.13043165947081,
+              "invested_time_pct": 28.805970149253728,
+              "turnover": 141.01464846431077,
+              "fees_usdt": 1293.1810634247797,
+              "slippage_usdt": 862.4262404560657,
+              "fee_drag_pct": 12.931810634247798,
+              "max_single_loss_usdt": -100.05070383202026,
+              "dollar_profit_factor": 0.7362729777074236,
+              "max_positions": 5,
+              "cash_reconciliation_error": 5.4569682106375694e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "C": {
+            "metrics": {
+              "trades": 337,
+              "closed_trades": 337,
+              "censored": 0,
+              "mean_net_pct": -0.3864134374397598,
+              "win_rate_pct": 36.201780415430264,
+              "avg_win_pct": 4.381388692723297,
+              "avg_loss_pct": -3.091863948509029,
+              "profit_factor": 0.8041050294009963,
+              "mean_raw_pct": -0.08942575203812421,
+              "mean_fee_pct": 0.17998430001472848,
+              "mean_slippage_pct": 0.11700338538691935,
+              "time_exit_pct": 10.682492581602373,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612401,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 1,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 196,
+                "TIME": 36,
+                "TP": 105
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 514,
+              "same_symbol": 50,
+              "cash_or_risk": 123,
+              "new_candidate_budget": 86,
+              "max_positions": 54,
+              "watching_at_end": 0
+            },
+            "account": {
+              "final_equity": 6582.0542395847315,
+              "net_return_pct": -34.17945760415269,
+              "cagr_pct": -36.599115228075384,
+              "max_drawdown_pct": 35.80461722121584,
+              "sharpe": -1.759866780009714,
+              "sortino": -2.4020594008887795,
+              "exposure_pct": 13.098583156676,
+              "invested_time_pct": 22.786069651741293,
+              "turnover": 145.47610245493254,
+              "fees_usdt": 1316.9646224494998,
+              "slippage_usdt": 861.2000027368017,
+              "fee_drag_pct": 13.169646224494997,
+              "max_single_loss_usdt": -99.99999999999999,
+              "dollar_profit_factor": 0.7659575254447426,
+              "max_positions": 5,
+              "cash_reconciliation_error": 8.185452315956354e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.200215191451047,
+              0.012081476882839275
+            ],
+            "c_ci": [
+              -0.9152644344451679,
+              0.17875216636201835
+            ],
+            "delta_ci": [
+              -0.4572380887494526,
+              0.7880943857595333
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "SHIBUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 311,
+                "closed_trades": 311,
+                "censored": 0,
+                "mean_net_pct": -0.588775927434677,
+                "win_rate_pct": 33.762057877813504,
+                "avg_win_pct": 4.305008800083289,
+                "avg_loss_pct": -3.0831807642763582,
+                "profit_factor": 0.711700276353799,
+                "mean_raw_pct": -0.28738452942595094,
+                "mean_fee_pct": 0.1815844503216027,
+                "mean_slippage_pct": 0.11980694768713537,
+                "time_exit_pct": 11.57556270096463,
+                "duration_median_hours": 8.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612401,
+                "tail_p05_pct": -3.290612387612393,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 187,
+                  "TIME": 36,
+                  "TP": 88
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 182,
+                "closed_trades": 182,
+                "censored": 0,
+                "mean_net_pct": -0.8060705074204476,
+                "win_rate_pct": 30.21978021978022,
+                "avg_win_pct": 4.344567089447795,
+                "avg_loss_pct": -3.0366615926783473,
+                "profit_factor": 0.6195966771452217,
+                "mean_raw_pct": -0.5018838507167908,
+                "mean_fee_pct": 0.18257792138460888,
+                "mean_slippage_pct": 0.12160873531905937,
+                "time_exit_pct": 11.538461538461538,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612401,
+                "tail_p05_pct": -3.290612387612394,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 113,
+                  "TIME": 21,
+                  "TP": 48
+                },
+                "signal_weeks": 18
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cost": "taker",
+      "policy": "target_first",
+      "layers": {
+        "all_events": {
+          "B": {
+            "metrics": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.18643559413029664,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2211185423985835,
+              "avg_loss_pct": -2.982084217871472,
+              "profit_factor": 0.897826819814308,
+              "mean_raw_pct": 0.1104295316610056,
+              "mean_fee_pct": 0.1799883831334839,
+              "mean_slippage_pct": 0.11687674265783102,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 1221,
+              "invalidated": 161,
+              "eligible_events": 858,
+              "expired": 202,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 650,
+              "closed_trades": 650,
+              "censored": 0,
+              "mean_net_pct": -0.24807639169449483,
+              "win_rate_pct": 38.0,
+              "avg_win_pct": 4.431571301275656,
+              "avg_loss_pct": -3.1162475583536198,
+              "profit_factor": 0.8716009543792949,
+              "mean_raw_pct": 0.04570359360907018,
+              "mean_fee_pct": 0.17881646973299897,
+              "mean_slippage_pct": 0.11496351557057843,
+              "time_exit_pct": 9.692307692307692,
+              "duration_median_hours": 8.0,
+              "duration_p90_hours": 47.10000000000002,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.290612387612392,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 371,
+                "TIME": 63,
+                "TP": 216
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 650,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -0.9441947233423668,
+              0.35507498580869906
+            ],
+            "c_ci": [
+              -0.7690592396990955,
+              0.218011603564684
+            ],
+            "delta_ci": [
+              -0.5979266738850387,
+              0.5395544922702235
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "BTCUSDT",
+                "FILUSDT"
+              ],
+              "remaining": {
+                "trades": 579,
+                "closed_trades": 579,
+                "censored": 0,
+                "mean_net_pct": -0.4314005936470883,
+                "win_rate_pct": 35.751295336787564,
+                "avg_win_pct": 4.471370246114151,
+                "avg_loss_pct": -3.159555335127133,
+                "profit_factor": 0.7874846050884604,
+                "mean_raw_pct": -0.13583806281590158,
+                "mean_fee_pct": 0.1794388137658166,
+                "mean_slippage_pct": 0.11612371706538245,
+                "time_exit_pct": 7.599309153713299,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 39.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612409,
+                "tail_p05_pct": -3.2906123876123923,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 350,
+                  "TIME": 44,
+                  "TP": 185
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05",
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 307,
+                "closed_trades": 307,
+                "censored": 0,
+                "mean_net_pct": -0.8679746851177303,
+                "win_rate_pct": 29.96742671009772,
+                "avg_win_pct": 4.358505741161386,
+                "avg_loss_pct": -3.104422123339491,
+                "profit_factor": 0.6007672090728082,
+                "mean_raw_pct": -0.5628351956414213,
+                "mean_fee_pct": 0.18291961387544625,
+                "mean_slippage_pct": 0.12221987560087491,
+                "time_exit_pct": 10.423452768729641,
+                "duration_median_hours": 11.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612405,
+                "tail_p05_pct": -3.290612387612393,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 196,
+                  "TIME": 32,
+                  "TP": 79
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "symbol_only": {
+          "B": {
+            "metrics": {
+              "trades": 534,
+              "closed_trades": 534,
+              "censored": 0,
+              "mean_net_pct": -0.3366376129598647,
+              "win_rate_pct": 36.70411985018727,
+              "avg_win_pct": 4.334897962738223,
+              "avg_loss_pct": -3.0455754024179273,
+              "profit_factor": 0.8253704080734389,
+              "mean_raw_pct": -0.03911596170694319,
+              "mean_fee_pct": 0.18019691381150957,
+              "mean_slippage_pct": 0.11732473744142476,
+              "time_exit_pct": 12.359550561797754,
+              "duration_median_hours": 10.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 303,
+                "TIME": 66,
+                "TP": 165
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 766,
+              "invalidated": 102,
+              "eligible_events": 534,
+              "expired": 129,
+              "watching_at_end": 1
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 570,
+              "closed_trades": 570,
+              "censored": 0,
+              "mean_net_pct": -0.1791984457089971,
+              "win_rate_pct": 38.771929824561404,
+              "avg_win_pct": 4.460393012414356,
+              "avg_loss_pct": -3.117163237242696,
+              "profit_factor": 0.9061089660812683,
+              "mean_raw_pct": 0.1127780432080539,
+              "mean_fee_pct": 0.1781576426187511,
+              "mean_slippage_pct": 0.1138188462983123,
+              "time_exit_pct": 9.12280701754386,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 46.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 322,
+                "TIME": 52,
+                "TP": 196
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 570,
+              "same_symbol": 80,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.098258086800474,
+              0.3451458468046279
+            ],
+            "c_ci": [
+              -0.6435085517250791,
+              0.22513577633402515
+            ],
+            "delta_ci": [
+              -0.5317543487162462,
+              0.7716766290890847
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 538,
+                "closed_trades": 538,
+                "censored": 0,
+                "mean_net_pct": -0.3422862085278717,
+                "win_rate_pct": 36.80297397769517,
+                "avg_win_pct": 4.414770091521184,
+                "avg_loss_pct": -3.1125719362034983,
+                "profit_factor": 0.8259903385722749,
+                "mean_raw_pct": -0.04688885888568801,
+                "mean_fee_pct": 0.17939918659218257,
+                "mean_slippage_pct": 0.11599816305001347,
+                "time_exit_pct": 9.66542750929368,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 47.30000000000001,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612409,
+                "tail_p05_pct": -3.2906123876123923,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 313,
+                  "TIME": 52,
+                  "TP": 173
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2024-09",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 270,
+                "closed_trades": 270,
+                "censored": 0,
+                "mean_net_pct": -0.6905325965704088,
+                "win_rate_pct": 32.22222222222222,
+                "avg_win_pct": 4.381291152061333,
+                "avg_loss_pct": -3.1017274934609094,
+                "profit_factor": 0.6715318843284056,
+                "mean_raw_pct": -0.38909683559989,
+                "mean_fee_pct": 0.18157562511312483,
+                "mean_slippage_pct": 0.1198601358574058,
+                "time_exit_pct": 10.0,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612405,
+                "tail_p05_pct": -3.290612387612394,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 167,
+                  "TIME": 27,
+                  "TP": 76
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "portfolio": {
+          "B": {
+            "metrics": {
+              "trades": 322,
+              "closed_trades": 322,
+              "censored": 0,
+              "mean_net_pct": -0.6033159830346446,
+              "win_rate_pct": 33.22981366459627,
+              "avg_win_pct": 4.112947073852192,
+              "avg_loss_pct": -2.950479457857396,
+              "profit_factor": 0.6937545483599237,
+              "mean_raw_pct": -0.29667561508968754,
+              "mean_fee_pct": 0.183548438162464,
+              "mean_slippage_pct": 0.12309192978250595,
+              "time_exit_pct": 17.70186335403727,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612404,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 184,
+                "TIME": 57,
+                "TP": 81
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 493,
+              "invalidated": 71,
+              "eligible_events": 399,
+              "cash_or_risk": 66,
+              "open_plan_budget": 466,
+              "max_positions": 11,
+              "expired": 99,
+              "new_candidate_budget": 176,
+              "watching_at_end": 1
+            },
+            "account": {
+              "final_equity": 6409.7032558879255,
+              "net_return_pct": -35.90296744112075,
+              "cagr_pct": -38.405798779347755,
+              "max_drawdown_pct": 36.47096284960043,
+              "sharpe": -1.7154704734401462,
+              "sortino": -2.2928147064971416,
+              "exposure_pct": 17.13043165947081,
+              "invested_time_pct": 28.805970149253728,
+              "turnover": 141.01464846431077,
+              "fees_usdt": 1293.1810634247797,
+              "slippage_usdt": 862.4262404560657,
+              "fee_drag_pct": 12.931810634247798,
+              "max_single_loss_usdt": -100.05070383202026,
+              "dollar_profit_factor": 0.7362729777074236,
+              "max_positions": 5,
+              "cash_reconciliation_error": 5.4569682106375694e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "C": {
+            "metrics": {
+              "trades": 338,
+              "closed_trades": 338,
+              "censored": 0,
+              "mean_net_pct": -0.3468178175245354,
+              "win_rate_pct": 36.68639053254438,
+              "avg_win_pct": 4.388997695310772,
+              "avg_loss_pct": -3.090935217485182,
+              "profit_factor": 0.8227793092171026,
+              "mean_raw_pct": -0.05059035610185946,
+              "mean_fee_pct": 0.17970922809163756,
+              "mean_slippage_pct": 0.11651823333105048,
+              "time_exit_pct": 10.650887573964496,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612401,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 1,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 195,
+                "TIME": 36,
+                "TP": 107
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 514,
+              "same_symbol": 50,
+              "cash_or_risk": 121,
+              "new_candidate_budget": 86,
+              "max_positions": 55,
+              "watching_at_end": 0
+            },
+            "account": {
+              "final_equity": 6744.064409712497,
+              "net_return_pct": -32.55935590287503,
+              "cagr_pct": -34.896960456830904,
+              "max_drawdown_pct": 34.224517072107396,
+              "sharpe": -1.6522890473120513,
+              "sortino": -2.2623322165235833,
+              "exposure_pct": 13.09942391179616,
+              "invested_time_pct": 22.786069651741293,
+              "turnover": 146.4387056516776,
+              "fees_usdt": 1324.304690397545,
+              "slippage_usdt": 864.6518315850078,
+              "fee_drag_pct": 13.24304690397545,
+              "max_single_loss_usdt": -99.99999999999999,
+              "dollar_profit_factor": 0.7773396915537172,
+              "max_positions": 5,
+              "cash_reconciliation_error": 8.185452315956354e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.200215191451047,
+              0.012081476882839275
+            ],
+            "c_ci": [
+              -0.8577604878060507,
+              0.19639955021643168
+            ],
+            "delta_ci": [
+              -0.4248041956719198,
+              0.829893913300743
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "SHIBUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 312,
+                "closed_trades": 312,
+                "censored": 0,
+                "mean_net_pct": -0.5452320748021744,
+                "win_rate_pct": 34.294871794871796,
+                "avg_win_pct": 4.31525437116859,
+                "avg_loss_pct": -3.0821689026991095,
+                "profit_factor": 0.7307686089378009,
+                "mean_raw_pct": -0.24467836723413902,
+                "mean_fee_pct": 0.18128132705137318,
+                "mean_slippage_pct": 0.11927238051667416,
+                "time_exit_pct": 11.538461538461538,
+                "duration_median_hours": 7.5,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612401,
+                "tail_p05_pct": -3.2906123876123927,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 186,
+                  "TIME": 36,
+                  "TP": 90
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 183,
+                "closed_trades": 183,
+                "censored": 0,
+                "mean_net_pct": -0.7306444057738543,
+                "win_rate_pct": 31.147540983606557,
+                "avg_win_pct": 4.362411993437235,
+                "avg_loss_pct": -3.0346461101788704,
+                "profit_factor": 0.650313750143638,
+                "mean_raw_pct": -0.4279012172461015,
+                "mean_fee_pct": 0.18205569225141424,
+                "mean_slippage_pct": 0.12068749627634999,
+                "time_exit_pct": 11.475409836065573,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.290612387612401,
+                "tail_p05_pct": -3.290612387612394,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 112,
+                  "TIME": 21,
+                  "TP": 50
+                },
+                "signal_weeks": 18
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cost": "stress",
+      "policy": "stop_first",
+      "layers": {
+        "all_events": {
+          "B": {
+            "metrics": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.5583431924822664,
+              "win_rate_pct": 37.41258741258741,
+              "avg_win_pct": 3.9241543584003105,
+              "avg_loss_pct": -3.237824968708164,
+              "profit_factor": 0.7244750959954825,
+              "mean_raw_pct": 0.10761360010428175,
+              "mean_fee_pct": 0.39888267577296865,
+              "mean_slippage_pct": 0.2670741168135786,
+              "time_exit_pct": 15.734265734265735,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 459,
+                "TIME": 135,
+                "TP": 264
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 1221,
+              "invalidated": 161,
+              "eligible_events": 858,
+              "expired": 202,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 650,
+              "closed_trades": 650,
+              "censored": 0,
+              "mean_net_pct": -0.6655813658433323,
+              "win_rate_pct": 36.0,
+              "avg_win_pct": 4.150899115180584,
+              "avg_loss_pct": -3.374851636419286,
+              "profit_factor": 0.6918469324969765,
+              "mean_raw_pct": -0.0015086682177847548,
+              "mean_fee_pct": 0.3986677696139285,
+              "mean_slippage_pct": 0.2654049280116188,
+              "time_exit_pct": 9.538461538461538,
+              "duration_median_hours": 8.0,
+              "duration_p90_hours": 47.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804422,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 5,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 379,
+                "TIME": 62,
+                "TP": 209
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 650,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.2970651917622384,
+              -0.04108479918982058
+            ],
+            "c_ci": [
+              -1.194932324557625,
+              -0.1779915389539094
+            ],
+            "delta_ci": [
+              -0.6453911853426669,
+              0.4997599732694382
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 612,
+                "closed_trades": 612,
+                "censored": 0,
+                "mean_net_pct": -0.813706635053035,
+                "win_rate_pct": 34.150326797385624,
+                "avg_win_pct": 4.111980649887599,
+                "avg_loss_pct": -3.368219395729443,
+                "profit_factor": 0.633128596707338,
+                "mean_raw_pct": -0.14803530097720682,
+                "mean_fee_pct": 0.3983709253870553,
+                "mean_slippage_pct": 0.2673004086887726,
+                "time_exit_pct": 10.130718954248366,
+                "duration_median_hours": 8.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.5804510978044064,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 366,
+                  "TIME": 62,
+                  "TP": 184
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2025-05",
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 564,
+                "closed_trades": 564,
+                "censored": 0,
+                "mean_net_pct": -0.8084955694347694,
+                "win_rate_pct": 34.39716312056738,
+                "avg_win_pct": 4.178349329679708,
+                "avg_loss_pct": -3.4232196516731705,
+                "profit_factor": 0.6399852805251647,
+                "mean_raw_pct": -0.14381449222422607,
+                "mean_fee_pct": 0.39838136840432636,
+                "mean_slippage_pct": 0.2662997088062167,
+                "time_exit_pct": 7.9787234042553195,
+                "duration_median_hours": 6.5,
+                "duration_p90_hours": 39.69999999999999,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.580451097804407,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 344,
+                  "TIME": 45,
+                  "TP": 175
+                },
+                "signal_weeks": 20
+              }
+            }
+          }
+        },
+        "symbol_only": {
+          "B": {
+            "metrics": {
+              "trades": 535,
+              "closed_trades": 535,
+              "censored": 0,
+              "mean_net_pct": -0.7230061890339462,
+              "win_rate_pct": 35.14018691588785,
+              "avg_win_pct": 4.045413502806799,
+              "avg_loss_pct": -3.3064727655931967,
+              "profit_factor": 0.6628669168752513,
+              "mean_raw_pct": -0.05700046536715596,
+              "mean_fee_pct": 0.39855268980793523,
+              "mean_slippage_pct": 0.2674530338588544,
+              "time_exit_pct": 12.336448598130842,
+              "duration_median_hours": 10.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 308,
+                "TIME": 66,
+                "TP": 161
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 767,
+              "invalidated": 103,
+              "eligible_events": 535,
+              "expired": 128,
+              "watching_at_end": 1
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 570,
+              "closed_trades": 570,
+              "censored": 0,
+              "mean_net_pct": -0.6103846140525572,
+              "win_rate_pct": 36.49122807017544,
+              "avg_win_pct": 4.192957361668083,
+              "avg_loss_pct": -3.3703159150191127,
+              "profit_factor": 0.7148330098527514,
+              "mean_raw_pct": 0.052855279482730666,
+              "mean_fee_pct": 0.3987783843469761,
+              "mean_slippage_pct": 0.2644615091883114,
+              "time_exit_pct": 8.947368421052632,
+              "duration_median_hours": 6.5,
+              "duration_p90_hours": 45.10000000000002,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804422,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 5,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 330,
+                "TIME": 51,
+                "TP": 189
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 570,
+              "same_symbol": 80,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.4666932039735627,
+              -0.09459753447411015
+            ],
+            "c_ci": [
+              -1.0922995038714423,
+              -0.19062282485346946
+            ],
+            "delta_ci": [
+              -0.5357233334872601,
+              0.7395727214200577
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 538,
+                "closed_trades": 538,
+                "censored": 0,
+                "mean_net_pct": -0.7781581640992687,
+                "win_rate_pct": 34.386617100371744,
+                "avg_win_pct": 4.157736265250121,
+                "avg_loss_pct": -3.364958360783794,
+                "profit_factor": 0.6475514290153691,
+                "mean_raw_pct": -0.11317335379990232,
+                "mean_fee_pct": 0.3984421648078043,
+                "mean_slippage_pct": 0.26654264549156204,
+                "time_exit_pct": 9.479553903345725,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 47.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.5804510978044064,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 321,
+                  "TIME": 51,
+                  "TP": 166
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 545,
+                "closed_trades": 545,
+                "censored": 0,
+                "mean_net_pct": -0.651204335300971,
+                "win_rate_pct": 36.14678899082569,
+                "avg_win_pct": 4.211765147672972,
+                "avg_loss_pct": -3.4040922322718528,
+                "profit_factor": 0.7004059231206256,
+                "mean_raw_pct": 0.012008679141842796,
+                "mean_fee_pct": 0.39869658129838204,
+                "mean_slippage_pct": 0.26451643314443135,
+                "time_exit_pct": 8.073394495412844,
+                "duration_median_hours": 6.0,
+                "duration_p90_hours": 40.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.5804510978044064,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 321,
+                  "TIME": 44,
+                  "TP": 180
+                },
+                "signal_weeks": 24
+              }
+            }
+          }
+        },
+        "portfolio": {
+          "B": {
+            "metrics": {
+              "trades": 326,
+              "closed_trades": 326,
+              "censored": 0,
+              "mean_net_pct": -0.8713478413557058,
+              "win_rate_pct": 32.515337423312886,
+              "avg_win_pct": 3.9411306223936493,
+              "avg_loss_pct": -3.190087464798577,
+              "profit_factor": 0.5952527671242296,
+              "mean_raw_pct": -0.20171642204584644,
+              "mean_fee_pct": 0.3982554119475709,
+              "mean_slippage_pct": 0.27137600736228773,
+              "time_exit_pct": 16.87116564417178,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 186,
+                "TIME": 55,
+                "TP": 85
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 495,
+              "invalidated": 71,
+              "eligible_events": 407,
+              "cash_or_risk": 64,
+              "open_plan_budget": 453,
+              "max_positions": 17,
+              "expired": 97,
+              "new_candidate_budget": 164,
+              "watching_at_end": 1
+            },
+            "account": {
+              "final_equity": 4876.326411470099,
+              "net_return_pct": -51.23673588529901,
+              "cagr_pct": -54.27425628650588,
+              "max_drawdown_pct": 51.23673588529901,
+              "sharpe": -2.9918496287618668,
+              "sortino": -3.647257264759443,
+              "exposure_pct": 16.788659174243197,
+              "invested_time_pct": 29.502487562189057,
+              "turnover": 122.28914904797827,
+              "fees_usdt": 2445.7829809595655,
+              "slippage_usdt": 1665.7367588654445,
+              "fee_drag_pct": 24.457829809595655,
+              "max_single_loss_usdt": -100.0,
+              "dollar_profit_factor": 0.6072784520378651,
+              "max_positions": 5,
+              "cash_reconciliation_error": 6.366462912410498e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "C": {
+            "metrics": {
+              "trades": 335,
+              "closed_trades": 335,
+              "censored": 0,
+              "mean_net_pct": -0.7767085965428732,
+              "win_rate_pct": 34.32835820895522,
+              "avg_win_pct": 4.134020366874838,
+              "avg_loss_pct": -3.3436805546930404,
+              "profit_factor": 0.6462833863547327,
+              "mean_raw_pct": -0.11129034855848222,
+              "mean_fee_pct": 0.3984450697528071,
+              "mean_slippage_pct": 0.2669731782315832,
+              "time_exit_pct": 10.447761194029852,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044157,
+              "tail_p05_pct": -3.580451097804406,
+              "ambiguous_trades": 1,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 198,
+                "TIME": 35,
+                "TP": 102
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 513,
+              "same_symbol": 51,
+              "cash_or_risk": 139,
+              "new_candidate_budget": 86,
+              "max_positions": 39,
+              "watching_at_end": 0
+            },
+            "account": {
+              "final_equity": 4954.6273450895505,
+              "net_return_pct": -50.453726549104495,
+              "cagr_pct": -53.47369674594018,
+              "max_drawdown_pct": 50.74555273358816,
+              "sharpe": -3.103109516323019,
+              "sortino": -3.813399371641234,
+              "exposure_pct": 12.363686015333233,
+              "invested_time_pct": 22.238805970149254,
+              "turnover": 125.89452691919804,
+              "fees_usdt": 2517.8905383839606,
+              "slippage_usdt": 1688.8006353822477,
+              "fee_drag_pct": 25.178905383839606,
+              "max_single_loss_usdt": -100.0,
+              "dollar_profit_factor": 0.6379678451797267,
+              "max_positions": 5,
+              "cash_reconciliation_error": 7.275957614183426e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.4907366342504365,
+              -0.3009469520907422
+            ],
+            "c_ci": [
+              -1.2638277771722777,
+              -0.2664241015959175
+            ],
+            "delta_ci": [
+              -0.5496625555195284,
+              0.7041990627496296
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "SHIBUSDT",
+                "DOTUSDT",
+                "DOGEUSDT"
+              ],
+              "remaining": {
+                "trades": 310,
+                "closed_trades": 310,
+                "censored": 0,
+                "mean_net_pct": -0.966430450716458,
+                "win_rate_pct": 31.93548387096774,
+                "avg_win_pct": 4.078709317476034,
+                "avg_loss_pct": -3.333581337214357,
+                "profit_factor": 0.5740694531568916,
+                "mean_raw_pct": -0.298932244537145,
+                "mean_fee_pct": 0.39806486563622673,
+                "mean_slippage_pct": 0.2694333405430858,
+                "time_exit_pct": 11.290322580645162,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.5804510978044157,
+                "tail_p05_pct": -3.580451097804406,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 189,
+                  "TIME": 35,
+                  "TP": 86
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [],
+              "remaining": {
+                "trades": 335,
+                "closed_trades": 335,
+                "censored": 0,
+                "mean_net_pct": -0.7767085965428732,
+                "win_rate_pct": 34.32835820895522,
+                "avg_win_pct": 4.134020366874838,
+                "avg_loss_pct": -3.3436805546930404,
+                "profit_factor": 0.6462833863547327,
+                "mean_raw_pct": -0.11129034855848222,
+                "mean_fee_pct": 0.3984450697528071,
+                "mean_slippage_pct": 0.2669731782315832,
+                "time_exit_pct": 10.447761194029852,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.5804510978044157,
+                "tail_p05_pct": -3.580451097804406,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 198,
+                  "TIME": 35,
+                  "TP": 102
+                },
+                "signal_weeks": 25
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cost": "stress",
+      "policy": "target_first",
+      "layers": {
+        "all_events": {
+          "B": {
+            "metrics": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.5583431924822664,
+              "win_rate_pct": 37.41258741258741,
+              "avg_win_pct": 3.9241543584003105,
+              "avg_loss_pct": -3.237824968708164,
+              "profit_factor": 0.7244750959954825,
+              "mean_raw_pct": 0.10761360010428175,
+              "mean_fee_pct": 0.39888267577296865,
+              "mean_slippage_pct": 0.2670741168135786,
+              "time_exit_pct": 15.734265734265735,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 459,
+                "TIME": 135,
+                "TP": 264
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 1221,
+              "invalidated": 161,
+              "eligible_events": 858,
+              "expired": 202,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 650,
+              "closed_trades": 650,
+              "censored": 0,
+              "mean_net_pct": -0.6036066844369143,
+              "win_rate_pct": 36.76923076923077,
+              "avg_win_pct": 4.157705775637683,
+              "avg_loss_pct": -3.3723504264267663,
+              "profit_factor": 0.7169306296999042,
+              "mean_raw_pct": 0.059906962060120986,
+              "mean_fee_pct": 0.3987919673722579,
+              "mean_slippage_pct": 0.26472167912477707,
+              "time_exit_pct": 9.538461538461538,
+              "duration_median_hours": 8.0,
+              "duration_p90_hours": 47.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804422,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 5,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 374,
+                "TIME": 62,
+                "TP": 214
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 650,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.2970651917622384,
+              -0.04108479918982058
+            ],
+            "c_ci": [
+              -1.12705464173899,
+              -0.13300009574118096
+            ],
+            "delta_ci": [
+              -0.5615518640536122,
+              0.5380799395780271
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 612,
+                "closed_trades": 612,
+                "censored": 0,
+                "mean_net_pct": -0.7478838525135387,
+                "win_rate_pct": 34.967320261437905,
+                "avg_win_pct": 4.120491790895597,
+                "avg_loss_pct": -3.3655531683164406,
+                "profit_factor": 0.6582991565984933,
+                "mean_raw_pct": -0.0828062818911958,
+                "mean_fee_pct": 0.398502834770902,
+                "mean_slippage_pct": 0.26657473585144076,
+                "time_exit_pct": 10.130718954248366,
+                "duration_median_hours": 8.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.5804510978044064,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 361,
+                  "TIME": 62,
+                  "TP": 189
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2025-05",
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 564,
+                "closed_trades": 564,
+                "censored": 0,
+                "mean_net_pct": -0.7370708479557416,
+                "win_rate_pct": 35.283687943262414,
+                "avg_win_pct": 4.1858344592111205,
+                "avg_loss_pct": -3.421065796246716,
+                "profit_factor": 0.6670844757633406,
+                "mean_raw_pct": -0.0730340672585545,
+                "mean_fee_pct": 0.3985245041187132,
+                "mean_slippage_pct": 0.2655122765784736,
+                "time_exit_pct": 7.9787234042553195,
+                "duration_median_hours": 6.5,
+                "duration_p90_hours": 39.69999999999999,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.580451097804407,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 339,
+                  "TIME": 45,
+                  "TP": 180
+                },
+                "signal_weeks": 20
+              }
+            }
+          }
+        },
+        "symbol_only": {
+          "B": {
+            "metrics": {
+              "trades": 535,
+              "closed_trades": 535,
+              "censored": 0,
+              "mean_net_pct": -0.7230061890339462,
+              "win_rate_pct": 35.14018691588785,
+              "avg_win_pct": 4.045413502806799,
+              "avg_loss_pct": -3.3064727655931967,
+              "profit_factor": 0.6628669168752513,
+              "mean_raw_pct": -0.05700046536715596,
+              "mean_fee_pct": 0.39855268980793523,
+              "mean_slippage_pct": 0.2674530338588544,
+              "time_exit_pct": 12.336448598130842,
+              "duration_median_hours": 10.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 308,
+                "TIME": 66,
+                "TP": 161
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 767,
+              "invalidated": 103,
+              "eligible_events": 535,
+              "expired": 128,
+              "watching_at_end": 1
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 570,
+              "closed_trades": 570,
+              "censored": 0,
+              "mean_net_pct": -0.5397117317469929,
+              "win_rate_pct": 37.36842105263158,
+              "avg_win_pct": 4.1996075993056845,
+              "avg_loss_pct": -3.367372845232204,
+              "profit_factor": 0.7440958713752828,
+              "mean_raw_pct": 0.1228906473435004,
+              "mean_fee_pct": 0.3989200133696325,
+              "mean_slippage_pct": 0.2636823657208604,
+              "time_exit_pct": 8.947368421052632,
+              "duration_median_hours": 6.5,
+              "duration_p90_hours": 45.10000000000002,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804422,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 5,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 325,
+                "TIME": 51,
+                "TP": 194
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 570,
+              "same_symbol": 80,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.4666932039735627,
+              -0.09459753447411015
+            ],
+            "c_ci": [
+              -1.0162454841424122,
+              -0.12878359417308946
+            ],
+            "delta_ci": [
+              -0.4399295066062273,
+              0.7768151715788977
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 538,
+                "closed_trades": 538,
+                "censored": 0,
+                "mean_net_pct": -0.7032816902811059,
+                "win_rate_pct": 35.31598513011152,
+                "avg_win_pct": 4.1661184026127485,
+                "avg_loss_pct": -3.3618622007691297,
+                "profit_factor": 0.6765907521341408,
+                "mean_raw_pct": -0.03897231350131728,
+                "mean_fee_pct": 0.39859221786154814,
+                "mean_slippage_pct": 0.26571715891824027,
+                "time_exit_pct": 9.479553903345725,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 47.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.5804510978044064,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 316,
+                  "TIME": 51,
+                  "TP": 171
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 545,
+                "closed_trades": 545,
+                "censored": 0,
+                "mean_net_pct": -0.5772895776602891,
+                "win_rate_pct": 37.06422018348624,
+                "avg_win_pct": 4.21831198770656,
+                "avg_loss_pct": -3.4015214033282293,
+                "profit_factor": 0.7303360503964855,
+                "mean_raw_pct": 0.08525667855585882,
+                "mean_fee_pct": 0.39884470706519703,
+                "mean_slippage_pct": 0.26370154915095045,
+                "time_exit_pct": 8.073394495412844,
+                "duration_median_hours": 6.0,
+                "duration_p90_hours": 40.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.580451097804422,
+                "tail_p05_pct": -3.5804510978044064,
+                "ambiguous_trades": 5,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 316,
+                  "TIME": 44,
+                  "TP": 185
+                },
+                "signal_weeks": 24
+              }
+            }
+          }
+        },
+        "portfolio": {
+          "B": {
+            "metrics": {
+              "trades": 326,
+              "closed_trades": 326,
+              "censored": 0,
+              "mean_net_pct": -0.8713478413557058,
+              "win_rate_pct": 32.515337423312886,
+              "avg_win_pct": 3.9411306223936493,
+              "avg_loss_pct": -3.190087464798577,
+              "profit_factor": 0.5952527671242296,
+              "mean_raw_pct": -0.20171642204584644,
+              "mean_fee_pct": 0.3982554119475709,
+              "mean_slippage_pct": 0.27137600736228773,
+              "time_exit_pct": 16.87116564417178,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 186,
+                "TIME": 55,
+                "TP": 85
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 495,
+              "invalidated": 71,
+              "eligible_events": 407,
+              "cash_or_risk": 64,
+              "open_plan_budget": 453,
+              "max_positions": 17,
+              "expired": 97,
+              "new_candidate_budget": 164,
+              "watching_at_end": 1
+            },
+            "account": {
+              "final_equity": 4876.326411470099,
+              "net_return_pct": -51.23673588529901,
+              "cagr_pct": -54.27425628650588,
+              "max_drawdown_pct": 51.23673588529901,
+              "sharpe": -2.9918496287618668,
+              "sortino": -3.647257264759443,
+              "exposure_pct": 16.788659174243197,
+              "invested_time_pct": 29.502487562189057,
+              "turnover": 122.28914904797827,
+              "fees_usdt": 2445.7829809595655,
+              "slippage_usdt": 1665.7367588654445,
+              "fee_drag_pct": 24.457829809595655,
+              "max_single_loss_usdt": -100.0,
+              "dollar_profit_factor": 0.6072784520378651,
+              "max_positions": 5,
+              "cash_reconciliation_error": 6.366462912410498e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "C": {
+            "metrics": {
+              "trades": 335,
+              "closed_trades": 335,
+              "censored": 0,
+              "mean_net_pct": -0.7526587201762037,
+              "win_rate_pct": 34.62686567164179,
+              "avg_win_pct": 4.136970686858933,
+              "avg_loss_pct": -3.3425994106605685,
+              "profit_factor": 0.655559304429056,
+              "mean_raw_pct": -0.08745741740586212,
+              "mean_fee_pct": 0.39849326589783046,
+              "mean_slippage_pct": 0.2667080368725103,
+              "time_exit_pct": 10.447761194029852,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044157,
+              "tail_p05_pct": -3.580451097804406,
+              "ambiguous_trades": 1,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 197,
+                "TIME": 35,
+                "TP": 103
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 513,
+              "same_symbol": 51,
+              "cash_or_risk": 139,
+              "new_candidate_budget": 86,
+              "max_positions": 39,
+              "watching_at_end": 0
+            },
+            "account": {
+              "final_equity": 5065.743925972391,
+              "net_return_pct": -49.3425607402761,
+              "cagr_pct": -52.33568318169819,
+              "max_drawdown_pct": 49.64093166073555,
+              "sharpe": -3.0076224163714658,
+              "sortino": -3.705542312154662,
+              "exposure_pct": 12.363686015333233,
+              "invested_time_pct": 22.238805970149254,
+              "turnover": 126.56201045601989,
+              "fees_usdt": 2531.2402091203976,
+              "slippage_usdt": 1696.0944951766346,
+              "fee_drag_pct": 25.312402091203975,
+              "max_single_loss_usdt": -100.0,
+              "dollar_profit_factor": 0.6461988242088469,
+              "max_positions": 5,
+              "cash_reconciliation_error": 7.275957614183426e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.4907366342504365,
+              -0.3009469520907422
+            ],
+            "c_ci": [
+              -1.2202872614562745,
+              -0.25618293884165966
+            ],
+            "delta_ci": [
+              -0.5297409386053825,
+              0.7220202828392752
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "SHIBUSDT",
+                "DOTUSDT",
+                "DOGEUSDT"
+              ],
+              "remaining": {
+                "trades": 310,
+                "closed_trades": 310,
+                "censored": 0,
+                "mean_net_pct": -0.940441068191186,
+                "win_rate_pct": 32.25806451612903,
+                "avg_win_pct": 4.082684799151572,
+                "avg_loss_pct": -3.332405766925833,
+                "profit_factor": 0.583403029108634,
+                "mean_raw_pct": -0.2731773028077007,
+                "mean_fee_pct": 0.39811694856713914,
+                "mean_slippage_pct": 0.2691468168163458,
+                "time_exit_pct": 11.290322580645162,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.5804510978044157,
+                "tail_p05_pct": -3.580451097804406,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 188,
+                  "TIME": 35,
+                  "TP": 87
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [],
+              "remaining": {
+                "trades": 335,
+                "closed_trades": 335,
+                "censored": 0,
+                "mean_net_pct": -0.7526587201762037,
+                "win_rate_pct": 34.62686567164179,
+                "avg_win_pct": 4.136970686858933,
+                "avg_loss_pct": -3.3425994106605685,
+                "profit_factor": 0.655559304429056,
+                "mean_raw_pct": -0.08745741740586212,
+                "mean_fee_pct": 0.39849326589783046,
+                "mean_slippage_pct": 0.2667080368725103,
+                "time_exit_pct": 10.447761194029852,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.5804510978044157,
+                "tail_p05_pct": -3.580451097804406,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 197,
+                  "TIME": 35,
+                  "TP": 103
+                },
+                "signal_weeks": 25
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cost": "legacy_fee",
+      "policy": "stop_first",
+      "layers": {
+        "all_events": {
+          "B": {
+            "metrics": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.12657140116396812,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2836262104567915,
+              "avg_loss_pct": -2.9238967433919933,
+              "profit_factor": 0.9292540568585849,
+              "mean_raw_pct": 0.1104957628875116,
+              "mean_fee_pct": 0.12012032338726247,
+              "mean_slippage_pct": 0.11694684066422316,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 1221,
+              "invalidated": 161,
+              "eligible_events": 858,
+              "expired": 202,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 650,
+              "closed_trades": 650,
+              "censored": 0,
+              "mean_net_pct": -0.23839466714241583,
+              "win_rate_pct": 37.69230769230769,
+              "avg_win_pct": 4.450963950028238,
+              "avg_loss_pct": -3.0751671639493545,
+              "profit_factor": 0.8755811620490918,
+              "mean_raw_pct": -0.003480079996091595,
+              "mean_fee_pct": 0.11928543664345918,
+              "mean_slippage_pct": 0.11562915050287094,
+              "time_exit_pct": 9.692307692307692,
+              "duration_median_hours": 8.0,
+              "duration_p90_hours": 47.10000000000002,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.232609956017621,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 375,
+                "TIME": 63,
+                "TP": 212
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 650,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -0.8847850040640916,
+              0.4152639552124161
+            ],
+            "c_ci": [
+              -0.7547148382147172,
+              0.2385141782780318
+            ],
+            "delta_ci": [
+              -0.6545119303503508,
+              0.49664964158893704
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "BTCUSDT",
+                "FILUSDT"
+              ],
+              "remaining": {
+                "trades": 579,
+                "closed_trades": 579,
+                "censored": 0,
+                "mean_net_pct": -0.4279779222428293,
+                "win_rate_pct": 35.40587219343696,
+                "avg_win_pct": 4.482737964736517,
+                "avg_loss_pct": -3.11968048061386,
+                "profit_factor": 0.7876177527163648,
+                "mean_raw_pct": -0.19116513775971045,
+                "mean_fee_pct": 0.11994956808913426,
+                "mean_slippage_pct": 0.11686321639399042,
+                "time_exit_pct": 7.599309153713299,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 39.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.232609956017621,
+                "tail_p05_pct": -3.2326099560176047,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 354,
+                  "TIME": 44,
+                  "TP": 181
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05",
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 307,
+                "closed_trades": 307,
+                "censored": 0,
+                "mean_net_pct": -0.8616048777865934,
+                "win_rate_pct": 29.64169381107492,
+                "avg_win_pct": 4.362170857707905,
+                "avg_loss_pct": -3.0623622478328865,
+                "profit_factor": 0.600113989605408,
+                "mean_raw_pct": -0.6152691870059085,
+                "mean_fee_pct": 0.12341084341905499,
+                "mean_slippage_pct": 0.12292484736163536,
+                "time_exit_pct": 10.423452768729641,
+                "duration_median_hours": 11.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176176,
+                "tail_p05_pct": -3.232609956017605,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 198,
+                  "TIME": 32,
+                  "TP": 77
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "symbol_only": {
+          "B": {
+            "metrics": {
+              "trades": 534,
+              "closed_trades": 534,
+              "censored": 0,
+              "mean_net_pct": -0.27686350517076347,
+              "win_rate_pct": 36.70411985018727,
+              "avg_win_pct": 4.397473871152493,
+              "avg_loss_pct": -2.9874260074173855,
+              "profit_factor": 0.8535824578845096,
+              "mean_raw_pct": -0.03913942189989018,
+              "mean_fee_pct": 0.1203289791336676,
+              "mean_slippage_pct": 0.11739510413721131,
+              "time_exit_pct": 12.359550561797754,
+              "duration_median_hours": 10.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017602,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 303,
+                "TIME": 66,
+                "TP": 165
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 766,
+              "invalidated": 102,
+              "eligible_events": 534,
+              "expired": 129,
+              "watching_at_end": 1
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 570,
+              "closed_trades": 570,
+              "censored": 0,
+              "mean_net_pct": -0.17651337564655958,
+              "win_rate_pct": 38.421052631578945,
+              "avg_win_pct": 4.474932653864643,
+              "avg_loss_pct": -3.0786976504697883,
+              "profit_factor": 0.9068938605531398,
+              "mean_raw_pct": 0.056727779262363956,
+              "mean_fee_pct": 0.11867361502588578,
+              "mean_slippage_pct": 0.1145675398830434,
+              "time_exit_pct": 9.12280701754386,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 46.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.232609956017621,
+              "tail_p05_pct": -3.2326099560176047,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 326,
+                "TIME": 52,
+                "TP": 192
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 570,
+              "same_symbol": 80,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.0389407685798506,
+              0.40532886110698313
+            ],
+            "c_ci": [
+              -0.6437236304354105,
+              0.2308630185652779
+            ],
+            "delta_ci": [
+              -0.5884245954888888,
+              0.7362151256796932
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 538,
+                "closed_trades": 538,
+                "censored": 0,
+                "mean_net_pct": -0.34310019889476673,
+                "win_rate_pct": 36.43122676579926,
+                "avg_win_pct": 4.423170809721189,
+                "avg_loss_pct": -3.074647326639583,
+                "profit_factor": 0.8244576808658394,
+                "mean_raw_pct": -0.10637275254690076,
+                "mean_fee_pct": 0.11993881099787002,
+                "mean_slippage_pct": 0.11678863535000154,
+                "time_exit_pct": 9.66542750929368,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 47.30000000000001,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.232609956017621,
+                "tail_p05_pct": -3.2326099560176047,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 317,
+                  "TIME": 52,
+                  "TP": 169
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2024-09",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 270,
+                "closed_trades": 270,
+                "censored": 0,
+                "mean_net_pct": -0.6913310634082892,
+                "win_rate_pct": 31.85185185185185,
+                "avg_win_pct": 4.381809170694175,
+                "avg_loss_pct": -3.0624726945648764,
+                "profit_factor": 0.668747025019599,
+                "mean_raw_pct": -0.4485657653885937,
+                "mean_fee_pct": 0.12211504360968294,
+                "mean_slippage_pct": 0.12065025441001773,
+                "time_exit_pct": 10.0,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176176,
+                "tail_p05_pct": -3.232609956017605,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 169,
+                  "TIME": 27,
+                  "TP": 74
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "portfolio": {
+          "B": {
+            "metrics": {
+              "trades": 322,
+              "closed_trades": 322,
+              "censored": 0,
+              "mean_net_pct": -0.5437018182903709,
+              "win_rate_pct": 33.22981366459627,
+              "avg_win_pct": 4.175389864980044,
+              "avg_loss_pct": -2.8922730281040194,
+              "profit_factor": 0.7184607757670396,
+              "mean_raw_pct": -0.29685354928506325,
+              "mean_fee_pct": 0.12368251359518836,
+              "mean_slippage_pct": 0.1231657554101244,
+              "time_exit_pct": 17.70186335403727,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.232609956017615,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 184,
+                "TIME": 57,
+                "TP": 81
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 493,
+              "invalidated": 71,
+              "eligible_events": 399,
+              "cash_or_risk": 66,
+              "open_plan_budget": 466,
+              "max_positions": 11,
+              "expired": 99,
+              "new_candidate_budget": 176,
+              "watching_at_end": 1
+            },
+            "account": {
+              "final_equity": 6768.946978826541,
+              "net_return_pct": -32.31053021173459,
+              "cagr_pct": -34.63520575381297,
+              "max_drawdown_pct": 33.34329008797475,
+              "sharpe": -1.475809768829416,
+              "sortino": -2.005920500004956,
+              "exposure_pct": 17.23275022589404,
+              "invested_time_pct": 28.805970149253728,
+              "turnover": 145.6949251611944,
+              "fees_usdt": 897.9929307669279,
+              "slippage_usdt": 890.5195235978678,
+              "fee_drag_pct": 8.979929307669279,
+              "max_single_loss_usdt": -100.55012726988467,
+              "dollar_profit_factor": 0.7651335832398224,
+              "max_positions": 5,
+              "cash_reconciliation_error": 9.094947017729282e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "C": {
+            "metrics": {
+              "trades": 336,
+              "closed_trades": 336,
+              "censored": 0,
+              "mean_net_pct": -0.34227246525680965,
+              "win_rate_pct": 36.30952380952381,
+              "avg_win_pct": 4.403966137108009,
+              "avg_loss_pct": -3.0480720423059116,
+              "profit_factor": 0.823691910468263,
+              "mean_raw_pct": -0.10476937179824039,
+              "mean_fee_pct": 0.12022977658361791,
+              "mean_slippage_pct": 0.11727331687495675,
+              "time_exit_pct": 10.714285714285714,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176176,
+              "tail_p05_pct": -3.2326099560176047,
+              "ambiguous_trades": 1,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 196,
+                "TIME": 36,
+                "TP": 104
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 513,
+              "same_symbol": 51,
+              "cash_or_risk": 124,
+              "new_candidate_budget": 86,
+              "max_positions": 53,
+              "watching_at_end": 0
+            },
+            "account": {
+              "final_equity": 6887.11672762844,
+              "net_return_pct": -31.128832723715604,
+              "cagr_pct": -33.39093548980987,
+              "max_drawdown_pct": 33.06759016970378,
+              "sharpe": -1.5354199096196266,
+              "sortino": -2.135218435734646,
+              "exposure_pct": 13.205339990915576,
+              "invested_time_pct": 22.786069651741293,
+              "turnover": 149.48292521344362,
+              "fees_usdt": 904.5456108493396,
+              "slippage_usdt": 885.6070793122977,
+              "fee_drag_pct": 9.045456108493395,
+              "max_single_loss_usdt": -100.00000000000001,
+              "dollar_profit_factor": 0.7887499843418884,
+              "max_positions": 5,
+              "cash_reconciliation_error": 3.637978807091713e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.1409590230332927,
+              0.07206473246672856
+            ],
+            "c_ci": [
+              -0.8558373639340459,
+              0.20414485046062522
+            ],
+            "delta_ci": [
+              -0.46437613983331094,
+              0.7617563070882166
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "SHIBUSDT",
+                "DOGEUSDT",
+                "SOLUSDT"
+              ],
+              "remaining": {
+                "trades": 288,
+                "closed_trades": 288,
+                "censored": 0,
+                "mean_net_pct": -0.5726538774057828,
+                "win_rate_pct": 33.68055555555556,
+                "avg_win_pct": 4.314131254805873,
+                "avg_loss_pct": -3.054424337220079,
+                "profit_factor": 0.7173025085786603,
+                "mean_raw_pct": -0.3302736982433183,
+                "mean_fee_pct": 0.12200036608083817,
+                "mean_slippage_pct": 0.12037981308163176,
+                "time_exit_pct": 11.458333333333334,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176127,
+                "tail_p05_pct": -3.2326099560176047,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 175,
+                  "TIME": 33,
+                  "TP": 80
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 182,
+                "closed_trades": 182,
+                "censored": 0,
+                "mean_net_pct": -0.7465779467491754,
+                "win_rate_pct": 30.76923076923077,
+                "avg_win_pct": 4.329035768754324,
+                "avg_loss_pct": -3.0024062647507304,
+                "profit_factor": 0.6408246344982502,
+                "mean_raw_pct": -0.5021848606232583,
+                "mean_fee_pct": 0.12271141474009746,
+                "mean_slippage_pct": 0.12168167138582411,
+                "time_exit_pct": 11.538461538461538,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176176,
+                "tail_p05_pct": -3.232609956017605,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 113,
+                  "TIME": 21,
+                  "TP": 48
+                },
+                "signal_weeks": 18
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cost": "legacy_fee",
+      "policy": "target_first",
+      "layers": {
+        "all_events": {
+          "B": {
+            "metrics": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.12657140116396812,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2836262104567915,
+              "avg_loss_pct": -2.9238967433919933,
+              "profit_factor": 0.9292540568585849,
+              "mean_raw_pct": 0.1104957628875116,
+              "mean_fee_pct": 0.12012032338726247,
+              "mean_slippage_pct": 0.11694684066422316,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 1221,
+              "invalidated": 161,
+              "eligible_events": 858,
+              "expired": 202,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 650,
+              "closed_trades": 650,
+              "censored": 0,
+              "mean_net_pct": -0.18824916841882827,
+              "win_rate_pct": 38.30769230769231,
+              "avg_win_pct": 4.458434948205542,
+              "avg_loss_pct": -3.073596662282839,
+              "profit_factor": 0.9007215073740302,
+              "mean_raw_pct": 0.04573100480075897,
+              "mean_fee_pct": 0.11894770711988398,
+              "mean_slippage_pct": 0.11503246609970912,
+              "time_exit_pct": 9.692307692307692,
+              "duration_median_hours": 8.0,
+              "duration_p90_hours": 47.10000000000002,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.232609956017621,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 371,
+                "TIME": 63,
+                "TP": 216
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 650,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -0.8847850040640916,
+              0.4152639552124161
+            ],
+            "c_ci": [
+              -0.7095444811463418,
+              0.2781183678211136
+            ],
+            "delta_ci": [
+              -0.5982852864443462,
+              0.5398780955242841
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "BTCUSDT",
+                "FILUSDT"
+              ],
+              "remaining": {
+                "trades": 579,
+                "closed_trades": 579,
+                "censored": 0,
+                "mean_net_pct": -0.3716833209123769,
+                "win_rate_pct": 36.09671848013817,
+                "avg_win_pct": 4.491030703910274,
+                "avg_loss_pct": -3.118459621420307,
+                "profit_factor": 0.8134867080667367,
+                "mean_raw_pct": -0.1359195330654913,
+                "mean_fee_pct": 0.11957042440981847,
+                "mean_slippage_pct": 0.116193363437073,
+                "time_exit_pct": 7.599309153713299,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 39.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.232609956017621,
+                "tail_p05_pct": -3.2326099560176043,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 350,
+                  "TIME": 44,
+                  "TP": 185
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05",
+                "2024-09"
+              ],
+              "remaining": {
+                "trades": 307,
+                "closed_trades": 307,
+                "censored": 0,
+                "mean_net_pct": -0.8085192521020138,
+                "win_rate_pct": 30.293159609120522,
+                "avg_win_pct": 4.374081884134948,
+                "avg_loss_pct": -3.060771147756394,
+                "profit_factor": 0.6210480825541485,
+                "mean_raw_pct": -0.5631727617323696,
+                "mean_fee_pct": 0.12305331216445586,
+                "mean_slippage_pct": 0.12229317820519371,
+                "time_exit_pct": 10.423452768729641,
+                "duration_median_hours": 11.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176176,
+                "tail_p05_pct": -3.232609956017605,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 196,
+                  "TIME": 32,
+                  "TP": 79
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "symbol_only": {
+          "B": {
+            "metrics": {
+              "trades": 534,
+              "closed_trades": 534,
+              "censored": 0,
+              "mean_net_pct": -0.27686350517076347,
+              "win_rate_pct": 36.70411985018727,
+              "avg_win_pct": 4.397473871152493,
+              "avg_loss_pct": -2.9874260074173855,
+              "profit_factor": 0.8535824578845096,
+              "mean_raw_pct": -0.03913942189989018,
+              "mean_fee_pct": 0.1203289791336676,
+              "mean_slippage_pct": 0.11739510413721131,
+              "time_exit_pct": 12.359550561797754,
+              "duration_median_hours": 10.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017602,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 303,
+                "TIME": 66,
+                "TP": 165
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 766,
+              "invalidated": 102,
+              "eligible_events": 534,
+              "expired": 129,
+              "watching_at_end": 1
+            },
+            "account": null
+          },
+          "C": {
+            "metrics": {
+              "trades": 570,
+              "closed_trades": 570,
+              "censored": 0,
+              "mean_net_pct": -0.1193299121898369,
+              "win_rate_pct": 39.12280701754386,
+              "avg_win_pct": 4.482844778218019,
+              "avg_loss_pct": -3.076923445218517,
+              "profit_factor": 0.9362943412473129,
+              "mean_raw_pct": 0.11284568297807072,
+              "mean_fee_pct": 0.11828848486742286,
+              "mean_slippage_pct": 0.11388711030049044,
+              "time_exit_pct": 9.12280701754386,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 46.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.232609956017621,
+              "tail_p05_pct": -3.2326099560176047,
+              "ambiguous_trades": 4,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 322,
+                "TIME": 52,
+                "TP": 196
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 570,
+              "same_symbol": 80,
+              "watching_at_end": 0
+            },
+            "account": null
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.0389407685798506,
+              0.40532886110698313
+            ],
+            "c_ci": [
+              -0.583918492879659,
+              0.2852468133849989
+            ],
+            "delta_ci": [
+              -0.5320732737554583,
+              0.772139449938199
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "DOGEUSDT",
+                "FILUSDT",
+                "DOTUSDT"
+              ],
+              "remaining": {
+                "trades": 538,
+                "closed_trades": 538,
+                "censored": 0,
+                "mean_net_pct": -0.2825154885409899,
+                "win_rate_pct": 37.174721189591075,
+                "avg_win_pct": 4.433028065258072,
+                "avg_loss_pct": -3.0727779464102576,
+                "profit_factor": 0.8536554139237148,
+                "mean_raw_pct": -0.04691698095219285,
+                "mean_fee_pct": 0.11953077346938697,
+                "mean_slippage_pct": 0.1160677341194157,
+                "time_exit_pct": 9.66542750929368,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 47.30000000000001,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.232609956017621,
+                "tail_p05_pct": -3.2326099560176047,
+                "ambiguous_trades": 4,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 313,
+                  "TIME": 52,
+                  "TP": 173
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2024-09",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 270,
+                "closed_trades": 270,
+                "censored": 0,
+                "mean_net_pct": -0.6309707408706375,
+                "win_rate_pct": 32.592592592592595,
+                "avg_win_pct": 4.393950634691248,
+                "avg_loss_pct": -3.060603054329132,
+                "profit_factor": 0.6941597854794738,
+                "mean_raw_pct": -0.3893302003553476,
+                "mean_fee_pct": 0.1217085173313054,
+                "mean_slippage_pct": 0.11993202318398961,
+                "time_exit_pct": 10.0,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176176,
+                "tail_p05_pct": -3.232609956017605,
+                "ambiguous_trades": 2,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 167,
+                  "TIME": 27,
+                  "TP": 76
+                },
+                "signal_weeks": 17
+              }
+            }
+          }
+        },
+        "portfolio": {
+          "B": {
+            "metrics": {
+              "trades": 322,
+              "closed_trades": 322,
+              "censored": 0,
+              "mean_net_pct": -0.5437018182903709,
+              "win_rate_pct": 33.22981366459627,
+              "avg_win_pct": 4.175389864980044,
+              "avg_loss_pct": -2.8922730281040194,
+              "profit_factor": 0.7184607757670396,
+              "mean_raw_pct": -0.29685354928506325,
+              "mean_fee_pct": 0.12368251359518836,
+              "mean_slippage_pct": 0.1231657554101244,
+              "time_exit_pct": 17.70186335403727,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.232609956017615,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 184,
+                "TIME": 57,
+                "TP": 81
+              },
+              "signal_weeks": 26
+            },
+            "counts": {
+              "plans_created": 493,
+              "invalidated": 71,
+              "eligible_events": 399,
+              "cash_or_risk": 66,
+              "open_plan_budget": 466,
+              "max_positions": 11,
+              "expired": 99,
+              "new_candidate_budget": 176,
+              "watching_at_end": 1
+            },
+            "account": {
+              "final_equity": 6768.946978826541,
+              "net_return_pct": -32.31053021173459,
+              "cagr_pct": -34.63520575381297,
+              "max_drawdown_pct": 33.34329008797475,
+              "sharpe": -1.475809768829416,
+              "sortino": -2.005920500004956,
+              "exposure_pct": 17.23275022589404,
+              "invested_time_pct": 28.805970149253728,
+              "turnover": 145.6949251611944,
+              "fees_usdt": 897.9929307669279,
+              "slippage_usdt": 890.5195235978678,
+              "fee_drag_pct": 8.979929307669279,
+              "max_single_loss_usdt": -100.55012726988467,
+              "dollar_profit_factor": 0.7651335832398224,
+              "max_positions": 5,
+              "cash_reconciliation_error": 9.094947017729282e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "C": {
+            "metrics": {
+              "trades": 336,
+              "closed_trades": 336,
+              "censored": 0,
+              "mean_net_pct": -0.3180205499515032,
+              "win_rate_pct": 36.607142857142854,
+              "avg_win_pct": 4.408129287103597,
+              "avg_loss_pct": -3.047205667124167,
+              "profit_factor": 0.8353684409771857,
+              "mean_raw_pct": -0.08096936799023975,
+              "mean_fee_pct": 0.12006644013248408,
+              "mean_slippage_pct": 0.11698474182878477,
+              "time_exit_pct": 10.714285714285714,
+              "duration_median_hours": 7.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176176,
+              "tail_p05_pct": -3.2326099560176047,
+              "ambiguous_trades": 1,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 195,
+                "TIME": 36,
+                "TP": 105
+              },
+              "signal_weeks": 25
+            },
+            "counts": {
+              "eligible_events": 513,
+              "same_symbol": 51,
+              "cash_or_risk": 124,
+              "new_candidate_budget": 86,
+              "max_positions": 53,
+              "watching_at_end": 0
+            },
+            "account": {
+              "final_equity": 7059.776685805482,
+              "net_return_pct": -29.402233141945178,
+              "cagr_pct": -31.569477512221166,
+              "max_drawdown_pct": 31.389595220724985,
+              "sharpe": -1.426531434587378,
+              "sortino": -1.9901562805405604,
+              "exposure_pct": 13.205339990915576,
+              "invested_time_pct": 22.786069651741293,
+              "turnover": 150.51071633986703,
+              "fees_usdt": 909.3791382501418,
+              "slippage_usdt": 889.3360651375158,
+              "fee_drag_pct": 9.093791382501417,
+              "max_single_loss_usdt": -100.00000000000001,
+              "dollar_profit_factor": 0.8007521074468321,
+              "max_positions": 5,
+              "cash_reconciliation_error": 6.366462912410498e-12,
+              "unresolved_gap_trades": 0
+            }
+          },
+          "bootstrap": {
+            "b_ci": [
+              -1.1409590230332927,
+              0.07206473246672856
+            ],
+            "c_ci": [
+              -0.8107201321038098,
+              0.21130855480708682
+            ],
+            "delta_ci": [
+              -0.4477279772095421,
+              0.783103721267287
+            ],
+            "valid_resamples": 2000,
+            "block_days": 14
+          },
+          "c_concentration": {
+            "symbol": {
+              "removed": [
+                "SHIBUSDT",
+                "DOGEUSDT",
+                "SOLUSDT"
+              ],
+              "remaining": {
+                "trades": 288,
+                "closed_trades": 288,
+                "censored": 0,
+                "mean_net_pct": -0.5443599762162585,
+                "win_rate_pct": 34.02777777777778,
+                "avg_win_pct": 4.3202731153340315,
+                "avg_loss_pct": -3.0534865181737767,
+                "profit_factor": 0.7297727967906384,
+                "mean_raw_pct": -0.3025070271339842,
+                "mean_fee_pct": 0.12180980688784872,
+                "mean_slippage_pct": 0.12004314219443109,
+                "time_exit_pct": 11.458333333333334,
+                "duration_median_hours": 7.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176127,
+                "tail_p05_pct": -3.2326099560176047,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 174,
+                  "TIME": 33,
+                  "TP": 81
+                },
+                "signal_weeks": 25
+              }
+            },
+            "month": {
+              "removed": [
+                "2024-11",
+                "2025-05"
+              ],
+              "remaining": {
+                "trades": 182,
+                "closed_trades": 182,
+                "censored": 0,
+                "mean_net_pct": -0.7018051800316867,
+                "win_rate_pct": 31.318681318681318,
+                "avg_win_pct": 4.339333976084343,
+                "avg_loss_pct": -3.000564635220596,
+                "profit_factor": 0.6594546472580776,
+                "mean_raw_pct": -0.45824639205464174,
+                "mean_fee_pct": 0.12240987052261962,
+                "mean_slippage_pct": 0.12114891745442964,
+                "time_exit_pct": 11.538461538461538,
+                "duration_median_hours": 9.0,
+                "duration_p90_hours": 48.0,
+                "duration_max_hours": 48.0,
+                "tail_worst_pct": -3.2326099560176176,
+                "tail_p05_pct": -3.232609956017605,
+                "ambiguous_trades": 1,
+                "fallback_trades": 0,
+                "status_counts": {
+                  "SL": 112,
+                  "TIME": 21,
+                  "TP": 49
+                },
+                "signal_weeks": 18
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

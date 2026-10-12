@@ -1,0 +1,185 @@
+"""Independently reconcile the frozen study exports; generate readable tables.
+
+Does not generate new signals, optimize parameters, or change production data.
+"""
+from collections import defaultdict
+import argparse
+import csv
+from datetime import datetime, timezone
+import gzip
+import json
+from pathlib import Path
+
+import numpy as np
+
+from research_short_horizon_entries import OUT, FROZEN_OUT, ROOT, file_hash, ms, save
+from short_horizon_core import COSTS, H4, HOLD, HOUR, Market, utc
+
+
+def read(path):
+    if path.suffix == ".gz":
+        with gzip.open(path, "rt", encoding="utf-8") as stream:
+            return json.load(stream)
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def fmt(x, digits=3):
+    return "n/a" if x is None else f"{x:.{digits}f}"
+
+
+def main():
+    summaries = read(OUT / "summary.json")
+    checks = defaultdict(int)
+    max_error = 0.
+    small_orders = []
+    primary_rows = []
+    audit = dict(created_utc=datetime.now(timezone.utc).isoformat(), windows=[])
+    lines = ["# 同退出入场研究：完整数值表", "", "研究裁决与解释见 [report.md](report.md)。",
+             "", "所有净期望均为含入场费投入现金上的平均每笔净收益率；单位 %。", ""]
+    for summary in summaries:
+        start = summary["start"]
+        inputs = read(FROZEN_OUT / f"{start}_inputs.json")
+        archive = ROOT / inputs["archive"]
+        assert file_hash(archive) == inputs["archive_sha256"]
+        arrays = defaultdict(dict)
+        with np.load(archive, allow_pickle=False) as data:
+            for key in data.files:
+                s, interval = key.split("__")
+                arrays[s][interval] = data[key]
+        market = Market(arrays)
+        frames = read(OUT / f"{start}_features.json.gz")
+        window_checks = defaultdict(int)
+        for branch in summary["branches"]:
+            cost = next(c for c in COSTS if c.name == branch["cost"])
+            for layer, detail in branch["layers"].items():
+                prefix = f"{start}_{cost.name}_{branch['policy']}_{layer}"
+                arms = read(OUT / f"{prefix}_trades.json.gz")
+                for arm, trades in arms.items():
+                    assert len(trades) == detail[arm]["metrics"]["trades"]
+                    closed = [t for t in trades if t["closed"]]
+                    assert len(closed) == detail[arm]["metrics"]["closed_trades"]
+                    assert np.isclose(np.mean([t["net_return_pct"] for t in closed]), detail[arm]["metrics"]["mean_net_pct"])
+                    previous = {}
+                    cash, active = 10000., []
+                    for t in trades:
+                        checks["exported_trades"] += 1
+                        assert t["signal_ms"] == t["entry_ms"] < ms(summary["end"])
+                        assert t["entry_ms"] < t["exit_ms"] <= t["entry_ms"] + HOLD
+                        opening = market.row(t["symbol"], "4h", t["entry_ms"])[1]
+                        assert np.isclose(t["raw_entry"], opening)
+                        assert np.isclose(t["entry_price"], opening * (1 + cost.entry_slip))
+                        assert np.isclose(t["stop"], t["entry_price"] * .97)
+                        assert np.isclose(t["target"], t["entry_price"] * 1.05)
+                        assert t["closed"], "Censored paths require manual audit instead of this closed-only audit"
+                        fee = cost.tp_fee if t["status"] == "TP" else cost.exit_fee
+                        pnl = t["quantity"] * (t["exit_price"] * (1 - fee) - t["entry_price"] * (1 + cost.entry_fee))
+                        error = abs(pnl - t["net_pnl"])
+                        assert error < 1e-7
+                        max_error = max(max_error, error)
+                        f = frames[str(t["signal_ms"])][t["symbol"]]
+                        assert f["regime"] not in {"UNKNOWN", "RISK_OFF"}
+                        if arm == "C":
+                            rows = arrays[t["symbol"]]["4h"]
+                            n = int(np.searchsorted(rows[:, 0], t["signal_ms"]))
+                            assert rows[n - 1, 4] > np.max(rows[n - 21:n - 1, 2])
+                            assert rows[n - 2, 4] <= np.max(rows[n - 22:n - 2, 2])
+                        else:
+                            created = t["plan_created_ms"]
+                            assert H4 <= t["entry_ms"] - created <= 18 * H4
+                            plan = frames[str(created)][t["symbol"]]["candidate"]
+                            bar = market.row(t["symbol"], "4h", t["entry_ms"] - H4)
+                            assert bar[2] >= plan["entry_low"] and bar[3] <= plan["entry_high"]
+                            assert bar[4] >= plan["entry_high"]
+                        if layer != "all_events":
+                            assert previous.get(t["symbol"], -1) <= t["entry_ms"]
+                            previous[t["symbol"]] = t["exit_ms"]
+                        if layer == "portfolio":
+                            keep = []
+                            for a in active:
+                                if a["exit_ms"] <= t["entry_ms"]:
+                                    cash += a["cash_invested"] + a["net_pnl"]
+                                else:
+                                    keep.append(a)
+                            active = keep
+                            eq = cash + sum(a["quantity"] * market.mark(a["symbol"], t["entry_ms"]) for a in active)
+                            assert t["cash_invested"] <= cash + 1e-7
+                            assert t["risk_cash"] <= eq * .01 + 1e-7
+                            assert sum(a["risk_cash"] for a in active) + t["risk_cash"] <= eq * .05 + 1e-7
+                            assert len(active) < 5
+                            cash -= t["cash_invested"]
+                            active.append(t)
+                            if t["cash_invested"] < 10:
+                                small_orders.append(dict(window=start, cost=cost.name, policy=branch["policy"], arm=arm,
+                                                         symbol=t["symbol"], invested=t["cash_invested"], entry=utc(t["entry_ms"])))
+                        if cost.name == "taker" and branch["policy"] == "stop_first":
+                            primary_rows.append(dict(window=start, **{k: t[k] for k in (
+                                "arm", "layer", "symbol", "status", "entry_price", "exit_price", "cash_invested",
+                                "net_pnl", "net_return_pct", "raw_return_pct", "fee_pct", "slippage_pct", "duration_hours",
+                                "regime", "ambiguous")}, entry_utc=utc(t["entry_ms"]), exit_utc=utc(t["exit_ms"])))
+                    if layer == "portfolio":
+                        final = 10000 + sum(t["net_pnl"] for t in trades)
+                        error = abs(final - detail[arm]["account"]["final_equity"])
+                        max_error = max(max_error, error)
+                        assert error < 1e-6
+                    window_checks["arm_layer_replays"] += 1
+                    window_checks["trades_checked"] += len(trades)
+        audit["windows"].append(dict(start=start, **window_checks))
+        lines += [f"## {start} → {summary['end']}", "", "### 全部预声明分支", "",
+                  "| 成本 | 同根顺序 | 层次 | B笔数 | C笔数 | B净期望% | C净期望% | C−B百分点 | B账户净收益% | C账户净收益% |",
+                  "|---|---|---|---:|---:|---:|---:|---:|---:|---:|"]
+        for branch in summary["branches"]:
+            for layer, d in branch["layers"].items():
+                b, c = d["B"]["metrics"], d["C"]["metrics"]
+                ba, ca = d["B"]["account"], d["C"]["account"]
+                lines.append(f"| {branch['cost']} | {branch['policy']} | {layer} | {b['closed_trades']} | {c['closed_trades']} | {fmt(b['mean_net_pct'])} | {fmt(c['mean_net_pct'])} | {fmt(c['mean_net_pct']-b['mean_net_pct'])} | {fmt(ba['net_return_pct'] if ba else None)} | {fmt(ca['net_return_pct'] if ca else None)} |")
+        primary = summary["branches"][0]["layers"]
+        lines += ["", "### 主结果：交易分布与不确定性", "",
+                  "| 层次/臂 | 胜率% | PF（等现金） | 平均赢% | 平均亏% | 原始价格贡献% | 费% | 滑点% | TIME% | 持仓中位h | P90h | 最差单笔% |",
+                  "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        for layer, d in primary.items():
+            for arm in ("B", "C"):
+                m = d[arm]["metrics"]
+                keys = ("win_rate_pct", "profit_factor", "avg_win_pct", "avg_loss_pct", "mean_raw_pct", "mean_fee_pct",
+                        "mean_slippage_pct", "time_exit_pct", "duration_median_hours", "duration_p90_hours", "tail_worst_pct")
+                lines.append(f"| {layer}/{arm} | " + " | ".join(fmt(m[k]) for k in keys) + " |")
+        lines += ["", "| 层次 | B 95%区间 | C 95%区间 | C−B 95%区间 |", "|---|---|---|---|"]
+        for layer, d in primary.items():
+            intervals = ["[" + ", ".join(fmt(v) for v in d["bootstrap"][k]) + "]" for k in ("b_ci", "c_ci", "delta_ci")]
+            lines.append(f"| {layer} | " + " | ".join(intervals) + " |")
+        lines += ["", "### 主结果：账户风险与成本", "",
+                  "| 臂 | CAGR% | Sharpe | Sortino | 4h收盘MDD% | 收盘采样资金暴露% | 4h收盘有仓点% | 双边换手/初始本金 | 费用USDT | 滑点USDT | 美元PF |",
+                  "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        for arm in ("B", "C"):
+            a = primary["portfolio"][arm]["account"]
+            keys = ("cagr_pct", "sharpe", "sortino", "max_drawdown_pct", "exposure_pct", "invested_time_pct",
+                    "turnover", "fees_usdt", "slippage_usdt", "dollar_profit_factor")
+            lines.append(f"| {arm} | " + " | ".join(fmt(a[k]) for k in keys) + " |")
+        lines += ["", "### 主结果：按市场状态/月/周末/出口分组（全事件）", "",
+                  "| 维度 | 组 | 臂 | 笔数 | 净期望% | 胜率% | PF |", "|---|---|---|---:|---:|---:|---:|"]
+        diagnostics = read(OUT / f"{start}_taker_stop_first_all_events_diagnostics.json.gz")
+        for arm, d in diagnostics.items():
+            for g in d["groups"]:
+                if g["dimension"] in {"regime", "month", "weekend", "exit", "crash", "duration"}:
+                    lines.append(f"| {g['dimension']} | {g['label']} | {arm} | {g['closed_trades']} | {fmt(g['mean_net_pct'])} | {fmt(g['win_rate_pct'])} | {fmt(g['profit_factor'])} |")
+        lines += ["", "逐币/逐周完整分组、全部拒绝事件和净值点见相应 `*_diagnostics.json.gz`；逐笔主结果见 `primary_trades.csv`。", ""]
+    audit.update(checks=dict(checks), max_reconciliation_error_usdt=max_error,
+                 orders_below_10_usdt=small_orders, verdict="export_and_independent_ledger_checks_pass",
+                 limitations=["No historical exchange lot-size/min-notional or order-book reconstruction; 10 USDT is a diagnostic threshold, not an applied filter.",
+                              "Intrabar times are upper bounds except opening/time exits; no tick-level order guarantee."])
+    save(OUT / "audit.json", audit)
+    (OUT / "numerical_tables.md").write_text("\n".join(lines), encoding="utf-8")
+    with (OUT / "primary_trades.csv").open("w", encoding="utf-8-sig", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(primary_rows[0]))
+        writer.writeheader()
+        writer.writerows(primary_rows)
+    print(json.dumps(dict(checks=dict(checks), max_error=max_error,
+                          small_order_count=len(small_orders), primary_rows=len(primary_rows)), ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cash-fix", action="store_true")
+    args = parser.parse_args()
+    if args.cash_fix:
+        OUT = OUT.parent / "short_horizon_entry_v1_cashfix"
+    main()

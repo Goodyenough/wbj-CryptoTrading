@@ -1,0 +1,409 @@
+"""Isolated, causal short-horizon event/portfolio model. No network or DB writes.
+
+Contract: reports/2026-10-13/short_horizon_entry_protocol_v1.md.
+Future paths may be precomputed, but capital is released only at known_exit_ms.
+All percentages in exported trade records are percentage points, not fractions.
+"""
+from __future__ import annotations
+
+from collections import Counter
+from dataclasses import dataclass
+from datetime import datetime, timezone
+import math
+
+import numpy as np
+
+HOUR = 3_600_000
+H4 = 4 * HOUR
+DAY = 24 * HOUR
+HOLD = 48 * HOUR
+
+
+@dataclass(frozen=True)
+class Costs:
+    name: str
+    entry_fee: float
+    entry_slip: float
+    tp_fee: float
+    tp_slip: float
+    exit_fee: float
+    exit_slip: float
+
+
+COSTS = (
+    Costs("taker", .001, .0005, .0004, 0, .001, .001),
+    Costs("stress", .002, .001, .002, .001, .002, .002),
+    Costs("legacy_fee", .0004, .0005, .0004, 0, .001, .001),
+)
+
+
+def utc(ms: int) -> str:
+    return datetime.fromtimestamp(ms / 1000, timezone.utc).isoformat()
+
+
+def valid_bar(row) -> bool:
+    return bool(np.isfinite(row).all() and row[3] > 0
+                and row[3] <= min(row[1], row[4]) <= max(row[1], row[4]) <= row[2]
+                and row[5] >= 0 and row[7] >= 0 and row[8] >= 0)
+
+
+def new_breakout(rows) -> bool:
+    if len(rows) < 22:
+        return False
+    return bool(rows[-1][4] > max(r[2] for r in rows[-21:-1])
+                and rows[-2][4] <= max(r[2] for r in rows[-22:-2]))
+
+
+def plan_decision(plan: dict, row, now: int, eligible: bool) -> str:
+    """The original WATCHING/reclaim order, before standardized execution."""
+    age = (now - plan["created_ms"]) // H4
+    if age > 18:
+        return "expired"
+    if age < 1 or row is None:
+        return "waiting"
+    if row[2] < plan["entry_low"] and row[3] <= plan["original_stop"]:
+        return "invalidated"
+    touches = row[2] >= plan["entry_low"] and row[3] <= plan["entry_high"]
+    if eligible and touches and row[4] >= plan["entry_high"]:
+        return "signal"
+    return "waiting"
+
+
+class Market:
+    def __init__(self, arrays: dict):
+        self.arrays = arrays
+        self.path_cache: dict = {}
+        self.segment_cache: dict = {}
+
+    def row(self, symbol: str, interval: str, opened: int):
+        rows = self.arrays[symbol][interval]
+        i = int(np.searchsorted(rows[:, 0], opened))
+        return rows[i] if i < len(rows) and rows[i][0] == opened else None
+
+    def mark(self, symbol: str, now: int, *, use_open=True) -> float:
+        rows = self.arrays[symbol]["4h"]
+        i = int(np.searchsorted(rows[:, 0], now))
+        if use_open and i < len(rows) and rows[i][0] == now and rows[i][1] > 0:
+            return float(rows[i][1])
+        if i == 0:
+            raise ValueError(f"No historical mark: {symbol} {utc(now)}")
+        return float(rows[i - 1][4])
+
+    def segments(self, symbol: str, opened: int):
+        key = symbol, opened
+        if key in self.segment_cache:
+            return self.segment_cache[key]
+        parent = self.row(symbol, "4h", opened)
+        if parent is None or not valid_bar(parent):
+            answer = ([], "gap")
+        else:
+            hours = [self.row(symbol, "1h", opened + j * HOUR) for j in range(4)]
+            if all(r is not None and valid_bar(r) for r in hours):
+                aggregate = [hours[0][1], max(r[2] for r in hours),
+                             min(r[3] for r in hours), hours[-1][4]]
+                if np.allclose(aggregate, parent[1:5], rtol=1e-8, atol=1e-12):
+                    answer = ([(r, HOUR) for r in hours], "1h")
+                else:
+                    answer = ([(parent, H4)], "4h_mismatch")
+            else:
+                answer = ([(parent, H4)], "4h_missing_fine")
+        self.segment_cache[key] = answer
+        return answer
+
+
+def path(market: Market, symbol: str, entered: int, end: int,
+         costs: Costs, policy: str) -> dict:
+    key = symbol, entered, end, costs.name, policy
+    if key in market.path_cache:
+        return market.path_cache[key].copy()
+    if policy not in {"stop_first", "target_first"}:
+        raise ValueError(policy)
+    first = market.row(symbol, "4h", entered)
+    if first is None or not math.isfinite(first[1]) or first[1] <= 0:
+        return {"status": "NO_ENTRY", "symbol": symbol, "entry_ms": entered}
+    raw_entry = float(first[1])
+    entry = raw_entry * (1 + costs.entry_slip)
+    stop, target = entry * .97, entry * 1.05
+    deadline = entered + HOLD
+    ambiguous = 0
+    fallback = Counter()
+    last_mark = raw_entry
+
+    def finish(status, raw_exit, when, *, exact=False, gap_at=None):
+        closed = status in {"TP", "SL", "TIME"}
+        fee = costs.tp_fee if status == "TP" else costs.exit_fee if closed else 0
+        slip = costs.tp_slip if status == "TP" else costs.exit_slip if closed else 0
+        exit_price = raw_exit * (1 - slip)
+        entry_cash = entry * (1 + costs.entry_fee)
+        fees = entry * costs.entry_fee + exit_price * fee
+        slippage = entry - raw_entry + raw_exit - exit_price
+        net = exit_price * (1 - fee) - entry_cash
+        result = dict(symbol=symbol, entry_ms=entered, exit_ms=int(when), status=status,
+                      closed=closed, raw_entry=raw_entry, entry_price=entry,
+                      stop=stop, target=target, raw_exit=float(raw_exit), exit_price=exit_price,
+                      entry_cash_per_unit=entry_cash, net_return_pct=100 * net / entry_cash,
+                      raw_return_pct=100 * (raw_exit - raw_entry) / entry_cash,
+                      fee_pct=100 * fees / entry_cash, slippage_pct=100 * slippage / entry_cash,
+                      duration_hours=(when - entered) / HOUR, exit_time_exact=exact,
+                      ambiguous=ambiguous, fallback=dict(fallback), gap_at=gap_at)
+        assert abs(result["raw_return_pct"] - result["fee_pct"] - result["slippage_pct"]
+                   - result["net_return_pct"]) < 1e-9
+        market.path_cache[key] = result.copy()
+        return result
+
+    for opened in range(entered, min(deadline, end), H4):
+        pieces, source = market.segments(symbol, opened)
+        if not pieces:
+            return finish("GAP_CENSORED", last_mark, end, gap_at=opened)
+        if source != "1h":
+            fallback[source] += 1
+        for row, step in pieces:
+            t, o, h, low = int(row[0]), float(row[1]), float(row[2]), float(row[3])
+            # Protective orders become active immediately after the opening entry.
+            if o <= stop:
+                return finish("SL", o, t, exact=True)
+            if o >= target:
+                return finish("TP", target, t, exact=True)
+            sl, tp = low <= stop, h >= target
+            if sl and tp:
+                ambiguous += 1
+            if sl and (not tp or policy == "stop_first"):
+                return finish("SL", stop, t + step)
+            if tp:
+                return finish("TP", target, t + step)
+            last_mark = float(row[4])
+    if deadline <= end:
+        row = market.row(symbol, "4h", deadline)
+        if row is None or not math.isfinite(row[1]) or row[1] <= 0:
+            return finish("GAP_CENSORED", last_mark, end, gap_at=deadline)
+        opening = float(row[1])
+        if opening <= stop:
+            return finish("SL", opening, deadline, exact=True)
+        if opening >= target:
+            return finish("TP", target, deadline, exact=True)
+        return finish("TIME", opening, deadline, exact=True)
+    return finish("END_CENSORED", last_mark, end)
+
+
+def size_for_account(equity, cash, active_risk, entry_price, costs):
+    unit_cash = entry_price * (1 + costs.entry_fee)
+    unit_risk = unit_cash - entry_price * .97 * (1 - costs.exit_slip) * (1 - costs.exit_fee)
+    budget = min(equity * .01, max(0, equity * .05 - active_risk))
+    qty = min(budget / unit_risk, max(0, cash) / unit_cash, equity / entry_price)
+    return qty, unit_risk
+
+
+def replay(market: Market, frames: dict[int, dict], start: int, end: int,
+           arm: str, layer: str, costs: Costs, policy: str) -> dict:
+    watches: dict[str, dict] = {}
+    active: dict[str, dict] = {}
+    records, blocks, curve = [], [], []
+    counts = Counter()
+    cash = 10_000.
+    realized = 0.
+    max_reconciliation_error = 0.
+
+    def settle(now):
+        nonlocal cash, realized
+        for symbol, trade in list(active.items()):
+            if trade["closed"] and trade["exit_ms"] <= now:
+                if layer == "portfolio":
+                    cash += trade["cash_invested"] + trade["net_pnl"]
+                    realized += trade["net_pnl"]
+                del active[symbol]
+
+    def equity(now, use_open=True):
+        if layer != "portfolio":
+            return 10_000.
+        return cash + sum(t["quantity"] * market.mark(s, now, use_open=use_open)
+                          for s, t in active.items())
+
+    def snapshot(now, use_open):
+        nonlocal max_reconciliation_error
+        value = equity(now, use_open)
+        residual = value - (10_000 + realized + sum(
+            t["quantity"] * market.mark(s, now, use_open=use_open) - t["cash_invested"]
+            for s, t in active.items()))
+        max_reconciliation_error = max(max_reconciliation_error, abs(residual))
+        assert cash >= -1e-7 and len(active) <= 5 and abs(residual) < 1e-6
+        curve.append(dict(ms=now, equity=value, cash=cash, positions=len(active),
+                          exposure=max(0, (value - cash) / value),
+                          expected_active_risk=sum(t["risk_cash"] for t in active.values())))
+
+    def block(symbol, now, reason, plan=None):
+        counts[reason] += 1
+        blocks.append(dict(symbol=symbol, signal_ms=now, reason=reason,
+                           plan_created_ms=None if plan is None else plan["created_ms"]))
+
+    for now in range(start + H4, end, H4):
+        settle(now)
+        if layer == "portfolio":
+            # Closed-bar mark BEFORE new opening fills; never mark earlier with current high/low.
+            snapshot(now, False)
+        eligible = frames.get(now, {})
+        signals = []
+        if arm == "B":
+            for symbol, plan in list(watches.items()):
+                state = plan_decision(plan, market.row(symbol, "4h", now - H4),
+                                      now, symbol in eligible)
+                if state in {"expired", "invalidated"}:
+                    counts[state] += 1
+                    del watches[symbol]
+                elif state == "signal":
+                    signals.append((symbol, plan))
+        else:
+            for symbol, feature in eligible.items():
+                if feature["breakout"]:
+                    if symbol in active:
+                        block(symbol, now, "same_symbol")
+                    else:
+                        signals.append((symbol, None))
+        signals.sort(key=lambda pair: (-eligible[pair[0]]["qv"], pair[0]))
+        if layer == "portfolio" and arm == "C":
+            for symbol, plan in signals[5:]:
+                block(symbol, now, "new_candidate_budget", plan)
+            signals = signals[:5]
+        for symbol, plan in signals:
+            counts["eligible_events"] += 1
+            if layer == "portfolio" and len(active) >= 5:
+                block(symbol, now, "max_positions", plan)
+                continue
+            trade = path(market, symbol, now, end, costs, policy)
+            if trade["status"] == "NO_ENTRY":
+                block(symbol, now, "missing_next_open", plan)
+                watches.pop(symbol, None)
+                continue
+            if layer == "portfolio":
+                eq = equity(now)
+                risk = sum(t["risk_cash"] for t in active.values())
+                qty, unit_risk = size_for_account(eq, cash, risk, trade["entry_price"], costs)
+                if qty <= 1e-10:
+                    block(symbol, now, "cash_or_risk", plan)
+                    continue
+                invested = qty * trade["entry_cash_per_unit"]
+                risk_cash = qty * unit_risk
+                assert risk_cash <= eq * .01 + 1e-7
+                assert risk + risk_cash <= eq * .05 + 1e-7
+                assert invested <= cash + 1e-7
+                cash -= invested
+            else:
+                invested = 1_000.
+                qty = invested / trade["entry_cash_per_unit"]
+                risk_cash = 0.
+            feature = eligible[symbol]
+            trade.update(arm=arm, layer=layer, cost=costs.name, policy=policy,
+                         regime=feature["regime"], crash=feature["crash"],
+                         plan_created_ms=None if plan is None else plan["created_ms"],
+                         signal_ms=now, quote_volume=feature["qv"], quantity=qty,
+                         cash_invested=invested, risk_cash=risk_cash,
+                         net_pnl=invested * trade["net_return_pct"] / 100)
+            records.append(trade)
+            watches.pop(symbol, None)
+            if layer != "all_events":
+                active[symbol] = trade
+        if arm == "B":
+            candidates = [(s, f) for s, f in eligible.items() if f["candidate"] is not None
+                          and s not in watches and s not in active]
+            candidates.sort(key=lambda pair: (-pair[1]["qv"], pair[0]))
+            if layer == "portfolio":
+                for symbol, feature in candidates[5:]:
+                    block(symbol, now, "new_candidate_budget")
+                candidates = candidates[:5]
+            for symbol, feature in candidates:
+                if layer == "portfolio" and len(watches) + len(active) >= 10:
+                    block(symbol, now, "open_plan_budget")
+                    continue
+                watches[symbol] = dict(feature["candidate"], created_ms=now)
+                counts["plans_created"] += 1
+    settle(end)
+    counts["watching_at_end"] = len(watches)
+    if layer == "portfolio":
+        snapshot(end, False)
+        final = curve[-1]["equity"]
+        assert abs(final - 10_000 - sum(t["net_pnl"] for t in records)) < 1e-5 or any(
+            t["status"] == "GAP_CENSORED" for t in records)
+    return dict(trades=records, blocks=blocks, counts=dict(counts), curve=curve,
+                max_cash_reconciliation_error=max_reconciliation_error)
+
+
+def trade_metrics(rows: list[dict]) -> dict:
+    closed = [r for r in rows if r["closed"]]
+    x = np.array([r["net_return_pct"] for r in closed])
+    wins, losses = x[x > 0], x[x < 0]
+    duration = np.array([r["duration_hours"] for r in closed])
+    total_loss = -sum(losses)
+    return dict(trades=len(rows), closed_trades=len(closed), censored=len(rows) - len(closed),
+                mean_net_pct=float(x.mean()) if len(x) else None,
+                win_rate_pct=100 * len(wins) / len(x) if len(x) else None,
+                avg_win_pct=float(wins.mean()) if len(wins) else None,
+                avg_loss_pct=float(losses.mean()) if len(losses) else None,
+                profit_factor=float(sum(wins) / total_loss) if total_loss else None,
+                mean_raw_pct=float(np.mean([r["raw_return_pct"] for r in closed])) if closed else None,
+                mean_fee_pct=float(np.mean([r["fee_pct"] for r in closed])) if closed else None,
+                mean_slippage_pct=float(np.mean([r["slippage_pct"] for r in closed])) if closed else None,
+                time_exit_pct=100 * sum(r["status"] == "TIME" for r in closed) / len(closed) if closed else None,
+                duration_median_hours=float(np.median(duration)) if len(duration) else None,
+                duration_p90_hours=float(np.quantile(duration, .9)) if len(duration) else None,
+                duration_max_hours=float(duration.max()) if len(duration) else None,
+                tail_worst_pct=float(x.min()) if len(x) else None,
+                tail_p05_pct=float(np.quantile(x, .05)) if len(x) else None,
+                ambiguous_trades=sum(r["ambiguous"] > 0 for r in rows),
+                fallback_trades=sum(bool(r["fallback"]) for r in rows),
+                status_counts=dict(Counter(r["status"] for r in rows)),
+                signal_weeks=len({datetime.fromtimestamp(r["entry_ms"] / 1000, timezone.utc).strftime("%G-W%V")
+                                  for r in closed}))
+
+
+def account_metrics(result: dict, start: int, end: int) -> dict:
+    curve = result["curve"]
+    equity = np.array([10_000.] + [r["equity"] for r in curve])
+    daily = np.array([10_000.] + [r["equity"] for r in curve if r["ms"] % DAY == 0])
+    ret = daily[1:] / daily[:-1] - 1
+    std = float(ret.std(ddof=1)) if len(ret) > 1 else 0
+    down = float(np.sqrt(np.mean(np.minimum(ret, 0) ** 2))) if len(ret) else 0
+    rows = result["trades"]
+    fees = sum(r["cash_invested"] * r["fee_pct"] / 100 for r in rows)
+    slippage = sum(r["cash_invested"] * r["slippage_pct"] / 100 for r in rows)
+    pnl = [r["net_pnl"] for r in rows if r["closed"]]
+    return dict(final_equity=float(equity[-1]), net_return_pct=100 * (equity[-1] / 10_000 - 1),
+                cagr_pct=100 * ((equity[-1] / 10_000) ** (365 * DAY / (end - start)) - 1),
+                max_drawdown_pct=100 * float(np.max(1 - equity / np.maximum.accumulate(equity))),
+                sharpe=float(ret.mean() / std * np.sqrt(365)) if std else None,
+                sortino=float(ret.mean() / down * np.sqrt(365)) if down else None,
+                exposure_pct=100 * float(np.mean([r["exposure"] for r in curve])),
+                invested_time_pct=100 * float(np.mean([r["positions"] > 0 for r in curve])),
+                turnover=sum(r["quantity"] * (r["entry_price"] + (r["exit_price"] if r["closed"] else 0))
+                             for r in rows) / 10_000,
+                fees_usdt=fees, slippage_usdt=slippage,
+                fee_drag_pct=fees / 100, max_single_loss_usdt=min(pnl) if pnl else None,
+                dollar_profit_factor=sum(max(0, v) for v in pnl) / -sum(min(0, v) for v in pnl)
+                if any(v < 0 for v in pnl) else None,
+                max_positions=max(r["positions"] for r in curve),
+                cash_reconciliation_error=result["max_cash_reconciliation_error"],
+                unresolved_gap_trades=sum(r["status"] == "GAP_CENSORED" for r in rows))
+
+
+def bootstrap(b: list[dict], c: list[dict], start: int, end: int,
+              *, repetitions=2000, block_days=14) -> dict:
+    days = (end - start) // DAY
+    data = np.zeros((days, 4))
+    for arm, rows in enumerate((b, c)):
+        for r in rows:
+            if r["closed"]:
+                i = (r["entry_ms"] - start) // DAY
+                data[i, arm * 2] += r["net_return_pct"]
+                data[i, arm * 2 + 1] += 1
+    rng = np.random.default_rng(20261013)
+    blocks = math.ceil(days / block_days)
+    begins = rng.integers(0, max(1, days - block_days + 1), size=(repetitions, blocks))
+    indices = (begins[:, :, None] + np.arange(min(block_days, days)))[..., :].reshape(repetitions, -1)[:, :days]
+    samples = data[indices].sum(axis=1)
+    usable = (samples[:, 1] > 0) & (samples[:, 3] > 0)
+    samples = samples[usable]
+    if not len(samples):
+        return dict(b_ci=None, c_ci=None, delta_ci=None, valid_resamples=0)
+    rb, rc = samples[:, 0] / samples[:, 1], samples[:, 2] / samples[:, 3]
+    return dict(b_ci=np.quantile(rb, [.025, .975]).tolist(),
+                c_ci=np.quantile(rc, [.025, .975]).tolist(),
+                delta_ci=np.quantile(rc - rb, [.025, .975]).tolist(),
+                valid_resamples=len(samples), block_days=block_days)

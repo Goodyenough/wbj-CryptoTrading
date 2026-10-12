@@ -1,0 +1,287 @@
+{
+  "created_utc": "2026-10-12T16:22:18.066983+00:00",
+  "windows": [
+    {
+      "start": "2024-07-01",
+      "arm_layer_replays": 36,
+      "trades_checked": 19631
+    },
+    {
+      "start": "2025-06-01",
+      "arm_layer_replays": 36,
+      "trades_checked": 13091
+    }
+  ],
+  "checks": {
+    "exported_trades": 32722
+  },
+  "max_reconciliation_error_usdt": 8.185452315956354e-12,
+  "orders_below_10_usdt": [
+    {
+      "window": "2024-07-01",
+      "cost": "taker",
+      "policy": "stop_first",
+      "arm": "B",
+      "symbol": "AVAXUSDT",
+      "invested": 8.805349215883325,
+      "entry": "2024-09-25T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "taker",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "FLOKIUSDT",
+      "invested": 1.1368683772161603e-13,
+      "entry": "2024-11-10T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "taker",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "CELOUSDT",
+      "invested": 2.833126262960377,
+      "entry": "2024-12-04T08:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "taker",
+      "policy": "target_first",
+      "arm": "B",
+      "symbol": "AVAXUSDT",
+      "invested": 8.805349215883325,
+      "entry": "2024-09-25T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "taker",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "FLOKIUSDT",
+      "invested": 1.1368683772161603e-13,
+      "entry": "2024-11-10T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "taker",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "CELOUSDT",
+      "invested": 2.833126262960377,
+      "entry": "2024-12-04T08:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "taker",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "FLOKIUSDT",
+      "invested": 1.1368683772161603e-13,
+      "entry": "2025-01-17T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "stress",
+      "policy": "stop_first",
+      "arm": "B",
+      "symbol": "AVAXUSDT",
+      "invested": 2.75939211355535,
+      "entry": "2024-09-25T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "stress",
+      "policy": "stop_first",
+      "arm": "B",
+      "symbol": "SHIBUSDT",
+      "invested": 4.547473508864641e-13,
+      "entry": "2024-10-14T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "stress",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "ARBUSDT",
+      "invested": 6.981905293403997,
+      "entry": "2024-10-14T12:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "stress",
+      "policy": "target_first",
+      "arm": "B",
+      "symbol": "AVAXUSDT",
+      "invested": 2.75939211355535,
+      "entry": "2024-09-25T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "stress",
+      "policy": "target_first",
+      "arm": "B",
+      "symbol": "SHIBUSDT",
+      "invested": 4.547473508864641e-13,
+      "entry": "2024-10-14T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "stress",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "ARBUSDT",
+      "invested": 6.981905293403997,
+      "entry": "2024-10-14T12:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "legacy_fee",
+      "policy": "stop_first",
+      "arm": "B",
+      "symbol": "AVAXUSDT",
+      "invested": 9.3286841075128,
+      "entry": "2024-09-25T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "legacy_fee",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "CELOUSDT",
+      "invested": 4.492037661190807,
+      "entry": "2024-12-04T08:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "legacy_fee",
+      "policy": "target_first",
+      "arm": "B",
+      "symbol": "AVAXUSDT",
+      "invested": 9.3286841075128,
+      "entry": "2024-09-25T04:00:00+00:00"
+    },
+    {
+      "window": "2024-07-01",
+      "cost": "legacy_fee",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "CELOUSDT",
+      "invested": 4.492037661190807,
+      "entry": "2024-12-04T08:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "taker",
+      "policy": "stop_first",
+      "arm": "B",
+      "symbol": "PEPEUSDT",
+      "invested": 1.1368683772161603e-13,
+      "entry": "2026-04-24T16:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "taker",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "ADAUSDT",
+      "invested": 2.826110423283808,
+      "entry": "2025-09-13T00:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "taker",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "DOGEUSDT",
+      "invested": 4.035018974112518,
+      "entry": "2026-05-06T12:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "taker",
+      "policy": "target_first",
+      "arm": "B",
+      "symbol": "PEPEUSDT",
+      "invested": 1.1368683772161603e-13,
+      "entry": "2026-04-24T16:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "taker",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "ADAUSDT",
+      "invested": 2.896758790606782,
+      "entry": "2025-09-13T00:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "stress",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "ADAUSDT",
+      "invested": 4.680153568740479,
+      "entry": "2025-09-13T00:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "stress",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "ADAUSDT",
+      "invested": 4.7865298533786245,
+      "entry": "2025-09-13T00:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "legacy_fee",
+      "policy": "stop_first",
+      "arm": "B",
+      "symbol": "PEPEUSDT",
+      "invested": 1.1368683772161603e-13,
+      "entry": "2026-04-24T16:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "legacy_fee",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "ADAUSDT",
+      "invested": 2.1465370991609234,
+      "entry": "2025-09-13T00:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "legacy_fee",
+      "policy": "stop_first",
+      "arm": "C",
+      "symbol": "DOGEUSDT",
+      "invested": 4.9886828011285616,
+      "entry": "2026-05-06T12:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "legacy_fee",
+      "policy": "target_first",
+      "arm": "B",
+      "symbol": "PEPEUSDT",
+      "invested": 1.1368683772161603e-13,
+      "entry": "2026-04-24T16:00:00+00:00"
+    },
+    {
+      "window": "2025-06-01",
+      "cost": "legacy_fee",
+      "policy": "target_first",
+      "arm": "C",
+      "symbol": "ADAUSDT",
+      "invested": 2.2011927686476156,
+      "entry": "2025-09-13T00:00:00+00:00"
+    }
+  ],
+  "verdict": "export_and_independent_ledger_checks_pass",
+  "limitations": [
+    "No historical exchange lot-size/min-notional or order-book reconstruction; 10 USDT is a diagnostic threshold, not an applied filter.",
+    "Intrabar times are upper bounds except opening/time exits; no tick-level order guarantee."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "started_utc": "2026-10-12T16:19:01.088203+00:00",
+  "source_sha256": {
+    "scripts/research_short_horizon_entries.py": "9747ab3139ad983e9fea09fdd284cc2dcd2a8c58fb47c09976c4e0f4d1fd7ceb",
+    "scripts/short_horizon_core.py": "0d34185d7d0e0054b409e8adb0a1d986fcfe827f87fa842fe1395eb201d29022",
+    "src/crypto_trading_system/scanner.py": "f0bca879e6f24ab4955452b43a2ad38e103ee7bdfbe088e9a8643b686a64c1e7",
+    "src/crypto_trading_system/indicators.py": "6a7fc50a59a6491c7b85f8e873fa9d9fd7cc60f281df90a5203ce0dcaf8e98bb",
+    "src/crypto_trading_system/market_regime.py": "f057055c879bf975efc03bf4115c4445875d05b1c6171eef44765bbdb92ac13d",
+    "src/crypto_trading_system/ticker_utils.py": "b39df0aba9cd71fabc4c69f918bc432f2a6dcb83b885a31719ca9687ab01dbd0",
+    "src/crypto_trading_system/config.py": "2fe06c259b3aa322760aef2c393c0d089238f0786a6dcd78867479d94eaf6461",
+    "src/crypto_trading_system/backtest/history.py": "05afefe4b4079b4d52271c7452df3f42075c2c92c5762f636c63cfee2094cc43",
+    "config/settings.toml": "be7ec39ec21f6a838571511cb2cd0e290263031b521a9a07a6fb70164b8ef4bf"
+  },
+  "protocol_sha256": "9a03a08a50822379086922bc245c38af82c1f98197f1c14f3a16fdc51ddc709a",
+  "input_manifest_sha256": "e47a6ad7c881b7cd9b1d95897fb3df85ba8096d04e369649677998bb14d35602",
+  "completed_utc": "2026-10-12T16:19:30.420324+00:00"
+}

@@ -8,3 +8,4 @@ data/*.db-journal
 data/*.db-shm
 data/*.db-wal
 reports/**/.n2_cache/
+data/research_snapshots/

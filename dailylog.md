@@ -1,5 +1,16 @@
 # Daily Log
 
+### 2026-10-13 00:32 +08:00 - 完成同短周期退出的入场研究
+- 类型：隔离研究代码 / 测试 / 协议与报告 / 记忆同步。
+- 改动：新增 `research_short_horizon_entries.py`、`short_horizon_core.py`、`audit_short_horizon_entries.py` 和针对性测试；只读冻结SQLite两窗口数据，复用原scanner构造B，比较C的20根新突破；统一next-open、+5%/-3%、48h及成本，输出事件/逐币/账户三层全部分支。
+- 原因：回答用户指定的“相同短出口下突破是否更能选出净盈利交易”，避免直接复用旧出口绩效或仅筛选事后亏损。主结果不支持升级，研究叙事放实验账本/报告。
+- 纠错：独立审计发现低单价币会把约1e-13 USDT剩余现金计为虚小仓位，改为USDT维度1e-8数值容差；原始代码/结果保留，新结果写入 `reports/2026-10-13/short_horizon_entry_v1_cashfix/`。策略协议未改、未择优调参。
+- 验证：51项针对性pytest通过、100个真实时点scanner适配一致、24份非组合逐笔结果纠错前后完全一致；32,713条跨分支导出记录的独立现金/费用/风险检查通过，最大对账误差约1e-11 USDT。曾误引用不存在的 `test_market_regime.py`，随后定位并运行实际 `test_scanner_regime.py`；不声称全套项目测试通过。
+- 记忆：更新TODO、EXPERIMENT_LEDGER、SYSTEM_OVERVIEW、仓库开发计划、Obsidian实验日志及开发计划；Obsidian保留历史条目和frontmatter，未做GUI渲染验收。新增历史最小订单/数量步长待立项项，未启动工程。
+- 数据边界：本地两份约419MB冻结数组置于忽略的 `data/research_snapshots/`；生产DB、默认配置及用户既有 `scripts/run_logged_paper_task.ps1` 修改不纳入提交。报告manifest保留hash及复核命令；主账户4笔非零小额订单仍属执行近似限制。
+- 打包验证（07:11 +08:00）：13个报告本地链接无断链、最终运行涉及9个源码/配置hash与当前文件一致；Obsidian两份笔记日期与新增章节核对通过。为本轮冻结文件添加限定路径的Git原字节/行尾保护，避免checkout自动换行破坏SHA256。按规则附带00:10/04:10自然调度reports，它们不是本轮入场实验结果。
+- Git：基于 `b3079ff`；本批以 `research: compare breakout and reference entries under fixed short exits` 提交并按规则推送origin/main，包含 `reports/`；实际提交hash见同主题Git记录。提交前核对暂存范围、文档本地链接与 `git diff --cached --check`。
+
 ### 2026-10-12 23:59 +08:00 - 交接同退出规则下的入场对照研究
 - 类型：会话交接 / 文档 / TODO；本轮未运行实验。
 - 改动：在 `handoff.md` 顶部追加新章节，保留全部旧交接；写清用户问题、事实/观察/假设/决策、共同退出下 B/C 入场定义、待冻结执行与成本细节、支持/否定/不足标准和可直接执行的只读命令。TODO 更新为用户已提出研究、待新对话执行。
