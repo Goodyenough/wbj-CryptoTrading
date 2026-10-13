@@ -2451,3 +2451,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 结果：D6全事件净期望早/近`-0.3802%/-0.5064%`，相对C20`-0.0820/+0.1932`百分点，差值95%区间均跨零；早窗路径更差、近窗路径混合，预注册裁决`retest / insufficient / no_automatic_next_experiment`。生产配置未修改。
 - 验证：相关回归62项通过；两窗主路径完整覆盖1,636条D6和1,107条C20事件；C20跨分支15,389条记录与既有cash-fix逐笔逐金额一致；协议/源码SHA256运行前后稳定；`git diff --check`待提交前复核。用户原有`scripts/run_logged_paper_task.ps1`改动未触碰。
 - Git：本次提交 `research: evaluate D6 breakout entry`。
+
+### 2026-10-14 00:14:19 +08:00 - 登记B入场 reclaim-strength 诊断待办
+- 类型：Taskboard / TODO / Git。
+- 改动：创建 `CRYPTOTRADIN-127`“B入场 reclaim-strength 连续关系诊断”，保持 `todo`、`priority=medium`，并同步 `TODO.md`。任务定义明确系统目标、单一问题、路线位置、事实/观察/假设/决定，以及支持、否定、证据不足标准。
+- 原因：B 入场两个已烧窗口的 raw price contribution 均为正但净收益仍为负，需要先判断实时 reclaim 强度与收益、路径是否存在稳定连续关系，再决定是否值得提出阈值实验。
+- 边界：用户明确要求仅加入 todo、不要开启；未认领任务，未编写实验协议、未运行诊断或回测、未选择阈值、未使用 2026-06 之后未用数据、未修改交易规则或生产配置。
+- 验证：重复项检索无匹配；`taskctl issue create` 返回 `CRYPTOTRADIN-127 status=todo version=1`。按仓库约定随提交归档 `reports/2026-10-14/` 已有自然调度产物，不重新评估其结论；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
+- Git：本次提交 `docs: queue B reclaim strength diagnostic`。

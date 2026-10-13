@@ -1,5 +1,9 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-14 B入场 reclaim-strength 连续关系诊断
+
+- [ ] **CRYPTOTRADIN-127 / todo / 未授权启动**：仅诊断实时 `reclaim_strength = (confirmation_close - entry_high) / ATR20` 与 B 入场后续 raw/net 收益、路径质量的连续关系，判断较强 reclaim 是否可能筛出覆盖成本的子群。只复用两个已烧窗口和冻结 B all-events 输入，不选阈值、不创建策略变体、不运行回测、不使用 2026-06 之后未用数据、不修改交易规则或生产配置；支持、否定与证据不足标准已写入 Taskboard，须等用户另行授权后才可开启。
+
 ## 2026-10-13 Claude独立评审：更早动能启动候选
 
 - [x] **CRYPTOTRADIN-126 / in_review / 实验完成待用户验收**：唯一一次`D6 vs C20`开发诊断已按冻结协议完成；主口径D6净期望早/近为`-0.3802% / -0.5064%`，相对C20为`-0.0820 / +0.1932`百分点，两窗差值95%区间均跨零，裁决`retest / insufficient`。报告：`reports/2026-10-13/breakout_d6_v1/report.md`。
