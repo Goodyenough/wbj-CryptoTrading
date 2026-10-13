@@ -1,5 +1,9 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-13 Claude独立评审：更早动能启动候选
+
+- [ ] **讨论中 / WAITING_CLAUDE**：通过 `claude-discussions/2026-10-13-2321-early-momentum-breakout.md` 评审“4h收缩—首次放量扩张—防追高”是否机制自洽、是否参数过多，以及首轮最小候选和审批标准。当前只做方向讨论，不运行新实验、不修改生产配置；最多三轮，未收敛则交用户裁决。
+
 ## 2026-10-13 20根4h突破入场时机诊断
 
 - [x] **用户授权 / 机制诊断完成**：复用冻结C臂1,107个事件，验证突破前是否已完成5%且成交后再无5%空间。早窗`late_exhausted=45.69%`、近窗`57.99%`，区块区间与双窗方向未同时通过预设门槛，结论`insufficient_or_window_inconsistent`。报告：`reports/2026-10-13/breakout_lateness_diagnostic_v1/report.md`。

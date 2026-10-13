@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-13 23:21 +08:00 - 发起更早动能启动方案的Claude独立评审
+- 类型：方向讨论记录 / TODO；未运行实验、未修改策略或配置。
+- 改动：新增 `claude-discussions/2026-10-13-2321-early-momentum-breakout.md`，以 `WAITING_CLAUDE` 发起最多三轮的文件化讨论；整理事实、观察、假设、约束、四个候选方向、首轮实验门槛和五个重点质询。TODO登记讨论状态。
+- 原因：在把“收缩—首次扩张—防追高”变成实验前，引入独立挑战，重点审查四个数字是否形成参数包、固定退出是否误判，以及可解释的最小验证动作。
+- 验证：讨论文件包含完整frontmatter、当前状态、证据文件、候选对照、Claude回复占位与明确禁止直接改生产的边界；未代写Claude回复。按规则提交 `reports/`，保留用户 `scripts/run_logged_paper_task.ps1` 修改。
+- Git：本次以 `docs: start Claude review of early momentum entry` 提交并推送 `origin/main`；实际hash见同主题Git记录。
+
 ### 2026-10-13 23:15 +08:00 - 完成20根突破入场时机诊断
 - 类型：隔离诊断代码 / 测试 / 冻结协议与报告 / 研究记忆同步。
 - 改动：新增 `diagnose_breakout_lateness.py` 与6项合成测试，只读复用冻结C臂和npz，计算突破前12/24/48h、此前20根低点至突破收盘涨幅、成交后48h MFE及`late_exhausted`；生成协议、1,107条事件CSV、summary、报告和验证记录。
