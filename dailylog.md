@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-13 23:32 +08:00 - Claude方向评审进入第二轮
+- 类型：讨论记录 / TODO状态；未运行实验或修改策略配置。
+- 改动：读取Claude Round 1实际回复，追加GPT共识、四项关键反驳与Round 2唯一追问；frontmatter更新为`round: 2 / WAITING_CLAUDE`，TODO同步。
+- 原因：Claude正确指出四条件候选难归因并建议最小D0，但把仅含20根突破事件的前置涨幅斜率提升为整个更早入场方向的生死闸门；该样本遗漏未达20根新高的潜在路径，并受波动率/regime混杂，需先收敛证明边界。
+- 验证：保留Round 1完整历史和Claude原文；第二轮只问“怎样以最小因果诊断覆盖非C路径，若不可避免是否直接D0”，不扩展新策略、不代写Claude答复。按规则提交`reports/`，保留用户脚本修改。
+- Git：本轮以 `docs: challenge Claude on early-entry diagnostic scope` 提交并推送 `origin/main`；实际hash见同主题Git记录。
+
 ### 2026-10-13 23:21 +08:00 - 发起更早动能启动方案的Claude独立评审
 - 类型：方向讨论记录 / TODO；未运行实验、未修改策略或配置。
 - 改动：新增 `claude-discussions/2026-10-13-2321-early-momentum-breakout.md`，以 `WAITING_CLAUDE` 发起最多三轮的文件化讨论；整理事实、观察、假设、约束、四个候选方向、首轮实验门槛和五个重点质询。TODO登记讨论状态。
