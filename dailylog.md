@@ -2437,3 +2437,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 约束：恢复率高只能支持“止损可能过早”的必要条件，不能直接证明退出实验有效；跨窗口不一致、K 敏感、beta/幸存者偏差无法排除时仍判证据不足；不修改生产策略或参数。
 - 验证：讨论文件已写入 Round 2 GPT 收口并设为 `status: DONE`、`decision: retest`；未修改代码、配置或实验结果文件，保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
 - Git：待提交。
+
+### 2026-10-13 23:55:00 +08:00 - 冻结D6 vs C20协议并启动任务
+- 类型：Taskboard / 研究协议 / TODO / 开发计划 / Claude讨论收口 / Git。
+- 改动：按用户授权创建`CRYPTOTRADIN-126`并由`todo`认领为`in_progress`；将三轮讨论设为`DONE / retest`；新增`reports/2026-10-13/breakout_d6_protocol_v1.md`，冻结同构D6/C20、尝试预算=1、三层回放、路径质量、事件密度和裁决标准；同步`TODO.md`与`开发计划.md`。
+- 原因：先回答“约24小时局部新高是否比80小时新高更能筛选好交易”，避免直接把收缩、放量、防追高和更早突破捆成不可归因的参数包。
+- 验证：Taskboard返回`CRYPTOTRADIN-126 status=in_progress version=2`；协议明确事实/观察/假设/决定、支持/否定/证据不足、已烧窗口与current-survivor边界；尚未运行实验，生产配置未修改，用户原有`scripts/run_logged_paper_task.ps1`改动未触碰。
+- Git：本次提交 `research: freeze D6 breakout experiment`。

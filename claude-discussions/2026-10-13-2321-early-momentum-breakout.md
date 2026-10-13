@@ -1,8 +1,8 @@
 ---
-status: WAITING_USER
+status: DONE
 round: 3
 max_rounds: 3
-decision: pending
+decision: retest
 ---
 
 # Claude 讨论：更早、可实时识别的动能启动入场是否合理
@@ -496,3 +496,13 @@ GPT与Claude在技术路线和最小实验上已无实质分歧。唯一未决�
 <!-- three-round-user-decision-boundary -->
 <!-- no-further-round-without-user-direction -->
 <!-- eof-boundary -->
+
+## 最终结论
+
+- 结论：`retest`
+- 当前决定：用户于2026-10-13明确选择“把结果分支放到Taskboard的todo中，然后开启”；已创建并认领`CRYPTOTRADIN-126`，先冻结协议，再运行唯一一次`D6 vs C20`开发诊断。
+- 理由：D6是把“更早局部突破”从收缩、放量、防追高中拆出的最小同构候选，能够覆盖不会成为C20的路径，同时保持退出和成本不变。
+- 主要风险：两个窗口已烧且继承current-survivor幸存者偏差；D6与C20事件总体不同；固定出口可能与D6路径不匹配。
+- 下一步行动：执行`reports/2026-10-13/breakout_d6_protocol_v1.md`，按预设裁决记录`开发资格 / 否定 / 证据不足`，完成后停下等待用户裁决。
+- 验证标准：使用协议冻结的双窗、同构定义、三层口径、14日区块区间、路径质量、成本压力、regime/波动率/集中度和事件密度；尝试预算=1，不扫5/8/10。
+- 需要更新的项目文件：`TODO.md`、`开发计划.md`、`dailylog.md`、Obsidian实验日志、当前策略文档和Taskboard `CRYPTOTRADIN-126`。
