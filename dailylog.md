@@ -2444,3 +2444,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 原因：先回答“约24小时局部新高是否比80小时新高更能筛选好交易”，避免直接把收缩、放量、防追高和更早突破捆成不可归因的参数包。
 - 验证：Taskboard返回`CRYPTOTRADIN-126 status=in_progress version=2`；协议明确事实/观察/假设/决定、支持/否定/证据不足、已烧窗口与current-survivor边界；尚未运行实验，生产配置未修改，用户原有`scripts/run_logged_paper_task.ps1`改动未触碰。
 - Git：本次提交 `research: freeze D6 breakout experiment`。
+
+### 2026-10-14 00:03:00 +08:00 - 完成D6 vs C20开发诊断
+- 类型：隔离研究代码 / 测试 / 回测报告 / 实验账本 / TODO / 开发计划 / 系统文档 / Taskboard / Git。
+- 改动：将研究回放器泛化为同构`D6/C20` feature key，新增`research_breakout_d6.py`和合成测试；复用冻结输入完成两个窗口、3成本、2种同根顺序、3层回放，生成逐笔、路径质量、事件密度、分层、集中度与14日区块结果；同步`TODO.md`、`开发计划.md`、`SYSTEM_OVERVIEW.md`、`EXPERIMENT_LEDGER.md`和Obsidian实验日志。
+- 结果：D6全事件净期望早/近`-0.3802%/-0.5064%`，相对C20`-0.0820/+0.1932`百分点，差值95%区间均跨零；早窗路径更差、近窗路径混合，预注册裁决`retest / insufficient / no_automatic_next_experiment`。生产配置未修改。
+- 验证：相关回归62项通过；两窗主路径完整覆盖1,636条D6和1,107条C20事件；C20跨分支15,389条记录与既有cash-fix逐笔逐金额一致；协议/源码SHA256运行前后稳定；`git diff --check`待提交前复核。用户原有`scripts/run_logged_paper_task.ps1`改动未触碰。
+- Git：本次提交 `research: evaluate D6 breakout entry`。

@@ -21,8 +21,9 @@ def market(rows, hours=(), symbol="TESTUSDT"):
                            "1h": np.array(hours, dtype=float).reshape(-1, 12)}})
 
 
-def feature(candidate=None, qv=50e6):
-    return dict(qv=qv, regime="NEUTRAL", crash=False, candidate=candidate, breakout=True)
+def feature(candidate=None, qv=50e6, *, breakout=True, breakout_6=True, breakout_20=True):
+    return dict(qv=qv, regime="NEUTRAL", crash=False, candidate=candidate,
+                breakout=breakout, breakout_6=breakout_6, breakout_20=breakout_20)
 
 
 def test_breakout_excludes_current_high_and_requires_new_event():
@@ -42,6 +43,17 @@ def test_breakout_equality_is_not_breakout_and_previous_uses_own_channel():
     rows[-2] = candle(20 * H4, h=103, c=102)
     rows[-1] = candle(21 * H4, h=107, c=104)
     assert new_breakout(rows)  # previous close did not exceed its own 105 channel
+
+
+def test_breakout_lookback_is_parameterized_without_changing_default():
+    rows = [candle(i * H4, h=100, low=98, c=99) for i in range(22)]
+    rows[-8][2] = 110
+    rows[-1] = candle(21 * H4, h=106, c=105)
+    assert new_breakout(rows, 6)
+    assert not new_breakout(rows, 20)
+    assert new_breakout(rows) == new_breakout(rows, 20)
+    with pytest.raises(ValueError):
+        new_breakout(rows, 0)
 
 
 def test_watching_activation_touch_reclaim_invalidation_and_expiry():
@@ -151,6 +163,20 @@ def test_same_symbol_lock_does_not_suppress_all_event_diagnostics():
     sym_r = replay(m, frames, 0, 5 * H4, "C", "symbol_only", COSTS[0], "stop_first")
     assert len(all_r["trades"]) == 3 and len(sym_r["trades"]) == 1
     assert sym_r["counts"]["same_symbol"] == 2
+
+
+def test_d6_and_c20_replay_read_symmetric_separate_feature_flags():
+    m = market([candle(t * H4) for t in range(1, 5)])
+    frames = {
+        H4: {"TESTUSDT": feature(breakout_6=True, breakout_20=False)},
+        2 * H4: {"TESTUSDT": feature(breakout_6=False, breakout_20=True)},
+    }
+    d6 = replay(m, frames, 0, 5 * H4, "D6", "all_events", COSTS[0], "stop_first")
+    c20 = replay(m, frames, 0, 5 * H4, "C20", "all_events", COSTS[0], "stop_first")
+    assert [t["entry_ms"] for t in d6["trades"]] == [H4]
+    assert [t["entry_ms"] for t in c20["trades"]] == [2 * H4]
+    assert d6["trades"][0]["arm"] == "D6"
+    assert c20["trades"][0]["arm"] == "C20"
 
 
 @pytest.mark.parametrize("price", [1e-8, 1e-6, 1e-4, 1., 10000.])

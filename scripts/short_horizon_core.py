@@ -47,11 +47,29 @@ def valid_bar(row) -> bool:
                 and row[5] >= 0 and row[7] >= 0 and row[8] >= 0)
 
 
-def new_breakout(rows) -> bool:
-    if len(rows) < 22:
+def new_breakout(rows, lookback: int = 20) -> bool:
+    """Return whether the latest closed bar is a first close breakout.
+
+    The previous bar is compared with its own preceding channel, keeping the
+    definition symmetric for the D6 and C20 research arms.
+    """
+    if lookback < 1:
+        raise ValueError("lookback must be positive")
+    required = lookback + 2
+    if len(rows) < required:
         return False
-    return bool(rows[-1][4] > max(r[2] for r in rows[-21:-1])
-                and rows[-2][4] <= max(r[2] for r in rows[-22:-2]))
+    return bool(rows[-1][4] > max(r[2] for r in rows[-lookback - 1:-1])
+                and rows[-2][4] <= max(r[2] for r in rows[-lookback - 2:-2]))
+
+
+def breakout_feature_key(arm: str) -> str | None:
+    """Map research arm names to their frozen feature flag."""
+    if arm == "B":
+        return None
+    mapping = {"C": "breakout", "C20": "breakout_20", "D6": "breakout_6"}
+    if arm not in mapping:
+        raise ValueError(f"Unknown replay arm: {arm}")
+    return mapping[arm]
 
 
 def plan_decision(plan: dict, row, now: int, eligible: bool) -> str:
@@ -195,6 +213,7 @@ def size_for_account(equity, cash, active_risk, entry_price, costs):
 
 def replay(market: Market, frames: dict[int, dict], start: int, end: int,
            arm: str, layer: str, costs: Costs, policy: str) -> dict:
+    breakout_key = breakout_feature_key(arm)
     watches: dict[str, dict] = {}
     active: dict[str, dict] = {}
     records, blocks, curve = [], [], []
@@ -253,13 +272,13 @@ def replay(market: Market, frames: dict[int, dict], start: int, end: int,
                     signals.append((symbol, plan))
         else:
             for symbol, feature in eligible.items():
-                if feature["breakout"]:
+                if feature[breakout_key]:
                     if symbol in active:
                         block(symbol, now, "same_symbol")
                     else:
                         signals.append((symbol, None))
         signals.sort(key=lambda pair: (-eligible[pair[0]]["qv"], pair[0]))
-        if layer == "portfolio" and arm == "C":
+        if layer == "portfolio" and breakout_key is not None:
             for symbol, plan in signals[5:]:
                 block(symbol, now, "new_candidate_budget", plan)
             signals = signals[:5]
