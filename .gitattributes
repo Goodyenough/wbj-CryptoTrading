@@ -7,3 +7,8 @@ reports/2026-10-13/short_horizon_entry_v1_cashfix/** -text whitespace=blank-at-e
 scripts/short_horizon_core.py text eol=lf
 scripts/research_short_horizon_entries.py text eol=lf
 scripts/audit_short_horizon_entries.py text eol=lf
+# Preserve exact bytes for the follow-up mechanism diagnostic fingerprints.
+reports/2026-10-13/breakout_lateness_protocol_v1.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+reports/2026-10-13/breakout_lateness_diagnostic_v1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/diagnose_breakout_lateness.py text eol=lf
+tests/test_breakout_lateness_diagnostic.py text eol=lf
