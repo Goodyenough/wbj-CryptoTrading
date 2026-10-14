@@ -1,5 +1,11 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-14 下一代入场研究问题
+
+- [ ] **CRYPTOTRADIN-129 / todo / 未授权启动**：诊断仅使用决策时点信息的“动能刚启动”特征，判断其与随后 12/24/40 根 4h K线的延续路径和净收益是否存在跨窗口稳定关系。`CRYPTOTRADIN-127` 是 B 入场 `reclaim_strength` 的窄前置诊断，本任务不替代或自动启动它；不选阈值、不运行回测、不修改生产配置。
+- [ ] **CRYPTOTRADIN-130 / todo / 未授权启动**：在完全相同的短周期退出与成本口径下，比较 B、C20、D6 及后续获准信号的 raw edge 与完整成本余量，判断是否存在跨窗口稳定覆盖手续费、滑点和执行摩擦的入场类型；不调整退出或成本假设，不修改生产配置。
+- [ ] **CRYPTOTRADIN-131 / todo / 未授权启动**：使用入场时点可得的 BTC/ETH 趋势、广度与波动状态，诊断市场状态能否跨窗口稳定区分信号延续与衰竭；只有主效应可信后才检验 regime 交互，不运行分层实验或创建生产过滤规则。
+
 ## 2026-10-14 Baseline 退出后恢复率诊断
 
 - [x] **CRYPTOTRADIN-128 / in_review / 诊断完成待用户验收**：老 baseline 非容量 `STOPPED` 的 K40 恢复率早窗为 `20/52=38.46%`、近窗为 `6/29=20.69%`；两窗落入不同裁决区，正式结论 `insufficient_or_window_inconsistent`。但近窗 17 笔 unknown 的完整样本 K20/K40 均 `0%`，K80 仅 `1/16=6.25%`，不支持把近窗主要亏损解释为止损过早。保持退出与生产配置冻结，不自动启动 `CRYPTOTRADIN-127`。协议：`reports/2026-10-14/baseline_post_exit_recovery_protocol_v1.md`；结果：`reports/2026-10-14/baseline_post_exit_recovery_v1/report.md`。

@@ -2468,3 +2468,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 验证：新增测试`5 passed`；全套测试`236 passed, 5 failed`，失败位于既有`test_database.py`/`test_signal_fill_timing_audit.py`契约及用户未提交`scripts/run_logged_paper_task.ps1`状态，不涉及本诊断。110行逐笔CSV与11,991条查询K线摘要双跑SHA256一致；独立检查确认所有首根均为`exit+4h`、最后一根严格早于cutoff和窗口结束，违规0；早/近最大读取分别为`2025-05-31T20:00Z`/`2026-05-31T20:00Z`。用户原有脚本改动未触碰。
 - 报告：`reports/2026-10-14/baseline_post_exit_recovery_v1/report.md`、`summary.json`、`trades.csv`。
 - Git：本次提交 `research: diagnose baseline post-exit recovery`。
+
+### 2026-10-14 08:58:42 +08:00 - 登记下一代入场三项研究问题
+- 类型：Taskboard / TODO / Git。
+- 改动：创建 `CRYPTOTRADIN-129`“实时动能启动与延续信号诊断”、`CRYPTOTRADIN-130`“入场类型毛优势与成本覆盖诊断”、`CRYPTOTRADIN-131`“市场状态与信号延续关系诊断”，全部保持 `todo`、`priority=medium`，并同步 `TODO.md`。每项任务均写明系统目标、单一问题、路线位置、事实/观察/假设以及支持、否定和证据不足标准。
+- 边界：用户明确要求仅加入 todo、不要开启；三项均未认领、未运行诊断或回测、未编写实验协议、未修改交易规则或生产配置。`CRYPTOTRADIN-127` 继续作为 B 入场 `reclaim_strength` 的窄前置诊断，不自动启动。
+- 验证：Taskboard 创建结果分别返回 `CRYPTOTRADIN-129/130/131 status=todo version=1`；重复项检索仅发现范围更窄的 `CRYPTOTRADIN-127`，已在任务定义中划清边界。当前研究阶段和优先级未改变，不更新开发计划或实验日志；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
+- Git：本次提交 `docs: queue next-generation entry research`。
