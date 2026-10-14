@@ -2475,3 +2475,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 边界：用户明确要求仅加入 todo、不要开启；三项均未认领、未运行诊断或回测、未编写实验协议、未修改交易规则或生产配置。`CRYPTOTRADIN-127` 继续作为 B 入场 `reclaim_strength` 的窄前置诊断，不自动启动。
 - 验证：Taskboard 创建结果分别返回 `CRYPTOTRADIN-129/130/131 status=todo version=1`；重复项检索仅发现范围更窄的 `CRYPTOTRADIN-127`，已在任务定义中划清边界。当前研究阶段和优先级未改变，不更新开发计划或实验日志；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
 - Git：本次提交 `docs: queue next-generation entry research`。
+
+### 2026-10-14 09:21:05 +08:00 - 登记固定5%/3%出口波动适配诊断
+- 类型：Taskboard / TODO / 研究定义 / Git。
+- 改动：创建 `CRYPTOTRADIN-132`“固定5%/3%短周期出口的波动适配诊断”，保持 `todo`、`priority=medium`，并同步 `TODO.md`。任务冻结 B all-events、Binance Spot USDT current-survivor、4h、两个既有窗口、next-open、`+5%/-3%/48h`、taker主成本和 `stop-first` 主口径；定义 `NATR20 = ATR20 / confirmation_close` 为唯一解释变量，C20/D6只作分开描述性复核。
+- 研究标准：支持需早窗识别的同一适配关系原样用于近窗后，两窗扣费后胜率均提高至少5个百分点、净期望不下降、至少近窗转正、交易保留率均不少于30%，且成本、同根顺序与symbol/week/regime稳健性不反转；胜率提高但净期望或尾部风险恶化时否定，单窗成立、切点敏感或样本集中时判证据不足。
+- 边界：只登记任务，未认领、未运行诊断或回测、未编写实验协议、未选择 NATR 阈值、未改为 ATR 自适应止盈止损、未修改交易规则或生产配置。既有两个窗口已烧且有 current-survivor 限制，结果最多授予后续过滤实验资格，不能直接升级生产。
+- 验证：查重仅发现动态止损、旧 `ATR 0.35` 和高波动惩罚等不同问题；Taskboard 返回 `CRYPTOTRADIN-132 status=todo version=1`。现有 `short_horizon_core.py`、`research_breakout_d6.py` 已具备同构出口、NATR20、同根顺序、路径质量和14日区块bootstrap，可复用实现。当前阶段和优先级未改变，不更新开发计划或实验日志；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
+- Git：本次提交 `docs: queue fixed-exit volatility fit diagnostic`。
