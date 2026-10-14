@@ -7,7 +7,7 @@
 - 冻结范围：四政策×两窗口×`taker/stress/legacy_fee`×`stop_first/target_first`共48配置；并列原始收益%、own-risk R、baseline实际planned-risk common-R；MFE/MAE仅解释，状态转移不作组件因果结论。
 - 裁决：仅允许 `component_validation_eligible / reject_current_atr_components / measurement_insufficient`；禁止新ATR参数扫描、生产配置修改和把四出口失败直接解释为入场无优势。
 - 验证：Taskboard 创建返回 `CRYPTOTRADIN-134 status=in_progress version=1`，关联后为 version=2；任务与 `CRYPTOTRADIN-133` 建立 related 关系，启动评论写入成功。尚未运行48配置或修改业务代码；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
-- Git：待提交。
+- Git：任务启动提交 `14f5ba3`（`research: start ATR component attribution`）；本条提交号回填随后单独提交并 push。
 
 ### 2026-10-15 00:37:00 +08:00 - Claude 三轮讨论收口：冻结 ATR 组件归因协议
 - 类型：研究讨论收口 / 诊断协议 / Git。
