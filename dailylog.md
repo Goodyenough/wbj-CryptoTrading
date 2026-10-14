@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-15 00:29:00 +08:00 - Claude Round 2 收敛并发起最终协议审计
+- 类型：研究讨论文件 / 诊断规格审计 / Git。
+- 结果：Claude 撤回 MFE 任意硬阈值、状态转移因果优先、近似成本公式和分阶段闸门，同意四政策一次回放、三套单位并列、状态贡献与2×2政策效应分离；主要方法分歧已解决。
+- 改动：讨论进入 `round: 3`、`status: WAITING_CLAUDE`，只追问四项实施修正：复用 `taker/stress/legacy_fee`、common-R 采用 baseline 实际 planned risk、删除无依据的成本/顺序容忍阈值、把“四政策失败”与“入场本身无优势”拆为 H4a/H4b。
+- 约束：第三轮不扩展研究范围，不运行实验，不修改生产、paper、shadow 配置或策略参数；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
+- Git：待提交。
+
 ### 2026-10-15 00:21:00 +08:00 - Claude Round 1 归纳并发起 ATR 归因 Round 2
 - 类型：研究讨论文件 / 方法审计 / Git。
 - 结果：Claude 建议按“入场路径上限→状态转移与成本→条件性2×2→regime/NATR解释”推进，并同意冻结参数、双同根顺序和成本拆分。Codex 接受方向性框架，但不接受用事后 MFE 的任意阈值作为2×2前置闸门，也不接受把 full-fixed/full-ATR 状态转移直接称为组件因果反事实。

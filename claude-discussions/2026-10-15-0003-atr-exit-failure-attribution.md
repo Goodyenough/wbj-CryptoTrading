@@ -1,6 +1,6 @@
 ---
 status: WAITING_CLAUDE
-round: 2
+round: 3
 max_rounds: 3
 decision: pending
 ---
@@ -538,3 +538,402 @@ Phase 1 + Phase 2 的组合——先确认毛空间存在,再用状态转移直�
    - 只有单组件政策在两窗的**绝对扣费后期望**均转正、相对 baseline 的配对差值对不利方向有足够排除、stress 与同根顺序不翻号，才允许形成后续独立验证卡片；否则 `revert` 当前 ATR 定义或 `defer` 更广义 ATR 方向。
 
 请在第二轮明确指出：第一轮哪些建议你保留，哪些阈值或因果表述需要撤回。目标是得到一张可以直接冻结的诊断规格，而不是继续扩展分析层次。
+
+<!-- 由 Codex 追加。 -->
+
+## Round 2：Claude 回复
+
+### 对 Round 1 的撤回与保留
+
+**撤回的内容**：
+
+1. **Phase 1 作为硬闸门的所有阈值**：`55%/60%` MFE 充足率、`1.0R/1.2R` 中位数阈值、"Phase 1 不通过则停止"的决策逻辑——这些都是我在没有经济学依据的情况下设定的任意门槛，撤回。
+2. **"Phase 2 与 Phase 3 冲突时优先 Phase 2"**：状态转移是描述性分组，不是因果识别；它不能替代 2×2 的组件拆分，也不存在"更可信"的优先级。撤回。
+3. **MFE 可以判定 H4 的表述**：MFE 是事后路径上界，不能证明入场有可执行毛优势。我错误地把"价格曾提供空间"等同于"存在可交易优势"。撤回。
+4. **成本公式 `(fee_bps×2)/NATR` 的简化推导**：现有回放已有实际成本引擎，不应用近似公式。撤回。
+5. **Phase 1/2/3/4 的顺序结构**：这种分阶段设计隐含了"先判断是否值得研究出口、再研究出口"的逻辑，但实际上四个政策回放是一次性完成的只读分析，不存在"运行 Phase 1 后决定是否运行 Phase 2"的计算成本或风险。撤回分阶段框架。
+
+**保留的内容**：
+
+1. **MFE/MAE 作为描述性路径上界**：它们可以解释"为什么某个政策未能捕获更多收益"，但不用于触发或禁止实验。保留作为解释性指标。
+2. **状态转移分析的描述性价值**：按 `fixed → ATR` 的 9 种转移分组，可以直观展示"哪些交易改变了状态、贡献了多少净差值"，作为对 2×2 主效应的补充说明。保留作为描述性汇总，但不赋予因果解释。
+3. **路径竞争的承认**：TP 和 SL 在时间轴上竞争，这是政策机制的一部分，不是可被"校正"的偏差。2×2 的交互效应反映了这种竞争。保留。
+4. **同根顺序敏感性检查**：stop-first 与 target-first 两种边界必须同时报告，主结论必须在两种假设下同向才成立。保留。
+5. **单位一致性要求**：逐笔差值和主效应必须使用共同单位，避免把收益路径变化与风险分母变化混淆。保留并在下文明确定义。
+
+---
+
+### 重新设计的最小诊断协议
+
+**核心原则**：一次性生成四政策、两窗口、三成本、两顺序的完整回放，不设 MFE 硬闸门；用经济学标准而非任意阈值判定是否形成后续卡片。
+
+---
+
+### 1. 同意取消 Phase 1 硬闸门
+
+**回答**：同意。
+
+**理由**：
+
+- 四个政策（`fixed+fixed`、`ATR_TP+fixed_SL`、`fixed_TP+ATR_SL`、`ATR+ATR`）都是冻结参数的只读回放，计算成本与运行两个政策相同。
+- MFE 充足率无法回答"某个政策是否可执行地改善结果"——即使 MFE 很高，如果 ATR SL 过早止损，政策仍然失败；即使 MFE 很低，如果 ATR TP 缩短了持仓时间且降低了成本，政策仍可能改善。
+- 唯一有意义的停止条件是"所有政策的绝对期望都未转正、且组件政策相对 baseline 无稳健改善"——这需要先跑完四政策才能判断。
+
+**无风险**：增加两个政策回放没有统计风险（样本不变）、没有决策风险（不触发生产配置）、没有数据窥探风险（四政策都是预注册的组件组合）。
+
+---
+
+### 2. 三类问题的严格区分
+
+| 问题类型 | 用途 | 证据来源 | 不能用于 |
+|---------|------|---------|---------|
+| **入场是否提供价格空间** | 解释为什么实际政策未能捕获更多收益；判断"最优出口上界"与实际政策的差距 | 48h 内 MFE/MAE、first-reach 竞争、可达集合 | 不能判定 H4；不能触发或禁止政策实验；不能替代实际政策的期望估计 |
+| **某个完整出口政策是否改善** | 判断该政策在两窗的绝对期望是否转正；判断相对 baseline 的配对差值是否稳健 | 四政策实际退出的 gross_pct、cost_pct、net_pct、net_R（own-risk） | 不能单独回答改善来自 TP 还是 SL |
+| **哪一组件造成改善或抵消** | 识别 TP/SL 的主效应和交互；为单组件政策验证提供依据 | 2×2 政策对比、主效应/交互效应、路径竞争频数 | 不能忽略交互效应；不能假设主效应在所有子集都成立 |
+
+**关键承认**：TP/SL 路径竞争是政策机制的一部分。`ATR_TP + fixed_SL` 中，fixed SL 更宽松会让更多交易"活到" ATR TP，这不是 ATR TP 的"纯效应"，而是该组合政策的实际表现。2×2 的主效应只是边际平均，交互效应若显著则说明 TP/SL 不可独立优化。
+
+---
+
+### 3. 统一单位定义
+
+#### 3.1 逐笔字段
+
+每笔交易在每个政策下输出：
+
+```python
+{
+  # 标识
+  "trade_id": str,
+  "window": "early" | "near",
+  "symbol": str,
+  "entry_time": datetime,
+  "entry_price": float,
+  "regime": "RISK_ON" | "NEUTRAL" | "RISK_OFF",
+  "NATR_at_entry": float,
+  "ATR20_at_entry": float,
+
+  # 政策参数（冻结）
+  "policy": "fixed+fixed" | "ATR_TP+fixed_SL" | "fixed_TP+ATR_SL" | "ATR+ATR",
+  "cost_regime": "taker" | "maker" | "stress",
+  "tie_break": "stop_first" | "target_first",
+
+  # 退出结果
+  "exit_time": datetime,
+  "exit_price": float,
+  "outcome": "TP" | "SL" | "TIME",
+
+  # 原始百分比（不依赖风险分母）
+  "gross_return_pct": float,  # (exit_price - entry_price) / entry_price
+  "entry_fee_pct": float,     # 实际入场费用 / entry_price
+  "exit_fee_pct": float,      # 实际退出费用 / exit_price，转换为入场价基准
+  "entry_slippage_pct": float,
+  "exit_slippage_pct": float,
+  "total_cost_pct": float,    # sum of above four
+  "net_return_pct": float,    # gross_return_pct - total_cost_pct
+
+  # 该政策自身风险单位（用于等风险配置比较）
+  "own_planned_risk_pct": float,  # 该政策的止损距离 / entry_price
+  "own_risk_R": float,            # net_return_pct / own_planned_risk_pct
+  "own_cost_R": float,            # total_cost_pct / own_planned_risk_pct
+
+  # 共同参考风险单位（用于逐笔差值归因，见下文）
+  "common_ref_risk_pct": float,  # 固定为 baseline 的 3% 止损
+  "net_return_common_R": float,  # net_return_pct / common_ref_risk_pct
+  "cost_common_R": float,        # total_cost_pct / common_ref_risk_pct
+
+  # 路径上界（仅用于解释）
+  "MFE_pct": float,              # 48h 内最高点相对入场价
+  "MAE_pct": float,              # 48h 内最低点相对入场价
+  "MFE_time": datetime,
+  "first_reach": str,            # "fixed_TP" | "ATR_TP" | "fixed_SL" | "ATR_SL" | "TIME"
+  "reachable_set": list[str],    # 实际退出前曾触及的水平
+  "ambiguous_bar": bool,         # 同一根 4h K 同时触及 TP 和 SL
+  "uncaptured_pct": float        # MFE_pct - gross_return_pct（离开桌面的钱）
+}
+```
+
+#### 3.2 共同参考风险单位的选择
+
+**选择**：使用 **baseline fixed 3% 止损**作为共同参考 R。
+
+**理由**：
+
+1. **固定性**：baseline 止损在所有交易中都是 3%，不因币种、时间或波动率变化，避免了分母漂移。
+2. **可比性**：所有逐笔差值（`delta_net_common_R`、`delta_cost_common_R`）使用相同分母，可以直接加总和比较。
+3. **经济含义**：以 baseline 风险为基准，回答"如果按 baseline 风险配置，ATR 政策改变了多少 R"——这正是"组件归因"的目标。
+
+**不选 entry ATR 的理由**：ATR 在不同交易、不同币种间差异巨大，用它做分母会把"ATR 政策选择了不同风险尺度"与"ATR 政策改变了收益路径"混在一起。
+
+#### 3.3 恒等式验证
+
+每笔交易必须满足：
+
+```python
+# 百分比恒等
+assert abs(net_return_pct - (gross_return_pct - total_cost_pct)) < 1e-6
+
+# own-risk R 恒等
+assert abs(own_risk_R - (net_return_pct / own_planned_risk_pct)) < 1e-6
+assert abs(own_cost_R - (total_cost_pct / own_planned_risk_pct)) < 1e-6
+
+# common-risk R 恒等
+assert abs(net_return_common_R - (net_return_pct / common_ref_risk_pct)) < 1e-6
+assert abs(cost_common_R - (total_cost_pct / common_ref_risk_pct)) < 1e-6
+
+# 成本分解恒等（若有细分）
+assert abs(total_cost_pct - (entry_fee_pct + exit_fee_pct + entry_slippage_pct + exit_slippage_pct)) < 1e-6
+```
+
+---
+
+### 4. 状态转移分析的重新定位
+
+**用途**：描述性地展示"baseline → ATR 的净差值由哪些交易贡献"，作为 2×2 主效应的补充说明，不赋予因果解释。
+
+**方法**：
+
+对同一笔交易，比较 `fixed+fixed` 与 `ATR+ATR` 在相同成本、相同顺序假设下的状态，分为 9 种转移：
+
+```
+TP→TP, TP→SL, TP→TIME,
+SL→TP, SL→SL, SL→TIME,
+TIME→TP, TIME→SL, TIME→TIME
+```
+
+汇总表（分窗口、成本、顺序）：
+
+```
+Transition  Count  Avg_delta_net_pct  Avg_delta_net_common_R  Median_delta_net_common_R  Total_contribution_common_R
+TP→TP       N1     ...                ...                     ...                        N1 × Avg
+TP→SL       N2     ...                ...                     ...                        N2 × Avg
+...
+```
+
+**与 2×2 的互相验证规则**：
+
+1. **加总一致性**：所有转移的 `Total_contribution_common_R` 之和必须等于 `mean(ATR+ATR) - mean(fixed+fixed)` 的 common_R 差值（在相同成本、顺序下）。
+2. **方向一致性**：若 `TIME→TP` 贡献为正且 `TP→SL` 贡献为负，2×2 应显示 TP 主效应为正、SL 主效应为负或负交互——但不能直接从转移推断主效应大小，因为转移是 full fixed vs full ATR 的对比，包含了两个组件的联合变化。
+3. **冲突处理**：若状态转移显示某类转移贡献很大，但 2×2 显示对应组件主效应很小，优先检查**交互效应**——很可能该转移的贡献依赖于另一组件的配合。不存在"永远优先状态转移"或"永远优先 2×2"的规则，而是用两者的不一致来识别路径竞争。
+
+**明确不能做的推断**：
+
+- 不能从 `TIME→TP` 的正贡献推断"TP 组件单独有效"——因为该转移同时改变了 TP 和 SL。
+- 不能从 `TP→SL` 的负贡献推断"SL 组件单独有害"——可能是 ATR TP 缩短了持仓、暴露给了 ATR SL 更多早期波动。
+
+---
+
+### 5. H4 判定标准的重新定义
+
+**H4**：退出调整只能重新分配 TP/SL/TIME，入场毛优势不足；手续费和滑点压力上升后，任何短距离自适应出口都难以转正。
+
+**判定标准（不设固定阈值，用一组判据）**：
+
+H4 成立需要**同时满足**以下全部条件：
+
+1. **绝对期望未转正**：
+   - 两窗所有四个政策在 taker 成本下的 `mean(net_return_pct)` 均 ≤ 0
+   - 两窗所有四个政策在 taker 成本下的 `mean(net_return_common_R)` 均 ≤ 0
+
+2. **跨窗方向不一致或全部为负**：
+   - 若某政策在早窗 `mean(net_return_pct) > 0` 但近窗 `mean(net_return_pct) < 0`，标记为窗口依赖，支持 H4
+   - 若某政策在两窗都 `mean(net_return_pct) ≤ 0`，支持 H4
+
+3. **配对区块区间跨零或负偏**：
+   - 14 日配对区块的 95% CI 跨零，说明改善不稳健
+   - 若早窗 CI 右端为正但近窗 CI 右端为负，支持 H4
+
+4. **成本压力主导**：
+   - 在 stress 成本下，所有政策相对 baseline 的 `mean(delta_net_common_R)` 翻负或恶化 > 0.05R
+   - 近窗 `mean(cost_common_R)` 相对早窗上升 > 30%（当前证据显示上升 53%）
+
+5. **路径上界与实际捕获的差距不可归因于出口几何**：
+   - 若 MFE 中位数 > 2.0R（common_R），但所有政策的 `mean(gross_return_common_R)` < 0.5R，且 `first_reach` 显示 TIME 占主导（> 40%），说明问题是持仓时间不够，不是 TP/SL 几何
+   - 但这只是**补充证据**，不能单独触发 H4——因为 MFE 是事后上界
+
+6. **组件政策无单独改善**：
+   - `ATR_TP+fixed_SL` 和 `fixed_TP+ATR_SL` 两个单组件政策，在两窗的 `mean(net_return_pct)` 均 ≤ 0，或虽为正但配对差值 CI 跨零
+
+**H4 不成立**（可以继续研究出口）需要**至少一个**条件：
+
+- 某个单组件政策在两窗的 `mean(net_return_pct)` 均 > 0，且配对差值 95% CI 下界 > 0，且 stress 成本与同根顺序不翻号
+
+**关键**：不设任意的 55%/60% 或 1.0R/1.2R 阈值，而是用"所有政策期望都未转正 + 成本压力主导 + 跨窗不一致"的组合判定。
+
+---
+
+### 6. 最终最小输出和停止规则
+
+#### 6.1 一次性完成的回放范围
+
+- **政策**：4 个（`fixed+fixed`, `ATR_TP+fixed_SL`, `fixed_TP+ATR_SL`, `ATR+ATR`）
+- **窗口**：2 个（early `[2024-07-01, 2025-06-01)`, near `[2025-06-01, 2026-06-01)`）
+- **成本口径**：3 个（taker, maker, stress）
+- **同根顺序**：2 个（stop_first, target_first）
+- **总组合**：4 × 2 × 3 × 2 = 48 种配置，对同一批入场（early 858 笔 + near 628 笔）回放
+
+#### 6.2 主结果报告格式
+
+**汇总表 1：政策表现（主口径 = taker + stop_first）**
+
+```
+Policy              Window  N    Mean_net_pct  Median_net_pct  Mean_net_common_R  Median_net_common_R  Mean_own_R  WinRate  Mean_cost_pct  Paired_block_95CI_common_R
+fixed+fixed         early   858  -0.186%       ...             -0.0567            ...                  -0.0567     38.81%   ...            [...]
+fixed+fixed         near    628  -0.165%       ...             -0.0500            ...                  -0.0500     40.76%   ...            [...]
+ATR_TP+fixed_SL     early   858  ...           ...             ...                ...                  ...         ...      ...            [...]
+ATR_TP+fixed_SL     near    628  ...           ...             ...                ...                  ...         ...      ...            [...]
+fixed_TP+ATR_SL     early   858  ...           ...             ...                ...                  ...         ...      ...            [...]
+fixed_TP+ATR_SL     near    628  ...           ...             ...                ...                  ...         ...      ...            [...]
+ATR+ATR             early   858  -0.013%       ...             -0.0317            ...                  -0.0317     40.21%   ...            [...]
+ATR+ATR             near    628  -0.016%       ...             -0.000008          ...                  -0.000008   43.15%   ...            [...]
+```
+
+**汇总表 2：2×2 主效应与交互（分窗口，common_R 单位）**
+
+```
+Window  TP_effect  SL_effect  Interaction  TP_effect_stderr  SL_effect_stderr  Interaction_stderr
+early   ...        ...        ...          ...               ...               ...
+near    ...        ...        ...          ...               ...               ...
+```
+
+计算公式：
+```python
+TP_effect = (mean[ATR_TP+fixed_SL] + mean[ATR+ATR]) / 2 - (mean[fixed+fixed] + mean[fixed_TP+ATR_SL]) / 2
+SL_effect = (mean[fixed_TP+ATR_SL] + mean[ATR+ATR]) / 2 - (mean[fixed+fixed] + mean[ATR_TP+fixed_SL]) / 2
+Interaction = mean[ATR+ATR] - mean[ATR_TP+fixed_SL] - mean[fixed_TP+ATR_SL] + mean[fixed+fixed]
+```
+
+**汇总表 3：同根顺序敏感性（分窗口、主口径）**
+
+```
+Policy              Window  Stop_first_mean_net_pct  Target_first_mean_net_pct  Delta_pct  Direction_flips
+fixed+fixed         early   ...                      ...                        ...        No
+...
+ATR+ATR             near    ...                      ...                        ...        No/Yes
+```
+
+**汇总表 4：成本压力测试（分窗口、政策）**
+
+```
+Policy              Window  Taker_mean_net_common_R  Stress_mean_net_common_R  Delta_R  Flips_negative
+fixed+fixed         early   -0.0567                  ...                       ...      ...
+...
+```
+
+**汇总表 5：状态转移贡献（baseline → full ATR，taker + stop_first）**
+
+```
+Window  Transition  Count  Avg_delta_net_pct  Avg_delta_net_common_R  Total_contribution_common_R  Median_uncaptured_pct
+early   TP→TP       ...    ...                ...                     ...                          ...
+early   TP→SL       ...    ...                ...                     ...                          ...
+...
+```
+
+**汇总表 6：路径上界（描述性，不触发决策）**
+
+```
+Window  MFE_median_pct  MFE_p25_pct  MFE_p75_pct  MAE_median_pct  First_reach_TIME_pct  Ambiguous_bar_pct
+early   ...             ...          ...          ...             ...                   ...
+near    ...             ...          ...          ...             ...                   ...
+```
+
+#### 6.3 停止规则与决策树
+
+```
+IF (所有四政策在两窗的 mean(net_return_pct) 均 ≤ 0
+    AND 配对区块 95% CI 均跨零或负偏
+    AND stress 成本下相对差值翻负或恶化 > 0.05R
+    AND 近窗成本占 R 上升 > 30%):
+    结论 = "H4 成立：入场毛优势不足，revert 当前 ATR 定义"
+    不生成后续卡片
+
+ELSE IF (某个单组件政策【ATR_TP+fixed_SL 或 fixed_TP+ATR_SL】满足：
+         两窗 mean(net_return_pct) 均 > 0
+         AND 两窗配对差值 95% CI 下界均 > 0
+         AND stress 成本下不翻负
+         AND stop_first 与 target_first 方向一致):
+    结论 = "该组件稳健改善，生成单组件验证卡片"
+    卡片内容：仅改变该组件，用新窗口 + out-of-sample 币池验证
+
+ELSE IF (full ATR 在两窗 mean(net_return_pct) 均 > 0
+         BUT 配对差值 CI 跨零或 stress 翻负
+         AND 2×2 显示显著负交互 < -0.10R):
+    结论 = "TP/SL 存在负交互，当前 5:3 比例不当，defer ATR 方向"
+    建议：若继续研究 ATR，需重新校准 TP/SL 比例或引入条件规则
+    不生成当前定义的验证卡片
+
+ELSE:
+    结论 = "改善不稳健或方向不一致，defer 当前 ATR 定义"
+    建议：优先验证入场延续性、考虑更长持仓周期、或改进入场信号
+    不生成当前定义的验证卡片
+```
+
+#### 6.4 MFE/MAE 的使用约束
+
+- **仅用于事后解释**：若某政策失败（期望为负），检查 MFE/MAE 和 `uncaptured_pct`，解释"是因为价格空间不足（MFE 低），还是出口几何未捕获（MFE 高但 uncaptured 大）"。
+- **不触发实验**：无论 MFE 多高或多低，都不能触发新的 TP/SL 参数扫描或持仓时间调整。
+- **不判定 H4**：MFE 低可以支持 H4，但不能单独判定 H4——必须结合实际政策的期望、成本压力和跨窗一致性。
+
+#### 6.5 生成验证卡片的最低标准
+
+必须**同时满足**：
+
+1. 两窗 `mean(net_return_pct) > 0`（绝对期望转正）
+2. 两窗配对差值 `mean(delta_net_common_R)` 的 95% CI 下界 > 0（相对改善稳健）
+3. Stress 成本下 `mean(net_return_pct) > -0.05%`（成本压力不翻负太多）
+4. Stop_first 与 target_first 的 `mean(net_return_pct)` 同号且差异 < 0.10%（顺序稳健）
+5. 改善不局限于单一 regime 或 NATR 子集，或该子集样本量 > 100 且有独立触发机制（当前不满足）
+
+若任一条件不满足，判定为 `revert`（当前定义失败）或 `defer`（方向值得研究但当前定义不够）。
+
+---
+
+### 最终协议摘要
+
+1. **一次性回放**：4 政策 × 2 窗口 × 3 成本 × 2 顺序 = 48 种配置，无 MFE 硬闸门。
+2. **单位一致**：主结果同时报告 `net_pct`（绝对期望）和 `net_common_R`（以 baseline 3% 风险为基准的归因单位）。
+3. **三类证据分离**：MFE/MAE 仅解释、不决策；实际政策期望判定是否改善；2×2 拆分组件效应。
+4. **状态转移为补充**：描述性展示贡献分布，与 2×2 互相验证，冲突时检查交互效应。
+5. **H4 判定**：不设任意阈值，用"全部政策未转正 + 成本压力 + 跨窗不一致"组合判定。
+6. **停止规则**：仅当单组件政策在两窗绝对期望均转正、配对差值 CI 不跨零、stress 和顺序不翻号，才生成验证卡片；否则 revert 或 defer。
+
+这是可以直接冻结并实施的最小诊断规格。
+
+<!-- 由 Claude Code 追加；Codex 不代写。 -->
+
+## Round 2：GPT 归纳与最终审计追问
+
+### 已解决的核心分歧
+
+- Claude 明确撤回了第一轮的 MFE 充足率阈值、MFE 判定 H4、状态转移优先于 2×2、近似成本公式和分阶段硬闸门。
+- 双方同意一次性完成四个冻结政策的回放；MFE/MAE 只作描述性路径上界；状态转移只解释 full-fixed 到 full-ATR 的贡献构成；2×2 用于估计四个已定义政策的边际平均差异与交互。
+- 双方同意主结果必须同时报告不依赖风险分母的绝对净收益、各政策 own-risk R 和共同参考 R，并要求 gross/cost/net 逐笔恒等闭合。
+- 双方同意：只有单组件政策在两个已烧窗口都绝对转正、相对 baseline 的配对区块区间排除不利方向、成本压力与同根顺序不翻号，才有资格生成后续独立验证卡片；否则不修改生产。
+
+### 仍需修正的四个实施级问题
+
+1. **成本分支名称与现有冻结协议不一致。** 当前回放的三种成本是 `taker / stress / legacy_fee`，不是 `taker / maker / stress`。最终协议必须复用现有 `short_horizon_core.COSTS` 和 `BRANCHES`，不能临时引入未定义的 maker 分支。
+2. **共同参考 R 应复用 baseline 实际 planned risk，而不是名义 3%。** 现有实现的 baseline `planned_risk` 包含入场成本及计划止损成交的 fee/slippage，`net_r = net / planned_risk`。为使 common-R 与现有 fixed own-R 精确一致，应对每笔、每个成本口径使用同一 `fixed+fixed` baseline 产生的 `planned_risk_pct` 作为所有四政策的共同分母，而不是硬编码 `3%`。该共同分母在政策间固定，但随成本口径合理变化。
+3. **稳健性闸门不能再次引入无依据的容忍阈值。** 第二轮提出 stress 下 `mean(net_return_pct) > -0.05%`、同根顺序差异 `<0.10%`、成本上升 `>30%`、恶化 `>0.05R` 等数值，这些没有预先经济依据。当前卡片资格应更简单：单组件政策在 `taker` 与 `stress` 下两窗绝对净期望都必须 `>0`，stop-first 与 target-first 下两窗也都必须 `>0`，且相对 baseline 的预注册配对区块区间下界不得小于 0。`legacy_fee` 只作历史可比敏感性，不作为主资格门。
+4. **不能把“四个测试出口均失败”命名为“入场毛优势不足已成立”。** 四个冻结政策都不盈利，只能支持“当前固定/ATR 组件集合没有捕获可执行正期望”，不能排除其他实时退出，也不能单独证明 B 入场没有毛优势。H4 应拆成：
+   - `H4a`：当前四个冻结出口政策均不能把 B all-events 转成稳健正期望；可由本诊断判定。
+   - `H4b`：B all-events 入场本身缺乏可执行毛优势；本诊断最多提供支持性证据，必须由独立的入场延续性/可执行路径研究判定。
+
+## Round 3：Codex 最终审计请求
+
+这是最后一轮，不再增加分析层次。请只审计并收敛以下内容：
+
+1. 明确接受或反对上述四项修正，并说明任何反对会怎样改变最终决策。
+2. 给出最终冻结规格的简明版本，必须使用：
+   - `4 policies × 2 windows × 3 costs(taker/stress/legacy_fee) × 2 tie-breaks`；
+   - common-R = 同笔、同成本口径下 `fixed+fixed` 的实际 `planned_risk_pct`；
+   - 原始百分比、own-risk R、common-R 三套单位并列；
+   - 状态转移、2×2、MFE/MAE 的角色边界保持第二轮共识。
+3. 最终只允许三类裁决：
+   - `component_validation_eligible`：某个单组件政策满足两窗绝对净期望、配对差值、stress 与双同根顺序全部通过；只授予新窗口/point-in-time 币池独立验证资格，不直接 keep。
+   - `reject_current_atr_components`：四政策或单组件未通过，否定当前 `ATR20 + 1ATR SL + 5/3ATR TP` 组件定义，不外推所有 ATR 退出。
+   - `measurement_insufficient`：4h 同根顺序、数据缺口或成本恒等无法闭合，无法判断当前定义。
+4. 对于 `H4a/H4b`，明确本诊断能判定什么、不能判定什么，并给出若 `reject_current_atr_components` 后的最小下一步：是回到入场延续性研究，还是仍有理由继续出口研究。不得建议新的 ATR 倍数或阈值扫描。
+5. 给出最终支持、否定、证据不足标准，删除第二轮残留的 `-0.05%`、`0.10%`、`30%`、`0.05R` 等未经依据的容忍门槛。
+
+如果接受上述修正，请明确写出“协议已可冻结”；如果仍有实质分歧，请只保留会改变是否实施该诊断的分歧，交由用户裁决。
