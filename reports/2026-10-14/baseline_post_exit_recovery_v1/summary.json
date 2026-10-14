@@ -1,0 +1,414 @@
+{
+  "experiment": "baseline_post_exit_recovery_v1",
+  "taskboard": "CRYPTOTRADIN-128",
+  "generated_at_utc": "2026-10-13T16:32:10+00:00",
+  "scope": {
+    "universe": "current-survivor conditional",
+    "venue": "Binance spot USDT",
+    "timeframe": "4h",
+    "start": "exit_bar+1",
+    "risk": "entry_price_filled - original stop_loss",
+    "horizons": [
+      20,
+      40,
+      80
+    ],
+    "primary_horizon": 40,
+    "window_end_exclusive": {
+      "2024-07-01": "2025-06-01T00:00:00+00:00",
+      "2025-06-01": "2026-06-01T00:00:00+00:00"
+    },
+    "next_entry_censoring": true
+  },
+  "counts": {
+    "all_stopped": 110,
+    "non_capacity_stopped": 87,
+    "capacity_contested_stopped": 23,
+    "near_unknown": 17
+  },
+  "primary_by_window_horizon": {
+    "2024-07-01": {
+      "20": {
+        "total": 55,
+        "eligible": 54,
+        "censored": 1,
+        "censored_pct": 1.8181818181818181,
+        "recovered": 19,
+        "recovery_rate_pct": 35.18518518518518,
+        "wilson_95_low_pct": 23.82301110811473,
+        "wilson_95_high_pct": 48.51516927976369,
+        "recovered_before_censor": 0
+      },
+      "40": {
+        "total": 55,
+        "eligible": 52,
+        "censored": 3,
+        "censored_pct": 5.454545454545454,
+        "recovered": 20,
+        "recovery_rate_pct": 38.46153846153846,
+        "wilson_95_low_pct": 26.470463780216214,
+        "wilson_95_high_pct": 52.04012628418061,
+        "recovered_before_censor": 1
+      },
+      "80": {
+        "total": 55,
+        "eligible": 48,
+        "censored": 7,
+        "censored_pct": 12.727272727272727,
+        "recovered": 22,
+        "recovery_rate_pct": 45.833333333333336,
+        "wilson_95_low_pct": 32.57524229286744,
+        "wilson_95_high_pct": 59.708925454350194,
+        "recovered_before_censor": 2
+      }
+    },
+    "2025-06-01": {
+      "20": {
+        "total": 32,
+        "eligible": 32,
+        "censored": 0,
+        "censored_pct": 0.0,
+        "recovered": 7,
+        "recovery_rate_pct": 21.875,
+        "wilson_95_low_pct": 11.023836252604186,
+        "wilson_95_high_pct": 38.75499364924353,
+        "recovered_before_censor": 0
+      },
+      "40": {
+        "total": 32,
+        "eligible": 29,
+        "censored": 3,
+        "censored_pct": 9.375,
+        "recovered": 6,
+        "recovery_rate_pct": 20.689655172413794,
+        "wilson_95_low_pct": 9.846070197841039,
+        "wilson_95_high_pct": 38.3900904038679,
+        "recovered_before_censor": 1
+      },
+      "80": {
+        "total": 32,
+        "eligible": 29,
+        "censored": 3,
+        "censored_pct": 9.375,
+        "recovered": 9,
+        "recovery_rate_pct": 31.03448275862069,
+        "wilson_95_low_pct": 17.275616744483216,
+        "wilson_95_high_pct": 49.23013423309317,
+        "recovered_before_censor": 1
+      }
+    }
+  },
+  "capacity_by_window_horizon": {
+    "2024-07-01": {
+      "20": {
+        "total": 12,
+        "eligible": 11,
+        "censored": 1,
+        "censored_pct": 8.333333333333334,
+        "recovered": 5,
+        "recovery_rate_pct": 45.45454545454545,
+        "wilson_95_low_pct": 21.271271622459764,
+        "wilson_95_high_pct": 71.9908462590678,
+        "recovered_before_censor": 1
+      },
+      "40": {
+        "total": 12,
+        "eligible": 11,
+        "censored": 1,
+        "censored_pct": 8.333333333333334,
+        "recovered": 5,
+        "recovery_rate_pct": 45.45454545454545,
+        "wilson_95_low_pct": 21.271271622459764,
+        "wilson_95_high_pct": 71.9908462590678,
+        "recovered_before_censor": 1
+      },
+      "80": {
+        "total": 12,
+        "eligible": 11,
+        "censored": 1,
+        "censored_pct": 8.333333333333334,
+        "recovered": 6,
+        "recovery_rate_pct": 54.54545454545455,
+        "wilson_95_low_pct": 28.009153740932202,
+        "wilson_95_high_pct": 78.72872837754024,
+        "recovered_before_censor": 1
+      }
+    },
+    "2025-06-01": {
+      "20": {
+        "total": 11,
+        "eligible": 11,
+        "censored": 0,
+        "censored_pct": 0.0,
+        "recovered": 3,
+        "recovery_rate_pct": 27.272727272727273,
+        "wilson_95_low_pct": 9.746059290024888,
+        "wilson_95_high_pct": 56.56453011761291,
+        "recovered_before_censor": 0
+      },
+      "40": {
+        "total": 11,
+        "eligible": 11,
+        "censored": 0,
+        "censored_pct": 0.0,
+        "recovered": 4,
+        "recovery_rate_pct": 36.36363636363637,
+        "wilson_95_low_pct": 15.166471095367573,
+        "wilson_95_high_pct": 64.6198825492151,
+        "recovered_before_censor": 0
+      },
+      "80": {
+        "total": 11,
+        "eligible": 11,
+        "censored": 0,
+        "censored_pct": 0.0,
+        "recovered": 4,
+        "recovery_rate_pct": 36.36363636363637,
+        "wilson_95_low_pct": 15.166471095367573,
+        "wilson_95_high_pct": 64.6198825492151,
+        "recovered_before_censor": 0
+      }
+    }
+  },
+  "near_unknown_by_horizon": {
+    "20": {
+      "total": 17,
+      "eligible": 17,
+      "censored": 0,
+      "censored_pct": 0.0,
+      "recovered": 0,
+      "recovery_rate_pct": 0.0,
+      "wilson_95_low_pct": 0.0,
+      "wilson_95_high_pct": 18.43181350088518,
+      "recovered_before_censor": 0
+    },
+    "40": {
+      "total": 17,
+      "eligible": 16,
+      "censored": 1,
+      "censored_pct": 5.882352941176471,
+      "recovered": 0,
+      "recovery_rate_pct": 0.0,
+      "wilson_95_low_pct": 0.0,
+      "wilson_95_high_pct": 19.36076805344365,
+      "recovered_before_censor": 0
+    },
+    "80": {
+      "total": 17,
+      "eligible": 16,
+      "censored": 1,
+      "censored_pct": 5.882352941176471,
+      "recovered": 1,
+      "recovery_rate_pct": 6.25,
+      "wilson_95_low_pct": 1.1119344764642518,
+      "wilson_95_high_pct": 28.328737570298944,
+      "recovered_before_censor": 0
+    }
+  },
+  "market_tailwind_k40": [
+    {
+      "window_start": "2024-07-01",
+      "market_tailwind_40": "False",
+      "total": 25,
+      "eligible": 25,
+      "censored": 0,
+      "censored_pct": 0.0,
+      "recovered": 8,
+      "recovery_rate_pct": 32.0,
+      "wilson_95_low_pct": 17.205190306907976,
+      "wilson_95_high_pct": 51.589730726897756,
+      "recovered_before_censor": 0
+    },
+    {
+      "window_start": "2024-07-01",
+      "market_tailwind_40": "None",
+      "total": 3,
+      "eligible": 0,
+      "censored": 3,
+      "censored_pct": 100.0,
+      "recovered": 0,
+      "recovery_rate_pct": null,
+      "wilson_95_low_pct": null,
+      "wilson_95_high_pct": null,
+      "recovered_before_censor": 1
+    },
+    {
+      "window_start": "2024-07-01",
+      "market_tailwind_40": "True",
+      "total": 27,
+      "eligible": 27,
+      "censored": 0,
+      "censored_pct": 0.0,
+      "recovered": 12,
+      "recovery_rate_pct": 44.44444444444444,
+      "wilson_95_low_pct": 27.585858177023002,
+      "wilson_95_high_pct": 62.68697548677552,
+      "recovered_before_censor": 0
+    },
+    {
+      "window_start": "2025-06-01",
+      "market_tailwind_40": "False",
+      "total": 20,
+      "eligible": 20,
+      "censored": 0,
+      "censored_pct": 0.0,
+      "recovered": 3,
+      "recovery_rate_pct": 15.0,
+      "wilson_95_low_pct": 5.236874589621659,
+      "wilson_95_high_pct": 36.041886474075696,
+      "recovered_before_censor": 0
+    },
+    {
+      "window_start": "2025-06-01",
+      "market_tailwind_40": "None",
+      "total": 3,
+      "eligible": 0,
+      "censored": 3,
+      "censored_pct": 100.0,
+      "recovered": 0,
+      "recovery_rate_pct": null,
+      "wilson_95_low_pct": null,
+      "wilson_95_high_pct": null,
+      "recovered_before_censor": 1
+    },
+    {
+      "window_start": "2025-06-01",
+      "market_tailwind_40": "True",
+      "total": 9,
+      "eligible": 9,
+      "censored": 0,
+      "censored_pct": 0.0,
+      "recovered": 3,
+      "recovery_rate_pct": 33.333333333333336,
+      "wilson_95_low_pct": 12.05838183869109,
+      "wilson_95_high_pct": 64.57978644196037,
+      "recovered_before_censor": 0
+    }
+  ],
+  "regime_k40": [
+    {
+      "window_start": "2024-07-01",
+      "regime": "NEUTRAL",
+      "total": 36,
+      "eligible": 35,
+      "censored": 1,
+      "censored_pct": 2.7777777777777777,
+      "recovered": 13,
+      "recovery_rate_pct": 37.142857142857146,
+      "wilson_95_low_pct": 23.165819503365707,
+      "wilson_95_high_pct": 53.663063156404675,
+      "recovered_before_censor": 1
+    },
+    {
+      "window_start": "2024-07-01",
+      "regime": "RISK_ON",
+      "total": 19,
+      "eligible": 17,
+      "censored": 2,
+      "censored_pct": 10.526315789473685,
+      "recovered": 7,
+      "recovery_rate_pct": 41.1764705882353,
+      "wilson_95_low_pct": 21.61105679021481,
+      "wilson_95_high_pct": 63.99455735700022,
+      "recovered_before_censor": 0
+    },
+    {
+      "window_start": "2025-06-01",
+      "regime": "NEUTRAL",
+      "total": 14,
+      "eligible": 13,
+      "censored": 1,
+      "censored_pct": 7.142857142857143,
+      "recovered": 4,
+      "recovery_rate_pct": 30.76923076923077,
+      "wilson_95_low_pct": 12.680703655710515,
+      "wilson_95_high_pct": 57.63065681945096,
+      "recovered_before_censor": 0
+    },
+    {
+      "window_start": "2025-06-01",
+      "regime": "RISK_OFF",
+      "total": 4,
+      "eligible": 4,
+      "censored": 0,
+      "censored_pct": 0.0,
+      "recovered": 0,
+      "recovery_rate_pct": 0.0,
+      "wilson_95_low_pct": 0.0,
+      "wilson_95_high_pct": 48.98908364545973,
+      "recovered_before_censor": 0
+    },
+    {
+      "window_start": "2025-06-01",
+      "regime": "RISK_ON",
+      "total": 14,
+      "eligible": 12,
+      "censored": 2,
+      "censored_pct": 14.285714285714286,
+      "recovered": 2,
+      "recovery_rate_pct": 16.666666666666668,
+      "wilson_95_low_pct": 4.696514218385378,
+      "wilson_95_high_pct": 44.80308622529734,
+      "recovered_before_censor": 1
+    }
+  ],
+  "concentration_k40": {
+    "symbol": {
+      "2024-07-01": {
+        "dimension": "symbol",
+        "min_rate_pct": 36.0,
+        "min_removed_label": "ARBUSDT",
+        "max_rate_pct": 40.0,
+        "max_removed_label": "XRPUSDT",
+        "variants": 36
+      },
+      "2025-06-01": {
+        "dimension": "symbol",
+        "min_rate_pct": 17.857142857142858,
+        "min_removed_label": "SEIUSDT",
+        "max_rate_pct": 22.22222222222222,
+        "max_removed_label": "TRXUSDT",
+        "variants": 25
+      }
+    },
+    "exit_week": {
+      "2024-07-01": {
+        "dimension": "exit_iso_week",
+        "min_rate_pct": 31.914893617021278,
+        "min_removed_label": "2024-W49",
+        "max_rate_pct": 42.5531914893617,
+        "max_removed_label": "2025-W05",
+        "variants": 19
+      },
+      "2025-06-01": {
+        "dimension": "exit_iso_week",
+        "min_rate_pct": 8.333333333333334,
+        "min_removed_label": "2025-W29",
+        "max_rate_pct": 25.0,
+        "max_removed_label": "2026-W04",
+        "variants": 12
+      }
+    }
+  },
+  "censor_reason_80": {
+    "next_same_symbol_entry": 6,
+    "none": 99,
+    "window_end": 5
+  },
+  "reproducibility": {
+    "git_head_before_changes": "5e419e651cf87d464b41cf5756eb38418edaa017",
+    "paths_csv_sha256": "969f375135b15bb7920dab2129fb25f7e5ecc6c7b5696f6f6509902f203ddd90",
+    "replay_sha256": {
+      "2024-07-01": "f347564ef5deee253281beebf4f398b15d86221d9679b1519353b9717537ba3d",
+      "2025-06-01": "8535097a2625b69053554b36976dabc1c531faad2cc427d9a56e2d2c3e1353c1"
+    },
+    "queried_bars_sha256": "360550342730820f552ae37c5b07073f811d3b290a3d4392a7e09871a8255fbf",
+    "queried_bar_rows": 11991,
+    "script_sha256": "04b11cdf23f7c74f0d637a53dad34811c0d6d04c5ddc95f12f497df50b0c4a98"
+  },
+  "verdict": "insufficient_or_window_inconsistent",
+  "verdict_reasons": [
+    "2024-07-01: K40=38.46% (eligible=52, censored=3)",
+    "2025-06-01: K40=20.69% (eligible=29, censored=3)"
+  ]
+}

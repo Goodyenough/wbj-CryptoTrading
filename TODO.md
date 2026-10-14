@@ -1,5 +1,9 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-14 Baseline 退出后恢复率诊断
+
+- [x] **CRYPTOTRADIN-128 / in_review / 诊断完成待用户验收**：老 baseline 非容量 `STOPPED` 的 K40 恢复率早窗为 `20/52=38.46%`、近窗为 `6/29=20.69%`；两窗落入不同裁决区，正式结论 `insufficient_or_window_inconsistent`。但近窗 17 笔 unknown 的完整样本 K20/K40 均 `0%`，K80 仅 `1/16=6.25%`，不支持把近窗主要亏损解释为止损过早。保持退出与生产配置冻结，不自动启动 `CRYPTOTRADIN-127`。协议：`reports/2026-10-14/baseline_post_exit_recovery_protocol_v1.md`；结果：`reports/2026-10-14/baseline_post_exit_recovery_v1/report.md`。
+
 ## 2026-10-14 B入场 reclaim-strength 连续关系诊断
 
 - [ ] **CRYPTOTRADIN-127 / todo / 未授权启动**：仅诊断实时 `reclaim_strength = (confirmation_close - entry_high) / ATR20` 与 B 入场后续 raw/net 收益、路径质量的连续关系，判断较强 reclaim 是否可能筛出覆盖成本的子群。只复用两个已烧窗口和冻结 B all-events 输入，不选阈值、不创建策略变体、不运行回测、不使用 2026-06 之后未用数据、不修改交易规则或生产配置；支持、否定与证据不足标准已写入 Taskboard，须等用户另行授权后才可开启。

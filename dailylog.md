@@ -2459,3 +2459,12 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 边界：用户明确要求仅加入 todo、不要开启；未认领任务，未编写实验协议、未运行诊断或回测、未选择阈值、未使用 2026-06 之后未用数据、未修改交易规则或生产配置。
 - 验证：重复项检索无匹配；`taskctl issue create` 返回 `CRYPTOTRADIN-127 status=todo version=1`。按仓库约定随提交归档 `reports/2026-10-14/` 已有自然调度产物，不重新评估其结论；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
 - Git：本次提交 `docs: queue B reclaim strength diagnostic`。
+
+### 2026-10-14 00:34:02 +08:00 - 完成Baseline退出后1R恢复率诊断
+- 类型：Taskboard / 隔离研究代码 / 测试 / 条件历史诊断 / 报告 / TODO / 开发计划 / 系统文档 / 实验账本 / Obsidian实验日志 / Git。
+- 改动：按用户授权创建并执行 `CRYPTOTRADIN-128`；先冻结 `baseline_post_exit_recovery_protocol_v1.md`，再新增只读诊断器 `scripts/diagnose_baseline_post_exit_recovery.py` 与5项合成测试。对冻结 baseline `STOPPED` 从 `exit_bar+1` 重建K20/K40/K80恢复路径，同币下一次入场和窗口末端按右删失处理；同步 `TODO.md`、`开发计划.md`、`SYSTEM_OVERVIEW.md`、`EXPERIMENT_LEDGER.md` 与 Obsidian开发计划/实验日志。
+- 结果：87笔非容量止损的K40恢复率早窗`20/52=38.46%`（Wilson 95% `[26.47%,52.04%]`）、近窗`6/29=20.69%`（`[9.85%,38.39%]`）；早窗处于预设灰区、近窗处于低恢复区。近窗17笔unknown为K20`0/17`、K40`0/16`、K80`1/16=6.25%`。市场顺风提高恢复率，逐symbol/week剔除不改变近窗低恢复。
+- 裁决：`insufficient_or_window_inconsistent`。不把老baseline全部亏损统一归为退出过早或慢性无跟随；近窗unknown的低恢复条件性反对“主要因为止损过早”。不授予退出参数实验资格，不修改生产配置，不自动启动`CRYPTOTRADIN-127`。Taskboard已移至`in_review`等待用户验收。
+- 验证：新增测试`5 passed`；全套测试`236 passed, 5 failed`，失败位于既有`test_database.py`/`test_signal_fill_timing_audit.py`契约及用户未提交`scripts/run_logged_paper_task.ps1`状态，不涉及本诊断。110行逐笔CSV与11,991条查询K线摘要双跑SHA256一致；独立检查确认所有首根均为`exit+4h`、最后一根严格早于cutoff和窗口结束，违规0；早/近最大读取分别为`2025-05-31T20:00Z`/`2026-05-31T20:00Z`。用户原有脚本改动未触碰。
+- 报告：`reports/2026-10-14/baseline_post_exit_recovery_v1/report.md`、`summary.json`、`trades.csv`。
+- Git：本次提交 `research: diagnose baseline post-exit recovery`。
