@@ -2483,3 +2483,10 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 边界：只登记任务，未认领、未运行诊断或回测、未编写实验协议、未选择 NATR 阈值、未改为 ATR 自适应止盈止损、未修改交易规则或生产配置。既有两个窗口已烧且有 current-survivor 限制，结果最多授予后续过滤实验资格，不能直接升级生产。
 - 验证：查重仅发现动态止损、旧 `ATR 0.35` 和高波动惩罚等不同问题；Taskboard 返回 `CRYPTOTRADIN-132 status=todo version=1`。现有 `short_horizon_core.py`、`research_breakout_d6.py` 已具备同构出口、NATR20、同根顺序、路径质量和14日区块bootstrap，可复用实现。当前阶段和优先级未改变，不更新开发计划或实验日志；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
 - Git：本次提交 `docs: queue fixed-exit volatility fit diagnostic`。
+
+### 2026-10-14 15:07:29 +08:00 - 启动固定5%/3%出口波动适配诊断
+- 类型：Taskboard / 研究协议 / TODO / 开发计划 / Git。
+- 改动：按用户授权将 `CRYPTOTRADIN-132` 从 `todo` 移至 `in_progress`；新增 `reports/2026-10-14/fixed_exit_volatility_fit_protocol_v1.md`，冻结 B all-events、两个既有窗口、NATR20 因果计算、早窗三分位与五个有限连续选择器、近窗原样应用、成本/同根顺序/区块/集中度裁决；同步 `TODO.md` 与 `开发计划.md`。
+- 边界：保持 `+5%/-3%/48h`、next-open、成本和生产配置不变；不运行 ATR 自适应出口，不把 C20/D6 与 B 混池，不自动启动其它研究任务。两个窗口已烧且币池为 current-survivor，通过也只授予后续固定过滤实验资格。
+- 验证：Taskboard 返回 `CRYPTOTRADIN-132 status=in_progress version=2` 并写入启动评论；协议已在运行前冻结。按仓库约定本次提交包含 `reports/` 下自然调度产物，不重新评估其结论；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
+- Git：本次提交 `research: start fixed-exit volatility fit diagnostic`。
