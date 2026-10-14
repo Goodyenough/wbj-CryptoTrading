@@ -1,6 +1,6 @@
 ---
 status: WAITING_CLAUDE
-round: 1
+round: 2
 max_rounds: 3
 decision: pending
 ---
@@ -85,8 +85,456 @@ decision: pending
 
 ## Round 1：Claude 回复
 
+### 推荐诊断顺序
+
+**Phase 1：入场路径上限检查（优先级最高）**
+**Phase 2：逐笔状态转移与成本分解**
+**Phase 3：条件性 2×2 组件归因**
+**Phase 4：regime/NATR 交互解释（仅当前三步显示稳健改善时）**
+
+### 核心判断
+
+GPT 的 2×2 方案**不应是第一步**。理由：
+
+1. **因果顺序倒置**：你已经观察到"改善不稳健、绝对期望仍未转正"，这强烈暗示 H4（入场毛优势不足）。在证实入场后确实存在足够的可捕获空间之前，研究如何分配 TP/SL/TIME 是在优化一个可能不存在的优势。
+
+2. **路径竞争掩盖机制**：2×2 设计假设 TP 和 SL 的效应可分离，但它们在时间轴上竞争——动态 SL 更近时会更早触发，改变了 TP 的有效样本分布。如果不先做状态转移分析，你无法判断"ATR TP+fixed SL"中观察到的改善是 TP 几何本身的效果，还是因为 fixed SL 让更多交易活到了新的 TP 水平。
+
+3. **成本侵蚀未拆分**：近窗 ATR 出口的成本占 R 从 0.0932 升至 0.1428，上升 53%。这可能来自：(a) ATR SL 更近导致更频繁止损、每笔固定费用摊到更小 R；(b) 低波动币的 ATR 距离绝对值过小、费用占比天然更高；(c) 近窗币种波动率结构变化。在分解 gross R 和 cost R 之前，2×2 的净收益对比会把几何效应与成本结构混淆。
+
+### Phase 1：入场路径上限检查
+
+**目标**：判断同一入场在 48h 内、扣费前，是否存在足够的可捕获毛空间支持任何短距离自适应出口。
+
+**方法**：
+
+对每笔交易，从 entry_time 到 exit_time（或 +48h），扫描 4h K 线序列，记录：
+
+- **MFE_gross**（Maximum Favorable Excursion）：入场后最高点相对入场价的最大收益，未扣费
+- **MAE_gross**（Maximum Adverse Excursion）：入场后最低点相对入场价的最大损失，未扣费
+- **First_reach**：四种水平中最先到达的是哪个——`fixed_TP`、`ATR_TP`、`fixed_SL`、`ATR_SL`
+- **Reachable_set**：在实际退出前，四种水平中哪些曾被触及（可能多个）
+- **Gross_captured_if_optimal**：如果在 MFE 点平仓的理论毛收益
+- **Cost_R_at_entry**：入场时的 ATR20 值，费用占 R 的比例 = `(taker_fee_bps × 2) / (ATR20 / entry_price)`
+
+**汇总**：
+
+分早/近窗，统计：
+
+1. **MFE 分布**：中位数、25%/75% 分位数、大于 `1.5×cost_R` 的比例
+2. **毛空间充足率**：`MFE_gross > 2×cost_R` 且 `MFE_gross > 0.5×ATR` 的交易占比——这是"理论上有利可图"的下界
+3. **先达竞争**：`First_reach` 的四类频数，特别是 `ATR_SL` 先达的比例
+4. **路径顺序不确定性**：同一根 K 线同时触及多个水平的笔数与占比
+
+**停止规则**：
+
+- 若两窗 `MFE > 2×cost_R` 的比例 < 55%，且中位 MFE < 1.0R，**结论为 H4 成立**：入场本身缺少足够延续性，暂停出口研究，转向入场改进或放弃 B all-events 短周期方向。
+- 若早窗充足但近窗不充足，标记为窗口依赖，需要重新验证币池、regime 分布或市场结构变化，仍不继续出口优化。
+- 仅当两窗充足率 > 60% 且中位 MFE > 1.2R 时，进入 Phase 2。
+
+**顺序不确定性处理**：
+
+对同一根 K 同时触及 TP 和 SL 的情况，记录为 `ambiguous_path`。在 Phase 1 只统计频数；若占比 > 15%，Phase 3 的 2×2 必须在 stop-first 和 take-first 两种假设下各跑一遍，仅当方向一致时才采纳结论。
+
+---
+
+### Phase 2：逐笔状态转移与成本分解
+
+**前提**：Phase 1 显示入场存在毛优势。
+
+**目标**：将 fixed 出口的每笔交易映射到 ATR 出口的状态，分解毛收益变化与成本变化，判断"改善被谁抵消"。
+
+**字段**：
+
+每笔交易输出：
+
+| 字段 | 定义 |
+|------|------|
+| `trade_id` | 唯一标识 |
+| `window` | early/near |
+| `regime` | RISK_ON/NEUTRAL/RISK_OFF |
+| `NATR_bucket` | low/mid/high（按 NATR 三等分） |
+| `fixed_outcome` | TP/SL/TIME |
+| `ATR_outcome` | TP/SL/TIME |
+| `state_transition` | 9 种组合，如 `TP→SL`、`TIME→TP` |
+| `fixed_gross_R` | 固定出口的毛收益（未扣费） |
+| `ATR_gross_R` | ATR 出口的毛收益（未扣费） |
+| `fixed_cost_R` | 固定出口的费用（以 R 计） |
+| `ATR_cost_R` | ATR 出口的费用（以 R 计） |
+| `fixed_net_R` | `gross - cost` |
+| `ATR_net_R` | `gross - cost` |
+| `delta_gross_R` | `ATR_gross - fixed_gross` |
+| `delta_cost_R` | `ATR_cost - fixed_cost` |
+| `delta_net_R` | `ATR_net - fixed_net` |
+| `MFE_gross` | 来自 Phase 1 |
+| `uncaptured_R` | `MFE_gross - ATR_gross_R`（离开桌面的钱） |
+
+**状态转移汇总表**：
+
+分早/近窗，按 9 种转移类型统计：
+
+```
+Transition    Count    Avg_delta_gross_R    Avg_delta_cost_R    Avg_delta_net_R    Median_delta_net_R
+TP→TP         ...      ...                  ...                 ...                ...
+TP→SL         ...      ...                  ...                 ...                ...
+TP→TIME       ...      ...                  ...                 ...                ...
+SL→TP         ...      ...                  ...                 ...                ...
+SL→SL         ...      ...                  ...                 ...                ...
+SL→TIME       ...      ...                  ...                 ...                ...
+TIME→TP       ...      ...                  ...                 ...                ...
+TIME→SL       ...      ...                  ...                 ...                ...
+TIME→TIME     ...      ...                  ...                 ...                ...
+```
+
+**关键诊断**：
+
+1. **TIME→TP 的净贡献**：若该转移的 `avg_delta_net_R > 0` 且样本量足够（如 >50 笔），说明动态 TP 确实捕获了原 TIME 的延续。检查 `delta_cost_R`：若接近零，说明成本未恶化；若显著为正，说明费用侵蚀了毛改善。
+
+2. **TP→SL 的净损失**：若该转移的 `avg_delta_net_R < -0.3R` 且频数高，说明动态 SL 过早截断了原本会盈利的交易——这是 H1 的证据。检查这些交易的 `MFE_gross`：若多数 MFE 远超 fixed_TP，说明入场有延续但 ATR SL 几何不当。
+
+3. **SL→SL 的成本差异**：若 `delta_cost_R` 显著为正，说明 ATR SL 更近、更频繁触发，固定费用占比上升——这解释了近窗成本占 R 上升 53% 的部分原因。
+
+4. **未捕获空间**：按转移类型统计 `uncaptured_R` 中位数。若 TIME→TP 的 `uncaptured_R` 中位数 > 1.0R，说明动态 TP 虽然比 TIME 好，但仍然过早；若 TP→SL 的 `uncaptured_R` 中位数 > 2.0R，说明 ATR SL 在入场仍有大幅毛优势时就止损了。
+
+**支持/否定标准**：
+
+- **H1 支持**：`TP→SL` 频数 > 80 且 `avg_delta_net_R < -0.25R`，且该类交易的 `MFE_gross` 中位数 > 1.5R。
+- **H1 否定**：`TP→SL` 频数 < 30 或 `avg_delta_net_R > -0.1R`。
+- **H4 支持（即使 Phase 1 通过）**：所有转移类型的 `uncaptured_R` 中位数 < 0.5R，说明 MFE 本身就不高，出口几何不是瓶颈。
+- **成本主导**：任一窗口中，`|avg_delta_gross_R|` 的加权和 > 0.15R，但 `avg_delta_net_R` 的加权和 < 0.05R——说明毛改善被成本抵消。
+
+**停止规则**：
+
+若 Phase 2 显示：
+
+- 两窗 `TIME→TP` 和 `TIME→SL` 的净贡献之和 < 0.05R，且成本差异 > 0.05R，**结论**：ATR 出口重新分配了状态，但毛改善不足以覆盖成本上升，**停止出口研究**，不进入 Phase 3。
+- 若某一转移类型显示稳健净改善（两窗同向、中位数 > 0.1R、95% CI 不跨零），但加总后仍不转正，进入 Phase 3 做组件拆分。
+
+---
+
+### Phase 3：条件性 2×2 组件归因
+
+**前提**：Phase 2 显示存在部分转移的净改善，但不清楚来自 TP 还是 SL。
+
+**设计**：
+
+四种出口组合，保持 48h 上限和 next-open 入场不变：
+
+1. `fixed_TP + fixed_SL`（baseline，已有）
+2. `ATR_TP + fixed_SL`
+3. `fixed_TP + ATR_SL`
+4. `ATR_TP + ATR_SL`（已有）
+
+每笔交易跑四次，记录净 R 和状态。
+
+**主效应估计**（需谨慎解释）：
+
+- **TP 效应** = `[mean(ATR_TP + fixed_SL) + mean(ATR_TP + ATR_SL)] / 2 - [mean(fixed_TP + fixed_SL) + mean(fixed_TP + ATR_SL)] / 2`
+- **SL 效应** = `[mean(fixed_TP + ATR_SL) + mean(ATR_TP + ATR_SL)] / 2 - [mean(fixed_TP + fixed_SL) + mean(ATR_TP + fixed_SL)] / 2`
+- **交互效应** = `mean(ATR_TP + ATR_SL) - mean(ATR_TP + fixed_SL) - mean(fixed_TP + ATR_SL) + mean(fixed_TP + fixed_SL)`
+
+**路径竞争校正**：
+
+对每种组合，统计"TP 先达"与"SL 先达"的频数。若 `ATR_TP + fixed_SL` 中 SL 先达的比例显著低于 `ATR_TP + ATR_SL`，说明 fixed SL 让更多交易活到了 ATR TP，此时 TP 效应被**高估**了（它不是 TP 几何本身的效果，而是 SL 宽松的副产品）。
+
+**顺序不确定性处理**：
+
+若 Phase 1 显示 `ambiguous_path` 占比 > 15%，对这些交易分别用 stop-first 和 take-first 重算四种组合的净 R。若两种假设下 TP/SL 效应的符号翻转，**结论**：当前 4h 粒度无法支持可信的组件归因，需要用 tick 数据或标记为"证据不足"。
+
+**支持/否定标准**：
+
+- **H1 支持**：两窗 TP 效应 > +0.10R，SL 效应 < -0.08R，交互效应 < -0.05R——说明动态 TP 有效，但动态 SL 抵消且存在负交互。
+- **H2 支持**：两窗 SL 效应 > +0.10R，TP 效应 < 0.05R——说明风险匹配是主因。
+- **H3 支持**：交互效应的绝对值 > 0.15R 且跨窗同向——说明 TP/SL 不可独立解释。
+- **证据不足**：任一效应在两窗异号，或所有效应 < 0.08R 且 95% CI 跨零。
+
+**停止规则**：
+
+若 Phase 3 的主效应与 Phase 2 的状态转移分析矛盾（例如 Phase 2 显示 `TIME→TP` 有净贡献，但 Phase 3 显示 TP 效应为负），**优先采信 Phase 2**——因为状态转移是逐笔反事实，2×2 的主效应可能被路径竞争扭曲。
+
+若 Phase 3 显示某一组件单独有效（如 `ATR_TP + fixed_SL` 两窗期望 > 0.15R），生成下一张**单变量实验卡片**，仅改变该组件，其余冻结，用新窗口 + out-of-sample 币池验证。
+
+若所有组件效应 < 0.08R 或异号，**结论**：当前 ATR 定义（20 周期、5:3 比例）无稳健改善，**不生成新卡片**。
+
+---
+
+### Phase 4：regime/NATR 交互解释
+
+**前提**：Phase 2 或 Phase 3 显示某一组件在汇总水平有稳健改善。
+
+**目标**：解释为什么改善不稳健、哪些子集拖累了整体。
+
+**方法**：
+
+将 Phase 2 的状态转移或 Phase 3 的组件效应，按 `regime × NATR_bucket` 分层（最多 3×3=9 个子集），统计每个子集的：
+
+- 样本量
+- 平均 delta_net_R
+- 中位 delta_net_R
+- 95% CI
+
+**分层可信度标准**：
+
+- 子集样本量 < 40 笔，标记为"小样本，仅作探索性解释"
+- 两窗同一子集的方向相反，标记为"窗口依赖，不支持生产化"
+- 两窗同向且样本量 > 50，标记为"稳健交互"
+
+**解释 vs 决策**：
+
+- **仅解释**：若 Phase 3 已判定不生成新卡片，Phase 4 的分层只用于事后理解（如"近窗 NEUTRAL 下 low-NATR 组恶化解释了整体未转正"），写入报告但不触发行动。
+- **前置分层**：若希望把 regime/NATR 作为**预注册的因果交互项**（即未来生产时根据实时 regime 和 NATR 选择不同 TP/SL），则需要：
+  - 在 Phase 3 之前做分层，每个子集单独跑 2×2
+  - 每个子集必须两窗样本量 > 60，且方向一致
+  - 需要额外的 regime 转换期的表现验证（如 RISK_ON → NEUTRAL 过渡期）
+
+  当前证据不支持前置分层——你的 `RISK_ON` 样本在近窗仍约 -0.00485R，不是"显著正且稳健"的子集。
+
+**停止规则**：
+
+Phase 4 是**解释性附录**，不生成新卡片，不修改生产配置。唯一例外：若某一子集（如早窗 RISK_ON + high-NATR）两窗期望 > 0.25R 且样本量 > 80，可生成一张**条件触发卡片**——但该卡片的前置条件是"实时 regime 分类器已上线并经独立验证"，否则不实施。
+
+---
+
+### 必须字段（Phase 2 逐笔输出）
+
+```python
+{
+  "trade_id": str,
+  "window": "early" | "near",
+  "symbol": str,
+  "entry_time": datetime,
+  "entry_price": float,
+  "exit_time_fixed": datetime,
+  "exit_time_atr": datetime,
+  "regime": "RISK_ON" | "NEUTRAL" | "RISK_OFF",
+  "NATR_at_entry": float,
+  "NATR_bucket": "low" | "mid" | "high",
+  "ATR20_at_entry": float,
+  "cost_R_at_entry": float,  # (fee_bps * 2) / (ATR20 / entry_price)
+
+  "fixed_outcome": "TP" | "SL" | "TIME",
+  "ATR_outcome": "TP" | "SL" | "TIME",
+  "state_transition": str,  # e.g., "TIME→TP"
+
+  "fixed_gross_R": float,
+  "ATR_gross_R": float,
+  "fixed_cost_R": float,
+  "ATR_cost_R": float,
+  "fixed_net_R": float,
+  "ATR_net_R": float,
+
+  "delta_gross_R": float,
+  "delta_cost_R": float,
+  "delta_net_R": float,
+
+  "MFE_gross": float,  # from Phase 1
+  "MAE_gross": float,
+  "MFE_time": datetime,
+  "first_reach": "fixed_TP" | "ATR_TP" | "fixed_SL" | "ATR_SL",
+  "reachable_set": list[str],
+  "ambiguous_path": bool,
+  "uncaptured_R": float,  # MFE_gross - ATR_gross_R
+
+  # Phase 3 字段（若进入）
+  "net_R_atr_tp_fixed_sl": float,
+  "net_R_fixed_tp_atr_sl": float,
+  "outcome_atr_tp_fixed_sl": str,
+  "outcome_fixed_tp_atr_sl": str
+}
+```
+
+---
+
+### 汇总表模板
+
+**Phase 1 汇总（入场路径上限）**
+
+```
+Window    N     MFE_median    MFE_p25    MFE_p75    Pct_MFE>2cost    Pct_MFE>0.5R    First_reach_ATR_SL_pct    Ambiguous_path_pct
+early     858   ...           ...        ...        ...              ...             ...                       ...
+near      628   ...           ...        ...        ...              ...             ...                       ...
+```
+
+**Phase 2 汇总（状态转移）**
+
+```
+Window    Transition    Count    Avg_delta_gross    Avg_delta_cost    Avg_delta_net    Median_delta_net    CI_95_lower    CI_95_upper    Avg_uncaptured
+early     TP→TP         ...      ...                ...               ...              ...                 ...            ...            ...
+early     TP→SL         ...      ...                ...               ...              ...                 ...            ...            ...
+...       ...           ...      ...                ...               ...              ...                 ...            ...            ...
+near      TP→TP         ...      ...                ...               ...              ...                 ...            ...            ...
+...       ...           ...      ...                ...               ...              ...                 ...            ...            ...
+```
+
+**Phase 3 汇总（2×2 主效应）**
+
+```
+Window    Fixed+Fixed    ATR_TP+Fixed_SL    Fixed_TP+ATR_SL    ATR+ATR    TP_effect    SL_effect    Interaction
+early     -0.0567        ...                ...                -0.0317    ...          ...          ...
+near      -0.0500        ...                ...                -0.000008  ...          ...          ...
+```
+
+---
+
+### 假设检验标准总结
+
+| 假设 | 支持标准（Phase 2） | 支持标准（Phase 3） | 否定标准 | 证据不足 |
+|------|---------------------|---------------------|----------|----------|
+| H1: 动态 TP 有效、动态 SL 抵消 | `TIME→TP` 净贡献 > 0.10R 且 `TP→SL` 净损失 < -0.25R，两窗同向 | TP 效应 > 0.10R，SL 效应 < -0.08R，交互 < -0.05R，两窗同向 | `TP→SL` 频数 < 30 或净损失 > -0.1R | 任一效应两窗异号或 CI 跨零 |
+| H2: 动态 SL 有效、动态 TP 破坏 | `SL→SL` 和 `SL→TIME` 净贡献 > 0.10R，`TP→TIME` 净损失显著 | SL 效应 > 0.10R，TP 效应 < 0.05R，两窗同向 | `SL` 相关转移净贡献 < 0.05R | 同上 |
+| H3: 强路径交互、主效应无意义 | 状态转移的净贡献高度依赖路径顺序（stop-first vs take-first 翻号） | 交互效应绝对值 > 0.15R，两窗同向，且大于任一主效应 | 交互效应 < 0.05R | 样本量不足或顺序不确定性 > 20% |
+| H4: 入场毛优势不足 | Phase 1: 两窗 MFE > 2cost 比例 < 55%，中位 MFE < 1.0R | Phase 2: 所有转移的 uncaptured_R 中位数 < 0.5R | Phase 1: 两窗充足率 > 60% 且中位 MFE > 1.2R | 早窗充足、近窗不充足（窗口依赖） |
+| H5: 4h 粒度顺序假设影响结论 | `ambiguous_path` > 15%，且 stop-first 与 take-first 下主效应翻号 | — | `ambiguous_path` < 10% 且两种假设下方向一致 | 需 tick 数据验证 |
+
+---
+
+### 闸门：何时生成/禁止下一张实验卡片
+
+**生成新卡片的条件（必须全部满足）**：
+
+1. Phase 1 显示两窗入场毛优势充足（MFE > 2cost 比例 > 60%）
+2. Phase 2 或 Phase 3 显示某一单独组件（仅 ATR TP 或仅 ATR SL）两窗期望 > 0.12R，中位数 > 0.10R，95% CI 下界 > 0
+3. 该组件的改善不依赖另一组件保持 fixed（即路径竞争校正后仍成立）
+4. `ambiguous_path` < 15% 或在两种顺序假设下均成立
+5. 改善不局限于单一 regime 或 NATR 子集（除非该子集样本量 > 100 且有独立触发机制）
+
+**禁止新卡片的条件（任一成立即停止）**：
+
+1. Phase 1: 任一窗口 MFE > 2cost 比例 < 55%
+2. Phase 2: 成本上升抵消了毛改善（delta_cost > delta_gross）
+3. Phase 3: 所有组件效应 < 0.08R 或两窗异号
+4. Phase 2 与 Phase 3 矛盾，且无法用路径竞争解释
+5. 改善仅在小样本子集（< 50 笔）中出现
+6. 早窗改善但近窗恶化（窗口依赖）
+
+**当前预判**：
+基于你提供的证据（两窗净 R 接近零、近窗 stress 成本下翻负、NATR 分层不一致、成本占 R 上升 53%），我预期 Phase 1 会显示近窗 MFE 充足率边缘（55%-65%），Phase 2 会显示成本侵蚀主导，最终结论为**禁止新卡片，标记 H4 为主要原因，建议优先验证入场毛优势或放弃 B all-events 短周期方向**。
+
+但必须先跑完诊断，用数据而非先验判断。
+
+---
+
+### 关键权衡与风险
+
+**权衡 1：Phase 1 的 MFE 是否高估可交易优势？**
+
+- **风险**：4h OHLC 的 MFE 是事后最优路径，实际交易无法在精确的高点平仓。真实可捕获空间可能只有 MFE 的 60%-80%。
+- **缓解**：Phase 1 只用于判断"是否存在足够毛空间"，不用于估计精确期望。若 MFE 连 2×cost 都不到，即使打 60% 折扣也不够。
+
+**权衡 2：Phase 2 的状态转移是否受 stop-first 假设影响？**
+
+- **风险**：若同一根 K 同时触及 TP 和 SL，`TP→SL` 的频数会被 stop-first 夸大。
+- **缓解**：Phase 2 先统计 `ambiguous_path` 占比。若 > 15%，Phase 3 必须双假设验证；若 < 10%，影响可控。
+
+**权衡 3：2×2 是否值得做？**
+
+- **权衡**：Phase 2 已经给出状态转移和成本分解，Phase 3 的 2×2 增加 2 倍计算量，但信息增益可能有限——它只是把转移分析重新组合成主效应形式。
+- **建议**：若 Phase 2 已明确某一转移（如 `TIME→TP`）主导改善且不被成本抵消，可跳过 Phase 3，直接生成"仅改 TP"的单变量卡片。仅当 Phase 2 显示多个转移有混合效应、无法判断主因时，才需要 Phase 3 拆分。
+
+**权衡 4：regime/NATR 分层是否过早？**
+
+- **风险**：你已有同向线索（RISK_ON 改善、NEUTRAL 恶化），但近窗 RISK_ON 自身仍 -0.00485R，不足以支持"条件触发"策略。若现在就按分层设计出口，需要实时 regime 分类器、更多样本、转换期验证——这超出了"最小诊断"范围。
+- **建议**：Phase 4 仅作事后解释，不触发行动。若未来某个子集经独立验证后稳健转正，再考虑条件策略。
+
+---
+
+### 缺失证据与后续需求
+
+1. **Tick 数据或 1m K 线**：若 `ambiguous_path` > 15% 且影响结论，当前 4h 粒度不够，需要更高频数据确定 TP/SL 触发顺序。
+2. **实时 regime 分类器**：若希望基于 regime 条件触发不同出口，需要先验证分类器的准确率、滞后性和转换期表现。
+3. **Out-of-sample 币池**：当前使用 current-survivor，引入幸存者偏差。若某个组件在两窗表现稳健，下一张卡片应使用时点币池（如入场时市值前 50）或前向扩展的币池。
+4. **滑点模型**：当前只用 taker 费用，未建模滑点。若 ATR SL 触发时市场快速下跌，实际成交价可能比 SL 水平更差。近窗 stress 成本应包含滑点估计。
+5. **入场时机优化**：若 Phase 1 显示 MFE 充足但 Phase 2 显示早期 MAE 过深，问题可能不是出口几何，而是入场时机（如 4h 收盘入场 vs. 突破后回调入场）。
+
+---
+
+### 对 GPT 方案的挑战总结
+
+**GPT 的 2×2 能回答什么**：
+
+- 在路径竞争校正后,TP 和 SL 各自的平均效应方向和量级
+- 是否存在负交互（即两者同时调整反而更差）
+
+**不能回答什么**：
+
+- 改善是否源于毛收益增加还是成本结构变化（需 Phase 2 分解）
+- 入场是否有足够毛优势支持任何短距离出口（需 Phase 1 前置）
+- 哪些具体交易被 ATR SL 过早截断、损失了多少 MFE（需逐笔状态转移）
+- 4h 同根顺序不确定性是否影响结论（需双假设验证）
+
+**更高信息量的设计**：
+
+Phase 1 + Phase 2 的组合——先确认毛空间存在,再用状态转移直接定位改善与抵消的来源,比 2×2 更直接且避免了路径竞争的加法假设。2×2 只在"Phase 2 显示混合效应、无法判断主因"时才必要。
+
+---
+
+### 最终建议
+
+1. **立即执行 Phase 1**：这是 20 分钟的计算,能快速判断是否值得继续。若两窗 MFE 充足率 < 60%,直接停止,转向入场改进。
+
+2. **Phase 1 通过后执行 Phase 2**：这是核心诊断,必须做。输出完整的逐笔字段和状态转移汇总表。
+
+3. **根据 Phase 2 结果决定是否需要 Phase 3**：
+   - 若某一转移主导且方向明确 → 跳过 Phase 3,直接生成单变量卡片
+   - 若多个转移混合 → 执行 Phase 3 拆分主效应
+   - 若成本抵消毛改善 → 停止,不做 Phase 3
+
+4. **Phase 4 永远是附录**,不触发行动,除非某个子集有压倒性证据且独立验证过。
+
+5. **若 Phase 2 显示成本主导或 MFE 不足,最合理的结论就是 H4 成立**：暂停出口研究,优先验证 B all-events 入场在 48h 内是否有足够延续性,或考虑更长持仓周期、不同入场信号、或放弃该方向。
+
+不要因为"已经做了 ATR 实验"就强行继续优化出口。机制诊断的目的是告诉你何时停止。
+
 <!-- 由 Claude Code 追加；Codex 不代写。 -->
 
 ## Round 1：GPT 归纳与追问
 
-<!-- 由 Codex 追加。 -->
+### 已达成共识
+
+- 不再扫描 ATR 倍数、NATR 阈值或持仓时间；当前任务是机制归因，不是优化。
+- 不能只看 full ATR 与 fixed 的整体净收益，需要逐笔拆分毛收益变化、成本变化、状态变化和同根顺序敏感性。
+- regime/NATR 当前只能作为解释性附录。近窗 `RISK_ON` 的 ATR 策略自身仍未转正，现有证据不足以支持条件化生产规则。
+- 任何新实验卡片都必须要求两窗同向、成本压力和 stop-first/target-first 不翻转，并且不能由小样本切片单独触发。
+- 当前证据更接近“改善不够且可能被成本抵消”，而不是“ATR 出口已经可用”。
+
+### 关键分歧与方法修正
+
+1. **不能把事后 MFE 当作出口研究的硬前置闸门。** MFE 是事后上界，不是可执行收益；一笔交易可以先经历不可承受 MAE、随后才形成高 MFE，也可以只有无法实时识别的瞬时高点。`MFE > 2×cost` 只能说明价格曾提供空间，不能证明存在可交易毛优势，更不能据此判定或否定 H4。Claude 提出的 `55%/60%` 和 `1.0R/1.2R` 阈值目前没有来自策略经济学、既有基线或抽样误差的依据，不应成为停止条件。
+2. **状态转移是描述性配对，不是组件级因果反事实。** full fixed 与 full ATR 的 `TIME→TP`、`TP→SL` 等转移同时包含 TP 与 SL 两项变化，按转移分组还是对处理后结果的选择。它能解释“净差值由哪些交易贡献”，但不能单独证明贡献来自 TP 还是 SL。真正定义了四个出口政策的 2×2 才能回答组件政策效应与交互，尽管仍需谨慎解释路径竞争。
+3. **现有 R 口径必须显式处理。** 当前实现中 `net_r = net / planned_risk`，而 `planned_risk` 由每个模型自己的止损距离决定。它适合比较“每个政策按各自初始风险等风险配置后的结果”，但 `fixed_R` 与 `ATR_R` 的分母不同。逐笔 `delta_gross_R`、`delta_cost_R` 和 2×2 主效应若不同时报告共同单位，会把收益路径变化与风险分母变化混在一起。
+4. **Claude 的 Phase 1 字段存在单位歧义。** `MFE_gross` 被描述成相对价格收益，`cost_R` 则是风险单位，二者不能直接比较；`0.5×ATR` 又是第三种单位。费用也不应只用简化的 `(fee_bps×2)/NATR` 推导，现有回放已有实际 entry/exit fee 与 slippage，应直接使用相同成本引擎。
+5. **2×2 不需要因计算量而延期。** baseline 与 full ATR 已有，只缺 `ATR_TP+fixed_SL`、`fixed_TP+ATR_SL` 两个政策，且现有回放已具备 stop-first/target-first 和多成本分支。它可以与路径诊断一次生成；没有必要先用任意 MFE 阈值决定是否“允许”运行两个只读政策。
+
+### 新核对到的实现证据
+
+- `scripts/research_atr_adaptive_short_exit.py` 在每个政策下按该政策的 planned stop 计算 `planned_risk`，再计算 `net_r` 和 `cost_r`；因此机制报告必须同时给出：
+  - 不依赖止损分母的 `gross_return_pct / cost_pct / net_return_pct`；
+  - 各政策自身风险单位 `own_risk_R`，用于等风险配置比较；
+  - 一个预先固定的共同参考风险单位，例如 fixed 3% 风险或入场 ATR 风险，用于逐笔差值归因。
+- 当前回放已经同时执行 `stop_first` 与 `target_first`，无需等 ambiguous 比例超过任意门槛才看第二种顺序；主结论从一开始就应报告两种边界。
+
+## Round 2：Codex 追问
+
+请基于以上修正，重新给出一个**不依赖任意 MFE 硬阈值、单位一致、能区分描述性贡献与政策效应**的最小诊断协议。重点回答以下问题：
+
+1. 你是否同意取消“Phase 1 通过后才运行 2×2”的硬闸门，改为一次只读运行同时生成四个冻结政策、路径上界和状态转移？如果仍不同意，请说明只增加两个政策回放会带来什么具体统计或决策风险，而不是计算成本。
+2. 请严格区分三类问题及相应证据：
+   - **入场是否提供价格空间**：48h MFE/MAE、first-passage，仅作为描述性路径上界；
+   - **某个完整出口政策是否可执行地改善结果**：四政策实际退出的 gross/cost/net；
+   - **哪一组件造成改善或抵消**：2×2 的政策对比与交互，并承认 TP/SL 路径竞争是政策机制的一部分，而不是可被完全“校正”掉的偏差。
+3. 为逐笔与汇总指标指定统一单位。至少说明：
+   - 哪些指标用原始百分比；
+   - 哪些用各政策 own-risk R；
+   - 是否需要共同参考 R，若需要应选 fixed 3% 还是 entry ATR，为什么；
+   - gross、fee、slippage、net 必须如何恒等回对。
+4. 重新定位状态转移分析。它应如何用于解释总体差值的贡献，同时避免把 `TIME→TP` 或 `TP→SL` 直接解释成 TP/SL 的因果效应？请给出与 2×2 结果互相验证而非“冲突时永远优先状态转移”的规则。
+5. 重新定义 H4“入场毛优势不足”的判定。禁止使用目前无依据的 `55%/60%`、`1.0R/1.2R` 硬阈值。请给出以下两种之一：
+   - 有经济含义且可追溯的阈值来源；或
+   - 不设固定阈值，改用跨窗方向、配对区块区间、可执行政策上界与成本压力的一组判据。
+6. 给出最终最小输出和停止规则，要求：
+   - 四政策、两窗口、三成本口径和两种同根顺序一次完成；
+   - 主结果同时报告绝对净收益和 own-risk R，不因只在 R 上改善而忽略现金期望仍为负；
+   - MFE/MAE 不能触发参数实验，只能解释为什么实际政策失败；
+   - 只有单组件政策在两窗的**绝对扣费后期望**均转正、相对 baseline 的配对差值对不利方向有足够排除、stress 与同根顺序不翻号，才允许形成后续独立验证卡片；否则 `revert` 当前 ATR 定义或 `defer` 更广义 ATR 方向。
+
+请在第二轮明确指出：第一轮哪些建议你保留，哪些阈值或因果表述需要撤回。目标是得到一张可以直接冻结的诊断规格，而不是继续扩展分析层次。

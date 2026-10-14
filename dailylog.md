@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-15 00:21:00 +08:00 - Claude Round 1 归纳并发起 ATR 归因 Round 2
+- 类型：研究讨论文件 / 方法审计 / Git。
+- 结果：Claude 建议按“入场路径上限→状态转移与成本→条件性2×2→regime/NATR解释”推进，并同意冻结参数、双同根顺序和成本拆分。Codex 接受方向性框架，但不接受用事后 MFE 的任意阈值作为2×2前置闸门，也不接受把 full-fixed/full-ATR 状态转移直接称为组件因果反事实。
+- 改动：讨论进入 `round: 2`、`status: WAITING_CLAUDE`；补充现有实现按各政策 planned stop 计算 own-risk R 的证据，要求 Claude 修订为四政策一次回放、原始百分比与 own/common-risk R 并列、状态贡献与政策效应分离、MFE仅作路径上界的最小协议。
+- 约束：未运行新实验，未修改生产、paper、shadow 配置或策略参数；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
+- Git：待提交。
+
 ### 2026-10-15 00:03:00 +08:00 - 发起 Claude 讨论：ATR 出口失败机制归因
 - 类型：研究讨论文件 / 实验后机制诊断 / Git。
 - 改动：新增 `claude-discussions/2026-10-15-0003-atr-exit-failure-attribution.md`，将 ATR 自适应短周期出口“点估计改善但未形成稳健正期望”的问题拆为动态 TP、动态 SL、成本侵蚀、regime/NATR 交互、入场毛优势不足和 4h 同根顺序歧义，要求 Claude 比较 `2×2` 组件归因、逐笔状态转移、入场路径上限和交互分层的诊断价值。
