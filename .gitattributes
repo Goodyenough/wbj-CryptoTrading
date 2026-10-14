@@ -17,3 +17,8 @@ reports/2026-10-14/fixed_exit_volatility_fit_protocol_v1.md -text whitespace=bla
 reports/2026-10-14/fixed_exit_volatility_fit_v1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 scripts/diagnose_fixed_exit_volatility_fit.py text eol=lf
 tests/test_fixed_exit_volatility_fit.py text eol=lf
+# Preserve exact bytes for the ATR-adaptive short-exit study fingerprints.
+reports/2026-10-14/atr_adaptive_short_exit_protocol_v1.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+reports/2026-10-14/atr_adaptive_short_exit_v1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/research_atr_adaptive_short_exit.py text eol=lf
+tests/test_atr_adaptive_short_exit.py text eol=lf

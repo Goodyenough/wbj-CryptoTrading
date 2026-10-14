@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-14 23:48:43 +08:00 - 启动ATR自适应短周期出口验证
+- 类型：Taskboard / 冻结研究协议 / TODO / 开发计划；尚未运行实验。
+- 改动：创建并认领 `CRYPTOTRADIN-133`，新增 `reports/2026-10-14/atr_adaptive_short_exit_protocol_v1.md`并配置冻结研究原始字节保护；将用户澄清后的问题冻结为固定B入场下 `+5%/-3%` 对比唯一 `TP=5/3×ATR20 / SL=1×ATR20`，同步 `TODO.md` 与 `开发计划.md`。
+- 原因：`CRYPTOTRADIN-132`只测试固定出口加NATR过滤，未回答按币种信号时点波动动态设置止盈止损的原始问题；本轮需单独验证出口尺度适配。
+- 验证：协议已在结果产生前冻结系统目标、单一问题、事实/观察/假设/决定、等风险R口径、支持/否定/证据不足和禁止参数网格。生产、paper、shadow均未修改，用户现有 `scripts/run_logged_paper_task.ps1` 修改未触碰。
+- Git：本轮启动记录以 `research: start ATR-adaptive short-exit study` 提交并推送 `origin/main`；实际hash见同主题Git记录，按规则包含当时全部 `reports/`。
+
 ### 2026-10-14 16:59:24 +08:00 - 完成固定5%/3%出口波动适配诊断
 - 类型：隔离研究代码 / 测试 / 冻结历史诊断 / 报告 / Taskboard / 项目记忆。
 - 改动：新增 `scripts/diagnose_fixed_exit_volatility_fit.py` 与5项合成测试，只读复用冻结 B all-events 和4h数组，因果计算信号时点NATR20；按早窗三分位固定切点 `2.622% / 3.926%` 评估五个预注册连续选择器，并生成1,486条逐笔记录、summary、报告、manifest与verification；为协议和输出目录增加Git原始字节保护。同步 `TODO.md`、`EXPERIMENT_LEDGER.md`、`SYSTEM_OVERVIEW.md`、仓库及Obsidian开发计划和实验日志；Taskboard `CRYPTOTRADIN-132` 写入结果评论并由`in_progress`移至`in_review`（version 3）。
