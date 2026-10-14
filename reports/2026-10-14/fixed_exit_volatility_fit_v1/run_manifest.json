@@ -1,0 +1,33 @@
+{
+  "completed_utc": "2026-10-14T09:00:03.791052+00:00",
+  "head": "373831f9748b428746037d141eabd438742c35dd",
+  "source_sha256": {
+    "reports\\2026-10-14\\fixed_exit_volatility_fit_protocol_v1.md": "6e78f16478df53867f91a42bc626e1105a31be6cc205c0f328760d1885ad7404",
+    "scripts\\diagnose_fixed_exit_volatility_fit.py": "94957515c44fcea2accc8a1d4a66a983f12171ad648585e91193a829d4128eee",
+    "scripts\\short_horizon_core.py": "51549c3151d4c75ec2a78624dc8bd3b2d457800e1f210fe015ce13170cf9f762",
+    "scripts\\research_breakout_d6.py": "07750ef594127615132d2b7045eaa383d1f2220cacc04954c1dbf9f134478347"
+  },
+  "input_sha256": {
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_taker_stop_first_all_events_trades.json.gz": "399e9bd169f136e304f4f46627d057b93c9fbc56fae9bd61792e429ac4c6839e",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_taker_target_first_all_events_trades.json.gz": "85948e2a81298328c0d9f92fa88e31c9dc07ec8f4c23fabfeca65f9b1507b5e7",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_stress_stop_first_all_events_trades.json.gz": "3cab84f84db0d87828dd7acc7cb948fd9df4ccefa2994b7414a018a1a0f32a9d",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_stress_target_first_all_events_trades.json.gz": "3758adea0e49327686ff50049986855f9caaf17b52546c144c268d44aac4a40a",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_legacy_fee_stop_first_all_events_trades.json.gz": "517789e8f48d1b952d761158069d56414646e6805292d497cc033f10516153cf",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_legacy_fee_target_first_all_events_trades.json.gz": "0b69ca626de6bda27e4232e035445973d1ba929e4140f1f51fa820ae955f1f32",
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2024-07-01_inputs.json": "696c1aa4e71f168bf88ee1659f727e6e4015c3df3c963e314b9ef11ba2d64d66",
+    "data\\research_snapshots\\short_horizon_entry_v1\\2024-07-01.npz": "9a1b475abd63a9f202caf6243edd2b9e7fbd0513b640fd09a66c5be661abc4d9",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_taker_stop_first_all_events_trades.json.gz": "36d505e91e7a8f3096a016a7465f9eb714fe37afc2adaa1bd3a15316c16566f9",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_taker_target_first_all_events_trades.json.gz": "196bf4a0f50887dee2e57a67e93a04f7175a5592ac37267209d35dbe31a302cc",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_stress_stop_first_all_events_trades.json.gz": "bcacbee57d649ea7d23e48a1609ab95e1db2e1624bcaebc84ae0c220199a135d",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_stress_target_first_all_events_trades.json.gz": "caeaf0e97fff5417b256bc0a259750966587fd30be967f70d1646841ca6c8a39",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_legacy_fee_stop_first_all_events_trades.json.gz": "714a360744360e4b1c2520c24652cbc717f797c49a81bbd93678a6732b1813b8",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_legacy_fee_target_first_all_events_trades.json.gz": "4cf757878a5bd08e380d801cbc2f2713b8a22107bcee0b6b939da8a36aba6f85",
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2025-06-01_inputs.json": "587d1b7ad96fcb5477d7d0006b3cf2d12d8b2c467af8c4ec006fc6c3e6d3d73c",
+    "data\\research_snapshots\\short_horizon_entry_v1\\2025-06-01.npz": "79a2efb3c6538a052672cb14987a28fa73d3a1b192db98028ec804f740cce7a9"
+  },
+  "outputs": {
+    "summary.json": "ce41fb2afc116d72366935afd1c3b8d0299a23221dcadf3bfb292a3ae5093dbc",
+    "trades.csv": "279a2acc908437d5f241ddddc01210ba89321e05bd0e27d8dab127a7b257436a",
+    "report.md": "dfeb9462577165e3fefe5a8a3b16444bb497a4eefbf3b6fa054ca35e1481301a"
+  }
+}

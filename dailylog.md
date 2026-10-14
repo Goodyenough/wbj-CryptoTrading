@@ -1,5 +1,13 @@
 # Daily Log
 
+### 2026-10-14 16:59:24 +08:00 - 完成固定5%/3%出口波动适配诊断
+- 类型：隔离研究代码 / 测试 / 冻结历史诊断 / 报告 / Taskboard / 项目记忆。
+- 改动：新增 `scripts/diagnose_fixed_exit_volatility_fit.py` 与5项合成测试，只读复用冻结 B all-events 和4h数组，因果计算信号时点NATR20；按早窗三分位固定切点 `2.622% / 3.926%` 评估五个预注册连续选择器，并生成1,486条逐笔记录、summary、报告、manifest与verification；为协议和输出目录增加Git原始字节保护。同步 `TODO.md`、`EXPERIMENT_LEDGER.md`、`SYSTEM_OVERVIEW.md`、仓库及Obsidian开发计划和实验日志；Taskboard `CRYPTOTRADIN-132` 写入结果评论并由`in_progress`移至`in_review`（version 3）。
+- 原因：回答固定 `+5%/-3%/48h` 是否只适合特定入场波动水平，避免直接改成ATR自适应出口或围绕已看结果调阈值。
+- 结果：裁决 `reject_no_early_qualifier`。最接近的low组早窗胜率 `+4.90pp`、净期望转为 `+0.0405%`，但未达到预注册 `+5pp`；同一切点近窗仅 `+0.76pp`，净期望 `-0.1645%→-0.1745%`、PF `0.898→0.883`，未形成跨窗稳定适配关系。生产配置、paper、shadow和固定出口均未修改。
+- 验证：1,486条主分支记录与858/628源样本闭合，输出SHA256逐项通过；`python -m pytest tests/test_fixed_exit_volatility_fit.py tests/test_short_horizon_entry_study.py tests/test_breakout_d6_study.py -q` 为`32 passed`。全套项目测试为`241 passed, 5 failed`；5项失败来自既有database/scheduler/audit测试或用户未提交的 `scripts/run_logged_paper_task.ps1` 契约，本轮未修改对应实现。`git diff --check`除用户脚本换行提示外通过。
+- Git：本轮以 `research: diagnose fixed-exit volatility fit` 提交并推送 `origin/main`；实际hash见同主题Git记录。按规则包含全部 `reports/`，不纳入用户现有 `scripts/run_logged_paper_task.ps1` 修改或本地数据库。
+
 ### 2026-10-13 23:42 +08:00 - Claude三轮评审收敛并交用户裁决
 - 类型：讨论记录 / TODO状态；未运行实验或修改策略配置。
 - 改动：读取Claude Round 3最终审计，双方收敛为`retest D6 vs C20`；追加三轮后的共识、无实质分歧、各自建议、行动影响和用户选项，frontmatter更新为`WAITING_USER`，TODO同步。
