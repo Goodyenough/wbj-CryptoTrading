@@ -5,7 +5,7 @@
 - 改动：新增 `claude-discussions/2026-10-15-0003-atr-exit-failure-attribution.md`，将 ATR 自适应短周期出口“点估计改善但未形成稳健正期望”的问题拆为动态 TP、动态 SL、成本侵蚀、regime/NATR 交互、入场毛优势不足和 4h 同根顺序歧义，要求 Claude 比较 `2×2` 组件归因、逐笔状态转移、入场路径上限和交互分层的诊断价值。
 - 原因：在尝试新的 ATR 倍数或阈值前，先找到改善被抵消的机制，并形成有支持、否定、证据不足和停止条件的最小诊断顺序。
 - 验证：讨论文件为 `round: 1`、`status: WAITING_CLAUDE`；未运行新实验，未修改生产、paper、shadow 配置或策略参数；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
-- Git：待提交。
+- Git：讨论发起提交 `7161005`（`docs: start ATR exit attribution discussion`）；本条提交号回填随后单独提交并 push。
 
 ### 2026-10-14 23:55:10 +08:00 - 完成ATR自适应5:3短周期出口验证
 - 类型：隔离研究代码 / 测试 / 固定历史A/B / 报告 / Taskboard / 项目记忆。
