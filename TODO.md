@@ -1,5 +1,9 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-15 ATR出口失败机制归因
+
+- [ ] **CRYPTOTRADIN-134 / in_progress / 已授权启动**：承接 `CRYPTOTRADIN-133`，在同一 B all-events 入场、两个已烧窗口、next-open、48小时和既有成本/同根顺序下，一次回放 `fixed+fixed / ATR_TP+fixed_SL / fixed_TP+ATR_SL / ATR+ATR` 四政策，使用原始收益%、own-risk R、baseline实际planned-risk common-R，拆分动态TP、动态SL、交互和成本贡献。MFE/MAE仅作解释，状态转移不作组件因果结论；裁决仅为 `component_validation_eligible / reject_current_atr_components / measurement_insufficient`。禁止扫描新ATR参数或修改生产配置。协议：`reports/2026-10-15/atr_exit_component_attribution_protocol_v1.md`。
+
 ## 2026-10-14 下一代入场研究问题
 
 - [x] **CRYPTOTRADIN-133 / in_review / 实验完成待用户验收**：固定 B 入场、next-open、成本和48小时，比较 `+5%/-3%` 与唯一预注册的 `TP=5/3×ATR20 / SL=1×ATR20`。ATR版本使平均净收益早窗 `-0.1864%→-0.0134%`、近窗 `-0.1645%→-0.0164%`，TIME也下降，但两窗等风险净R仍未为正、R-PF未超过1，14日配对差值区间均跨零；早窗风险曲线MDD扩大，近窗stress成本下相对差值转负。裁决 `reject_preregistered_atr_exit`：波动尺度错配机制成立，但这个具体ATR公式不可采用，不外推否定所有ATR出口。报告：`reports/2026-10-14/atr_adaptive_short_exit_v1/report.md`。

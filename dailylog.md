@@ -1,5 +1,14 @@
 # Daily Log
 
+### 2026-10-15 00:45:00 +08:00 - 创建并启动ATR出口四政策失败机制归因
+- 类型：Taskboard / 冻结诊断协议 / TODO / 开发计划 / Git。
+- 改动：创建 `CRYPTOTRADIN-134`“ATR出口四政策2×2失败机制归因”，直接置为 `in_progress`、`priority=medium`，关联前置 `CRYPTOTRADIN-133` 并追加启动评论；新增 `reports/2026-10-15/atr_exit_component_attribution_protocol_v1.md`，同步 `TODO.md`、仓库及 Obsidian 开发计划。
+- 单一问题：在完全相同的B all-events入场下，交叉组合固定/ATR TP与固定/ATR SL，识别动态TP、动态SL、交互、成本和4h同根顺序分别如何造成“点估计改善但未形成稳健正期望”。
+- 冻结范围：四政策×两窗口×`taker/stress/legacy_fee`×`stop_first/target_first`共48配置；并列原始收益%、own-risk R、baseline实际planned-risk common-R；MFE/MAE仅解释，状态转移不作组件因果结论。
+- 裁决：仅允许 `component_validation_eligible / reject_current_atr_components / measurement_insufficient`；禁止新ATR参数扫描、生产配置修改和把四出口失败直接解释为入场无优势。
+- 验证：Taskboard 创建返回 `CRYPTOTRADIN-134 status=in_progress version=1`，关联后为 version=2；任务与 `CRYPTOTRADIN-133` 建立 related 关系，启动评论写入成功。尚未运行48配置或修改业务代码；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
+- Git：待提交。
+
 ### 2026-10-15 00:37:00 +08:00 - Claude 三轮讨论收口：冻结 ATR 组件归因协议
 - 类型：研究讨论收口 / 诊断协议 / Git。
 - 结论：`retest`。Claude 接受 `taker/stress/legacy_fee`、baseline 实际 planned risk 作为 common-R、删除无依据容忍阈值及 H4a/H4b 边界；双方同意一次回放四政策×两窗口×三成本×两顺序，MFE/MAE仅作解释，状态转移不作组件因果结论。
