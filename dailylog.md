@@ -5,7 +5,7 @@
 - 结论：`retest`。Claude 接受 `taker/stress/legacy_fee`、baseline 实际 planned risk 作为 common-R、删除无依据容忍阈值及 H4a/H4b 边界；双方同意一次回放四政策×两窗口×三成本×两顺序，MFE/MAE仅作解释，状态转移不作组件因果结论。
 - 最终修正：不采纳 Claude 在测量不足和 reject 后路径中重新加入的任意比例/MFE阈值；恒等式任一失败即阻断对应裁决，同根顺序导致资格翻号即判4h粒度不足，数据缺口按是否破坏四政策同一配对事件集判断。未通过资格时只否定当前 ATR20/1ATR/5:3 组件定义，不证明入场无优势。
 - 状态：讨论文件设为 `status: DONE`、`decision: retest`。尚未创建或启动诊断任务，未运行新实验，未修改生产、paper、shadow 配置或策略参数；保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
-- Git：待提交。
+- Git：讨论收口提交 `0fc0a26`（`docs: finalize ATR component attribution protocol`）；本条提交号回填随后单独提交并 push。
 
 ### 2026-10-15 00:29:00 +08:00 - Claude Round 2 收敛并发起最终协议审计
 - 类型：研究讨论文件 / 诊断规格审计 / Git。
