@@ -1,5 +1,13 @@
 # Daily Log
 
+### 2026-10-14 23:55:10 +08:00 - 完成ATR自适应5:3短周期出口验证
+- 类型：隔离研究代码 / 测试 / 固定历史A/B / 报告 / Taskboard / 项目记忆。
+- 改动：新增 `scripts/research_atr_adaptive_short_exit.py` 与6项合成测试，重放冻结B all-events，比较固定`+5%/-3%`与唯一`TP=5/3×ATR20 / SL=1×ATR20`；输出2,972行主分支逐笔记录、summary、报告、manifest和verification，并同步TODO、实验账本、系统总览、仓库及Obsidian开发计划/实验日志。Taskboard `CRYPTOTRADIN-133`写入结果后移至`in_review`。
+- 原因：正确回答用户“按不同币种信号时点波动动态设置止盈止损”的问题，并以等风险R避免不同止损宽度造成不公平比较。
+- 结果：ATR出口使早/近平均净收益由`-0.1864%/-0.1645%`改善到`-0.0134%/-0.0164%`，TIME明显下降，但等风险净R仍为`-0.0317/约0`、R-PF为`0.943/约1.000`；两窗区块差值区间跨零，早窗MDD恶化，近窗stress成本相对差值转负。裁决`reject_preregistered_atr_exit`，仅否定该具体倍数，不修改生产。
+- 验证：12个固定成本/顺序分支逐笔复现cashfix，858/628事件完全配对，输出SHA256闭合；38项相关测试通过。全套`247 passed, 5 failed`，失败均为既有database/scheduler/audit或用户未提交 `scripts/run_logged_paper_task.ps1` 契约问题，本轮未修改对应实现。
+- Git：本轮以 `research: evaluate ATR-adaptive short exits` 提交并推送`origin/main`；实际hash见同主题Git记录。按规则包含全部`reports/`，不纳入用户现有脚本修改或本地数据库。
+
 ### 2026-10-14 23:48:43 +08:00 - 启动ATR自适应短周期出口验证
 - 类型：Taskboard / 冻结研究协议 / TODO / 开发计划；尚未运行实验。
 - 改动：创建并认领 `CRYPTOTRADIN-133`，新增 `reports/2026-10-14/atr_adaptive_short_exit_protocol_v1.md`并配置冻结研究原始字节保护；将用户澄清后的问题冻结为固定B入场下 `+5%/-3%` 对比唯一 `TP=5/3×ATR20 / SL=1×ATR20`，同步 `TODO.md` 与 `开发计划.md`。
