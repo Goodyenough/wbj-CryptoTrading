@@ -1,0 +1,801 @@
+{
+  "experiment": "momentum_resolution_stage_a_v1",
+  "taskboard": "CRYPTOTRADIN-129",
+  "scope": "oracle_confirmed_latency_ceiling_not_standalone_1h_strategy",
+  "windows": {
+    "early": {
+      "start": "2024-07-01",
+      "end": "2025-06-01",
+      "recovered_plans": 858,
+      "confirming_paths_verified": 858,
+      "frame_checks": {
+        "source_features": "reports\\2026-10-13\\short_horizon_entry_v1\\2024-07-01_features.json.gz",
+        "source_features_sha256": "ccbcd1104e95a81fb0331cbde9e0b08479d0b5102d52541d5f6dbe085e35c609",
+        "eligible_frames": 792,
+        "recomputed_c20_events": 650,
+        "natr_tercile_cuts_pct": [
+          2.6221175304072863,
+          3.8969818797417575
+        ]
+      },
+      "latency": {
+        "events": 858,
+        "earlier_reclaim_events": 691,
+        "earlier_reclaim_pct": 80.53613053613054,
+        "lead_hour_counts": {
+          "2": 228,
+          "3": 302,
+          "1": 161
+        },
+        "lead_hours_mean": 2.2040520984081042,
+        "entry_price_improvement_mean_pct": 0.7792930469636461,
+        "entry_price_improvement_median_pct": 0.3748807197709869,
+        "earlier_entry_cheaper_pct": 71.05643994211287
+      },
+      "branches": {
+        "taker_stop_first": {
+          "comparison": {
+            "baseline": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.18643559413029664,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2211185423985835,
+              "avg_loss_pct": -2.982084217871472,
+              "profit_factor": 0.897826819814308,
+              "mean_raw_pct": 0.1104295316610056,
+              "mean_fee_pct": 0.1799883831334839,
+              "mean_slippage_pct": 0.11687674265783102,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26
+            },
+            "oracle": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": 0.3972839189048859,
+              "win_rate_pct": 46.62004662004662,
+              "avg_win_pct": 4.229196558381331,
+              "avg_loss_pct": -2.9493646745243236,
+              "profit_factor": 1.2523447779355081,
+              "mean_raw_pct": 0.6839573194967741,
+              "mean_fee_pct": 0.17631394143284915,
+              "mean_slippage_pct": 0.11035945915905147,
+              "time_exit_pct": 16.433566433566433,
+              "duration_median_hours": 14.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2906123876124047,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 389,
+                "TIME": 141,
+                "TP": 328
+              },
+              "signal_weeks": 26
+            },
+            "mean_net_pct_delta": 0.5837195130351825,
+            "win_rate_delta_pp": 7.808857808857809,
+            "profit_factor_delta": 0.3545179581212001,
+            "bootstrap": {
+              "block_days": 14,
+              "repetitions": 2000,
+              "valid_resamples": 2000,
+              "baseline_mean_net_pct_ci": [
+                -0.992287793074751,
+                0.391093999379016
+              ],
+              "oracle_mean_net_pct_ci": [
+                -0.5662544130287804,
+                1.0377293409351163
+              ],
+              "delta_mean_net_pct_ci": [
+                0.34941675325872046,
+                0.7792713740964275
+              ]
+            },
+            "leave_one_symbol": {
+              "dimension": "symbol",
+              "groups": 61,
+              "min_delta": 0.5490603173990337,
+              "max_delta": 0.6454646046581262,
+              "worst_removed": {
+                "removed": "WLDUSDT",
+                "mean_delta_net_pct": 0.5490603173990337,
+                "paired": 838
+              },
+              "best_removed": {
+                "removed": "DOGEUSDT",
+                "mean_delta_net_pct": 0.6454646046581262,
+                "paired": 813
+              }
+            },
+            "leave_one_week": {
+              "dimension": "week",
+              "groups": 26,
+              "min_delta": 0.48455802706156775,
+              "max_delta": 0.6176514399210041,
+              "worst_removed": {
+                "removed": "2024-W46",
+                "mean_delta_net_pct": 0.48455802706156775,
+                "paired": 776
+              },
+              "best_removed": {
+                "removed": "2024-W39",
+                "mean_delta_net_pct": 0.6176514399210041,
+                "paired": 808
+              }
+            }
+          },
+          "baseline_verification": {
+            "rows": 858,
+            "max_numeric_error": 0.0,
+            "exact_status_exit": true
+          },
+          "measurement": {
+            "passed": true,
+            "errors": []
+          }
+        },
+        "stress_stop_first": {
+          "comparison": {
+            "baseline": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.5583431924822664,
+              "win_rate_pct": 37.41258741258741,
+              "avg_win_pct": 3.9241543584003105,
+              "avg_loss_pct": -3.237824968708164,
+              "profit_factor": 0.7244750959954825,
+              "mean_raw_pct": 0.10761360010428175,
+              "mean_fee_pct": 0.39888267577296865,
+              "mean_slippage_pct": 0.2670741168135786,
+              "time_exit_pct": 15.734265734265735,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 459,
+                "TIME": 135,
+                "TP": 264
+              },
+              "signal_weeks": 26
+            },
+            "oracle": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.00243886137955751,
+              "win_rate_pct": 44.40559440559441,
+              "avg_win_pct": 3.9780823092105515,
+              "avg_loss_pct": -3.1818488529829785,
+              "profit_factor": 0.9986212787169557,
+              "mean_raw_pct": 0.6587726848391579,
+              "mean_fee_pct": 0.39999671250864544,
+              "mean_slippage_pct": 0.2612148337100696,
+              "time_exit_pct": 16.317016317016318,
+              "duration_median_hours": 14.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804422,
+              "tail_p05_pct": -3.5804510978044055,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 397,
+                "TIME": 140,
+                "TP": 321
+              },
+              "signal_weeks": 26
+            },
+            "mean_net_pct_delta": 0.5559043311027089,
+            "win_rate_delta_pp": 6.993006993006993,
+            "profit_factor_delta": 0.2741461827214732,
+            "bootstrap": {
+              "block_days": 14,
+              "repetitions": 2000,
+              "valid_resamples": 2000,
+              "baseline_mean_net_pct_ci": [
+                -1.3428471372361377,
+                -0.014083961299505478
+              ],
+              "oracle_mean_net_pct_ci": [
+                -0.912906332715465,
+                0.591987899262934
+              ],
+              "delta_mean_net_pct_ci": [
+                0.35195635459757063,
+                0.7422727199922063
+              ]
+            },
+            "leave_one_symbol": {
+              "dimension": "symbol",
+              "groups": 61,
+              "min_delta": 0.5211006839760768,
+              "max_delta": 0.6158035906264492,
+              "worst_removed": {
+                "removed": "WLDUSDT",
+                "mean_delta_net_pct": 0.5211006839760768,
+                "paired": 838
+              },
+              "best_removed": {
+                "removed": "DOGEUSDT",
+                "mean_delta_net_pct": 0.6158035906264492,
+                "paired": 813
+              }
+            },
+            "leave_one_week": {
+              "dimension": "week",
+              "groups": 26,
+              "min_delta": 0.45556032713615824,
+              "max_delta": 0.5902556366434266,
+              "worst_removed": {
+                "removed": "2024-W46",
+                "mean_delta_net_pct": 0.45556032713615824,
+                "paired": 776
+              },
+              "best_removed": {
+                "removed": "2024-W47",
+                "mean_delta_net_pct": 0.5902556366434266,
+                "paired": 767
+              }
+            }
+          },
+          "baseline_verification": {
+            "rows": 858,
+            "max_numeric_error": 0.0,
+            "exact_status_exit": true
+          },
+          "measurement": {
+            "passed": true,
+            "errors": []
+          }
+        },
+        "taker_target_first": {
+          "comparison": {
+            "baseline": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.18643559413029664,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2211185423985835,
+              "avg_loss_pct": -2.982084217871472,
+              "profit_factor": 0.897826819814308,
+              "mean_raw_pct": 0.1104295316610056,
+              "mean_fee_pct": 0.1799883831334839,
+              "mean_slippage_pct": 0.11687674265783102,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26
+            },
+            "oracle": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": 0.3972839189048859,
+              "win_rate_pct": 46.62004662004662,
+              "avg_win_pct": 4.229196558381331,
+              "avg_loss_pct": -2.9493646745243236,
+              "profit_factor": 1.2523447779355081,
+              "mean_raw_pct": 0.6839573194967741,
+              "mean_fee_pct": 0.17631394143284915,
+              "mean_slippage_pct": 0.11035945915905147,
+              "time_exit_pct": 16.433566433566433,
+              "duration_median_hours": 14.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2906123876124047,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 389,
+                "TIME": 141,
+                "TP": 328
+              },
+              "signal_weeks": 26
+            },
+            "mean_net_pct_delta": 0.5837195130351825,
+            "win_rate_delta_pp": 7.808857808857809,
+            "profit_factor_delta": 0.3545179581212001,
+            "bootstrap": {
+              "block_days": 14,
+              "repetitions": 2000,
+              "valid_resamples": 2000,
+              "baseline_mean_net_pct_ci": [
+                -0.992287793074751,
+                0.391093999379016
+              ],
+              "oracle_mean_net_pct_ci": [
+                -0.5662544130287804,
+                1.0377293409351163
+              ],
+              "delta_mean_net_pct_ci": [
+                0.34941675325872046,
+                0.7792713740964275
+              ]
+            },
+            "leave_one_symbol": {
+              "dimension": "symbol",
+              "groups": 61,
+              "min_delta": 0.5490603173990337,
+              "max_delta": 0.6454646046581262,
+              "worst_removed": {
+                "removed": "WLDUSDT",
+                "mean_delta_net_pct": 0.5490603173990337,
+                "paired": 838
+              },
+              "best_removed": {
+                "removed": "DOGEUSDT",
+                "mean_delta_net_pct": 0.6454646046581262,
+                "paired": 813
+              }
+            },
+            "leave_one_week": {
+              "dimension": "week",
+              "groups": 26,
+              "min_delta": 0.48455802706156775,
+              "max_delta": 0.6176514399210041,
+              "worst_removed": {
+                "removed": "2024-W46",
+                "mean_delta_net_pct": 0.48455802706156775,
+                "paired": 776
+              },
+              "best_removed": {
+                "removed": "2024-W39",
+                "mean_delta_net_pct": 0.6176514399210041,
+                "paired": 808
+              }
+            }
+          },
+          "baseline_verification": {
+            "rows": 858,
+            "max_numeric_error": 0.0,
+            "exact_status_exit": true
+          },
+          "measurement": {
+            "passed": true,
+            "errors": []
+          }
+        }
+      }
+    },
+    "near": {
+      "start": "2025-06-01",
+      "end": "2026-06-01",
+      "recovered_plans": 628,
+      "confirming_paths_verified": 628,
+      "frame_checks": {
+        "source_features": "reports\\2026-10-13\\short_horizon_entry_v1\\2025-06-01_features.json.gz",
+        "source_features_sha256": "8b826ad7c57db3889dbaea31906b836b1f616cc187814a1002fbd3897fac73bc",
+        "eligible_frames": 719,
+        "recomputed_c20_events": 457,
+        "natr_tercile_cuts_pct": [
+          1.5073873945004683,
+          2.3815341589967085
+        ]
+      },
+      "latency": {
+        "events": 628,
+        "earlier_reclaim_events": 506,
+        "earlier_reclaim_pct": 80.5732484076433,
+        "lead_hour_counts": {
+          "3": 222,
+          "1": 137,
+          "2": 147
+        },
+        "lead_hours_mean": 2.1679841897233203,
+        "entry_price_improvement_mean_pct": 0.5423314000902063,
+        "entry_price_improvement_median_pct": 0.3539931371292826,
+        "earlier_entry_cheaper_pct": 76.48221343873517
+      },
+      "branches": {
+        "taker_stop_first": {
+          "comparison": {
+            "baseline": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.16446632100603867,
+              "win_rate_pct": 40.76433121019108,
+              "avg_win_pct": 3.5714791440288773,
+              "avg_loss_pct": -2.7354395442558737,
+              "profit_factor": 0.8984998788504573,
+              "mean_raw_pct": 0.14224356587945913,
+              "mean_fee_pct": 0.18368427901160167,
+              "mean_slippage_pct": 0.12302560787390826,
+              "time_exit_pct": 30.095541401273884,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.290612387612392,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 189,
+                "TP": 161,
+                "SL": 278
+              },
+              "signal_weeks": 23
+            },
+            "oracle": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": 0.320996251468993,
+              "win_rate_pct": 46.81528662420382,
+              "avg_win_pct": 3.709974092877049,
+              "avg_loss_pct": -2.6621159801895953,
+              "profit_factor": 1.2267180853812478,
+              "mean_raw_pct": 0.6206500235292272,
+              "mean_fee_pct": 0.18116067038291317,
+              "mean_slippage_pct": 0.11849310167733336,
+              "time_exit_pct": 31.05095541401274,
+              "duration_median_hours": 27.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2906123876124056,
+              "tail_p05_pct": -3.2906123876123905,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 195,
+                "TP": 191,
+                "SL": 242
+              },
+              "signal_weeks": 23
+            },
+            "mean_net_pct_delta": 0.48546257247503166,
+            "win_rate_delta_pp": 6.050955414012741,
+            "profit_factor_delta": 0.3282182065307905,
+            "bootstrap": {
+              "block_days": 14,
+              "repetitions": 2000,
+              "valid_resamples": 2000,
+              "baseline_mean_net_pct_ci": [
+                -0.6663706088665717,
+                0.27842037431152994
+              ],
+              "oracle_mean_net_pct_ci": [
+                -0.22948000685613207,
+                0.8295307804865768
+              ],
+              "delta_mean_net_pct_ci": [
+                0.3418134680697721,
+                0.6428012032514689
+              ]
+            },
+            "leave_one_symbol": {
+              "dimension": "symbol",
+              "groups": 37,
+              "min_delta": 0.4344333412472181,
+              "max_delta": 0.5112281022677465,
+              "worst_removed": {
+                "removed": "DOGEUSDT",
+                "mean_delta_net_pct": 0.4344333412472181,
+                "paired": 577
+              },
+              "best_removed": {
+                "removed": "BNBUSDT",
+                "mean_delta_net_pct": 0.5112281022677465,
+                "paired": 573
+              }
+            },
+            "leave_one_week": {
+              "dimension": "week",
+              "groups": 23,
+              "min_delta": 0.4456453945892396,
+              "max_delta": 0.4979374497211481,
+              "worst_removed": {
+                "removed": "2026-W16",
+                "mean_delta_net_pct": 0.4456453945892396,
+                "paired": 596
+              },
+              "best_removed": {
+                "removed": "2025-W33",
+                "mean_delta_net_pct": 0.4979374497211481,
+                "paired": 530
+              }
+            }
+          },
+          "baseline_verification": {
+            "rows": 628,
+            "max_numeric_error": 0.0,
+            "exact_status_exit": true
+          },
+          "measurement": {
+            "passed": true,
+            "errors": []
+          }
+        },
+        "stress_stop_first": {
+          "comparison": {
+            "baseline": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.5645077081299266,
+              "win_rate_pct": 37.261146496815286,
+              "avg_win_pct": 3.401451194632402,
+              "avg_loss_pct": -2.9199249244913092,
+              "profit_factor": 0.6918503966223195,
+              "mean_raw_pct": 0.10798366312370777,
+              "mean_fee_pct": 0.39887032203419576,
+              "mean_slippage_pct": 0.2736210492194381,
+              "time_exit_pct": 30.573248407643312,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044215,
+              "tail_p05_pct": -3.580451097804407,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 192,
+                "TP": 154,
+                "SL": 282
+              },
+              "signal_weeks": 23
+            },
+            "oracle": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.05993885235090185,
+              "win_rate_pct": 44.904458598726116,
+              "avg_win_pct": 3.42278817434516,
+              "avg_loss_pct": -2.8984620359586746,
+              "profit_factor": 0.9624660430242015,
+              "mean_raw_pct": 0.6090593273450647,
+              "mean_fee_pct": 0.39988148206581703,
+              "mean_slippage_pct": 0.26911669763014906,
+              "time_exit_pct": 31.21019108280255,
+              "duration_median_hours": 27.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044157,
+              "tail_p05_pct": -3.5804510978044037,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 196,
+                "TP": 187,
+                "SL": 245
+              },
+              "signal_weeks": 23
+            },
+            "mean_net_pct_delta": 0.5045688557790247,
+            "win_rate_delta_pp": 7.64331210191083,
+            "profit_factor_delta": 0.27061564640188196,
+            "bootstrap": {
+              "block_days": 14,
+              "repetitions": 2000,
+              "valid_resamples": 2000,
+              "baseline_mean_net_pct_ci": [
+                -1.0416594380632334,
+                -0.14350755026118409
+              ],
+              "oracle_mean_net_pct_ci": [
+                -0.5909521146169038,
+                0.41426759862536955
+              ],
+              "delta_mean_net_pct_ci": [
+                0.3461804571632811,
+                0.6611239819875243
+              ]
+            },
+            "leave_one_symbol": {
+              "dimension": "symbol",
+              "groups": 37,
+              "min_delta": 0.44546881464855037,
+              "max_delta": 0.5323251821003078,
+              "worst_removed": {
+                "removed": "DOGEUSDT",
+                "mean_delta_net_pct": 0.44546881464855037,
+                "paired": 577
+              },
+              "best_removed": {
+                "removed": "BNBUSDT",
+                "mean_delta_net_pct": 0.5323251821003078,
+                "paired": 573
+              }
+            },
+            "leave_one_week": {
+              "dimension": "week",
+              "groups": 23,
+              "min_delta": 0.46290260586073845,
+              "max_delta": 0.5193391610863446,
+              "worst_removed": {
+                "removed": "2026-W19",
+                "mean_delta_net_pct": 0.46290260586073845,
+                "paired": 575
+              },
+              "best_removed": {
+                "removed": "2025-W27",
+                "mean_delta_net_pct": 0.5193391610863446,
+                "paired": 608
+              }
+            }
+          },
+          "baseline_verification": {
+            "rows": 628,
+            "max_numeric_error": 0.0,
+            "exact_status_exit": true
+          },
+          "measurement": {
+            "passed": true,
+            "errors": []
+          }
+        },
+        "taker_target_first": {
+          "comparison": {
+            "baseline": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.16446632100603867,
+              "win_rate_pct": 40.76433121019108,
+              "avg_win_pct": 3.5714791440288773,
+              "avg_loss_pct": -2.7354395442558737,
+              "profit_factor": 0.8984998788504573,
+              "mean_raw_pct": 0.14224356587945913,
+              "mean_fee_pct": 0.18368427901160167,
+              "mean_slippage_pct": 0.12302560787390826,
+              "time_exit_pct": 30.095541401273884,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.290612387612392,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 189,
+                "TP": 161,
+                "SL": 278
+              },
+              "signal_weeks": 23
+            },
+            "oracle": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": 0.320996251468993,
+              "win_rate_pct": 46.81528662420382,
+              "avg_win_pct": 3.709974092877049,
+              "avg_loss_pct": -2.6621159801895953,
+              "profit_factor": 1.2267180853812478,
+              "mean_raw_pct": 0.6206500235292272,
+              "mean_fee_pct": 0.18116067038291317,
+              "mean_slippage_pct": 0.11849310167733336,
+              "time_exit_pct": 31.05095541401274,
+              "duration_median_hours": 27.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2906123876124056,
+              "tail_p05_pct": -3.2906123876123905,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 195,
+                "TP": 191,
+                "SL": 242
+              },
+              "signal_weeks": 23
+            },
+            "mean_net_pct_delta": 0.48546257247503166,
+            "win_rate_delta_pp": 6.050955414012741,
+            "profit_factor_delta": 0.3282182065307905,
+            "bootstrap": {
+              "block_days": 14,
+              "repetitions": 2000,
+              "valid_resamples": 2000,
+              "baseline_mean_net_pct_ci": [
+                -0.6663706088665717,
+                0.27842037431152994
+              ],
+              "oracle_mean_net_pct_ci": [
+                -0.22948000685613207,
+                0.8295307804865768
+              ],
+              "delta_mean_net_pct_ci": [
+                0.3418134680697721,
+                0.6428012032514689
+              ]
+            },
+            "leave_one_symbol": {
+              "dimension": "symbol",
+              "groups": 37,
+              "min_delta": 0.4344333412472181,
+              "max_delta": 0.5112281022677465,
+              "worst_removed": {
+                "removed": "DOGEUSDT",
+                "mean_delta_net_pct": 0.4344333412472181,
+                "paired": 577
+              },
+              "best_removed": {
+                "removed": "BNBUSDT",
+                "mean_delta_net_pct": 0.5112281022677465,
+                "paired": 573
+              }
+            },
+            "leave_one_week": {
+              "dimension": "week",
+              "groups": 23,
+              "min_delta": 0.4456453945892396,
+              "max_delta": 0.4979374497211481,
+              "worst_removed": {
+                "removed": "2026-W16",
+                "mean_delta_net_pct": 0.4456453945892396,
+                "paired": 596
+              },
+              "best_removed": {
+                "removed": "2025-W33",
+                "mean_delta_net_pct": 0.4979374497211481,
+                "paired": 530
+              }
+            }
+          },
+          "baseline_verification": {
+            "rows": 628,
+            "max_numeric_error": 0.0,
+            "exact_status_exit": true
+          },
+          "measurement": {
+            "passed": true,
+            "errors": []
+          }
+        }
+      }
+    }
+  },
+  "limitations": [
+    "future_4h_confirmation_conditioning",
+    "burned_windows",
+    "current_survivor_universe"
+  ],
+  "qualification_checks": {
+    "taker_oracle_positive_both": true,
+    "paired_ci_lower_nonnegative_both": true,
+    "stress_oracle_positive_both": false,
+    "tie_break_no_sign_flip": true
+  },
+  "decision": "stop_lower_timeframe_timing_route",
+  "decision_reasons": [
+    "测量闭合，但oracle-confirmed提前成交上界未同时通过双窗正收益、压力成本和配对区块门槛。"
+  ],
+  "plain_language": "4h确认延迟是真实且有经济影响的：约80.5%的最终确认事件可提前1至3小时，普通taker成本下的有利上界在两窗均转正。但这个上界已经提前知道未来4h会确认，仍在stress成本下略亏，所以不能授权独立1h策略阶段；单纯把同一个B信号提前几小时还不是稳健充分解法。"
+}

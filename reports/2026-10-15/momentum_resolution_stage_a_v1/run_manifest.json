@@ -1,0 +1,27 @@
+{
+  "completed_utc": "2026-10-15T07:41:49.646229+00:00",
+  "head": "a23070b6ed03a7b6519fbba9a5fde22836d1d810",
+  "source_sha256": {
+    "reports\\2026-10-15\\momentum_resolution_stage_a_protocol_v1.md": "2e670af4390dd5d489436452471bfe5fef8246818c89a33847e77bd9300bae4c",
+    "scripts\\diagnose_momentum_resolution_stage_a.py": "31cc82210e51314800d7ec9f34f25b9acd46c721cf214673024f938373382b85",
+    "scripts\\research_breakout_d6.py": "07750ef594127615132d2b7045eaa383d1f2220cacc04954c1dbf9f134478347",
+    "scripts\\short_horizon_core.py": "51549c3151d4c75ec2a78624dc8bd3b2d457800e1f210fe015ce13170cf9f762"
+  },
+  "input_sha256": {
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_taker_stop_first_all_events_trades.json.gz": "399e9bd169f136e304f4f46627d057b93c9fbc56fae9bd61792e429ac4c6839e",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_stress_stop_first_all_events_trades.json.gz": "3cab84f84db0d87828dd7acc7cb948fd9df4ccefa2994b7414a018a1a0f32a9d",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2024-07-01_taker_target_first_all_events_trades.json.gz": "85948e2a81298328c0d9f92fa88e31c9dc07ec8f4c23fabfeca65f9b1507b5e7",
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2024-07-01_inputs.json": "696c1aa4e71f168bf88ee1659f727e6e4015c3df3c963e314b9ef11ba2d64d66",
+    "data\\research_snapshots\\short_horizon_entry_v1\\2024-07-01.npz": "9a1b475abd63a9f202caf6243edd2b9e7fbd0513b640fd09a66c5be661abc4d9",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_taker_stop_first_all_events_trades.json.gz": "36d505e91e7a8f3096a016a7465f9eb714fe37afc2adaa1bd3a15316c16566f9",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_stress_stop_first_all_events_trades.json.gz": "bcacbee57d649ea7d23e48a1609ab95e1db2e1624bcaebc84ae0c220199a135d",
+    "reports\\2026-10-13\\short_horizon_entry_v1_cashfix\\2025-06-01_taker_target_first_all_events_trades.json.gz": "196bf4a0f50887dee2e57a67e93a04f7175a5592ac37267209d35dbe31a302cc",
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2025-06-01_inputs.json": "587d1b7ad96fcb5477d7d0006b3cf2d12d8b2c467af8c4ec006fc6c3e6d3d73c",
+    "data\\research_snapshots\\short_horizon_entry_v1\\2025-06-01.npz": "79a2efb3c6538a052672cb14987a28fa73d3a1b192db98028ec804f740cce7a9"
+  },
+  "outputs": {
+    "summary.json": "fe3f8670b0e7140fb0c8901f138fa97a23f85838f77fb9f7de356340c4e2ae89",
+    "trades.csv": "b72d3fa6548decc787eb07912e1acbf809c879201d298eef7b5f265a024ede56",
+    "report.md": "5565cd9c46bf04725c8146e0d49f1903387b7dda5d3c767da61ddccba2d51ac3"
+  }
+}
