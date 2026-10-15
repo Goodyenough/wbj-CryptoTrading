@@ -6,7 +6,7 @@
 - 改动：在`reports/2026-10-15/decision_audit_existing_evidence_v1.md`新增ATR 0.35路线、历史阶段与当前裁决，明确其与ATR20出口不是同一研究问题；当前判断为冻结、不部署，`retest_path_dependent / insufficient_paired_forward_evidence`，不继续扫阈值。
 - 边界：本次只补充已有报告，不新增统计、不读取新收益窗口、不修改生产/paper/shadow或外部Taskboard；实验账本不新增实验结果。
 - 验证：核对历史A/B汇总、交易归因、路径复盘和可信前向证据报告；报告链接与关键数字已复核，`git diff --check`通过。纯文档无需运行回测或测试套件。
-- Git：本次修订提交为`待回填`，提交后推送`origin/main`。
+- Git：本次修订已提交为`3c2a40c`（`docs: restore ATR 0.35 research line`）并成功推送`origin/main`；本条提交号回填随后单独提交，用户原有脚本与历史dailylog回填继续保留未暂存。
 
 ### 2026-10-15 23:35:00 +08:00 - 整理现有研究路线裁决表
 - 类型：已有研究证据整理 / 决策边界 / 项目记忆，未运行新实验。
