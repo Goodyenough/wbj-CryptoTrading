@@ -6,7 +6,7 @@
 - 原因：回答4h收盘确认是否错过大量盘中启动，同时避免把15m/1h/4h混成多参数搜索，保留与既有4h研究的可比性。
 - 结果：约80.5%最终确认事件可提前1–3小时；taker净收益早/近由`-0.1864%/-0.1645%`转为`+0.3973%/+0.3210%`且区块CI为正，但stress仍为`-0.0024%/-0.0599%`。裁决`stop_lower_timeframe_timing_route`：确认延迟真实但单纯提前不足以通过成本稳健性，不运行阶段B或15分钟研究。
 - 验证：6个原4h分支逐笔复现误差0，1486条确认路径的1h/4h聚合通过，同根顺序无翻号；44项相关测试通过，manifest哈希闭合。全套为`256 passed, 5 failed`，5项均为既有database/scheduler/audit或用户未提交脚本契约失败，本轮未触及对应实现。Taskboard已写入结果并移至`in_review`；生产、paper、shadow、采集调度及用户原有`scripts/run_logged_paper_task.ps1`改动未触碰。
-- Git：本轮将以`research: diagnose 4h confirmation latency`提交并推送`origin/main`；实际hash随后回填。
+- Git：本轮提交`1f01457`（`research: diagnose 4h confirmation latency`）并已推送`origin/main`；按规则同时纳入当时生成的全部`reports/`，未纳入用户原有`scripts/run_logged_paper_task.ps1`改动或本地数据库。
 
 ### 2026-10-15 08:46:00 +08:00 - 完成ATR出口四政策2×2失败机制归因
 - 类型：隔离研究代码 / 测试 / 固定历史回放 / 报告 / Taskboard / 项目记忆。
