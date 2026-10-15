@@ -6,7 +6,7 @@
 - 原因：拆开`CRYPTOTRADIN-133`中同时变化的ATR TP和ATR SL，判断full ATR点估计改善来自哪个组件、交互是否稳定以及成本是否仍使绝对期望为负。
 - 结果：裁决`reject_current_atr_components`。ATR TP单组件主口径早/近净收益`-0.1718%/-0.0034%`，ATR SL为`-0.1059%/-0.1170%`；stress下均明显为负，双窗配对区间均跨零。早窗TP/SL边际与交互均正，近窗主要由TP改善且交互转负，机制不稳定。生产、paper、shadow和配置均未修改。
 - 验证：12/12测量分支通过会计恒等、共同事件集和删失一致，12/12 fixed分支逐笔复现，stop-first/target-first无资格翻号；45项相关测试通过。全套为`252 passed, 5 failed`，5项均为既有database/scheduler/audit或用户未提交脚本契约失败，本轮未触及对应实现。Taskboard已写入结果并移至`in_review`；保留用户原有 `scripts/run_logged_paper_task.ps1` 改动不纳入提交。
-- Git：本轮将以 `research: attribute ATR exit components` 提交并推送`origin/main`；实际hash随后回填。
+- Git：本轮提交 `9ea8746`（`research: attribute ATR exit components`）并已推送`origin/main`；按规则同时纳入当时生成的全部`reports/`，未纳入用户原有 `scripts/run_logged_paper_task.ps1` 改动或本地数据库。
 
 ### 2026-10-15 00:45:00 +08:00 - 创建并启动ATR出口四政策失败机制归因
 - 类型：Taskboard / 冻结诊断协议 / TODO / 开发计划 / Git。
