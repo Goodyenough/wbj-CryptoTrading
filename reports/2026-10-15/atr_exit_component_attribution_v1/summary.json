@@ -1,0 +1,4447 @@
+{
+  "experiment": "atr_exit_component_attribution_v1",
+  "taskboard": "CRYPTOTRADIN-134",
+  "policies": {
+    "fixed_fixed": "fixed+fixed",
+    "atr_tp_fixed_sl": "ATR_TP+fixed_SL",
+    "fixed_tp_atr_sl": "fixed_TP+ATR_SL",
+    "atr_atr": "ATR+ATR"
+  },
+  "configurations": 48,
+  "windows": {
+    "early": {
+      "start": "2024-07-01",
+      "end": "2025-06-01",
+      "branches": {
+        "taker_stop_first": {
+          "cost": "taker",
+          "tie_break": "stop_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.18643559413029664,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2211185423985835,
+              "avg_loss_pct": -2.982084217871472,
+              "profit_factor": 0.897826819814308,
+              "mean_raw_pct": 0.1104295316610056,
+              "mean_fee_pct": 0.1799883831334839,
+              "mean_slippage_pct": 0.11687674265783102,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2906123876123643,
+              "mean_own_net_r": -0.056656807964420054,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.056656807964420054,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.2968651257913149,
+              "mean_own_cost_r": 0.09021576862375941,
+              "mean_common_cost_r": 0.0902157686237594,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -41.699183980018184,
+                "max_drawdown_pct": 61.21436105272669
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6977127335211293,
+              "first_touch_counts": {
+                "SL": 454,
+                "NONE": 134,
+                "TP": 270
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.17181313181053484,
+              "win_rate_pct": 38.344988344988344,
+              "avg_win_pct": 4.431417558465835,
+              "avg_loss_pct": -3.034691954307559,
+              "profit_factor": 0.9081723739910363,
+              "mean_raw_pct": 0.12175524106163828,
+              "mean_fee_pct": 0.17875622258639318,
+              "mean_slippage_pct": 0.11481215028579263,
+              "time_exit_pct": 11.655011655011656,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 471,
+                "TIME": 100,
+                "TP": 287
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2906123876123674,
+              "mean_own_net_r": -0.05221311767296893,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.05221311767296894,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.2935683728721858,
+              "mean_own_cost_r": 0.08921390254814993,
+              "mean_common_cost_r": 0.08921390254814993,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -39.96439738520484,
+                "max_drawdown_pct": 64.89139465748208
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.8178971557978043,
+              "first_touch_counts": {
+                "SL": 471,
+                "NONE": 100,
+                "TP": 287
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.10585926068892729,
+              "win_rate_pct": 40.675990675990676,
+              "avg_win_pct": 4.399110891401818,
+              "avg_loss_pct": -3.1947287755802245,
+              "profit_factor": 0.9441447025987326,
+              "mean_raw_pct": 0.1850950451765433,
+              "mean_fee_pct": 0.17779281407146588,
+              "mean_slippage_pct": 0.11316149179401734,
+              "time_exit_pct": 10.48951048951049,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.295400291706038,
+              "tail_p05_pct": -5.3999047050264,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 467,
+                "TIME": 90,
+                "TP": 301
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.481735549610462,
+              "mean_own_net_r": -0.04799817417940121,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.032170079067178434,
+              "median_common_net_r": -0.45029173146873913,
+              "mean_total_cost_pct": 0.2909543058654832,
+              "mean_own_cost_r": 0.1025014184138678,
+              "mean_common_cost_r": 0.08841950117272711,
+              "common_r_p05": -1.6410029711656409,
+              "common_r_worst": -2.824823831180749,
+              "common_r_curve": {
+                "final_return_pct": -28.75898692097395,
+                "max_drawdown_pct": 65.51887585395349
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6945085256857126,
+              "first_touch_counts": {
+                "SL": 467,
+                "NONE": 90,
+                "TP": 301
+              }
+            },
+            "atr_atr": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.013400069053431466,
+              "win_rate_pct": 40.20979020979021,
+              "avg_win_pct": 4.89385844464647,
+              "avg_loss_pct": -3.313603163062137,
+              "profit_factor": 0.9932364226202044,
+              "mean_raw_pct": 0.2784326822956519,
+              "mean_fee_pct": 0.17814523677286148,
+              "mean_slippage_pct": 0.11368751457623442,
+              "time_exit_pct": 10.955710955710956,
+              "duration_median_hours": 13.5,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.295400291706038,
+              "tail_p05_pct": -5.466434211092274,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 468,
+                "TIME": 94,
+                "TP": 296
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.6813514745935432,
+              "mean_own_net_r": -0.03172966948701091,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.004072211331810495,
+              "median_common_net_r": -0.5109539734679944,
+              "mean_total_cost_pct": 0.2918327513490959,
+              "mean_own_cost_r": 0.09928547188226867,
+              "mean_common_cost_r": 0.08868645618903949,
+              "common_r_p05": -1.66122094223885,
+              "common_r_worst": -2.824823831180749,
+              "common_r_curve": {
+                "final_return_pct": -10.84934119563199,
+                "max_drawdown_pct": 68.77080183875182
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.7904583172471225,
+              "first_touch_counts": {
+                "SL": 468,
+                "NONE": 94,
+                "TP": 296
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.05354082697762881,
+              "sl_marginal": 0.11949469809923637,
+              "interaction": 0.07783672931573404
+            },
+            "common_r": {
+              "tp_marginal": 0.016270779013409526,
+              "sl_marginal": 0.03631381761920004,
+              "interaction": 0.023654177443916825
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.30155110240581684,
+                0.11885143350559982
+              ],
+              "atr_tp_fixed_sl": [
+                -0.3460277982036735,
+                0.14341225716801523
+              ],
+              "fixed_tp_atr_sl": [
+                -0.31268131375339486,
+                0.19913223197783686
+              ],
+              "atr_atr": [
+                -0.3683778900680699,
+                0.25385429564336526
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.06913492407741104,
+                0.06162067130399121
+              ],
+              "fixed_tp_atr_sl": [
+                -0.07531981137390285,
+                0.09641962752719602
+              ],
+              "atr_atr": [
+                -0.10411915071155486,
+                0.15551035456787105
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.06311085837071033,
+                0.07997419656612124
+              ],
+              "sl_marginal": [
+                -0.062061687842185326,
+                0.10724502284476063
+              ],
+              "interaction": [
+                -0.012463046142660436,
+                0.04914553088817744
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 386,
+                "mean_delta_common_r": -0.13644735250980763,
+                "total_delta_common_r": -52.66867806878575,
+                "mean_delta_net_pct": -0.4489953484256861,
+                "total_delta_net_pct": -173.3122044923148
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 26,
+                "mean_delta_common_r": 1.0115065407907218,
+                "total_delta_common_r": 26.29917006055876,
+                "mean_delta_net_pct": 3.3284759532768926,
+                "total_delta_net_pct": 86.5403747851992
+              },
+              {
+                "transition": "SL->TP",
+                "count": 42,
+                "mean_delta_common_r": 2.993088957210168,
+                "total_delta_common_r": 125.70973620282706,
+                "mean_delta_net_pct": 9.849095599821604,
+                "total_delta_net_pct": 413.66201519250734
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 51,
+                "mean_delta_common_r": -0.4576754672693053,
+                "total_delta_common_r": -23.341448830734574,
+                "mean_delta_net_pct": -1.506032562102661,
+                "total_delta_net_pct": -76.8076606672357
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 49,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 34,
+                "mean_delta_common_r": 0.4104719093157778,
+                "total_delta_common_r": 13.956044916736445,
+                "mean_delta_net_pct": 1.3507039495614022,
+                "total_delta_net_pct": 45.92393428508768
+              },
+              {
+                "transition": "TP->SL",
+                "count": 31,
+                "mean_delta_common_r": -2.567115887264138,
+                "total_delta_common_r": -79.58059250518828,
+                "mean_delta_net_pct": -8.447383339067919,
+                "total_delta_net_pct": -261.86888351110554
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 19,
+                "mean_delta_common_r": -0.8841628623199701,
+                "total_delta_common_r": -16.799094384079435,
+                "mean_delta_net_pct": -2.9094372674169158,
+                "total_delta_net_pct": -55.2793080809214
+              },
+              {
+                "transition": "TP->TP",
+                "count": 220,
+                "mean_delta_common_r": 0.234283847815658,
+                "total_delta_common_r": 51.54244651944476,
+                "mean_delta_net_pct": 0.7709373318396977,
+                "total_delta_net_pct": 169.6062130047335
+              }
+            ],
+            "total_delta_common_r": 45.11758391077899,
+            "direct_delta_common_r": 45.11758391077899,
+            "total_delta_net_pct": 148.4644805159503,
+            "direct_delta_net_pct": 148.46448051595027,
+            "closure_error_common_r": 0.0,
+            "closure_error_net_pct": 2.842170943040401e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 858,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "taker_target_first": {
+          "cost": "taker",
+          "tie_break": "target_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.18643559413029664,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2211185423985835,
+              "avg_loss_pct": -2.982084217871472,
+              "profit_factor": 0.897826819814308,
+              "mean_raw_pct": 0.1104295316610056,
+              "mean_fee_pct": 0.1799883831334839,
+              "mean_slippage_pct": 0.11687674265783102,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123914,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2906123876123643,
+              "mean_own_net_r": -0.056656807964420054,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.056656807964420054,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.2968651257913149,
+              "mean_own_cost_r": 0.09021576862375941,
+              "mean_common_cost_r": 0.0902157686237594,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -41.699183980018184,
+                "max_drawdown_pct": 61.21436105272669
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6977127335211293,
+              "first_touch_counts": {
+                "SL": 454,
+                "NONE": 134,
+                "TP": 270
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.17181313181053484,
+              "win_rate_pct": 38.344988344988344,
+              "avg_win_pct": 4.431417558465835,
+              "avg_loss_pct": -3.034691954307559,
+              "profit_factor": 0.9081723739910363,
+              "mean_raw_pct": 0.12175524106163828,
+              "mean_fee_pct": 0.17875622258639318,
+              "mean_slippage_pct": 0.11481215028579263,
+              "time_exit_pct": 11.655011655011656,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612408,
+              "tail_p05_pct": -3.2906123876123923,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 471,
+                "TIME": 100,
+                "TP": 287
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2906123876123674,
+              "mean_own_net_r": -0.05221311767296893,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.05221311767296894,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.2935683728721858,
+              "mean_own_cost_r": 0.08921390254814993,
+              "mean_common_cost_r": 0.08921390254814993,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -39.96439738520484,
+                "max_drawdown_pct": 64.89139465748208
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.8178971557978043,
+              "first_touch_counts": {
+                "SL": 471,
+                "NONE": 100,
+                "TP": 287
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.10585926068892729,
+              "win_rate_pct": 40.675990675990676,
+              "avg_win_pct": 4.399110891401818,
+              "avg_loss_pct": -3.1947287755802245,
+              "profit_factor": 0.9441447025987326,
+              "mean_raw_pct": 0.1850950451765433,
+              "mean_fee_pct": 0.17779281407146588,
+              "mean_slippage_pct": 0.11316149179401734,
+              "time_exit_pct": 10.48951048951049,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.295400291706038,
+              "tail_p05_pct": -5.3999047050264,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 467,
+                "TIME": 90,
+                "TP": 301
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.481735549610462,
+              "mean_own_net_r": -0.04799817417940121,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.032170079067178434,
+              "median_common_net_r": -0.45029173146873913,
+              "mean_total_cost_pct": 0.2909543058654832,
+              "mean_own_cost_r": 0.1025014184138678,
+              "mean_common_cost_r": 0.08841950117272711,
+              "common_r_p05": -1.6410029711656409,
+              "common_r_worst": -2.824823831180749,
+              "common_r_curve": {
+                "final_return_pct": -28.75898692097395,
+                "max_drawdown_pct": 65.51887585395349
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6945085256857126,
+              "first_touch_counts": {
+                "SL": 467,
+                "NONE": 90,
+                "TP": 301
+              }
+            },
+            "atr_atr": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.013400069053431466,
+              "win_rate_pct": 40.20979020979021,
+              "avg_win_pct": 4.89385844464647,
+              "avg_loss_pct": -3.313603163062137,
+              "profit_factor": 0.9932364226202044,
+              "mean_raw_pct": 0.2784326822956519,
+              "mean_fee_pct": 0.17814523677286148,
+              "mean_slippage_pct": 0.11368751457623442,
+              "time_exit_pct": 10.955710955710956,
+              "duration_median_hours": 13.5,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.295400291706038,
+              "tail_p05_pct": -5.466434211092274,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 468,
+                "TIME": 94,
+                "TP": 296
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.6813514745935432,
+              "mean_own_net_r": -0.03172966948701091,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.004072211331810495,
+              "median_common_net_r": -0.5109539734679944,
+              "mean_total_cost_pct": 0.2918327513490959,
+              "mean_own_cost_r": 0.09928547188226867,
+              "mean_common_cost_r": 0.08868645618903949,
+              "common_r_p05": -1.66122094223885,
+              "common_r_worst": -2.824823831180749,
+              "common_r_curve": {
+                "final_return_pct": -10.84934119563199,
+                "max_drawdown_pct": 68.77080183875182
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.7904583172471225,
+              "first_touch_counts": {
+                "SL": 468,
+                "NONE": 94,
+                "TP": 296
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.05354082697762881,
+              "sl_marginal": 0.11949469809923637,
+              "interaction": 0.07783672931573404
+            },
+            "common_r": {
+              "tp_marginal": 0.016270779013409526,
+              "sl_marginal": 0.03631381761920004,
+              "interaction": 0.023654177443916825
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.30155110240581684,
+                0.11885143350559982
+              ],
+              "atr_tp_fixed_sl": [
+                -0.3460277982036735,
+                0.14341225716801523
+              ],
+              "fixed_tp_atr_sl": [
+                -0.31268131375339486,
+                0.19913223197783686
+              ],
+              "atr_atr": [
+                -0.3683778900680699,
+                0.25385429564336526
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.06913492407741104,
+                0.06162067130399121
+              ],
+              "fixed_tp_atr_sl": [
+                -0.07531981137390285,
+                0.09641962752719602
+              ],
+              "atr_atr": [
+                -0.10411915071155486,
+                0.15551035456787105
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.06311085837071033,
+                0.07997419656612124
+              ],
+              "sl_marginal": [
+                -0.062061687842185326,
+                0.10724502284476063
+              ],
+              "interaction": [
+                -0.012463046142660436,
+                0.04914553088817744
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 386,
+                "mean_delta_common_r": -0.13644735250980763,
+                "total_delta_common_r": -52.66867806878575,
+                "mean_delta_net_pct": -0.4489953484256861,
+                "total_delta_net_pct": -173.3122044923148
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 26,
+                "mean_delta_common_r": 1.0115065407907218,
+                "total_delta_common_r": 26.29917006055876,
+                "mean_delta_net_pct": 3.3284759532768926,
+                "total_delta_net_pct": 86.5403747851992
+              },
+              {
+                "transition": "SL->TP",
+                "count": 42,
+                "mean_delta_common_r": 2.993088957210168,
+                "total_delta_common_r": 125.70973620282706,
+                "mean_delta_net_pct": 9.849095599821604,
+                "total_delta_net_pct": 413.66201519250734
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 51,
+                "mean_delta_common_r": -0.4576754672693053,
+                "total_delta_common_r": -23.341448830734574,
+                "mean_delta_net_pct": -1.506032562102661,
+                "total_delta_net_pct": -76.8076606672357
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 49,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 34,
+                "mean_delta_common_r": 0.4104719093157778,
+                "total_delta_common_r": 13.956044916736445,
+                "mean_delta_net_pct": 1.3507039495614022,
+                "total_delta_net_pct": 45.92393428508768
+              },
+              {
+                "transition": "TP->SL",
+                "count": 31,
+                "mean_delta_common_r": -2.567115887264138,
+                "total_delta_common_r": -79.58059250518828,
+                "mean_delta_net_pct": -8.447383339067919,
+                "total_delta_net_pct": -261.86888351110554
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 19,
+                "mean_delta_common_r": -0.8841628623199701,
+                "total_delta_common_r": -16.799094384079435,
+                "mean_delta_net_pct": -2.9094372674169158,
+                "total_delta_net_pct": -55.2793080809214
+              },
+              {
+                "transition": "TP->TP",
+                "count": 220,
+                "mean_delta_common_r": 0.234283847815658,
+                "total_delta_common_r": 51.54244651944476,
+                "mean_delta_net_pct": 0.7709373318396977,
+                "total_delta_net_pct": 169.6062130047335
+              }
+            ],
+            "total_delta_common_r": 45.11758391077899,
+            "direct_delta_common_r": 45.11758391077899,
+            "total_delta_net_pct": 148.4644805159503,
+            "direct_delta_net_pct": 148.46448051595027,
+            "closure_error_common_r": 0.0,
+            "closure_error_net_pct": 2.842170943040401e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 858,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "stress_stop_first": {
+          "cost": "stress",
+          "tie_break": "stop_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.5583431924822664,
+              "win_rate_pct": 37.41258741258741,
+              "avg_win_pct": 3.9241543584003105,
+              "avg_loss_pct": -3.237824968708164,
+              "profit_factor": 0.7244750959954825,
+              "mean_raw_pct": 0.10761360010428175,
+              "mean_fee_pct": 0.39888267577296865,
+              "mean_slippage_pct": 0.2670741168135786,
+              "time_exit_pct": 15.734265734265735,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 459,
+                "TIME": 135,
+                "TP": 264
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.5804510978043793,
+              "mean_own_net_r": -0.15594213612487381,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.15594213612487381,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.6659567925865473,
+              "mean_own_cost_r": 0.18599801376841188,
+              "mean_common_cost_r": 0.18599801376841188,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -74.91310554382919,
+                "max_drawdown_pct": 77.20329761502968
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.674057636605953,
+              "first_touch_counts": {
+                "SL": 459,
+                "NONE": 135,
+                "TP": 264
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.5251938911121498,
+              "win_rate_pct": 37.41258741258741,
+              "avg_win_pct": 4.126361365795946,
+              "avg_loss_pct": -3.305732508370062,
+              "profit_factor": 0.7461571358175603,
+              "mean_raw_pct": 0.13832631978614424,
+              "mean_fee_pct": 0.39894910723864024,
+              "mean_slippage_pct": 0.2645711036596531,
+              "time_exit_pct": 11.421911421911421,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804425,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 475,
+                "TIME": 98,
+                "TP": 285
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.5804510978043824,
+              "mean_own_net_r": -0.14668372134288044,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.1466837213428804,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.6635202108982933,
+              "mean_own_cost_r": 0.18531749010765078,
+              "mean_common_cost_r": 0.18531749010765078,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -73.04307520932332,
+                "max_drawdown_pct": 74.81821656064464
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.7516724730737336,
+              "first_touch_counts": {
+                "SL": 475,
+                "NONE": 98,
+                "TP": 285
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.48620489602856415,
+              "win_rate_pct": 39.51048951048951,
+              "avg_win_pct": 4.0787998591080985,
+              "avg_loss_pct": -3.467971007765228,
+              "profit_factor": 0.7682264889884817,
+              "mean_raw_pct": 0.17612521813708407,
+              "mean_fee_pct": 0.3990272414973247,
+              "mean_slippage_pct": 0.26330287266832286,
+              "time_exit_pct": 10.023310023310023,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.56276267083716,
+              "tail_p05_pct": -5.680881882050114,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 476,
+                "TIME": 86,
+                "TP": 296
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.854386006374253,
+              "mean_own_net_r": -0.1566695521578821,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.13579431271291928,
+              "median_common_net_r": -0.517919657529017,
+              "mean_total_cost_pct": 0.6623301141656476,
+              "mean_own_cost_r": 0.20219827240335067,
+              "mean_common_cost_r": 0.18498510273518384,
+              "common_r_p05": -1.5866385901859554,
+              "common_r_worst": -2.6708262198305857,
+              "common_r_curve": {
+                "final_return_pct": -70.41672109579673,
+                "max_drawdown_pct": 71.59545934962084
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.646415174713179,
+              "first_touch_counts": {
+                "SL": 476,
+                "NONE": 86,
+                "TP": 296
+              }
+            },
+            "atr_atr": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.3781136369024858,
+              "win_rate_pct": 39.044289044289044,
+              "avg_win_pct": 4.6193040483939,
+              "avg_loss_pct": -3.579136437235735,
+              "profit_factor": 0.8266875803219804,
+              "mean_raw_pct": 0.2848371620841763,
+              "mean_fee_pct": 0.3992438572470764,
+              "mean_slippage_pct": 0.26370694173958503,
+              "time_exit_pct": 10.372960372960373,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.56276267083716,
+              "tail_p05_pct": -5.747178866795216,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 476,
+                "TIME": 89,
+                "TP": 293
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -2.081867321282718,
+              "mean_own_net_r": -0.13637052011699474,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.10560502757162454,
+              "median_common_net_r": -0.5814539186303554,
+              "mean_total_cost_pct": 0.6629507989866613,
+              "mean_own_cost_r": 0.20063245921190034,
+              "mean_common_cost_r": 0.18515845654007013,
+              "common_r_p05": -1.6051549678529315,
+              "common_r_worst": -2.6708262198305857,
+              "common_r_curve": {
+                "final_return_pct": -62.203396349436915,
+                "max_drawdown_pct": 73.33385173303323
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.7302302124982587,
+              "first_touch_counts": {
+                "SL": 476,
+                "NONE": 89,
+                "TP": 293
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.0706202802480975,
+              "sl_marginal": 0.10960927533168313,
+              "interaction": 0.0749419577559618
+            },
+            "common_r": {
+              "tp_marginal": 0.019723849961644085,
+              "sl_marginal": 0.0306132585916052,
+              "interaction": 0.02093087035930133
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.3750497075800308,
+                -0.003933571752493001
+              ],
+              "atr_tp_fixed_sl": [
+                -0.40937800316989265,
+                0.02583064116015295
+              ],
+              "fixed_tp_atr_sl": [
+                -0.3888209845386148,
+                0.06808605876088586
+              ],
+              "atr_atr": [
+                -0.4320733280987934,
+                0.12640789265457514
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.056088460027440966,
+                0.06098579559537538
+              ],
+              "fixed_tp_atr_sl": [
+                -0.06862874673909433,
+                0.0867924974493658
+              ],
+              "atr_atr": [
+                -0.08888334105060726,
+                0.14409516002235406
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.051304131565382126,
+                0.07816463822461908
+              ],
+              "sl_marginal": [
+                -0.05922748837706793,
+                0.09602715165956226
+              ],
+              "interaction": [
+                -0.012222586275105663,
+                0.04396267172050798
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 392,
+                "mean_delta_common_r": -0.12211090384134121,
+                "total_delta_common_r": -47.86747430580576,
+                "mean_delta_net_pct": -0.4372121197126172,
+                "total_delta_net_pct": -171.38715092734589
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 25,
+                "mean_delta_common_r": 0.9750721001728578,
+                "total_delta_common_r": 24.37680250432145,
+                "mean_delta_net_pct": 3.4911979715023462,
+                "total_delta_net_pct": 87.27994928755865
+              },
+              {
+                "transition": "SL->TP",
+                "count": 42,
+                "mean_delta_common_r": 2.7201336470807975,
+                "total_delta_common_r": 114.24561317739348,
+                "mean_delta_net_pct": 9.739305502865124,
+                "total_delta_net_pct": 409.0508311203352
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 54,
+                "mean_delta_common_r": -0.4373420840690513,
+                "total_delta_common_r": -23.616472539728772,
+                "mean_delta_net_pct": -1.565881945021097,
+                "total_delta_net_pct": -84.55762503113925
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 46,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 35,
+                "mean_delta_common_r": 0.3990492429578503,
+                "total_delta_common_r": 13.966723503524761,
+                "mean_delta_net_pct": 1.4287763000264462,
+                "total_delta_net_pct": 50.00717050092562
+              },
+              {
+                "transition": "TP->SL",
+                "count": 30,
+                "mean_delta_common_r": -2.346425718868295,
+                "total_delta_common_r": -70.39277156604885,
+                "mean_delta_net_pct": -8.401262541038452,
+                "total_delta_net_pct": -252.03787623115358
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 18,
+                "mean_delta_common_r": -0.8450083039909273,
+                "total_delta_common_r": -15.21014947183669,
+                "mean_delta_net_pct": -3.0255109096781507,
+                "total_delta_net_pct": -54.459196374206705
+              },
+              {
+                "transition": "TP->TP",
+                "count": 216,
+                "mean_delta_common_r": 0.22077299924476032,
+                "total_delta_common_r": 47.68696783686823,
+                "mean_delta_net_pct": 0.7904669275114707,
+                "total_delta_net_pct": 170.74085634247766
+              }
+            ],
+            "total_delta_common_r": 43.18923913868784,
+            "direct_delta_common_r": 43.18923913868785,
+            "total_delta_net_pct": 154.63695868745174,
+            "direct_delta_net_pct": 154.63695868745168,
+            "closure_error_common_r": -1.4210854715202004e-14,
+            "closure_error_net_pct": 5.684341886080802e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 858,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "stress_target_first": {
+          "cost": "stress",
+          "tie_break": "target_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.5583431924822664,
+              "win_rate_pct": 37.41258741258741,
+              "avg_win_pct": 3.9241543584003105,
+              "avg_loss_pct": -3.237824968708164,
+              "profit_factor": 0.7244750959954825,
+              "mean_raw_pct": 0.10761360010428175,
+              "mean_fee_pct": 0.39888267577296865,
+              "mean_slippage_pct": 0.2670741168135786,
+              "time_exit_pct": 15.734265734265735,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804421,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 459,
+                "TIME": 135,
+                "TP": 264
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.5804510978043793,
+              "mean_own_net_r": -0.15594213612487381,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.15594213612487381,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.6659567925865473,
+              "mean_own_cost_r": 0.18599801376841188,
+              "mean_common_cost_r": 0.18599801376841188,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -74.91310554382919,
+                "max_drawdown_pct": 77.20329761502968
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.674057636605953,
+              "first_touch_counts": {
+                "SL": 459,
+                "NONE": 135,
+                "TP": 264
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.5251938911121498,
+              "win_rate_pct": 37.41258741258741,
+              "avg_win_pct": 4.126361365795946,
+              "avg_loss_pct": -3.305732508370062,
+              "profit_factor": 0.7461571358175603,
+              "mean_raw_pct": 0.13832631978614424,
+              "mean_fee_pct": 0.39894910723864024,
+              "mean_slippage_pct": 0.2645711036596531,
+              "time_exit_pct": 11.421911421911421,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.580451097804425,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 475,
+                "TIME": 98,
+                "TP": 285
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.5804510978043824,
+              "mean_own_net_r": -0.14668372134288044,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.1466837213428804,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.6635202108982933,
+              "mean_own_cost_r": 0.18531749010765078,
+              "mean_common_cost_r": 0.18531749010765078,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -73.04307520932332,
+                "max_drawdown_pct": 74.81821656064464
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.7516724730737336,
+              "first_touch_counts": {
+                "SL": 475,
+                "NONE": 98,
+                "TP": 285
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.48620489602856415,
+              "win_rate_pct": 39.51048951048951,
+              "avg_win_pct": 4.0787998591080985,
+              "avg_loss_pct": -3.467971007765228,
+              "profit_factor": 0.7682264889884817,
+              "mean_raw_pct": 0.17612521813708407,
+              "mean_fee_pct": 0.3990272414973247,
+              "mean_slippage_pct": 0.26330287266832286,
+              "time_exit_pct": 10.023310023310023,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.56276267083716,
+              "tail_p05_pct": -5.680881882050114,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 476,
+                "TIME": 86,
+                "TP": 296
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.854386006374253,
+              "mean_own_net_r": -0.1566695521578821,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.13579431271291928,
+              "median_common_net_r": -0.517919657529017,
+              "mean_total_cost_pct": 0.6623301141656476,
+              "mean_own_cost_r": 0.20219827240335067,
+              "mean_common_cost_r": 0.18498510273518384,
+              "common_r_p05": -1.5866385901859554,
+              "common_r_worst": -2.6708262198305857,
+              "common_r_curve": {
+                "final_return_pct": -70.41672109579673,
+                "max_drawdown_pct": 71.59545934962084
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.646415174713179,
+              "first_touch_counts": {
+                "SL": 476,
+                "NONE": 86,
+                "TP": 296
+              }
+            },
+            "atr_atr": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.3781136369024858,
+              "win_rate_pct": 39.044289044289044,
+              "avg_win_pct": 4.6193040483939,
+              "avg_loss_pct": -3.579136437235735,
+              "profit_factor": 0.8266875803219804,
+              "mean_raw_pct": 0.2848371620841763,
+              "mean_fee_pct": 0.3992438572470764,
+              "mean_slippage_pct": 0.26370694173958503,
+              "time_exit_pct": 10.372960372960373,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.56276267083716,
+              "tail_p05_pct": -5.747178866795216,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 476,
+                "TIME": 89,
+                "TP": 293
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -2.081867321282718,
+              "mean_own_net_r": -0.13637052011699474,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.10560502757162454,
+              "median_common_net_r": -0.5814539186303554,
+              "mean_total_cost_pct": 0.6629507989866613,
+              "mean_own_cost_r": 0.20063245921190034,
+              "mean_common_cost_r": 0.18515845654007013,
+              "common_r_p05": -1.6051549678529315,
+              "common_r_worst": -2.6708262198305857,
+              "common_r_curve": {
+                "final_return_pct": -62.203396349436915,
+                "max_drawdown_pct": 73.33385173303323
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.383774357246228,
+              "mae_48h_median_pct": -3.8683339200431655,
+              "uncaptured_median_pct": 2.7302302124982587,
+              "first_touch_counts": {
+                "SL": 476,
+                "NONE": 89,
+                "TP": 293
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.0706202802480975,
+              "sl_marginal": 0.10960927533168313,
+              "interaction": 0.0749419577559618
+            },
+            "common_r": {
+              "tp_marginal": 0.019723849961644085,
+              "sl_marginal": 0.0306132585916052,
+              "interaction": 0.02093087035930133
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.3750497075800308,
+                -0.003933571752493001
+              ],
+              "atr_tp_fixed_sl": [
+                -0.40937800316989265,
+                0.02583064116015295
+              ],
+              "fixed_tp_atr_sl": [
+                -0.3888209845386148,
+                0.06808605876088586
+              ],
+              "atr_atr": [
+                -0.4320733280987934,
+                0.12640789265457514
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.056088460027440966,
+                0.06098579559537538
+              ],
+              "fixed_tp_atr_sl": [
+                -0.06862874673909433,
+                0.0867924974493658
+              ],
+              "atr_atr": [
+                -0.08888334105060726,
+                0.14409516002235406
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.051304131565382126,
+                0.07816463822461908
+              ],
+              "sl_marginal": [
+                -0.05922748837706793,
+                0.09602715165956226
+              ],
+              "interaction": [
+                -0.012222586275105663,
+                0.04396267172050798
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 392,
+                "mean_delta_common_r": -0.12211090384134121,
+                "total_delta_common_r": -47.86747430580576,
+                "mean_delta_net_pct": -0.4372121197126172,
+                "total_delta_net_pct": -171.38715092734589
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 25,
+                "mean_delta_common_r": 0.9750721001728578,
+                "total_delta_common_r": 24.37680250432145,
+                "mean_delta_net_pct": 3.4911979715023462,
+                "total_delta_net_pct": 87.27994928755865
+              },
+              {
+                "transition": "SL->TP",
+                "count": 42,
+                "mean_delta_common_r": 2.7201336470807975,
+                "total_delta_common_r": 114.24561317739348,
+                "mean_delta_net_pct": 9.739305502865124,
+                "total_delta_net_pct": 409.0508311203352
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 54,
+                "mean_delta_common_r": -0.4373420840690513,
+                "total_delta_common_r": -23.616472539728772,
+                "mean_delta_net_pct": -1.565881945021097,
+                "total_delta_net_pct": -84.55762503113925
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 46,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 35,
+                "mean_delta_common_r": 0.3990492429578503,
+                "total_delta_common_r": 13.966723503524761,
+                "mean_delta_net_pct": 1.4287763000264462,
+                "total_delta_net_pct": 50.00717050092562
+              },
+              {
+                "transition": "TP->SL",
+                "count": 30,
+                "mean_delta_common_r": -2.346425718868295,
+                "total_delta_common_r": -70.39277156604885,
+                "mean_delta_net_pct": -8.401262541038452,
+                "total_delta_net_pct": -252.03787623115358
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 18,
+                "mean_delta_common_r": -0.8450083039909273,
+                "total_delta_common_r": -15.21014947183669,
+                "mean_delta_net_pct": -3.0255109096781507,
+                "total_delta_net_pct": -54.459196374206705
+              },
+              {
+                "transition": "TP->TP",
+                "count": 216,
+                "mean_delta_common_r": 0.22077299924476032,
+                "total_delta_common_r": 47.68696783686823,
+                "mean_delta_net_pct": 0.7904669275114707,
+                "total_delta_net_pct": 170.74085634247766
+              }
+            ],
+            "total_delta_common_r": 43.18923913868784,
+            "direct_delta_common_r": 43.18923913868785,
+            "total_delta_net_pct": 154.63695868745174,
+            "direct_delta_net_pct": 154.63695868745168,
+            "closure_error_common_r": -1.4210854715202004e-14,
+            "closure_error_net_pct": 5.684341886080802e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 858,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "legacy_fee_stop_first": {
+          "cost": "legacy_fee",
+          "tie_break": "stop_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.12657140116396812,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2836262104567915,
+              "avg_loss_pct": -2.9238967433919933,
+              "profit_factor": 0.9292540568585849,
+              "mean_raw_pct": 0.1104957628875116,
+              "mean_fee_pct": 0.12012032338726247,
+              "mean_slippage_pct": 0.11694684066422316,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2326099560175767,
+              "mean_own_net_r": -0.0391545540247909,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.0391545540247909,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.23706716405148565,
+              "mean_own_cost_r": 0.07333614858488528,
+              "mean_common_cost_r": 0.0733361485848853,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -32.3813192709987,
+                "max_drawdown_pct": 60.02474532182844
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6977127335211293,
+              "first_touch_counts": {
+                "SL": 454,
+                "NONE": 134,
+                "TP": 270
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.11194016887480238,
+              "win_rate_pct": 38.344988344988344,
+              "avg_win_pct": 4.4940513554821,
+              "avg_loss_pct": -2.9765360318491334,
+              "profit_factor": 0.9390032874114472,
+              "mean_raw_pct": 0.12182826499670121,
+              "mean_fee_pct": 0.1188874238394438,
+              "mean_slippage_pct": 0.11488101003206558,
+              "time_exit_pct": 11.655011655011656,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 471,
+                "TIME": 100,
+                "TP": 287
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2326099560175794,
+              "mean_own_net_r": -0.03462841802687081,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.03462841802687083,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.2337684338715094,
+              "mean_own_cost_r": 0.0723156944549846,
+              "mean_common_cost_r": 0.07231569445498459,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -30.342965531705858,
+                "max_drawdown_pct": 63.65933307112493
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.8175714486643377,
+              "first_touch_counts": {
+                "SL": 471,
+                "NONE": 100,
+                "TP": 287
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.045946741253121856,
+              "win_rate_pct": 40.675990675990676,
+              "avg_win_pct": 4.461725312168347,
+              "avg_loss_pct": -3.1366688368210833,
+              "profit_factor": 0.975308040779115,
+              "mean_raw_pct": 0.18520605779860036,
+              "mean_fee_pct": 0.11792343751053312,
+              "mean_slippage_pct": 0.11322936154119487,
+              "time_exit_pct": 10.48951048951049,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.24099929228084,
+              "tail_p05_pct": -5.343167342794304,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 467,
+                "TIME": 90,
+                "TP": 301
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.4226482258697302,
+              "mean_own_net_r": -0.02887520269091435,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.014213512263547319,
+              "median_common_net_r": -0.44009275638758405,
+              "mean_total_cost_pct": 0.23115279905172798,
+              "mean_own_cost_r": 0.08445303807485809,
+              "mean_common_cost_r": 0.07150655420751605,
+              "common_r_p05": -1.6528957763208796,
+              "common_r_worst": -2.8586805763802277,
+              "common_r_curve": {
+                "final_return_pct": -17.083341215299786,
+                "max_drawdown_pct": 64.53861869114958
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6945085256857126,
+              "first_touch_counts": {
+                "SL": 467,
+                "NONE": 90,
+                "TP": 301
+              }
+            },
+            "atr_atr": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": 0.046567903716021763,
+              "win_rate_pct": 40.20979020979021,
+              "avg_win_pct": 4.956769595253008,
+              "avg_loss_pct": -3.2556145204170397,
+              "profit_factor": 1.0239234403501731,
+              "mean_raw_pct": 0.2785996751079044,
+              "mean_fee_pct": 0.11827607158100197,
+              "mean_slippage_pct": 0.11375569981088629,
+              "time_exit_pct": 10.955710955710956,
+              "duration_median_hours": 13.5,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.24099929228084,
+              "tail_p05_pct": -5.409736750603137,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 468,
+                "TIME": 94,
+                "TP": 296
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.6223838725191386,
+              "mean_own_net_r": -0.01238486721401035,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": 0.014405667355362589,
+              "median_common_net_r": -0.5018804911799,
+              "mean_total_cost_pct": 0.23203177139188827,
+              "mean_own_cost_r": 0.08105460907762947,
+              "mean_common_cost_r": 0.07177846215561973,
+              "common_r_p05": -1.6734888601492892,
+              "common_r_worst": -2.8586805763802277,
+              "common_r_curve": {
+                "final_return_pct": 4.157596359100535,
+                "max_drawdown_pct": 67.94117344701748
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.7896983785505522,
+              "first_touch_counts": {
+                "SL": 468,
+                "NONE": 94,
+                "TP": 296
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.05357293862915468,
+              "sl_marginal": 0.11956636625083521,
+              "interaction": 0.07788341267997786
+            },
+            "common_r": {
+              "tp_marginal": 0.01657265780841499,
+              "sl_marginal": 0.036987563571738505,
+              "interaction": 0.024093043620989837
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.28859247815034417,
+                0.13960996770106882
+              ],
+              "atr_tp_fixed_sl": [
+                -0.3338943693074527,
+                0.1646264789396865
+              ],
+              "fixed_tp_atr_sl": [
+                -0.2999291931193527,
+                0.2213802505234343
+              ],
+              "atr_atr": [
+                -0.35665913208556016,
+                0.27711759628614707
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.07041761420282444,
+                0.0627639462501595
+              ],
+              "fixed_tp_atr_sl": [
+                -0.076717252386337,
+                0.09820854254772406
+              ],
+              "atr_atr": [
+                -0.1060509183133327,
+                0.1583956053852491
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.06428178140156256,
+                0.08145799239857719
+              ],
+              "sl_marginal": [
+                -0.06321314515878722,
+                0.10923478610317762
+              ],
+              "interaction": [
+                -0.01269427842407377,
+                0.05005734916265579
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 386,
+                "mean_delta_common_r": -0.1389789192112787,
+                "total_delta_common_r": -53.64586281555358,
+                "mean_delta_net_pct": -0.4492646379189442,
+                "total_delta_net_pct": -173.41615023671244
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 26,
+                "mean_delta_common_r": 1.0302734587989102,
+                "total_delta_common_r": 26.787109928771663,
+                "mean_delta_net_pct": 3.330472240334035,
+                "total_delta_net_pct": 86.59227824868492
+              },
+              {
+                "transition": "SL->TP",
+                "count": 42,
+                "mean_delta_common_r": 3.0486210301983183,
+                "total_delta_common_r": 128.04208326832935,
+                "mean_delta_net_pct": 9.855002694343685,
+                "total_delta_net_pct": 413.9101131624348
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 51,
+                "mean_delta_common_r": -0.4661669180135473,
+                "total_delta_common_r": -23.774512818690916,
+                "mean_delta_net_pct": -1.5069358203366288,
+                "total_delta_net_pct": -76.85372683716805
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 49,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 34,
+                "mean_delta_common_r": 0.4180875720486875,
+                "total_delta_common_r": 14.214977449655375,
+                "mean_delta_net_pct": 1.351514047891807,
+                "total_delta_net_pct": 45.951477628321435
+              },
+              {
+                "transition": "TP->SL",
+                "count": 31,
+                "mean_delta_common_r": -2.61474469778685,
+                "total_delta_common_r": -81.05708563139234,
+                "mean_delta_net_pct": -8.452449742509984,
+                "total_delta_net_pct": -262.0259420178095
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 19,
+                "mean_delta_common_r": -0.9005671180255973,
+                "total_delta_common_r": -17.110775242486348,
+                "mean_delta_net_pct": -2.9111822317916163,
+                "total_delta_net_pct": -55.31246240404071
+              },
+              {
+                "transition": "TP->TP",
+                "count": 220,
+                "mean_delta_common_r": 0.2386306172979021,
+                "total_delta_common_r": 52.498735805538466,
+                "mean_delta_net_pct": 0.7713997092878223,
+                "total_delta_net_pct": 169.7079360433209
+              }
+            ],
+            "total_delta_common_r": 45.95466994417167,
+            "direct_delta_common_r": 45.954669944171684,
+            "total_delta_net_pct": 148.55352358703138,
+            "direct_delta_net_pct": 148.5535235870314,
+            "closure_error_common_r": -1.4210854715202004e-14,
+            "closure_error_net_pct": -2.842170943040401e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 858,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "legacy_fee_target_first": {
+          "cost": "legacy_fee",
+          "tie_break": "target_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.12657140116396812,
+              "win_rate_pct": 38.81118881118881,
+              "avg_win_pct": 4.2836262104567915,
+              "avg_loss_pct": -2.9238967433919933,
+              "profit_factor": 0.9292540568585849,
+              "mean_raw_pct": 0.1104957628875116,
+              "mean_fee_pct": 0.12012032338726247,
+              "mean_slippage_pct": 0.11694684066422316,
+              "time_exit_pct": 15.617715617715618,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 454,
+                "TIME": 134,
+                "TP": 270
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2326099560175767,
+              "mean_own_net_r": -0.0391545540247909,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.0391545540247909,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.23706716405148565,
+              "mean_own_cost_r": 0.07333614858488528,
+              "mean_common_cost_r": 0.0733361485848853,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -32.3813192709987,
+                "max_drawdown_pct": 60.02474532182844
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6977127335211293,
+              "first_touch_counts": {
+                "SL": 454,
+                "NONE": 134,
+                "TP": 270
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.11194016887480238,
+              "win_rate_pct": 38.344988344988344,
+              "avg_win_pct": 4.4940513554821,
+              "avg_loss_pct": -2.9765360318491334,
+              "profit_factor": 0.9390032874114472,
+              "mean_raw_pct": 0.12182826499670121,
+              "mean_fee_pct": 0.1188874238394438,
+              "mean_slippage_pct": 0.11488101003206558,
+              "time_exit_pct": 11.655011655011656,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176256,
+              "tail_p05_pct": -3.232609956017604,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 471,
+                "TIME": 100,
+                "TP": 287
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -3.2326099560175794,
+              "mean_own_net_r": -0.03462841802687081,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.03462841802687083,
+              "median_common_net_r": -1.0,
+              "mean_total_cost_pct": 0.2337684338715094,
+              "mean_own_cost_r": 0.0723156944549846,
+              "mean_common_cost_r": 0.07231569445498459,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -30.342965531705858,
+                "max_drawdown_pct": 63.65933307112493
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.8175714486643377,
+              "first_touch_counts": {
+                "SL": 471,
+                "NONE": 100,
+                "TP": 287
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": -0.045946741253121856,
+              "win_rate_pct": 40.675990675990676,
+              "avg_win_pct": 4.461725312168347,
+              "avg_loss_pct": -3.1366688368210833,
+              "profit_factor": 0.975308040779115,
+              "mean_raw_pct": 0.18520605779860036,
+              "mean_fee_pct": 0.11792343751053312,
+              "mean_slippage_pct": 0.11322936154119487,
+              "time_exit_pct": 10.48951048951049,
+              "duration_median_hours": 13.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.24099929228084,
+              "tail_p05_pct": -5.343167342794304,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 467,
+                "TIME": 90,
+                "TP": 301
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.4226482258697302,
+              "mean_own_net_r": -0.02887520269091435,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.014213512263547319,
+              "median_common_net_r": -0.44009275638758405,
+              "mean_total_cost_pct": 0.23115279905172798,
+              "mean_own_cost_r": 0.08445303807485809,
+              "mean_common_cost_r": 0.07150655420751605,
+              "common_r_p05": -1.6528957763208796,
+              "common_r_worst": -2.8586805763802277,
+              "common_r_curve": {
+                "final_return_pct": -17.083341215299786,
+                "max_drawdown_pct": 64.53861869114958
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.6945085256857126,
+              "first_touch_counts": {
+                "SL": 467,
+                "NONE": 90,
+                "TP": 301
+              }
+            },
+            "atr_atr": {
+              "trades": 858,
+              "closed_trades": 858,
+              "censored": 0,
+              "mean_net_pct": 0.046567903716021763,
+              "win_rate_pct": 40.20979020979021,
+              "avg_win_pct": 4.956769595253008,
+              "avg_loss_pct": -3.2556145204170397,
+              "profit_factor": 1.0239234403501731,
+              "mean_raw_pct": 0.2785996751079044,
+              "mean_fee_pct": 0.11827607158100197,
+              "mean_slippage_pct": 0.11375569981088629,
+              "time_exit_pct": 10.955710955710956,
+              "duration_median_hours": 13.5,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -9.24099929228084,
+              "tail_p05_pct": -5.409736750603137,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "SL": 468,
+                "TIME": 94,
+                "TP": 296
+              },
+              "signal_weeks": 26,
+              "median_net_pct": -1.6223838725191386,
+              "mean_own_net_r": -0.01238486721401035,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": 0.014405667355362589,
+              "median_common_net_r": -0.5018804911799,
+              "mean_total_cost_pct": 0.23203177139188827,
+              "mean_own_cost_r": 0.08105460907762947,
+              "mean_common_cost_r": 0.07177846215561973,
+              "common_r_p05": -1.6734888601492892,
+              "common_r_worst": -2.8586805763802277,
+              "common_r_curve": {
+                "final_return_pct": 4.157596359100535,
+                "max_drawdown_pct": 67.94117344701748
+              },
+              "path_complete": 858,
+              "mfe_48h_median_pct": 4.435940161522711,
+              "mae_48h_median_pct": -3.820292107909251,
+              "uncaptured_median_pct": 2.7896983785505522,
+              "first_touch_counts": {
+                "SL": 468,
+                "NONE": 94,
+                "TP": 296
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.05357293862915468,
+              "sl_marginal": 0.11956636625083521,
+              "interaction": 0.07788341267997786
+            },
+            "common_r": {
+              "tp_marginal": 0.01657265780841499,
+              "sl_marginal": 0.036987563571738505,
+              "interaction": 0.024093043620989837
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.28859247815034417,
+                0.13960996770106882
+              ],
+              "atr_tp_fixed_sl": [
+                -0.3338943693074527,
+                0.1646264789396865
+              ],
+              "fixed_tp_atr_sl": [
+                -0.2999291931193527,
+                0.2213802505234343
+              ],
+              "atr_atr": [
+                -0.35665913208556016,
+                0.27711759628614707
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.07041761420282444,
+                0.0627639462501595
+              ],
+              "fixed_tp_atr_sl": [
+                -0.076717252386337,
+                0.09820854254772406
+              ],
+              "atr_atr": [
+                -0.1060509183133327,
+                0.1583956053852491
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.06428178140156256,
+                0.08145799239857719
+              ],
+              "sl_marginal": [
+                -0.06321314515878722,
+                0.10923478610317762
+              ],
+              "interaction": [
+                -0.01269427842407377,
+                0.05005734916265579
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 386,
+                "mean_delta_common_r": -0.1389789192112787,
+                "total_delta_common_r": -53.64586281555358,
+                "mean_delta_net_pct": -0.4492646379189442,
+                "total_delta_net_pct": -173.41615023671244
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 26,
+                "mean_delta_common_r": 1.0302734587989102,
+                "total_delta_common_r": 26.787109928771663,
+                "mean_delta_net_pct": 3.330472240334035,
+                "total_delta_net_pct": 86.59227824868492
+              },
+              {
+                "transition": "SL->TP",
+                "count": 42,
+                "mean_delta_common_r": 3.0486210301983183,
+                "total_delta_common_r": 128.04208326832935,
+                "mean_delta_net_pct": 9.855002694343685,
+                "total_delta_net_pct": 413.9101131624348
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 51,
+                "mean_delta_common_r": -0.4661669180135473,
+                "total_delta_common_r": -23.774512818690916,
+                "mean_delta_net_pct": -1.5069358203366288,
+                "total_delta_net_pct": -76.85372683716805
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 49,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 34,
+                "mean_delta_common_r": 0.4180875720486875,
+                "total_delta_common_r": 14.214977449655375,
+                "mean_delta_net_pct": 1.351514047891807,
+                "total_delta_net_pct": 45.951477628321435
+              },
+              {
+                "transition": "TP->SL",
+                "count": 31,
+                "mean_delta_common_r": -2.61474469778685,
+                "total_delta_common_r": -81.05708563139234,
+                "mean_delta_net_pct": -8.452449742509984,
+                "total_delta_net_pct": -262.0259420178095
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 19,
+                "mean_delta_common_r": -0.9005671180255973,
+                "total_delta_common_r": -17.110775242486348,
+                "mean_delta_net_pct": -2.9111822317916163,
+                "total_delta_net_pct": -55.31246240404071
+              },
+              {
+                "transition": "TP->TP",
+                "count": 220,
+                "mean_delta_common_r": 0.2386306172979021,
+                "total_delta_common_r": 52.498735805538466,
+                "mean_delta_net_pct": 0.7713997092878223,
+                "total_delta_net_pct": 169.7079360433209
+              }
+            ],
+            "total_delta_common_r": 45.95466994417167,
+            "direct_delta_common_r": 45.954669944171684,
+            "total_delta_net_pct": 148.55352358703138,
+            "direct_delta_net_pct": 148.5535235870314,
+            "closure_error_common_r": -1.4210854715202004e-14,
+            "closure_error_net_pct": -2.842170943040401e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 858,
+            "errors": [],
+            "error_count": 0
+          }
+        }
+      }
+    },
+    "near": {
+      "start": "2025-06-01",
+      "end": "2026-06-01",
+      "branches": {
+        "taker_stop_first": {
+          "cost": "taker",
+          "tie_break": "stop_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.16446632100603867,
+              "win_rate_pct": 40.76433121019108,
+              "avg_win_pct": 3.5714791440288773,
+              "avg_loss_pct": -2.7354395442558737,
+              "profit_factor": 0.8984998788504573,
+              "mean_raw_pct": 0.14224356587945913,
+              "mean_fee_pct": 0.18368427901160167,
+              "mean_slippage_pct": 0.12302560787390826,
+              "time_exit_pct": 30.095541401273884,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.290612387612392,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 189,
+                "TP": 161,
+                "SL": 278
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.3526426463521048,
+              "mean_own_net_r": -0.04998046005818789,
+              "median_own_net_r": -0.41106106919312924,
+              "mean_common_net_r": -0.04998046005818791,
+              "median_common_net_r": -0.41106106919312924,
+              "mean_total_cost_pct": 0.30670988688550993,
+              "mean_own_cost_r": 0.09320754034724037,
+              "mean_common_cost_r": 0.09320754034724037,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -29.342676406040844,
+                "max_drawdown_pct": 59.70678404584866
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.6819601996072313,
+              "first_touch_counts": {
+                "NONE": 189,
+                "TP": 161,
+                "SL": 278
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.0033618133034001834,
+              "win_rate_pct": 50.318471337579616,
+              "avg_win_pct": 2.8401711973811743,
+              "avg_loss_pct": -2.883350375407008,
+              "profit_factor": 0.9976531722141475,
+              "mean_raw_pct": 0.26923119786724353,
+              "mean_fee_pct": 0.17093555261985555,
+              "mean_slippage_pct": 0.10165745855080097,
+              "time_exit_pct": 12.420382165605096,
+              "duration_median_hours": 17.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.290612387612391,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 295,
+                "SL": 255,
+                "TIME": 78
+              },
+              "signal_weeks": 23,
+              "median_net_pct": 0.16222256324292655,
+              "mean_own_net_r": -0.0010216375882056879,
+              "median_own_net_r": 0.04929859373702558,
+              "mean_common_net_r": -0.0010216375882056822,
+              "median_common_net_r": 0.04929859373702558,
+              "mean_total_cost_pct": 0.2725930111706565,
+              "mean_own_cost_r": 0.08283959915693563,
+              "mean_common_cost_r": 0.08283959915693563,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -3.421653031711225,
+                "max_drawdown_pct": 47.32070117335561
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.6120612970018873,
+              "first_touch_counts": {
+                "TP": 295,
+                "SL": 255,
+                "NONE": 78
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.11697436533096602,
+              "win_rate_pct": 33.9171974522293,
+              "avg_win_pct": 3.964862181126366,
+              "avg_loss_pct": -2.211989267488584,
+              "profit_factor": 0.9199761891835563,
+              "mean_raw_pct": 0.1914363477923969,
+              "mean_fee_pct": 0.18433372993670882,
+              "mean_slippage_pct": 0.1240769831866663,
+              "time_exit_pct": 12.579617834394904,
+              "duration_median_hours": 16.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.223251132034822,
+              "tail_p05_pct": -3.5984846349632797,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 79,
+                "SL": 394,
+                "TP": 155
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.4335669774903752,
+              "mean_own_net_r": -0.03276302656955268,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.035547901591606465,
+              "median_common_net_r": -0.43565355278156814,
+              "mean_total_cost_pct": 0.30841071312337515,
+              "mean_own_cost_r": 0.1615512852486638,
+              "mean_common_cost_r": 0.09372441260003683,
+              "common_r_p05": -1.0935607756507273,
+              "common_r_worst": -1.8912136705807225,
+              "common_r_curve": {
+                "final_return_pct": -22.293735472763366,
+                "max_drawdown_pct": 55.87036649180109
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.911170191438448,
+              "first_touch_counts": {
+                "NONE": 79,
+                "SL": 394,
+                "TP": 155
+              }
+            },
+            "atr_atr": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.016442593968808684,
+              "win_rate_pct": 43.152866242038215,
+              "avg_win_pct": 3.06334306054958,
+              "avg_loss_pct": -2.354319099219462,
+              "profit_factor": 0.9877143982159794,
+              "mean_raw_pct": 0.2654774675899725,
+              "mean_fee_pct": 0.17442861183835665,
+              "mean_slippage_pct": 0.10749144972043721,
+              "time_exit_pct": 3.343949044585987,
+              "duration_median_hours": 12.0,
+              "duration_p90_hours": 31.300000000000068,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.223251132034822,
+              "tail_p05_pct": -3.6849923697505957,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 259,
+                "SL": 348,
+                "TIME": 21
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.2150886939115857,
+              "mean_own_net_r": -7.979932078386303e-06,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.004996818838556362,
+              "median_common_net_r": -0.36925913805157506,
+              "mean_total_cost_pct": 0.28192006155879384,
+              "mean_own_cost_r": 0.14283056515943543,
+              "mean_common_cost_r": 0.08567404128790472,
+              "common_r_p05": -1.1198500265855886,
+              "common_r_worst": -1.8912136705807225,
+              "common_r_curve": {
+                "final_return_pct": -5.525709435302561,
+                "max_drawdown_pct": 41.23044854846164
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.7660462566576096,
+              "first_touch_counts": {
+                "TP": 259,
+                "SL": 348,
+                "NONE": 21
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.1308181395323979,
+              "sl_marginal": 0.017205587504832073,
+              "interaction": -0.06057273634048116
+            },
+            "common_r": {
+              "tp_marginal": 0.03975495261151617,
+              "sl_marginal": 0.005228688608115382,
+              "interaction": -0.018407739716932124
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.20250656424170352,
+                0.08461050452482713
+              ],
+              "atr_tp_fixed_sl": [
+                -0.12787311743852361,
+                0.1109720517120093
+              ],
+              "fixed_tp_atr_sl": [
+                -0.1641569810107214,
+                0.09047554907452307
+              ],
+              "atr_atr": [
+                -0.1181704105532785,
+                0.10292955509197457
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.018747040305604666,
+                0.12429262757337693
+              ],
+              "fixed_tp_atr_sl": [
+                -0.021375858178108064,
+                0.05113285666742602
+              ],
+              "atr_atr": [
+                -0.03084675204325756,
+                0.12866743014145496
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.0246872958573686,
+                0.11269433373722226
+              ],
+              "sl_marginal": [
+                -0.03245304713688722,
+                0.042672357827757926
+              ],
+              "interaction": [
+                -0.03186745004741198,
+                -0.006897979990356797
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 252,
+                "mean_delta_common_r": 0.17989890736399985,
+                "total_delta_common_r": 45.33452465572797,
+                "mean_delta_net_pct": 0.5919775730899103,
+                "total_delta_net_pct": 149.17834841865738
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 1,
+                "mean_delta_common_r": 1.9921690747323466,
+                "total_delta_common_r": 1.9921690747323466,
+                "mean_delta_net_pct": 6.555456235532591,
+                "total_delta_net_pct": 6.555456235532591
+              },
+              {
+                "transition": "SL->TP",
+                "count": 25,
+                "mean_delta_common_r": 1.9986621043625192,
+                "total_delta_common_r": 49.96655260906297,
+                "mean_delta_net_pct": 6.576822279266724,
+                "total_delta_net_pct": 164.42055698166814
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 84,
+                "mean_delta_common_r": -0.3555895149949473,
+                "total_delta_common_r": -29.869519259575572,
+                "mean_delta_net_pct": -1.170107262947452,
+                "total_delta_net_pct": -98.28901008758599
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 19,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 86,
+                "mean_delta_common_r": 0.40113077235870676,
+                "total_delta_common_r": 34.49724642284878,
+                "mean_delta_net_pct": 1.319965888576083,
+                "total_delta_net_pct": 113.51706641754313
+              },
+              {
+                "transition": "TP->SL",
+                "count": 12,
+                "mean_delta_common_r": -2.2879179989744918,
+                "total_delta_common_r": -27.4550159876939,
+                "mean_delta_net_pct": -7.528651309266799,
+                "total_delta_net_pct": -90.34381571120157
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 1,
+                "mean_delta_common_r": 0.6753673635988633,
+                "total_delta_common_r": 0.6753673635988633,
+                "mean_delta_net_pct": 2.222372212847537,
+                "total_delta_net_pct": 2.222372212847537
+              },
+              {
+                "transition": "TP->TP",
+                "count": 148,
+                "mean_delta_common_r": -0.31683512292414107,
+                "total_delta_common_r": -46.89159819277287,
+                "mean_delta_net_pct": -1.0425815803248701,
+                "total_delta_net_pct": -154.30207388808077
+              }
+            ],
+            "total_delta_common_r": 28.2497266859286,
+            "direct_delta_common_r": 28.249726685928593,
+            "total_delta_net_pct": 92.95890057938041,
+            "direct_delta_net_pct": 92.95890057938044,
+            "closure_error_common_r": 7.105427357601002e-15,
+            "closure_error_net_pct": -2.842170943040401e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 628,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "taker_target_first": {
+          "cost": "taker",
+          "tie_break": "target_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.16446632100603867,
+              "win_rate_pct": 40.76433121019108,
+              "avg_win_pct": 3.5714791440288773,
+              "avg_loss_pct": -2.7354395442558737,
+              "profit_factor": 0.8984998788504573,
+              "mean_raw_pct": 0.14224356587945913,
+              "mean_fee_pct": 0.18368427901160167,
+              "mean_slippage_pct": 0.12302560787390826,
+              "time_exit_pct": 30.095541401273884,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.290612387612392,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 189,
+                "TP": 161,
+                "SL": 278
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.3526426463521048,
+              "mean_own_net_r": -0.04998046005818789,
+              "median_own_net_r": -0.41106106919312924,
+              "mean_common_net_r": -0.04998046005818791,
+              "median_common_net_r": -0.41106106919312924,
+              "mean_total_cost_pct": 0.30670988688550993,
+              "mean_own_cost_r": 0.09320754034724037,
+              "mean_common_cost_r": 0.09320754034724037,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -29.342676406040844,
+                "max_drawdown_pct": 59.70678404584866
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.6819601996072313,
+              "first_touch_counts": {
+                "NONE": 189,
+                "TP": 161,
+                "SL": 278
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.0033618133034001834,
+              "win_rate_pct": 50.318471337579616,
+              "avg_win_pct": 2.8401711973811743,
+              "avg_loss_pct": -2.883350375407008,
+              "profit_factor": 0.9976531722141475,
+              "mean_raw_pct": 0.26923119786724353,
+              "mean_fee_pct": 0.17093555261985555,
+              "mean_slippage_pct": 0.10165745855080097,
+              "time_exit_pct": 12.420382165605096,
+              "duration_median_hours": 17.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.290612387612409,
+              "tail_p05_pct": -3.290612387612391,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 295,
+                "SL": 255,
+                "TIME": 78
+              },
+              "signal_weeks": 23,
+              "median_net_pct": 0.16222256324292655,
+              "mean_own_net_r": -0.0010216375882056879,
+              "median_own_net_r": 0.04929859373702558,
+              "mean_common_net_r": -0.0010216375882056822,
+              "median_common_net_r": 0.04929859373702558,
+              "mean_total_cost_pct": 0.2725930111706565,
+              "mean_own_cost_r": 0.08283959915693563,
+              "mean_common_cost_r": 0.08283959915693563,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -3.421653031711225,
+                "max_drawdown_pct": 47.32070117335561
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.6120612970018873,
+              "first_touch_counts": {
+                "TP": 295,
+                "SL": 255,
+                "NONE": 78
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.11697436533096602,
+              "win_rate_pct": 33.9171974522293,
+              "avg_win_pct": 3.964862181126366,
+              "avg_loss_pct": -2.211989267488584,
+              "profit_factor": 0.9199761891835563,
+              "mean_raw_pct": 0.1914363477923969,
+              "mean_fee_pct": 0.18433372993670882,
+              "mean_slippage_pct": 0.1240769831866663,
+              "time_exit_pct": 12.579617834394904,
+              "duration_median_hours": 16.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.223251132034822,
+              "tail_p05_pct": -3.5984846349632797,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 79,
+                "SL": 394,
+                "TP": 155
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.4335669774903752,
+              "mean_own_net_r": -0.03276302656955268,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.035547901591606465,
+              "median_common_net_r": -0.43565355278156814,
+              "mean_total_cost_pct": 0.30841071312337515,
+              "mean_own_cost_r": 0.1615512852486638,
+              "mean_common_cost_r": 0.09372441260003683,
+              "common_r_p05": -1.0935607756507273,
+              "common_r_worst": -1.8912136705807225,
+              "common_r_curve": {
+                "final_return_pct": -22.293735472763366,
+                "max_drawdown_pct": 55.87036649180109
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.911170191438448,
+              "first_touch_counts": {
+                "NONE": 79,
+                "SL": 394,
+                "TP": 155
+              }
+            },
+            "atr_atr": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.016442593968808684,
+              "win_rate_pct": 43.152866242038215,
+              "avg_win_pct": 3.06334306054958,
+              "avg_loss_pct": -2.354319099219462,
+              "profit_factor": 0.9877143982159794,
+              "mean_raw_pct": 0.2654774675899725,
+              "mean_fee_pct": 0.17442861183835665,
+              "mean_slippage_pct": 0.10749144972043721,
+              "time_exit_pct": 3.343949044585987,
+              "duration_median_hours": 12.0,
+              "duration_p90_hours": 31.300000000000068,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.223251132034822,
+              "tail_p05_pct": -3.6849923697505957,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 259,
+                "SL": 348,
+                "TIME": 21
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.2150886939115857,
+              "mean_own_net_r": -7.979932078386303e-06,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.004996818838556362,
+              "median_common_net_r": -0.36925913805157506,
+              "mean_total_cost_pct": 0.28192006155879384,
+              "mean_own_cost_r": 0.14283056515943543,
+              "mean_common_cost_r": 0.08567404128790472,
+              "common_r_p05": -1.1198500265855886,
+              "common_r_worst": -1.8912136705807225,
+              "common_r_curve": {
+                "final_return_pct": -5.525709435302561,
+                "max_drawdown_pct": 41.23044854846164
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.7660462566576096,
+              "first_touch_counts": {
+                "TP": 259,
+                "SL": 348,
+                "NONE": 21
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.1308181395323979,
+              "sl_marginal": 0.017205587504832073,
+              "interaction": -0.06057273634048116
+            },
+            "common_r": {
+              "tp_marginal": 0.03975495261151617,
+              "sl_marginal": 0.005228688608115382,
+              "interaction": -0.018407739716932124
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.20250656424170352,
+                0.08461050452482713
+              ],
+              "atr_tp_fixed_sl": [
+                -0.12787311743852361,
+                0.1109720517120093
+              ],
+              "fixed_tp_atr_sl": [
+                -0.1641569810107214,
+                0.09047554907452307
+              ],
+              "atr_atr": [
+                -0.1181704105532785,
+                0.10292955509197457
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.018747040305604666,
+                0.12429262757337693
+              ],
+              "fixed_tp_atr_sl": [
+                -0.021375858178108064,
+                0.05113285666742602
+              ],
+              "atr_atr": [
+                -0.03084675204325756,
+                0.12866743014145496
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.0246872958573686,
+                0.11269433373722226
+              ],
+              "sl_marginal": [
+                -0.03245304713688722,
+                0.042672357827757926
+              ],
+              "interaction": [
+                -0.03186745004741198,
+                -0.006897979990356797
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 252,
+                "mean_delta_common_r": 0.17989890736399985,
+                "total_delta_common_r": 45.33452465572797,
+                "mean_delta_net_pct": 0.5919775730899103,
+                "total_delta_net_pct": 149.17834841865738
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 1,
+                "mean_delta_common_r": 1.9921690747323466,
+                "total_delta_common_r": 1.9921690747323466,
+                "mean_delta_net_pct": 6.555456235532591,
+                "total_delta_net_pct": 6.555456235532591
+              },
+              {
+                "transition": "SL->TP",
+                "count": 25,
+                "mean_delta_common_r": 1.9986621043625192,
+                "total_delta_common_r": 49.96655260906297,
+                "mean_delta_net_pct": 6.576822279266724,
+                "total_delta_net_pct": 164.42055698166814
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 84,
+                "mean_delta_common_r": -0.3555895149949473,
+                "total_delta_common_r": -29.869519259575572,
+                "mean_delta_net_pct": -1.170107262947452,
+                "total_delta_net_pct": -98.28901008758599
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 19,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 86,
+                "mean_delta_common_r": 0.40113077235870676,
+                "total_delta_common_r": 34.49724642284878,
+                "mean_delta_net_pct": 1.319965888576083,
+                "total_delta_net_pct": 113.51706641754313
+              },
+              {
+                "transition": "TP->SL",
+                "count": 12,
+                "mean_delta_common_r": -2.2879179989744918,
+                "total_delta_common_r": -27.4550159876939,
+                "mean_delta_net_pct": -7.528651309266799,
+                "total_delta_net_pct": -90.34381571120157
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 1,
+                "mean_delta_common_r": 0.6753673635988633,
+                "total_delta_common_r": 0.6753673635988633,
+                "mean_delta_net_pct": 2.222372212847537,
+                "total_delta_net_pct": 2.222372212847537
+              },
+              {
+                "transition": "TP->TP",
+                "count": 148,
+                "mean_delta_common_r": -0.31683512292414107,
+                "total_delta_common_r": -46.89159819277287,
+                "mean_delta_net_pct": -1.0425815803248701,
+                "total_delta_net_pct": -154.30207388808077
+              }
+            ],
+            "total_delta_common_r": 28.2497266859286,
+            "direct_delta_common_r": 28.249726685928593,
+            "total_delta_net_pct": 92.95890057938041,
+            "direct_delta_net_pct": 92.95890057938044,
+            "closure_error_common_r": 7.105427357601002e-15,
+            "closure_error_net_pct": -2.842170943040401e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 628,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "stress_stop_first": {
+          "cost": "stress",
+          "tie_break": "stop_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.5645077081299266,
+              "win_rate_pct": 37.261146496815286,
+              "avg_win_pct": 3.401451194632402,
+              "avg_loss_pct": -2.9199249244913092,
+              "profit_factor": 0.6918503966223195,
+              "mean_raw_pct": 0.10798366312370777,
+              "mean_fee_pct": 0.39887032203419576,
+              "mean_slippage_pct": 0.2736210492194381,
+              "time_exit_pct": 30.573248407643312,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044215,
+              "tail_p05_pct": -3.580451097804407,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 192,
+                "TP": 154,
+                "SL": 282
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.7983124378274096,
+              "mean_own_net_r": -0.15766385092540255,
+              "median_own_net_r": -0.5022586229232873,
+              "mean_common_net_r": -0.15766385092540255,
+              "median_common_net_r": -0.5022586229232873,
+              "mean_total_cost_pct": 0.6724913712536339,
+              "mean_own_cost_r": 0.18782308510400245,
+              "mean_common_cost_r": 0.18782308510400245,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -63.871742878857994,
+                "max_drawdown_pct": 71.11352204222655
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.6699624647052214,
+              "first_touch_counts": {
+                "NONE": 192,
+                "TP": 154,
+                "SL": 282
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.38190954025532775,
+              "win_rate_pct": 48.40764331210191,
+              "avg_win_pct": 2.524138491344252,
+              "avg_loss_pct": -3.1085718908919713,
+              "profit_factor": 0.7618699378641299,
+              "mean_raw_pct": 0.26945157944197184,
+              "mean_fee_pct": 0.39923625022632925,
+              "mean_slippage_pct": 0.2521248694709703,
+              "time_exit_pct": 12.738853503184714,
+              "duration_median_hours": 17.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044215,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 290,
+                "SL": 258,
+                "TIME": 80
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -0.41682441870627207,
+              "mean_own_net_r": -0.10666520218346846,
+              "median_own_net_r": -0.11641673278595457,
+              "mean_common_net_r": -0.10666520218346846,
+              "median_common_net_r": -0.11641673278595457,
+              "mean_total_cost_pct": 0.6513611196972996,
+              "mean_own_cost_r": 0.1819215238260697,
+              "mean_common_cost_r": 0.1819215238260697,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -50.016798964053166,
+                "max_drawdown_pct": 57.056529638038256
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.5685751429428407,
+              "first_touch_counts": {
+                "TP": 290,
+                "SL": 258,
+                "NONE": 80
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.5302487689068188,
+              "win_rate_pct": 30.89171974522293,
+              "avg_win_pct": 3.775759257918102,
+              "avg_loss_pct": -2.455054200252521,
+              "profit_factor": 0.6874723123945848,
+              "mean_raw_pct": 0.1435504371571646,
+              "mean_fee_pct": 0.39893897722301963,
+              "mean_slippage_pct": 0.27486022884096317,
+              "time_exit_pct": 12.101910828025478,
+              "duration_median_hours": 15.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.501350704669101,
+              "tail_p05_pct": -3.8857577940072234,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 76,
+                "SL": 405,
+                "TP": 147
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.7981505749050257,
+              "mean_own_net_r": -0.2132585523999688,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.14809552048678384,
+              "median_common_net_r": -0.5022134155128344,
+              "mean_total_cost_pct": 0.6737992060639829,
+              "mean_own_cost_r": 0.294161714661881,
+              "mean_common_cost_r": 0.1881883560641759,
+              "common_r_p05": -1.085270455555178,
+              "common_r_worst": -1.815790951217246,
+              "common_r_curve": {
+                "final_return_pct": -61.48378791498574,
+                "max_drawdown_pct": 68.21236120155827
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.883093902347388,
+              "first_touch_counts": {
+                "NONE": 76,
+                "SL": 405,
+                "TP": 147
+              }
+            },
+            "atr_atr": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.4074393424166272,
+              "win_rate_pct": 41.0828025477707,
+              "avg_win_pct": 2.75125171364178,
+              "avg_loss_pct": -2.609986078803301,
+              "profit_factor": 0.7350385504686642,
+              "mean_raw_pct": 0.25031208898379265,
+              "mean_fee_pct": 0.39918508829815025,
+              "mean_slippage_pct": 0.2585663431022692,
+              "time_exit_pct": 3.343949044585987,
+              "duration_median_hours": 11.0,
+              "duration_p90_hours": 31.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.501350704669101,
+              "tail_p05_pct": -3.971963183355036,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 250,
+                "SL": 357,
+                "TIME": 21
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.5517962226806536,
+              "mean_own_net_r": -0.16915334914415298,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.11379553338027067,
+              "median_common_net_r": -0.43340802046765803,
+              "mean_total_cost_pct": 0.6577514314004195,
+              "mean_own_cost_r": 0.28501759196877746,
+              "mean_common_cost_r": 0.18370630220414577,
+              "common_r_p05": -1.1093471394681835,
+              "common_r_worst": -1.815790951217246,
+              "common_r_curve": {
+                "final_return_pct": -52.087133704700925,
+                "max_drawdown_pct": 54.76168491709357
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.7393327364992008,
+              "first_touch_counts": {
+                "TP": 250,
+                "SL": 357,
+                "NONE": 21
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.15270379718239518,
+              "sl_marginal": 0.0043645685309041116,
+              "interaction": -0.05978874138440715
+            },
+            "common_r": {
+              "tp_marginal": 0.042649317924223634,
+              "sl_marginal": 0.0012189996209082468,
+              "interaction": -0.016698661635420914
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.29092966489669414,
+                -0.0400808575068056
+              ],
+              "atr_tp_fixed_sl": [
+                -0.2208961338697702,
+                -0.005600152551406827
+              ],
+              "fixed_tp_atr_sl": [
+                -0.2706988130386007,
+                -0.030499100627940774
+              ],
+              "atr_atr": [
+                -0.22142034009967534,
+                -0.013844150059787935
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.027181117985138295,
+                0.13984329899594874
+              ],
+              "fixed_tp_atr_sl": [
+                -0.0217222571773152,
+                0.040758441310929545
+              ],
+              "atr_atr": [
+                -0.04120824049153961,
+                0.13040268224283516
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.03102332368624168,
+                0.12928169095257344
+              ],
+              "sl_marginal": [
+                -0.03297430693640453,
+                0.032808489346362164
+              ],
+              "interaction": [
+                -0.03303972729671249,
+                -0.0023441509490157043
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 255,
+                "mean_delta_common_r": 0.1638919753552242,
+                "total_delta_common_r": 41.79245371558217,
+                "mean_delta_net_pct": 0.5868072030819433,
+                "total_delta_net_pct": 149.63583678589558
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 1,
+                "mean_delta_common_r": 1.811052031527306,
+                "total_delta_common_r": 1.811052031527306,
+                "mean_delta_net_pct": 6.484383234462804,
+                "total_delta_net_pct": 6.484383234462804
+              },
+              {
+                "transition": "SL->TP",
+                "count": 26,
+                "mean_delta_common_r": 1.8310697090534995,
+                "total_delta_common_r": 47.60781243539099,
+                "mean_delta_net_pct": 6.556055549936981,
+                "total_delta_net_pct": 170.45744429836154
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 89,
+                "mean_delta_common_r": -0.32587074158026447,
+                "total_delta_common_r": -29.002496000643536,
+                "mean_delta_net_pct": -1.1667642544333903,
+                "total_delta_net_pct": -103.84201864457174
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 18,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 85,
+                "mean_delta_common_r": 0.38817065956441776,
+                "total_delta_common_r": 32.99450606297551,
+                "mean_delta_net_pct": 1.3898260641728752,
+                "total_delta_net_pct": 118.1352154546944
+              },
+              {
+                "transition": "TP->SL",
+                "count": 13,
+                "mean_delta_common_r": -1.9967751069170965,
+                "total_delta_common_r": -25.958076389922255,
+                "mean_delta_net_pct": -7.14935562362981,
+                "total_delta_net_pct": -92.94162310718752
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 2,
+                "mean_delta_common_r": -0.8276852854169494,
+                "total_delta_common_r": -1.6553705708338988,
+                "mean_delta_net_pct": -2.9634866888076745,
+                "total_delta_net_pct": -5.926973377615349
+              },
+              {
+                "transition": "TP->TP",
+                "count": 139,
+                "mean_delta_common_r": -0.28806171126426944,
+                "total_delta_common_r": -40.04057786573346,
+                "mean_delta_net_pct": -1.0313908703315662,
+                "total_delta_net_pct": -143.3633309760877
+              }
+            ],
+            "total_delta_common_r": 27.549303418342838,
+            "direct_delta_common_r": 27.549303418342845,
+            "total_delta_net_pct": 98.63893366795202,
+            "direct_delta_net_pct": 98.63893366795196,
+            "closure_error_common_r": -7.105427357601002e-15,
+            "closure_error_net_pct": 5.684341886080802e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 628,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "stress_target_first": {
+          "cost": "stress",
+          "tie_break": "target_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.5645077081299266,
+              "win_rate_pct": 37.261146496815286,
+              "avg_win_pct": 3.401451194632402,
+              "avg_loss_pct": -2.9199249244913092,
+              "profit_factor": 0.6918503966223195,
+              "mean_raw_pct": 0.10798366312370777,
+              "mean_fee_pct": 0.39887032203419576,
+              "mean_slippage_pct": 0.2736210492194381,
+              "time_exit_pct": 30.573248407643312,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044215,
+              "tail_p05_pct": -3.580451097804407,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 192,
+                "TP": 154,
+                "SL": 282
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.7983124378274096,
+              "mean_own_net_r": -0.15766385092540255,
+              "median_own_net_r": -0.5022586229232873,
+              "mean_common_net_r": -0.15766385092540255,
+              "median_common_net_r": -0.5022586229232873,
+              "mean_total_cost_pct": 0.6724913712536339,
+              "mean_own_cost_r": 0.18782308510400245,
+              "mean_common_cost_r": 0.18782308510400245,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -63.871742878857994,
+                "max_drawdown_pct": 71.11352204222655
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.6699624647052214,
+              "first_touch_counts": {
+                "NONE": 192,
+                "TP": 154,
+                "SL": 282
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.38190954025532775,
+              "win_rate_pct": 48.40764331210191,
+              "avg_win_pct": 2.524138491344252,
+              "avg_loss_pct": -3.1085718908919713,
+              "profit_factor": 0.7618699378641299,
+              "mean_raw_pct": 0.26945157944197184,
+              "mean_fee_pct": 0.39923625022632925,
+              "mean_slippage_pct": 0.2521248694709703,
+              "time_exit_pct": 12.738853503184714,
+              "duration_median_hours": 17.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.5804510978044215,
+              "tail_p05_pct": -3.5804510978044064,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 290,
+                "SL": 258,
+                "TIME": 80
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -0.41682441870627207,
+              "mean_own_net_r": -0.10666520218346846,
+              "median_own_net_r": -0.11641673278595457,
+              "mean_common_net_r": -0.10666520218346846,
+              "median_common_net_r": -0.11641673278595457,
+              "mean_total_cost_pct": 0.6513611196972996,
+              "mean_own_cost_r": 0.1819215238260697,
+              "mean_common_cost_r": 0.1819215238260697,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -50.016798964053166,
+                "max_drawdown_pct": 57.056529638038256
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.5685751429428407,
+              "first_touch_counts": {
+                "TP": 290,
+                "SL": 258,
+                "NONE": 80
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.5302487689068188,
+              "win_rate_pct": 30.89171974522293,
+              "avg_win_pct": 3.775759257918102,
+              "avg_loss_pct": -2.455054200252521,
+              "profit_factor": 0.6874723123945848,
+              "mean_raw_pct": 0.1435504371571646,
+              "mean_fee_pct": 0.39893897722301963,
+              "mean_slippage_pct": 0.27486022884096317,
+              "time_exit_pct": 12.101910828025478,
+              "duration_median_hours": 15.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.501350704669101,
+              "tail_p05_pct": -3.8857577940072234,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 76,
+                "SL": 405,
+                "TP": 147
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.7981505749050257,
+              "mean_own_net_r": -0.2132585523999688,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.14809552048678384,
+              "median_common_net_r": -0.5022134155128344,
+              "mean_total_cost_pct": 0.6737992060639829,
+              "mean_own_cost_r": 0.294161714661881,
+              "mean_common_cost_r": 0.1881883560641759,
+              "common_r_p05": -1.085270455555178,
+              "common_r_worst": -1.815790951217246,
+              "common_r_curve": {
+                "final_return_pct": -61.48378791498574,
+                "max_drawdown_pct": 68.21236120155827
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.883093902347388,
+              "first_touch_counts": {
+                "NONE": 76,
+                "SL": 405,
+                "TP": 147
+              }
+            },
+            "atr_atr": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.4074393424166272,
+              "win_rate_pct": 41.0828025477707,
+              "avg_win_pct": 2.75125171364178,
+              "avg_loss_pct": -2.609986078803301,
+              "profit_factor": 0.7350385504686642,
+              "mean_raw_pct": 0.25031208898379265,
+              "mean_fee_pct": 0.39918508829815025,
+              "mean_slippage_pct": 0.2585663431022692,
+              "time_exit_pct": 3.343949044585987,
+              "duration_median_hours": 11.0,
+              "duration_p90_hours": 31.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.501350704669101,
+              "tail_p05_pct": -3.971963183355036,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 250,
+                "SL": 357,
+                "TIME": 21
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.5517962226806536,
+              "mean_own_net_r": -0.16915334914415298,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.11379553338027067,
+              "median_common_net_r": -0.43340802046765803,
+              "mean_total_cost_pct": 0.6577514314004195,
+              "mean_own_cost_r": 0.28501759196877746,
+              "mean_common_cost_r": 0.18370630220414577,
+              "common_r_p05": -1.1093471394681835,
+              "common_r_worst": -1.815790951217246,
+              "common_r_curve": {
+                "final_return_pct": -52.087133704700925,
+                "max_drawdown_pct": 54.76168491709357
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 2.9523247727271107,
+              "mae_48h_median_pct": -3.1056201764294245,
+              "uncaptured_median_pct": 1.7393327364992008,
+              "first_touch_counts": {
+                "TP": 250,
+                "SL": 357,
+                "NONE": 21
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.15270379718239518,
+              "sl_marginal": 0.0043645685309041116,
+              "interaction": -0.05978874138440715
+            },
+            "common_r": {
+              "tp_marginal": 0.042649317924223634,
+              "sl_marginal": 0.0012189996209082468,
+              "interaction": -0.016698661635420914
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.29092966489669414,
+                -0.0400808575068056
+              ],
+              "atr_tp_fixed_sl": [
+                -0.2208961338697702,
+                -0.005600152551406827
+              ],
+              "fixed_tp_atr_sl": [
+                -0.2706988130386007,
+                -0.030499100627940774
+              ],
+              "atr_atr": [
+                -0.22142034009967534,
+                -0.013844150059787935
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.027181117985138295,
+                0.13984329899594874
+              ],
+              "fixed_tp_atr_sl": [
+                -0.0217222571773152,
+                0.040758441310929545
+              ],
+              "atr_atr": [
+                -0.04120824049153961,
+                0.13040268224283516
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.03102332368624168,
+                0.12928169095257344
+              ],
+              "sl_marginal": [
+                -0.03297430693640453,
+                0.032808489346362164
+              ],
+              "interaction": [
+                -0.03303972729671249,
+                -0.0023441509490157043
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 255,
+                "mean_delta_common_r": 0.1638919753552242,
+                "total_delta_common_r": 41.79245371558217,
+                "mean_delta_net_pct": 0.5868072030819433,
+                "total_delta_net_pct": 149.63583678589558
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 1,
+                "mean_delta_common_r": 1.811052031527306,
+                "total_delta_common_r": 1.811052031527306,
+                "mean_delta_net_pct": 6.484383234462804,
+                "total_delta_net_pct": 6.484383234462804
+              },
+              {
+                "transition": "SL->TP",
+                "count": 26,
+                "mean_delta_common_r": 1.8310697090534995,
+                "total_delta_common_r": 47.60781243539099,
+                "mean_delta_net_pct": 6.556055549936981,
+                "total_delta_net_pct": 170.45744429836154
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 89,
+                "mean_delta_common_r": -0.32587074158026447,
+                "total_delta_common_r": -29.002496000643536,
+                "mean_delta_net_pct": -1.1667642544333903,
+                "total_delta_net_pct": -103.84201864457174
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 18,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 85,
+                "mean_delta_common_r": 0.38817065956441776,
+                "total_delta_common_r": 32.99450606297551,
+                "mean_delta_net_pct": 1.3898260641728752,
+                "total_delta_net_pct": 118.1352154546944
+              },
+              {
+                "transition": "TP->SL",
+                "count": 13,
+                "mean_delta_common_r": -1.9967751069170965,
+                "total_delta_common_r": -25.958076389922255,
+                "mean_delta_net_pct": -7.14935562362981,
+                "total_delta_net_pct": -92.94162310718752
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 2,
+                "mean_delta_common_r": -0.8276852854169494,
+                "total_delta_common_r": -1.6553705708338988,
+                "mean_delta_net_pct": -2.9634866888076745,
+                "total_delta_net_pct": -5.926973377615349
+              },
+              {
+                "transition": "TP->TP",
+                "count": 139,
+                "mean_delta_common_r": -0.28806171126426944,
+                "total_delta_common_r": -40.04057786573346,
+                "mean_delta_net_pct": -1.0313908703315662,
+                "total_delta_net_pct": -143.3633309760877
+              }
+            ],
+            "total_delta_common_r": 27.549303418342838,
+            "direct_delta_common_r": 27.549303418342845,
+            "total_delta_net_pct": 98.63893366795202,
+            "direct_delta_net_pct": 98.63893366795196,
+            "closure_error_common_r": -7.105427357601002e-15,
+            "closure_error_net_pct": 5.684341886080802e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 628,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "legacy_fee_stop_first": {
+          "cost": "legacy_fee",
+          "tie_break": "stop_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.1045889517463526,
+              "win_rate_pct": 40.92356687898089,
+              "avg_win_pct": 3.619502731970987,
+              "avg_loss_pct": -2.6843505763160467,
+              "profit_factor": 0.9340473408936566,
+              "mean_raw_pct": 0.14232887789418092,
+              "mean_fee_pct": 0.12381843591624674,
+              "mean_slippage_pct": 0.12309939372429246,
+              "time_exit_pct": 30.095541401273884,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176207,
+              "tail_p05_pct": -3.2326099560176025,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 189,
+                "TP": 161,
+                "SL": 278
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.2934778978393289,
+              "mean_own_net_r": -0.03235433695044399,
+              "median_own_net_r": -0.4001342306799124,
+              "mean_common_net_r": -0.03235433695044399,
+              "median_common_net_r": -0.4001342306799124,
+              "mean_total_cost_pct": 0.2469178296405392,
+              "mean_own_cost_r": 0.07638342794214777,
+              "mean_common_cost_r": 0.07638342794214777,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -21.166037043294217,
+                "max_drawdown_pct": 58.1170789148576
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.681083643579544,
+              "first_touch_counts": {
+                "NONE": 189,
+                "TP": 161,
+                "SL": 278
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": 0.05661218001128546,
+              "win_rate_pct": 50.318471337579616,
+              "avg_win_pct": 2.901850628327218,
+              "avg_loss_pct": -2.8251036843086976,
+              "profit_factor": 1.0403348584461223,
+              "mean_raw_pct": 0.26939267199631217,
+              "mean_fee_pct": 0.11106206334713656,
+              "mean_slippage_pct": 0.10171842863789661,
+              "time_exit_pct": 12.420382165605096,
+              "duration_median_hours": 17.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176207,
+              "tail_p05_pct": -3.232609956017602,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 295,
+                "SL": 255,
+                "TIME": 78
+              },
+              "signal_weeks": 23,
+              "median_net_pct": 0.22229586745917657,
+              "mean_own_net_r": 0.01751283971204141,
+              "median_own_net_r": 0.06876668403664551,
+              "mean_common_net_r": 0.017512839712041397,
+              "median_common_net_r": 0.06876668403664551,
+              "mean_total_cost_pct": 0.2127804919850331,
+              "mean_own_cost_r": 0.06582312585808146,
+              "mean_common_cost_r": 0.06582312585808146,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": 8.384994996505757,
+                "max_drawdown_pct": 45.798571760887775
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.610312987463709,
+              "first_touch_counts": {
+                "TP": 295,
+                "SL": 255,
+                "NONE": 78
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.0570685122913868,
+              "win_rate_pct": 33.9171974522293,
+              "avg_win_pct": 4.027216156844746,
+              "avg_loss_pct": -2.1533399207877637,
+              "profit_factor": 0.9598952783606702,
+              "mean_raw_pct": 0.19155116367471942,
+              "mean_fee_pct": 0.12446827635610307,
+              "mean_slippage_pct": 0.12415139961000894,
+              "time_exit_pct": 12.579617834394904,
+              "duration_median_hours": 16.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.167007580134794,
+              "tail_p05_pct": -3.540666852857115,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 79,
+                "SL": 394,
+                "TP": 155
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.3744507641622095,
+              "mean_own_net_r": -0.0007819825359479508,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.017654004989111807,
+              "median_common_net_r": -0.42518298924484466,
+              "mean_total_cost_pct": 0.248619675966112,
+              "mean_own_cost_r": 0.1362009829089646,
+              "mean_common_cost_r": 0.07690988994923426,
+              "common_r_p05": -1.0952966491568412,
+              "common_r_worst": -1.9077487429792614,
+              "common_r_curve": {
+                "final_return_pct": -13.14256298015012,
+                "max_drawdown_pct": 54.05020219922374
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.9081444436881014,
+              "first_touch_counts": {
+                "NONE": 79,
+                "SL": 394,
+                "TP": 155
+              }
+            },
+            "atr_atr": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": 0.043523554015609874,
+              "win_rate_pct": 43.152866242038215,
+              "avg_win_pct": 3.125156341073693,
+              "avg_loss_pct": -2.2957551162721788,
+              "profit_factor": 1.0333495684340737,
+              "mean_raw_pct": 0.26563669038140986,
+              "mean_fee_pct": 0.11455721756316971,
+              "mean_slippage_pct": 0.10755591880263657,
+              "time_exit_pct": 3.343949044585987,
+              "duration_median_hours": 12.0,
+              "duration_p90_hours": 31.300000000000068,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.167007580134794,
+              "tail_p05_pct": -3.6272264715317384,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 259,
+                "SL": 348,
+                "TIME": 21
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.1558414460270912,
+              "mean_own_net_r": 0.03198019923892276,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": 0.013463905205943432,
+              "median_common_net_r": -0.35755673024376444,
+              "mean_total_cost_pct": 0.2221131363658063,
+              "mean_own_cost_r": 0.11655662009947597,
+              "mean_common_cost_r": 0.06871015661890684,
+              "common_r_p05": -1.12207365592609,
+              "common_r_worst": -1.9077487429792614,
+              "common_r_curve": {
+                "final_return_pct": 5.986700130135514,
+                "max_drawdown_pct": 39.33006286588252
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.765788973173732,
+              "first_touch_counts": {
+                "TP": 259,
+                "SL": 348,
+                "NONE": 21
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.13089659903231737,
+              "sl_marginal": 0.01721590672964511,
+              "interaction": -0.06060906545064139
+            },
+            "common_r": {
+              "tp_marginal": 0.04049254342877031,
+              "sl_marginal": 0.005325698727617111,
+              "interaction": -0.01874926646743015
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.18771032386421177,
+                0.10473375196653519
+              ],
+              "atr_tp_fixed_sl": [
+                -0.11169217046711394,
+                0.13158439633171914
+              ],
+              "fixed_tp_atr_sl": [
+                -0.14864922424147062,
+                0.11070761322253977
+              ],
+              "atr_atr": [
+                -0.10180944506767267,
+                0.12339268379605477
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.01909486224656469,
+                0.12659868241002545
+              ],
+              "fixed_tp_atr_sl": [
+                -0.02177245371318955,
+                0.05208154665597703
+              ],
+              "atr_atr": [
+                -0.03141906516538734,
+                0.1310546525808684
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.025145329926863687,
+                0.11478520041573202
+              ],
+              "sl_marginal": [
+                -0.03305516254610417,
+                0.04346407652484473
+              ],
+              "interaction": [
+                -0.032458700620742166,
+                -0.0070259611943140725
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 252,
+                "mean_delta_common_r": 0.18323664954174573,
+                "total_delta_common_r": 46.175635684519925,
+                "mean_delta_net_pct": 0.5923326176159538,
+                "total_delta_net_pct": 149.26781963922033
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 1,
+                "mean_delta_common_r": 2.029130648559378,
+                "total_delta_common_r": 2.029130648559378,
+                "mean_delta_net_pct": 6.559387936593486,
+                "total_delta_net_pct": 6.559387936593486
+              },
+              {
+                "transition": "SL->TP",
+                "count": 25,
+                "mean_delta_common_r": 2.035744146174453,
+                "total_delta_common_r": 50.89360365436133,
+                "mean_delta_net_pct": 6.580766794828061,
+                "total_delta_net_pct": 164.51916987070152
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 84,
+                "mean_delta_common_r": -0.36218692094673205,
+                "total_delta_common_r": -30.42370135952549,
+                "mean_delta_net_pct": -1.1708090465917629,
+                "total_delta_net_pct": -98.3479599137081
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 19,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 86,
+                "mean_delta_common_r": 0.4085731249405621,
+                "total_delta_common_r": 35.13728874488835,
+                "mean_delta_net_pct": 1.3207575514440812,
+                "total_delta_net_pct": 113.58514942419099
+              },
+              {
+                "transition": "TP->SL",
+                "count": 12,
+                "mean_delta_common_r": -2.3303667304109186,
+                "total_delta_common_r": -27.964400764931025,
+                "mean_delta_net_pct": -7.533166693898505,
+                "total_delta_net_pct": -90.39800032678205
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 1,
+                "mean_delta_common_r": 0.6878977461786522,
+                "total_delta_common_r": 0.6878977461786522,
+                "mean_delta_net_pct": 2.223705103019176,
+                "total_delta_net_pct": 2.223705103019176
+              },
+              {
+                "transition": "TP->TP",
+                "count": 148,
+                "mean_delta_common_r": -0.32271350189080955,
+                "total_delta_common_r": -47.76159827983982,
+                "mean_delta_net_pct": -1.0432068791535336,
+                "total_delta_net_pct": -154.39461811472296
+              }
+            ],
+            "total_delta_common_r": 28.773856074211288,
+            "direct_delta_common_r": 28.773856074211295,
+            "total_delta_net_pct": 93.01465361851243,
+            "direct_delta_net_pct": 93.01465361851241,
+            "closure_error_common_r": -7.105427357601002e-15,
+            "closure_error_net_pct": 1.4210854715202004e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 628,
+            "errors": [],
+            "error_count": 0
+          }
+        },
+        "legacy_fee_target_first": {
+          "cost": "legacy_fee",
+          "tie_break": "target_first",
+          "metrics": {
+            "fixed_fixed": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.1045889517463526,
+              "win_rate_pct": 40.92356687898089,
+              "avg_win_pct": 3.619502731970987,
+              "avg_loss_pct": -2.6843505763160467,
+              "profit_factor": 0.9340473408936566,
+              "mean_raw_pct": 0.14232887789418092,
+              "mean_fee_pct": 0.12381843591624674,
+              "mean_slippage_pct": 0.12309939372429246,
+              "time_exit_pct": 30.095541401273884,
+              "duration_median_hours": 26.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176207,
+              "tail_p05_pct": -3.2326099560176025,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 189,
+                "TP": 161,
+                "SL": 278
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.2934778978393289,
+              "mean_own_net_r": -0.03235433695044399,
+              "median_own_net_r": -0.4001342306799124,
+              "mean_common_net_r": -0.03235433695044399,
+              "median_common_net_r": -0.4001342306799124,
+              "mean_total_cost_pct": 0.2469178296405392,
+              "mean_own_cost_r": 0.07638342794214777,
+              "mean_common_cost_r": 0.07638342794214777,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": -21.166037043294217,
+                "max_drawdown_pct": 58.1170789148576
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.681083643579544,
+              "first_touch_counts": {
+                "NONE": 189,
+                "TP": 161,
+                "SL": 278
+              }
+            },
+            "atr_tp_fixed_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": 0.05661218001128546,
+              "win_rate_pct": 50.318471337579616,
+              "avg_win_pct": 2.901850628327218,
+              "avg_loss_pct": -2.8251036843086976,
+              "profit_factor": 1.0403348584461223,
+              "mean_raw_pct": 0.26939267199631217,
+              "mean_fee_pct": 0.11106206334713656,
+              "mean_slippage_pct": 0.10171842863789661,
+              "time_exit_pct": 12.420382165605096,
+              "duration_median_hours": 17.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -3.2326099560176207,
+              "tail_p05_pct": -3.232609956017602,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 295,
+                "SL": 255,
+                "TIME": 78
+              },
+              "signal_weeks": 23,
+              "median_net_pct": 0.22229586745917657,
+              "mean_own_net_r": 0.01751283971204141,
+              "median_own_net_r": 0.06876668403664551,
+              "mean_common_net_r": 0.017512839712041397,
+              "median_common_net_r": 0.06876668403664551,
+              "mean_total_cost_pct": 0.2127804919850331,
+              "mean_own_cost_r": 0.06582312585808146,
+              "mean_common_cost_r": 0.06582312585808146,
+              "common_r_p05": -1.0,
+              "common_r_worst": -1.0,
+              "common_r_curve": {
+                "final_return_pct": 8.384994996505757,
+                "max_drawdown_pct": 45.798571760887775
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.610312987463709,
+              "first_touch_counts": {
+                "TP": 295,
+                "SL": 255,
+                "NONE": 78
+              }
+            },
+            "fixed_tp_atr_sl": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": -0.0570685122913868,
+              "win_rate_pct": 33.9171974522293,
+              "avg_win_pct": 4.027216156844746,
+              "avg_loss_pct": -2.1533399207877637,
+              "profit_factor": 0.9598952783606702,
+              "mean_raw_pct": 0.19155116367471942,
+              "mean_fee_pct": 0.12446827635610307,
+              "mean_slippage_pct": 0.12415139961000894,
+              "time_exit_pct": 12.579617834394904,
+              "duration_median_hours": 16.0,
+              "duration_p90_hours": 48.0,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.167007580134794,
+              "tail_p05_pct": -3.540666852857115,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TIME": 79,
+                "SL": 394,
+                "TP": 155
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.3744507641622095,
+              "mean_own_net_r": -0.0007819825359479508,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": -0.017654004989111807,
+              "median_common_net_r": -0.42518298924484466,
+              "mean_total_cost_pct": 0.248619675966112,
+              "mean_own_cost_r": 0.1362009829089646,
+              "mean_common_cost_r": 0.07690988994923426,
+              "common_r_p05": -1.0952966491568412,
+              "common_r_worst": -1.9077487429792614,
+              "common_r_curve": {
+                "final_return_pct": -13.14256298015012,
+                "max_drawdown_pct": 54.05020219922374
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.9081444436881014,
+              "first_touch_counts": {
+                "NONE": 79,
+                "SL": 394,
+                "TP": 155
+              }
+            },
+            "atr_atr": {
+              "trades": 628,
+              "closed_trades": 628,
+              "censored": 0,
+              "mean_net_pct": 0.043523554015609874,
+              "win_rate_pct": 43.152866242038215,
+              "avg_win_pct": 3.125156341073693,
+              "avg_loss_pct": -2.2957551162721788,
+              "profit_factor": 1.0333495684340737,
+              "mean_raw_pct": 0.26563669038140986,
+              "mean_fee_pct": 0.11455721756316971,
+              "mean_slippage_pct": 0.10755591880263657,
+              "time_exit_pct": 3.343949044585987,
+              "duration_median_hours": 12.0,
+              "duration_p90_hours": 31.300000000000068,
+              "duration_max_hours": 48.0,
+              "tail_worst_pct": -6.167007580134794,
+              "tail_p05_pct": -3.6272264715317384,
+              "ambiguous_trades": 0,
+              "fallback_trades": 0,
+              "status_counts": {
+                "TP": 259,
+                "SL": 348,
+                "TIME": 21
+              },
+              "signal_weeks": 23,
+              "median_net_pct": -1.1558414460270912,
+              "mean_own_net_r": 0.03198019923892276,
+              "median_own_net_r": -1.0,
+              "mean_common_net_r": 0.013463905205943432,
+              "median_common_net_r": -0.35755673024376444,
+              "mean_total_cost_pct": 0.2221131363658063,
+              "mean_own_cost_r": 0.11655662009947597,
+              "mean_common_cost_r": 0.06871015661890684,
+              "common_r_p05": -1.12207365592609,
+              "common_r_worst": -1.9077487429792614,
+              "common_r_curve": {
+                "final_return_pct": 5.986700130135514,
+                "max_drawdown_pct": 39.33006286588252
+              },
+              "path_complete": 628,
+              "mfe_48h_median_pct": 3.0037752098948767,
+              "mae_48h_median_pct": -3.0571971980068557,
+              "uncaptured_median_pct": 1.765788973173732,
+              "first_touch_counts": {
+                "TP": 259,
+                "SL": 348,
+                "NONE": 21
+              }
+            }
+          },
+          "factorial": {
+            "net_pct": {
+              "tp_marginal": 0.13089659903231737,
+              "sl_marginal": 0.01721590672964511,
+              "interaction": -0.06060906545064139
+            },
+            "common_r": {
+              "tp_marginal": 0.04049254342877031,
+              "sl_marginal": 0.005325698727617111,
+              "interaction": -0.01874926646743015
+            }
+          },
+          "bootstrap": {
+            "block_days": 14,
+            "repetitions": 2000,
+            "valid_resamples": 2000,
+            "policy_mean_common_r_ci": {
+              "fixed_fixed": [
+                -0.18771032386421177,
+                0.10473375196653519
+              ],
+              "atr_tp_fixed_sl": [
+                -0.11169217046711394,
+                0.13158439633171914
+              ],
+              "fixed_tp_atr_sl": [
+                -0.14864922424147062,
+                0.11070761322253977
+              ],
+              "atr_atr": [
+                -0.10180944506767267,
+                0.12339268379605477
+              ]
+            },
+            "delta_vs_fixed_common_r_ci": {
+              "fixed_fixed": [
+                0.0,
+                0.0
+              ],
+              "atr_tp_fixed_sl": [
+                -0.01909486224656469,
+                0.12659868241002545
+              ],
+              "fixed_tp_atr_sl": [
+                -0.02177245371318955,
+                0.05208154665597703
+              ],
+              "atr_atr": [
+                -0.03141906516538734,
+                0.1310546525808684
+              ]
+            },
+            "factorial_common_r_ci": {
+              "tp_marginal": [
+                -0.025145329926863687,
+                0.11478520041573202
+              ],
+              "sl_marginal": [
+                -0.03305516254610417,
+                0.04346407652484473
+              ],
+              "interaction": [
+                -0.032458700620742166,
+                -0.0070259611943140725
+              ]
+            }
+          },
+          "transitions_fixed_to_atr": {
+            "cells": [
+              {
+                "transition": "SL->SL",
+                "count": 252,
+                "mean_delta_common_r": 0.18323664954174573,
+                "total_delta_common_r": 46.175635684519925,
+                "mean_delta_net_pct": 0.5923326176159538,
+                "total_delta_net_pct": 149.26781963922033
+              },
+              {
+                "transition": "SL->TIME",
+                "count": 1,
+                "mean_delta_common_r": 2.029130648559378,
+                "total_delta_common_r": 2.029130648559378,
+                "mean_delta_net_pct": 6.559387936593486,
+                "total_delta_net_pct": 6.559387936593486
+              },
+              {
+                "transition": "SL->TP",
+                "count": 25,
+                "mean_delta_common_r": 2.035744146174453,
+                "total_delta_common_r": 50.89360365436133,
+                "mean_delta_net_pct": 6.580766794828061,
+                "total_delta_net_pct": 164.51916987070152
+              },
+              {
+                "transition": "TIME->SL",
+                "count": 84,
+                "mean_delta_common_r": -0.36218692094673205,
+                "total_delta_common_r": -30.42370135952549,
+                "mean_delta_net_pct": -1.1708090465917629,
+                "total_delta_net_pct": -98.3479599137081
+              },
+              {
+                "transition": "TIME->TIME",
+                "count": 19,
+                "mean_delta_common_r": 0.0,
+                "total_delta_common_r": 0.0,
+                "mean_delta_net_pct": 0.0,
+                "total_delta_net_pct": 0.0
+              },
+              {
+                "transition": "TIME->TP",
+                "count": 86,
+                "mean_delta_common_r": 0.4085731249405621,
+                "total_delta_common_r": 35.13728874488835,
+                "mean_delta_net_pct": 1.3207575514440812,
+                "total_delta_net_pct": 113.58514942419099
+              },
+              {
+                "transition": "TP->SL",
+                "count": 12,
+                "mean_delta_common_r": -2.3303667304109186,
+                "total_delta_common_r": -27.964400764931025,
+                "mean_delta_net_pct": -7.533166693898505,
+                "total_delta_net_pct": -90.39800032678205
+              },
+              {
+                "transition": "TP->TIME",
+                "count": 1,
+                "mean_delta_common_r": 0.6878977461786522,
+                "total_delta_common_r": 0.6878977461786522,
+                "mean_delta_net_pct": 2.223705103019176,
+                "total_delta_net_pct": 2.223705103019176
+              },
+              {
+                "transition": "TP->TP",
+                "count": 148,
+                "mean_delta_common_r": -0.32271350189080955,
+                "total_delta_common_r": -47.76159827983982,
+                "mean_delta_net_pct": -1.0432068791535336,
+                "total_delta_net_pct": -154.39461811472296
+              }
+            ],
+            "total_delta_common_r": 28.773856074211288,
+            "direct_delta_common_r": 28.773856074211295,
+            "total_delta_net_pct": 93.01465361851243,
+            "direct_delta_net_pct": 93.01465361851241,
+            "closure_error_common_r": -7.105427357601002e-15,
+            "closure_error_net_pct": 1.4210854715202004e-14
+          },
+          "measurement": {
+            "passed": true,
+            "events": 628,
+            "errors": [],
+            "error_count": 0
+          }
+        }
+      }
+    }
+  },
+  "fixed_replay_verification": {
+    "2024-07-01_taker_stop_first": {
+      "rows": 858,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2024-07-01_taker_target_first": {
+      "rows": 858,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2024-07-01_stress_stop_first": {
+      "rows": 858,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2024-07-01_stress_target_first": {
+      "rows": 858,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2024-07-01_legacy_fee_stop_first": {
+      "rows": 858,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2024-07-01_legacy_fee_target_first": {
+      "rows": 858,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2025-06-01_taker_stop_first": {
+      "rows": 628,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2025-06-01_taker_target_first": {
+      "rows": 628,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2025-06-01_stress_stop_first": {
+      "rows": 628,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2025-06-01_stress_target_first": {
+      "rows": 628,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2025-06-01_legacy_fee_stop_first": {
+      "rows": 628,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    },
+    "2025-06-01_legacy_fee_target_first": {
+      "rows": 628,
+      "max_numeric_error": 0.0,
+      "exact_status_exit": true
+    }
+  },
+  "limitations": [
+    "burned_windows",
+    "current_survivor_universe",
+    "descriptive_all_events_risk_curve"
+  ],
+  "order_flip_check": {
+    "passed": true,
+    "flips": []
+  },
+  "qualification": {
+    "atr_tp_fixed_sl": {
+      "absolute_positive_all_8": false,
+      "relative_nonnegative_all_8": true,
+      "main_ci_lower_nonnegative_both": false,
+      "qualified": false
+    },
+    "fixed_tp_atr_sl": {
+      "absolute_positive_all_8": false,
+      "relative_nonnegative_all_8": true,
+      "main_ci_lower_nonnegative_both": false,
+      "qualified": false
+    }
+  },
+  "decision": "reject_current_atr_components",
+  "decision_reasons": [
+    "测量闭合且事件集一致，但两个单组件政策均未同时通过双窗绝对正收益、相对改善和主分支区块区间门槛。"
+  ],
+  "plain_language": "把ATR止盈和ATR止损拆开后，没有任何一个单组件能在两个窗口稳定把交易变成正期望。因此应停止当前ATR组件路线；这不等于入场一定无效，也不应继续扫ATR参数。"
+}

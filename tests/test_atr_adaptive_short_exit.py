@@ -82,6 +82,13 @@ def test_atr_exit_levels_scale_with_volatility_and_keep_ratio() -> None:
     assert np.isclose((target - 100) / (100 - stop), 5 / 3)
 
 
+def test_four_exit_policies_keep_the_frozen_components() -> None:
+    assert exit_levels(100.0, 6.0, "fixed_fixed") == (97.0, 105.0)
+    assert exit_levels(100.0, 6.0, "atr_tp_fixed_sl") == (97.0, 110.0)
+    assert exit_levels(100.0, 6.0, "fixed_tp_atr_sl") == (94.0, 105.0)
+    assert exit_levels(100.0, 6.0, "atr_atr") == (94.0, 110.0)
+
+
 def test_planned_stop_is_minus_one_r_without_costs() -> None:
     rows = bars(40)
     entered = 25 * H4

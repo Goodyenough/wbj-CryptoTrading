@@ -1,8 +1,14 @@
 # CryptoTradingSystem 系统总览
 
-更新时间：2026-10-14 +08:00
+更新时间：2026-10-15 +08:00
 
-## 最新研究状态：ATR自适应出口修正尺度错配，但未形成正优势
+## 最新研究状态：拆开ATR止盈/止损后，当前两个组件均未形成正期望
+
+`CRYPTOTRADIN-134`已在同一B all-events入场上完成`fixed+fixed / ATR_TP+fixed_SL / fixed_TP+ATR_SL / ATR+ATR`四政策2×2归因，覆盖早/近两窗、`taker/stress/legacy_fee`与两种同根顺序。12个分支全部通过会计恒等、共同事件集、删失一致和旧fixed逐笔复现；同根顺序不翻转结论。
+
+主口径中，ATR TP单组件早/近窗平均净收益为`-0.1718%/-0.0034%`，ATR SL单组件为`-0.1059%/-0.1170%`，均较fixed改善但仍为负；stress下也全部为负。两者相对fixed的14日配对common-R区间在两个窗口均跨零。早窗TP/SL边际改善并有正交互，近窗改善主要来自TP，SL边际很弱且交互为负，说明full ATR接近盈亏平衡不是一个跨窗稳定的单组件优势。裁决`reject_current_atr_components`：不继续扫描当前ATR参数，不改生产；结果只否定当前组件定义，不证明入场本身没有毛优势。完整报告：[ATR出口组件归因](reports/2026-10-15/atr_exit_component_attribution_v1/report.md)。
+
+## 前一研究状态：ATR自适应出口修正尺度错配，但未形成正优势
 
 `CRYPTOTRADIN-133`已比较固定`+5%/-3%/48h`与唯一预注册的`TP=5/3×ATR20 / SL=1×ATR20 / 48h`。两边使用完全相同的B all-events、next-open和成本，并按计划止损归一为1R公平比较。12个固定出口分支逐笔复现旧cashfix，主样本858/628笔全部配对。
 

@@ -76,9 +76,15 @@ def causal_atr20(bars: np.ndarray, signal_ms: int) -> tuple[float, float]:
 
 
 def exit_levels(entry: float, atr: float, model: str) -> tuple[float, float]:
-    if model == "fixed":
+    if model in {"fixed", "fixed_fixed"}:
         stop, target = entry * 0.97, entry * 1.05
-    elif model == "atr":
+    elif model == "atr_tp_fixed_sl":
+        stop = entry * 0.97
+        target = entry + ATR_TARGET_MULTIPLE * atr
+    elif model == "fixed_tp_atr_sl":
+        stop = entry - ATR_STOP_MULTIPLE * atr
+        target = entry * 1.05
+    elif model in {"atr", "atr_atr"}:
         stop = entry - ATR_STOP_MULTIPLE * atr
         target = entry + ATR_TARGET_MULTIPLE * atr
     else:

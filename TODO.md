@@ -2,7 +2,7 @@
 
 ## 2026-10-15 ATR出口失败机制归因
 
-- [ ] **CRYPTOTRADIN-134 / in_progress / 已授权启动**：承接 `CRYPTOTRADIN-133`，在同一 B all-events 入场、两个已烧窗口、next-open、48小时和既有成本/同根顺序下，一次回放 `fixed+fixed / ATR_TP+fixed_SL / fixed_TP+ATR_SL / ATR+ATR` 四政策，使用原始收益%、own-risk R、baseline实际planned-risk common-R，拆分动态TP、动态SL、交互和成本贡献。MFE/MAE仅作解释，状态转移不作组件因果结论；裁决仅为 `component_validation_eligible / reject_current_atr_components / measurement_insufficient`。禁止扫描新ATR参数或修改生产配置。协议：`reports/2026-10-15/atr_exit_component_attribution_protocol_v1.md`。
+- [x] **CRYPTOTRADIN-134 / in_review / 实验完成待用户验收**：四政策48配置已按冻结协议完成，12个窗口×成本×顺序分支全部通过会计恒等、共同事件集和删失一致闸门，同根顺序未翻号。两个单组件均改善common-R点估计，但早/近窗主口径平均净收益仍分别为：`ATR_TP+fixed_SL -0.1718%/-0.0034%`、`fixed_TP+ATR_SL -0.1059%/-0.1170%`；stress下也全部为负，且双窗14日配对CI下界均小于0。裁决 `reject_current_atr_components`：停止当前`ATR20 + 1ATR SL + 5/3ATR TP`组件路线，不扫描新ATR参数、不改生产；该结论不证明入场无优势。报告：`reports/2026-10-15/atr_exit_component_attribution_v1/report.md`。
 
 ## 2026-10-14 下一代入场研究问题
 

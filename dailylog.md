@@ -1,5 +1,13 @@
 # Daily Log
 
+### 2026-10-15 08:46:00 +08:00 - 完成ATR出口四政策2×2失败机制归因
+- 类型：隔离研究代码 / 测试 / 固定历史回放 / 报告 / Taskboard / 项目记忆。
+- 改动：兼容扩展 `research_atr_adaptive_short_exit.py` 的四政策出口水平，新增 `research_atr_exit_component_attribution.py` 与归因测试；运行四政策×两窗口×三成本×两同根顺序48配置，输出35,664行逐笔、summary、报告、manifest和verification；同步TODO、实验账本、系统总览、仓库及Obsidian开发计划和实验日志。
+- 原因：拆开`CRYPTOTRADIN-133`中同时变化的ATR TP和ATR SL，判断full ATR点估计改善来自哪个组件、交互是否稳定以及成本是否仍使绝对期望为负。
+- 结果：裁决`reject_current_atr_components`。ATR TP单组件主口径早/近净收益`-0.1718%/-0.0034%`，ATR SL为`-0.1059%/-0.1170%`；stress下均明显为负，双窗配对区间均跨零。早窗TP/SL边际与交互均正，近窗主要由TP改善且交互转负，机制不稳定。生产、paper、shadow和配置均未修改。
+- 验证：12/12测量分支通过会计恒等、共同事件集和删失一致，12/12 fixed分支逐笔复现，stop-first/target-first无资格翻号；45项相关测试通过。全套为`252 passed, 5 failed`，5项均为既有database/scheduler/audit或用户未提交脚本契约失败，本轮未触及对应实现。Taskboard已写入结果并移至`in_review`；保留用户原有 `scripts/run_logged_paper_task.ps1` 改动不纳入提交。
+- Git：本轮将以 `research: attribute ATR exit components` 提交并推送`origin/main`；实际hash随后回填。
+
 ### 2026-10-15 00:45:00 +08:00 - 创建并启动ATR出口四政策失败机制归因
 - 类型：Taskboard / 冻结诊断协议 / TODO / 开发计划 / Git。
 - 改动：创建 `CRYPTOTRADIN-134`“ATR出口四政策2×2失败机制归因”，直接置为 `in_progress`、`priority=medium`，关联前置 `CRYPTOTRADIN-133` 并追加启动评论；新增 `reports/2026-10-15/atr_exit_component_attribution_protocol_v1.md`，同步 `TODO.md`、仓库及 Obsidian 开发计划。
