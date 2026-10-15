@@ -2574,3 +2574,11 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 边界：保持 `+5%/-3%/48h`、next-open、成本和生产配置不变；不运行 ATR 自适应出口，不把 C20/D6 与 B 混池，不自动启动其它研究任务。两个窗口已烧且币池为 current-survivor，通过也只授予后续固定过滤实验资格。
 - 验证：Taskboard 返回 `CRYPTOTRADIN-132 status=in_progress version=2` 并写入启动评论；协议已在运行前冻结。按仓库约定本次提交包含 `reports/` 下自然调度产物，不重新评估其结论；用户原有 `scripts/run_logged_paper_task.ps1` 改动未触碰。
 - Git：本次提交 `research: start fixed-exit volatility fit diagnostic`。
+
+### 2026-10-15 17:04:27 +08:00 - 完成 Claude 讨论：实时动能延续的可检验研究设计
+- 类型：研究讨论文档 / 研究方法审计 / Git。
+- 改动：新增 `claude-discussions/2026-10-15-1642-realtime-momentum-continuation.md`，围绕 RT1 1,860 笔固定候选，完成三轮 Claude 与 GPT 文件化讨论；定义机制层、路径层、经济层标签，并收敛出“先标签审计、后单特征因果诊断、再新数据验证”的研究路线。
+- 结论：`retest`。当前唯一建议是经项目 owner 另行批准后执行只读 Phase 0 标签审计；它只拆解未保持候选的价格回落与 eligibility 变化及其路径/经济后果，不改候选、阈值、4h确认、退出或生产配置。若未来获批 Phase 1，仅预注册 `normalized_close_position`，结果差不自动改试 `reclaim_strength_atr`；完整 cutoff 规则仍须单独前向验证。
+- 方法校正：不采纳讨论中没有业务或功效依据的占比/收益硬门槛；使用固定统计对象、时间区块 bootstrap、完整五分位梯度和集中度稳健性，避免在已烧窗口继续挑参数。`TP_first / SL_first / neither` 与同K stop-first 语义已明确。
+- 验证：讨论文档状态已为 `DONE`、`round: 3`、`decision: retest`；未运行回测、未创建或开启 Taskboard 任务、未改代码/配置/生产策略。保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
+- Git：待提交；按仓库约定将同时归档本次已有 `reports/2026-10-15/` 调度产物。
