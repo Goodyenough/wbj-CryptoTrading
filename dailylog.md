@@ -1,5 +1,13 @@
 # Daily Log
 
+### 2026-10-15 16:09:00 +08:00 - 完成实时1h动能启动候选全样本因果验证
+- 类型：Taskboard / 冻结协议 / 隔离研究代码 / 测试 / 固定历史诊断 / 项目记忆。
+- 改动：创建并启动`CRYPTOTRADIN-135`，关联`CRYPTOTRADIN-129`；新增唯一RT1协议、`research_realtime_momentum_start.py`及合成测试。复用B watch与最近已完成4h资格，在前3根已完成1h中生成全部实时reclaim，未来4h确认仅在事件冻结后作标签；输出1,860个候选、三成本/顺序分支逐笔、summary、报告、manifest与verification，并同步TODO、实验账本、系统总览、仓库及Obsidian开发计划和实验日志。
+- 原因：阶段A使用未来4h确认筛选，只能证明延迟上界；本轮回答当时可见信息是否能在纳入假启动和成本后预测后续上涨。
+- 结果：早/近窗taker平均净收益`-0.2984%/-0.3854%`，stress`-0.6704%/-0.7477%`，symbol-only仍为负。仅`60.33%/62.71%`候选保持到4h确认；保持组为`+0.5825%/+0.3309%`，未保持组为`-1.6472%/-1.5880%`。裁决`reject_current_realtime_reclaim`，Taskboard移至`in_review`；不追加参数、不改生产。
+- 验证：因果违规0，候选1h/4h聚合`1090/1090`与`770/770`，成交取消0、删失0，同根顺序无翻号；36项相关测试通过，manifest 14项哈希闭合。全套为`261 passed, 5 failed`，5项均为既有database/scheduler/audit或用户未提交脚本契约失败，本轮未触及对应实现；用户原有`scripts/run_logged_paper_task.ps1`改动未纳入。
+- Git：本轮将以`research: test causal 1h momentum starts`提交并推送`origin/main`；实际hash随后回填。
+
 ### 2026-10-15 15:41:00 +08:00 - 改写CRYPTOTRADIN-129并完成时间颗粒度阶段A
 - 类型：Taskboard / 冻结协议 / 隔离研究代码 / 测试 / 固定历史诊断 / 项目记忆。
 - 改动：将`CRYPTOTRADIN-129`从宽泛4h特征问题改为“4h延迟闸门→仅条件通过后另冻单一1h候选”，移至`in_progress`并启动阶段A；新增协议、`diagnose_momentum_resolution_stage_a.py`及合成测试，恢复原B watch计划，验证确认4h与1h聚合，模拟oracle-confirmed提前成交上界，输出4,458行逐笔、summary、报告、manifest和verification。

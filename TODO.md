@@ -1,5 +1,9 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-15 实时1h动能启动全样本验证
+
+- [x] **CRYPTOTRADIN-135 / in_review / 实验完成待用户验收**：不使用未来4h确认，复用既有B watch与最近已完成4h资格，在每个4h区间前3根已完成1h中实时产生全部RT1 reclaim候选。早/近窗共`1090/770`笔，只有`60.33%/62.71%`事后保持到4h确认；全样本taker净收益`-0.2984%/-0.3854%`，stress为`-0.6704%/-0.7477%`，symbol-only仍为负。未保持确认组净收益`-1.6472%/-1.5880%`，而保持组为`+0.5825%/+0.3309%`。裁决`reject_current_realtime_reclaim`：当前可实时price-only定义无法区分真启动和假启动，不加入参数、不改生产；不外推否定所有1h信号。报告：`reports/2026-10-15/realtime_momentum_start_v1/report.md`。
+
 ## 2026-10-15 ATR出口失败机制归因
 
 - [x] **CRYPTOTRADIN-134 / in_review / 实验完成待用户验收**：四政策48配置已按冻结协议完成，12个窗口×成本×顺序分支全部通过会计恒等、共同事件集和删失一致闸门，同根顺序未翻号。两个单组件均改善common-R点估计，但早/近窗主口径平均净收益仍分别为：`ATR_TP+fixed_SL -0.1718%/-0.0034%`、`fixed_TP+ATR_SL -0.1059%/-0.1170%`；stress下也全部为负，且双窗14日配对CI下界均小于0。裁决 `reject_current_atr_components`：停止当前`ATR20 + 1ATR SL + 5/3ATR TP`组件路线，不扫描新ATR参数、不改生产；该结论不证明入场无优势。报告：`reports/2026-10-15/atr_exit_component_attribution_v1/report.md`。

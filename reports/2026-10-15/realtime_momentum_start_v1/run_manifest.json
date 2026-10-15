@@ -1,0 +1,24 @@
+{
+  "completed_utc": "2026-10-15T08:04:48.223010+00:00",
+  "head": "88494bcaaf92df4ba9c9e07b5b5bceb59e29a28f",
+  "source_sha256": {
+    "reports\\2026-10-15\\realtime_momentum_start_protocol_v1.md": "ef15befdda3866ffffacc433d5e860dff69b272bf2bfe105579946fe8afa3dec",
+    "scripts\\research_realtime_momentum_start.py": "d4da965de3be2031915bbdb370cdc07ac5bb09a6b87db19cf4912f02a3d35e24",
+    "scripts\\diagnose_momentum_resolution_stage_a.py": "31cc82210e51314800d7ec9f34f25b9acd46c721cf214673024f938373382b85",
+    "scripts\\research_breakout_d6.py": "07750ef594127615132d2b7045eaa383d1f2220cacc04954c1dbf9f134478347",
+    "scripts\\short_horizon_core.py": "51549c3151d4c75ec2a78624dc8bd3b2d457800e1f210fe015ce13170cf9f762"
+  },
+  "input_sha256": {
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2024-07-01_inputs.json": "696c1aa4e71f168bf88ee1659f727e6e4015c3df3c963e314b9ef11ba2d64d66",
+    "data\\research_snapshots\\short_horizon_entry_v1\\2024-07-01.npz": "9a1b475abd63a9f202caf6243edd2b9e7fbd0513b640fd09a66c5be661abc4d9",
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2024-07-01_features.json.gz": "ccbcd1104e95a81fb0331cbde9e0b08479d0b5102d52541d5f6dbe085e35c609",
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2025-06-01_inputs.json": "587d1b7ad96fcb5477d7d0006b3cf2d12d8b2c467af8c4ec006fc6c3e6d3d73c",
+    "data\\research_snapshots\\short_horizon_entry_v1\\2025-06-01.npz": "79a2efb3c6538a052672cb14987a28fa73d3a1b192db98028ec804f740cce7a9",
+    "reports\\2026-10-13\\short_horizon_entry_v1\\2025-06-01_features.json.gz": "8b826ad7c57db3889dbaea31906b836b1f616cc187814a1002fbd3897fac73bc"
+  },
+  "outputs": {
+    "summary.json": "9acd03dbf0cf28fd9cf3a5dbc092f5c59286f15e77002b4e143b0774476cb010",
+    "trades.csv": "066d6fe20797835c28f8fc9da058cc400ff697e4787f07c83292d8619d96a913",
+    "report.md": "c4fcb6a8311f0d6d8e81cf5e5b4bcd18acef4a353d2579f6adf32aff5a39027e"
+  }
+}
