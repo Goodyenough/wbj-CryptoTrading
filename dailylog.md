@@ -2581,4 +2581,4 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 结论：`retest`。当前唯一建议是经项目 owner 另行批准后执行只读 Phase 0 标签审计；它只拆解未保持候选的价格回落与 eligibility 变化及其路径/经济后果，不改候选、阈值、4h确认、退出或生产配置。若未来获批 Phase 1，仅预注册 `normalized_close_position`，结果差不自动改试 `reclaim_strength_atr`；完整 cutoff 规则仍须单独前向验证。
 - 方法校正：不采纳讨论中没有业务或功效依据的占比/收益硬门槛；使用固定统计对象、时间区块 bootstrap、完整五分位梯度和集中度稳健性，避免在已烧窗口继续挑参数。`TP_first / SL_first / neither` 与同K stop-first 语义已明确。
 - 验证：讨论文档状态已为 `DONE`、`round: 3`、`decision: retest`；未运行回测、未创建或开启 Taskboard 任务、未改代码/配置/生产策略。保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
-- Git：待提交；按仓库约定将同时归档本次已有 `reports/2026-10-15/` 调度产物。
+- Git：讨论记录及本次已有 `reports/2026-10-15/` 调度产物已提交为 `feeba4b`（`docs: discuss real-time continuation research`）；本条提交号回填随后单独提交并 push。
