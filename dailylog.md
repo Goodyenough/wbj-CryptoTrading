@@ -6,7 +6,7 @@
 - 原因：阶段A使用未来4h确认筛选，只能证明延迟上界；本轮回答当时可见信息是否能在纳入假启动和成本后预测后续上涨。
 - 结果：早/近窗taker平均净收益`-0.2984%/-0.3854%`，stress`-0.6704%/-0.7477%`，symbol-only仍为负。仅`60.33%/62.71%`候选保持到4h确认；保持组为`+0.5825%/+0.3309%`，未保持组为`-1.6472%/-1.5880%`。裁决`reject_current_realtime_reclaim`，Taskboard移至`in_review`；不追加参数、不改生产。
 - 验证：因果违规0，候选1h/4h聚合`1090/1090`与`770/770`，成交取消0、删失0，同根顺序无翻号；36项相关测试通过，manifest 14项哈希闭合。全套为`261 passed, 5 failed`，5项均为既有database/scheduler/audit或用户未提交脚本契约失败，本轮未触及对应实现；用户原有`scripts/run_logged_paper_task.ps1`改动未纳入。
-- Git：本轮将以`research: test causal 1h momentum starts`提交并推送`origin/main`；实际hash随后回填。
+- Git：本轮提交`7a8d314`（`research: test causal 1h momentum starts`）并已推送`origin/main`；按规则纳入全部本轮`reports/`，未纳入用户原有`scripts/run_logged_paper_task.ps1`改动或本地数据库。
 
 ### 2026-10-15 15:41:00 +08:00 - 改写CRYPTOTRADIN-129并完成时间颗粒度阶段A
 - 类型：Taskboard / 冻结协议 / 隔离研究代码 / 测试 / 固定历史诊断 / 项目记忆。
