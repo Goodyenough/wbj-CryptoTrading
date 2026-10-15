@@ -7,7 +7,7 @@
 - 边界：本次仅讨论，不启动`CRYPTOTRADIN-130`、B选择实验或RT1特征，不改排TODO/Taskboard、不修改生产/paper/shadow；没有新实验结论或正式路线变更，因此不更新实验账本、Obsidian实验日志与开发计划。原有`dailylog.md`回填及用户脚本改动单独保留。
 - 验证：CLI会话工具记录确认先Read完整handoff、后Read讨论；两轮正文均经文件回读核验。首轮有写入标点/GBK解码故障，次轮曾遇网络关闭与服务不可用；最后调用虽超时但正文与`WAITING_CODEX`已落盘，按实证完成归纳，未虚构正常退出。原有脚本SHA256仍为`C61EF0B541D0B6163B567DDAB74C1F3DE52EE1D84E10A33F1A696F3FD409A558`；暂存检查仅有1处Claude原文空行尾随空格提示，为保留讨论原文未改写。仅暂存本轮日志新增节，原有两行回填保持未暂存；纯文档无需运行回测或测试套件。
 - 归档：按仓库规则同时纳入既有`reports/`自动产物（6份Markdown、5份SVG）；它们不是本轮新研究。数据库不入Git。
-- Git：本轮以`docs: review system edge research direction with Claude`提交；真实提交号在完成后回填。
+- Git：讨论与报告归档已提交为`a089ec7`（`docs: review system edge research direction with Claude`）；本条提交号回填随`docs: record system discussion commit`提交，随后一并推送`origin/main`。
 
 ### 2026-10-15 18:47:00 +08:00 - 研究主线与本质问题交接
 - 类型：交接文档 / 只读证据核对 / Git。
