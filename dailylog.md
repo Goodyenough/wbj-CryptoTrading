@@ -8,7 +8,7 @@
 - 边界：Claude只改讨论文件，未改原审查报告；没有新统计、新收益窗口、回测、策略/配置/采集或外部Taskboard变更。研究主线未正式变更，不更新开发计划或实验账本。既有原审查日志及历史两行回填继续保留未暂存。
 - 归档：按规则纳入既有17份`reports/`（原审查稿、白话总结、15份自动产物）；不是本轮新实验，也不表示采纳报告建议。原审查SHA256仍为`CA2F805E4E6A8DBCD2102DDB780EF17B8F87885E6D346A6C695CE1B6F70E81A6`，用户脚本仍为`C61EF0B541D0B6163B567DDAB74C1F3DE52EE1D84E10A33F1A696F3FD409A558`。
 - 验证：三轮协调器均成功，首轮一次Edit因标点匹配失败后恢复；CLI Read记录确认末轮读取B/C原报告、候选生成源码和D6报告。暂存检查仅报原稿/总结7处与Claude回复1处Markdown尾随空格，均为保留来源/讨论原文未改；忽略行尾空格后无其他格式问题，TODO与本轮日志检查通过。纯讨论无需测试套件或回测。
-- Git：本次提交`docs: discuss independent research review with Claude`，提交号与推送结果随后回填。
+- Git：三轮讨论、TODO及报告归档已提交为`e0874ce`（`docs: discuss independent research review with Claude`）并成功推送`origin/main`；本条提交号回填随`docs: record research discussion delivery`提交并推送，用户原有审查日志、历史两行回填和脚本修改继续保留未暂存。
 
 ### 2026-10-16 00:10:00 +08:00 - 补回ATR 0.35入场过滤研究线
 - 类型：已有研究证据纠正 / 裁决表补充，未运行新实验。
