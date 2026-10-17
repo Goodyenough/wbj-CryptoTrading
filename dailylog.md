@@ -7,7 +7,7 @@
 - 系统状态：已实际注册 `CryptoTrading_DailyPaperUpdate`（每天 20:05，`WakeToRun=True`、`StartWhenAvailable=True`）和 `CryptoTrading_4H_PaperUpdate`（00:10/04:10/08:10/12:10/16:10，`WakeToRun=True`、`StartWhenAvailable=False`），两者均为 `Ready`；新任务尚未到首次触发，`LastTaskResult=267011` 表示尚未运行。未手动运行真实 daily/4h，避免同日重复 run 或污染 paper 样本。
 - 企业微信：旧用户目录、Git 历史和 Windows Credential Manager 均无 webhook 副本；健康检查目前仅剩 `WeCom webhook environment variable is missing`，等待用户在隐藏输入终端粘贴 webhook 后发送测试消息并复检。密钥不写入仓库或日志。
 - 验证：`.venv` 下 `Python 3.12.10`；`python main.py db status` 成功；`python main.py db stability --days 5` 对 2026-10-12 至 2026-10-16 返回 `ready_for_4h_task=true`；五个 PowerShell 文件 parser 全部通过；调度契约测试 `1 passed`。全套测试 `262 passed, 4 failed`，四项均为既有数据库导出数量、shadow funnel 测试变量及 ATR readiness fixture 问题，与本次调度修复无关；相比历史记录的五项既有失败，本次修复使 scheduler 契约项通过。按规则将当前 `reports/` 自然产物随提交归档，不把它们解释为本次实验结论。
-- Git：本次代码提交主题 `fix: restore Windows paper task scheduling`；提交号和 push 结果随后回填。
+- Git：本次代码提交 `e1892d6`（`fix: restore Windows paper task scheduling`）。`git push origin main` 两次均因重装后无 GitHub 凭据而停在 `credential-manager get`，远端 `git ls-remote origin HEAD` 正常；已终止遗留凭据提示进程，等待用户在可见终端完成一次 GitHub 登录后推送。
 
 ### 2026-10-16 11:40:00 +08:00 - 与Claude讨论独立全局审查报告
 - 类型：文件化讨论 / 原始证据核对 / 文档归档，未运行实验。

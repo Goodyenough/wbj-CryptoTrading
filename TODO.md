@@ -4,6 +4,7 @@
 
 - [x] **daily / 4h 调度与运行环境已恢复**：安装 Python 3.12.10 并创建项目 `.venv`；移除旧用户绝对 Python 路径；重新注册 daily 20:05 和 4h 五个固定触发点，任务均为 `Ready`，项目 Python、动作、触发器和唤醒设置检查通过。未手动触发真实任务，等待自然调度验证首次 `LastTaskResult=0`。
 - [ ] **待用户输入 / 企业微信 webhook**：新系统没有保留 `CRYPTO_TRADING_WECOM_WEBHOOK_URL`，旧用户目录、Git 历史和 Credential Manager 也无可恢复副本。运行 `scripts/configure_wecom_webhook.ps1` 隐藏粘贴机器人 URL，收到连通性测试消息后再运行 `scripts/test_paper_task_setup.ps1`，目标为全绿；密钥禁止写入仓库、TODO 或日志。
+- [ ] **待用户登录 / GitHub 推送**：调度修复已本地提交为 `e1892d6`，远端可连接，但重装后 GitHub 凭据缺失，`git push` 停在 `credential-manager get`。在可见终端完成一次 GitHub 登录后推送 `main`，不得把 token 写入仓库或日志。
 
 ## 2026-10-16 Claude全局审查报告讨论
 
