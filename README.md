@@ -78,7 +78,26 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_logged_paper_tas
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_logged_paper_task.ps1 -Mode paper_4h
 ```
 
+任务脚本固定使用项目内 `.venv\Scripts\python.exe`，不依赖 Windows 用户名或全局 PATH。重装系统后先安装 Python 3.12，并在项目根目录重建运行环境：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+```
+
+企业微信机器人地址保存在当前 Windows 用户环境变量，不写入 Git。需要恢复或更换 webhook 时运行下面的交互脚本；输入会隐藏，默认会先发一条连通性测试消息再保存：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\configure_wecom_webhook.ps1
+```
+
 `scripts\install_daily_task.ps1` 与 `scripts\install_4h_paper_task.ps1` 会把计划任务动作直接指向这个统一脚本，并设置唤醒运行、错过后立即运行、失败后每 5 分钟重试 3 次、同任务不启动新实例。取消 Windows 休眠时不需要改交易脚本，只需调整系统电源策略。
+
+安装后可用一条命令同时检查项目 Python、企业微信 webhook、两个任务的动作与触发器：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\test_paper_task_setup.ps1
+```
 
 检查 5 天门槛：
 

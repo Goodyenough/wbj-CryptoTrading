@@ -10,7 +10,7 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [Console]::OutputEncoding = $utf8NoBom
 $OutputEncoding = $utf8NoBom
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$python = "C:\Users\10537\miniconda3\envs\ppt-master\python.exe"
+$python = Join-Path $projectRoot ".venv\Scripts\python.exe"
 $logDir = Join-Path $projectRoot "logs"
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 

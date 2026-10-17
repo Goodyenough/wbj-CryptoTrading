@@ -3,7 +3,9 @@ name = "crypto-trading-system"
 version = "0.1.0"
 description = "Local crypto market scanner, trade planner, and paper-trading foundation."
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "tzdata",
+]
 
 [tool.pyright]
 pythonVersion = "3.12"

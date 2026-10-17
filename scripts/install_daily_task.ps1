@@ -7,17 +7,13 @@ $ErrorActionPreference = "Stop"
 
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $taskScriptPath = Join-Path $projectRoot "scripts\run_logged_paper_task.ps1"
+$pythonPath = Join-Path $projectRoot ".venv\Scripts\python.exe"
 
 if (-not (Test-Path -LiteralPath $taskScriptPath)) {
     throw "Cannot find unified paper task script: $taskScriptPath"
 }
-
-$currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
-$principalCheck = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
-$isAdmin = $principalCheck.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-if (-not $isAdmin) {
-    throw "Please run this script from an elevated PowerShell session so the existing scheduled task can be replaced."
+if (-not (Test-Path -LiteralPath $pythonPath)) {
+    throw "Cannot find project Python interpreter: $pythonPath. Create .venv and install the project dependencies first."
 }
 
 $trigger = New-ScheduledTaskTrigger -Daily -At $At
@@ -37,7 +33,7 @@ $settings = New-ScheduledTaskSettingsSet `
     -ExecutionTimeLimit (New-TimeSpan -Hours 2) `
     -MultipleInstances IgnoreNew
 
-$description = "Wake the PC and run the unified CryptoTrading paper task script in daily mode every day at $At."
+$description = "Wake the PC and run the unified CryptoTrading paper task script with the project .venv in daily mode every day at $At."
 
 Register-ScheduledTask `
     -TaskName $TaskName `

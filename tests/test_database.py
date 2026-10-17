@@ -1768,8 +1768,10 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert "select count(*) from paper_snapshots where run_id" in runner_text
     assert "database:" in runner_text
     assert "exit $exitcode" in runner_text
-    assert installer_text.index("main.py db stability") < installer_text.index("windowsidentity")
-    assert installer_text.index("windowsidentity") < installer_text.index("register-scheduledtask")
+    assert '.venv\\scripts\\python.exe' in runner_text
+    assert '.venv\\scripts\\python.exe' in installer_text
+    assert "windowsidentity" not in installer_text
+    assert installer_text.index("main.py db stability") < installer_text.index("register-scheduledtask")
     assert 'new-scheduledtasktrigger -daily -at "20:10"' not in installer_text
     assert installer_text.count("new-scheduledtasktrigger -daily -at") == 5
     assert "-multipleinstances ignorenew" in installer_text

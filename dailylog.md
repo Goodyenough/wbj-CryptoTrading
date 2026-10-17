@@ -1,5 +1,14 @@
 # Daily Log
 
+### 2026-10-18 01:39:00 +08:00 - 恢复重装系统后的 daily / 4h 自动任务
+- 类型：Windows 调度修复 / Python 运行环境 / 企业微信通知恢复准备 / 测试 / Git。
+- 根因：重装系统清除了 `CryptoTrading_DailyPaperUpdate` 与 `CryptoTrading_4H_PaperUpdate`；统一运行器和 4h 安装器仍硬编码旧用户路径 `C:\Users\10537\miniconda3\envs\ppt-master\python.exe`；新系统未保留四个受支持的企业微信 webhook 环境变量。旧日志确认 2026-10-17 00:10 前任务与企业微信通知均成功，通知代码本身无故障。
+- 改动：安装 Python 3.12.10，创建项目内 `.venv` 并安装项目、`tzdata`、测试依赖；`pyproject.toml` 声明 Windows 所需 `tzdata`。daily/4h 运行器与安装器统一改用 `.venv\Scripts\python.exe`，移除当前用户注册 `RunLevel Limited` 任务时不必要的管理员限制；4h 明确保持 `StartWhenAvailable=False`，不补跑错过的 K 线时点。新增 `scripts/test_paper_task_setup.ps1` 一键检查 Python、webhook、任务动作和触发器，新增 `scripts/configure_wecom_webhook.ps1` 以隐藏输入、连通性测试和 User 级环境变量方式安全恢复企业微信地址；README 补充重装恢复步骤。保留用户既有 `--no-obsidian` 修改原样且不纳入本次提交。
+- 系统状态：已实际注册 `CryptoTrading_DailyPaperUpdate`（每天 20:05，`WakeToRun=True`、`StartWhenAvailable=True`）和 `CryptoTrading_4H_PaperUpdate`（00:10/04:10/08:10/12:10/16:10，`WakeToRun=True`、`StartWhenAvailable=False`），两者均为 `Ready`；新任务尚未到首次触发，`LastTaskResult=267011` 表示尚未运行。未手动运行真实 daily/4h，避免同日重复 run 或污染 paper 样本。
+- 企业微信：旧用户目录、Git 历史和 Windows Credential Manager 均无 webhook 副本；健康检查目前仅剩 `WeCom webhook environment variable is missing`，等待用户在隐藏输入终端粘贴 webhook 后发送测试消息并复检。密钥不写入仓库或日志。
+- 验证：`.venv` 下 `Python 3.12.10`；`python main.py db status` 成功；`python main.py db stability --days 5` 对 2026-10-12 至 2026-10-16 返回 `ready_for_4h_task=true`；五个 PowerShell 文件 parser 全部通过；调度契约测试 `1 passed`。全套测试 `262 passed, 4 failed`，四项均为既有数据库导出数量、shadow funnel 测试变量及 ATR readiness fixture 问题，与本次调度修复无关；相比历史记录的五项既有失败，本次修复使 scheduler 契约项通过。按规则将当前 `reports/` 自然产物随提交归档，不把它们解释为本次实验结论。
+- Git：本次代码提交主题 `fix: restore Windows paper task scheduling`；提交号和 push 结果随后回填。
+
 ### 2026-10-16 11:40:00 +08:00 - 与Claude讨论独立全局审查报告
 - 类型：文件化讨论 / 原始证据核对 / 文档归档，未运行实验。
 - 改动：新增`claude-discussions/2026-10-16-1121-independent-review-research-direction.md`，通过`claude-discussion`协调器完成三轮真实CLI讨论，保留原文、纠错、撤回与Codex保留意见；TODO登记讨论完成和待用户裁决的文档修订。

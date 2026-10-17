@@ -1,5 +1,10 @@
 # CryptoTradingSystem 待办清单
 
+## 2026-10-18 重装系统后调度恢复
+
+- [x] **daily / 4h 调度与运行环境已恢复**：安装 Python 3.12.10 并创建项目 `.venv`；移除旧用户绝对 Python 路径；重新注册 daily 20:05 和 4h 五个固定触发点，任务均为 `Ready`，项目 Python、动作、触发器和唤醒设置检查通过。未手动触发真实任务，等待自然调度验证首次 `LastTaskResult=0`。
+- [ ] **待用户输入 / 企业微信 webhook**：新系统没有保留 `CRYPTO_TRADING_WECOM_WEBHOOK_URL`，旧用户目录、Git 历史和 Credential Manager 也无可恢复副本。运行 `scripts/configure_wecom_webhook.ps1` 隐藏粘贴机器人 URL，收到连通性测试消息后再运行 `scripts/test_paper_task_setup.ps1`，目标为全绿；密钥禁止写入仓库、TODO 或日志。
+
 ## 2026-10-16 Claude全局审查报告讨论
 
 - [x] **用户授权 / 三轮讨论完成**：核对历史漏项、B优先排序和对照设计；撤回B必经、随机基准全类可行性闸门，确认评分隔离草案仍未完整定义。记录：`claude-discussions/2026-10-16-1121-independent-review-research-direction.md`；下一实证建议`defer`，未启动任何研究任务或修改外部Taskboard。

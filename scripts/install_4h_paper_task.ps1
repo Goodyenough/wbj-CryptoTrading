@@ -7,14 +7,14 @@ $ErrorActionPreference = "Stop"
 
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $taskScriptPath = Join-Path $projectRoot "scripts\run_logged_paper_task.ps1"
-$pythonPath = "C:\Users\10537\miniconda3\envs\ppt-master\python.exe"
+$pythonPath = Join-Path $projectRoot ".venv\Scripts\python.exe"
 
 if (-not (Test-Path -LiteralPath $taskScriptPath)) {
     throw "Cannot find unified paper task script: $taskScriptPath"
 }
 
 if (-not (Test-Path -LiteralPath $pythonPath)) {
-    throw "Cannot find configured Python interpreter: $pythonPath"
+    throw "Cannot find project Python interpreter: $pythonPath. Create .venv and install the project dependencies first."
 }
 
 Push-Location $projectRoot
@@ -26,14 +26,6 @@ try {
 }
 finally {
     Pop-Location
-}
-
-$currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
-$principalCheck = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
-$isAdmin = $principalCheck.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-if (-not $isAdmin) {
-    throw "Stability gate passed. Please rerun this script from an elevated PowerShell session."
 }
 
 $action = New-ScheduledTaskAction `
@@ -52,13 +44,12 @@ $settings = New-ScheduledTaskSettingsSet `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
     -WakeToRun `
-    -StartWhenAvailable `
     -RestartCount 3 `
     -RestartInterval (New-TimeSpan -Minutes 5) `
     -ExecutionTimeLimit (New-TimeSpan -Minutes 30) `
     -MultipleInstances IgnoreNew
 
-$description = "Wake the PC and run the unified CryptoTrading paper task script in paper_4h mode at closed 4h candle intervals; never scans or creates plans."
+$description = "Wake the PC and run the unified CryptoTrading paper task script with the project .venv in paper_4h mode at closed 4h candle intervals; never scans or creates plans."
 
 Register-ScheduledTask `
     -TaskName $TaskName `
