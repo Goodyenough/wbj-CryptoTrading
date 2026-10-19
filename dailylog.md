@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-19 23:57:00 +08:00 - 完成调度与企业微信推送复验
+- 类型：Windows 任务自然运行复核 / 企业微信连通性测试 / TODO / Git。
+- 结果：使用 User 级 `CRYPTO_TRADING_WECOM_WEBHOOK_URL` 发送新的 Markdown 验证消息，企业微信接口返回 `errcode=0 / errmsg=ok`；`scripts/test_paper_task_setup.ps1` 全绿，确认项目 `.venv`、Webhook、daily/4h 任务动作和触发器均有效。Webhook 值未打印、未写入仓库或日志。
+- 自然调度：`CryptoTrading_DailyPaperUpdate` 于 2026-10-19 20:05 自动启动并以 `LastTaskResult=0` 完成；`CryptoTrading_4H_PaperUpdate` 当日 04:10、08:10、12:10、16:10 均自然完成，最近一次 `LastTaskResult=0`；两个任务 `NumberOfMissedRuns=0`。这些运行早于本次 Webhook 保存，因此日志中的 `notification skipped` 符合时间顺序；下一次 2026-10-20 00:10 的 4h 任务将首次验证任务进程自动推送。
+- 验证：直接 Webhook POST 成功；健康检查退出码 `0`；daily/4h 均为 `Ready`，下一次运行分别为 2026-10-20 20:05 和 00:10。未手动触发真实 daily/4h，避免重复 run 或污染 paper 样本。
+- Git：此前本地提交 `e1892d6`、`becd778` 尚未推送；非交互复试明确失败为 `could not read Username for 'https://github.com'`，需用户完成重装后的 GitHub 登录。本条与当前自然生成 `reports/` 按规则提交，push 在凭据恢复后执行；用户既有 `scripts/run_logged_paper_task.ps1` 两处 `--no-obsidian` 及历史日志改动继续保留未暂存。
+
 ### 2026-10-18 01:39:00 +08:00 - 恢复重装系统后的 daily / 4h 自动任务
 - 类型：Windows 调度修复 / Python 运行环境 / 企业微信通知恢复准备 / 测试 / Git。
 - 根因：重装系统清除了 `CryptoTrading_DailyPaperUpdate` 与 `CryptoTrading_4H_PaperUpdate`；统一运行器和 4h 安装器仍硬编码旧用户路径 `C:\Users\10537\miniconda3\envs\ppt-master\python.exe`；新系统未保留四个受支持的企业微信 webhook 环境变量。旧日志确认 2026-10-17 00:10 前任务与企业微信通知均成功，通知代码本身无故障。
