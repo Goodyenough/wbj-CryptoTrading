@@ -1,5 +1,12 @@
 # Daily Log
 
+### 2026-10-20 00:02:00 +08:00 - 恢复 Git for Windows 与远端推送
+- 类型：本机开发环境修复 / GitHub 认证 / TODO / Git。
+- 根因：重装系统后普通 PowerShell 没有安装或配置 Git；Codex 先前仅能使用内部运行时自带 Git，因此用户执行 `git push origin main` 得到 `CommandNotFoundException`。使用仅含 User/Machine PATH 的新 PowerShell 已稳定复现。
+- 改动：通过 `winget` 安装正式 Git for Windows `2.55.0.windows.5`；同一干净 PowerShell 反馈检查现返回 `C:\Program Files\Git\cmd\git.exe` 且 `git --version` 成功。完成 GitHub 浏览器授权，凭据交由 Git Credential Manager 管理，未写入仓库或日志。
+- 验证：`git push origin main` 成功返回 `4d6d17a..0cd5f31 main -> main`；本地 `HEAD` 与 `origin/main` 均为 `0cd5f3152daa71efc83d0b3bf92ae025aad6e2fe`。调度健康检查仍全绿；当前 00:01 尚未到 00:10，不能把计划任务内自动企业微信推送标为已自然验证。
+- Git：本条与 TODO 完成状态以 `docs: record restored Git delivery` 提交并推送；用户既有 `scripts/run_logged_paper_task.ps1` 两处 `--no-obsidian` 及历史日志改动继续保留未暂存。
+
 ### 2026-10-19 23:57:00 +08:00 - 完成调度与企业微信推送复验
 - 类型：Windows 任务自然运行复核 / 企业微信连通性测试 / TODO / Git。
 - 结果：使用 User 级 `CRYPTO_TRADING_WECOM_WEBHOOK_URL` 发送新的 Markdown 验证消息，企业微信接口返回 `errcode=0 / errmsg=ok`；`scripts/test_paper_task_setup.ps1` 全绿，确认项目 `.venv`、Webhook、daily/4h 任务动作和触发器均有效。Webhook 值未打印、未写入仓库或日志。
