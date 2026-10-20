@@ -5,7 +5,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$runnerPath = Join-Path $projectRoot "scripts\run_logged_paper_task.ps1"
+$loggedRunnerPath = Join-Path $projectRoot "scripts\run_logged_paper_task.ps1"
+$powerRunnerPath = Join-Path $projectRoot "scripts\run_power_managed_paper_task.ps1"
 $pythonPath = Join-Path $projectRoot ".venv\Scripts\python.exe"
 $failures = New-Object System.Collections.Generic.List[string]
 
@@ -21,8 +22,10 @@ function Test-ConfiguredTask([string]$TaskName, [string]$Mode, [int]$ExpectedTri
 
     $matchingAction = @($task.Actions | Where-Object {
         $_.Execute -match "(?i)powershell(\.exe)?$" -and
-        $_.Arguments -like "*$runnerPath*" -and
-        $_.Arguments -match "(?i)-Mode\s+$([regex]::Escape($Mode))(\s|$)"
+        $_.Arguments -like "*$powerRunnerPath*" -and
+        $_.Arguments -match "(?i)-Operation\s+run(\s|$)" -and
+        $_.Arguments -match "(?i)-Mode\s+$([regex]::Escape($Mode))(\s|$)" -and
+        $_.Arguments -match "(?i)-SleepAfterSuccessSeconds\s+180(\s|$)"
     })
     if ($matchingAction.Count -ne 1) {
         $failures.Add("scheduled task action is invalid: $TaskName mode=$Mode")
@@ -34,6 +37,34 @@ function Test-ConfiguredTask([string]$TaskName, [string]$Mode, [int]$ExpectedTri
             "scheduled task trigger count is invalid: $TaskName expected=$ExpectedTriggerCount actual=$($enabledTriggers.Count)"
         )
     }
+    if (-not $task.Settings.WakeToRun) {
+        $failures.Add("scheduled task does not wake the PC: $TaskName")
+    }
+
+    $preWakeTaskName = "${TaskName}_PreWake"
+    $preWakeTask = Get-ScheduledTask -TaskName $preWakeTaskName -ErrorAction SilentlyContinue
+    if ($null -eq $preWakeTask) {
+        $failures.Add("pre-wake task is missing: $preWakeTaskName")
+    } else {
+        $matchingPreWakeAction = @($preWakeTask.Actions | Where-Object {
+            $_.Execute -match "(?i)powershell(\.exe)?$" -and
+            $_.Arguments -like "*$powerRunnerPath*" -and
+            $_.Arguments -match "(?i)-Operation\s+prewake(\s|$)" -and
+            $_.Arguments -match "(?i)-DurationSeconds\s+240(\s|$)"
+        })
+        if ($matchingPreWakeAction.Count -ne 1) {
+            $failures.Add("pre-wake task action is invalid: $preWakeTaskName")
+        }
+        if (-not $preWakeTask.Settings.WakeToRun) {
+            $failures.Add("pre-wake task does not wake the PC: $preWakeTaskName")
+        }
+        $enabledPreWakeTriggers = @($preWakeTask.Triggers | Where-Object { $_.Enabled })
+        if ($enabledPreWakeTriggers.Count -ne $ExpectedTriggerCount) {
+            $failures.Add(
+                "pre-wake task trigger count is invalid: $preWakeTaskName expected=$ExpectedTriggerCount actual=$($enabledPreWakeTriggers.Count)"
+            )
+        }
+    }
 
     $info = Get-ScheduledTaskInfo -TaskName $TaskName
     Write-Host (
@@ -42,8 +73,11 @@ function Test-ConfiguredTask([string]$TaskName, [string]$Mode, [int]$ExpectedTri
     )
 }
 
-if (-not (Test-Path -LiteralPath $runnerPath)) {
-    $failures.Add("paper task runner is missing: $runnerPath")
+if (-not (Test-Path -LiteralPath $loggedRunnerPath)) {
+    $failures.Add("paper task runner is missing: $loggedRunnerPath")
+}
+if (-not (Test-Path -LiteralPath $powerRunnerPath)) {
+    $failures.Add("power-managed paper task runner is missing: $powerRunnerPath")
 }
 if (-not (Test-Path -LiteralPath $pythonPath)) {
     $failures.Add("project Python is missing: $pythonPath")

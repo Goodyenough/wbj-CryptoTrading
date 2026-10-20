@@ -1772,11 +1772,41 @@ def test_4h_batch_never_scans_or_creates_plans() -> None:
     assert '.venv\\scripts\\python.exe' in installer_text
     assert "windowsidentity" not in installer_text
     assert installer_text.index("main.py db stability") < installer_text.index("register-scheduledtask")
+    assert "existingtaskmaintenance" in installer_text
+    assert "requires an already registered task" in installer_text
     assert 'new-scheduledtasktrigger -daily -at "20:10"' not in installer_text
-    assert installer_text.count("new-scheduledtasktrigger -daily -at") == 5
+    assert installer_text.count("new-scheduledtasktrigger -daily -at") == 10
     assert "-multipleinstances ignorenew" in installer_text
     assert "-executiontimelimit (new-timespan -minutes 30)" in installer_text
     assert "-startwhenavailable" not in installer_text
+
+
+def test_scheduled_paper_tasks_manage_wake_and_post_success_sleep() -> None:
+    power_runner_text = (
+        ROOT / "scripts" / "run_power_managed_paper_task.ps1"
+    ).read_text(encoding="utf-8").lower()
+    daily_installer_text = (
+        ROOT / "scripts" / "install_daily_task.ps1"
+    ).read_text(encoding="utf-8").lower()
+    four_hour_installer_text = (
+        ROOT / "scripts" / "install_4h_paper_task.ps1"
+    ).read_text(encoding="utf-8").lower()
+
+    assert 'validateset("prewake", "run", "sleep")' in power_runner_text
+    assert "setthreadexecutionstate" in power_runner_text
+    assert "setsuspendstate" in power_runner_text
+    assert "minimumidleseconds" in power_runner_text
+    assert "run_logged_paper_task.ps1" in power_runner_text
+    assert "exit $taskexitcode" in power_runner_text
+
+    for installer_text in (daily_installer_text, four_hour_installer_text):
+        assert "run_power_managed_paper_task.ps1" in installer_text
+        assert "-operation run" in installer_text
+        assert "-sleepaftersuccessseconds 180" in installer_text
+        assert "-operation prewake" in installer_text
+        assert "-durationseconds 240" in installer_text
+        assert "-waketorun" in installer_text
+        assert "logontype interactive" in installer_text
 
 
 def test_consecutive_4h_cycles_are_idempotent_and_do_not_lock() -> None:

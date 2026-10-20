@@ -2,6 +2,7 @@
 
 ## 2026-10-18 重装系统后调度恢复
 
+- [x] **睡眠/唤醒调度已加固**：daily 与 4h 均新增提前3分钟的 `_PreWake` 任务；主任务执行期间阻止自动睡眠，成功后延迟3分钟且仅在用户空闲时进入睡眠，失败不安排成功后睡眠。四个任务均为 `Ready`、`WakeToRun=True`；未手动执行真实交易任务，等待 2026-10-20 16:07/16:10 首次自然端到端验证。
 - [x] **daily / 4h 调度与运行环境已恢复**：安装 Python 3.12.10 并创建项目 `.venv`；移除旧用户绝对 Python 路径；重新注册 daily 20:05 和 4h 五个固定触发点，任务均为 `Ready`，项目 Python、动作、触发器和唤醒设置检查通过。未手动触发真实任务，等待自然调度验证首次 `LastTaskResult=0`。
 - [x] **企业微信 webhook 已恢复并实测通过**：已通过 `scripts/configure_wecom_webhook.ps1` 保存到 User 级 `CRYPTO_TRADING_WECOM_WEBHOOK_URL`；独立复测返回 `errcode=0 / errmsg=ok`，`scripts/test_paper_task_setup.ps1` 全绿。密钥未写入仓库、TODO 或日志；2026-10-20 00:10 的 4h 自然任务将首次验证计划任务进程内的自动推送。
 - [x] **GitHub 推送已恢复**：安装 Git for Windows `2.55.0.windows.5`，普通 PowerShell 已从 `C:\Program Files\Git\cmd\git.exe` 识别 `git`；完成 GitHub 浏览器授权后，将 `e1892d6`、`becd778`、`0cd5f31` 成功推送到 `origin/main`。凭据由 Git Credential Manager 保存，未写入仓库或日志。

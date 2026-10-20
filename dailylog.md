@@ -1,5 +1,13 @@
 # Daily Log
 
+### 2026-10-20 13:34:00 +08:00 - 加固定时任务的唤醒与成功后睡眠
+- 类型：Windows 调度可靠性 / 电源管理 / 测试 / Git，未运行新实验，未修改生产、paper 或 shadow 策略参数。
+- 根因与证据：当前平衡电源计划设置为交流电空闲 600 秒后睡眠，唤醒定时器已启用；`CryptoTrading_4H_PaperUpdate` 与 `CryptoTrading_DailyPaperUpdate` 原本已有 `WakeToRun=True`。系统事件确认 2026-10-20 08:09、12:09 曾由 4h 任务唤醒，但任务日志最后停在 00:10，说明仅依赖主触发器唤醒不足以保证恢复后的动作执行。
+- 改动：新增 `scripts/run_power_managed_paper_task.ps1`，统一提供 `prewake / run / sleep` 三种操作；提前唤醒阶段保持系统清醒 240 秒，主脚本运行期间通过 `SetThreadExecutionState` 阻止自动睡眠，成功后延迟 180 秒并仅在用户空闲至少 120 秒时请求睡眠，失败则保留原退出码且不安排成功后睡眠。daily/4h 安装器分别注册对应 `_PreWake` 任务，主任务继续保留原执行时点；4h 安装器新增 `ExistingTaskMaintenance`，只允许在任务已存在时维护电源包装，不绕过新安装的数据库稳定性门禁。健康检查同步验证主任务、提前唤醒任务、动作参数和 `WakeToRun`。
+- 系统状态：已注册 `CryptoTrading_4H_PaperUpdate_PreWake`（00:07/04:07/08:07/12:07/16:07）与 `CryptoTrading_DailyPaperUpdate_PreWake`（20:02）；主任务保持 4h 的 00:10/04:10/08:10/12:10/16:10 和 daily 的 20:05。四个任务均为 `Ready` 且 `WakeToRun=True`。未手动运行真实 daily/4h，避免重复 run 或污染 paper 样本；下一次 16:07/16:10 自然运行用于端到端确认。
+- 验证：三个 PowerShell 文件 parser 通过；新增/相关契约测试 `2 passed`；`scripts/test_paper_task_setup.ps1` 全绿；成功与失败烟雾测试分别确认成功后安排睡眠、失败时不安排睡眠。`tests/test_database.py` 全文件为 `50 passed, 3 failed`，三项失败均为既有的导出数量断言、shadow funnel 额外阶段和未定义 `outcomes`，与本次电源调度改动无关。4h 常规安装门禁因 2026-10-19 `git_commit` 元数据缺失按设计拒绝，随后仅对已存在任务执行维护模式。
+- Git：本次提交主题为 `fix: manage paper task wake and sleep`；按规则包含当前自然生成的 `reports/2026-10-20/`。保留用户既有 `scripts/run_logged_paper_task.ps1` 两处 `--no-obsidian` 与此前未暂存的历史日志改动，不纳入本次代码提交。
+
 ### 2026-10-20 00:02:00 +08:00 - 恢复 Git for Windows 与远端推送
 - 类型：本机开发环境修复 / GitHub 认证 / TODO / Git。
 - 根因：重装系统后普通 PowerShell 没有安装或配置 Git；Codex 先前仅能使用内部运行时自带 Git，因此用户执行 `git push origin main` 得到 `CommandNotFoundException`。使用仅含 User/Machine PATH 的新 PowerShell 已稳定复现。
