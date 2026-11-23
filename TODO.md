@@ -451,3 +451,10 @@
 - [ ] 下一次正常 daily/cycle 后，继续检查 `paper shadow-decisions`、`paper shadow-maturity` 和 `paper shadow-reconciliation`；若仍为 `no_shadow_samples_yet`，继续等待正常样本，不手动制造样本。
 - [ ] 等待 `ONDOUSDT` WATCHING plan 或后续新计划触发 entry-zone 4h decision，产生 plan-linked shadow rows；candidate-only rows 不得用于 direct filtering / capacity-path attribution。
 - [ ] 当 reconciliation 达到 pre-attribution sample gate 后，只允许启动只读 direct filtering / capacity-path attribution，不得直接升级为 paper deployment。
+
+
+## ZEC 短线研究（独立分支）
+
+- [x] 完成封存边界、USDM下载与双边回放的隔离入口及合成测试。
+- [ ] 按冻结协议运行2024开发/2025时间顺序验证，保留全部四组与成本压力结果。
+- [ ] 记录keep/revert/retest结论；不得使用2026行情或自动接入正式策略。

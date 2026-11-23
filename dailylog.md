@@ -2656,3 +2656,12 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 方法校正：不采纳讨论中没有业务或功效依据的占比/收益硬门槛；使用固定统计对象、时间区块 bootstrap、完整五分位梯度和集中度稳健性，避免在已烧窗口继续挑参数。`TP_first / SL_first / neither` 与同K stop-first 语义已明确。
 - 验证：讨论文档状态已为 `DONE`、`round: 3`、`decision: retest`；未运行回测、未创建或开启 Taskboard 任务、未改代码/配置/生产策略。保留用户原有 `scripts/run_logged_paper_task.ps1` 未提交改动。
 - Git：讨论记录及本次已有 `reports/2026-10-15/` 调度产物已提交为 `feeba4b`（`docs: discuss real-time continuation research`）；本条提交号回填随后单独提交并 push。
+
+
+## 2026-11-24 00:05 +08:00 - ZEC 短线研究隔离入口
+
+- 变更：新增 research/zec_momentum 与53项合成测试；不改生产策略、数据库、模拟盘或调度。
+- 原因：原回测限定4H现货做多且有end+4H补取；用户要求USDM短线多空并封存最近5个月。
+- 数据：封存点固定2026-06-23北京时间00:00；研究协议只允许2023-12预热和2024–2025评估。
+- 验证：53项测试通过；独立源码复核已修正不可后移cutoff、结论门槛及权益导出。尚未运行真实回放。
+- 关联Git：基于19c808d04b2aaadbc93281ddf7bb938aab145fce；本条随预注册代码提交，实际提交号见下一次结果记录。
