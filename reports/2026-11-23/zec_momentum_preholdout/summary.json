@@ -25,6 +25,7 @@
         "worst_net_trade_usdt": -4.9449056832332285,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 59,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.1272327059379036,
@@ -191,6 +192,7 @@
         "worst_net_trade_usdt": -4.94757926292033,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 59,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.2525264846086956,
@@ -357,6 +359,7 @@
         "worst_net_trade_usdt": -4.964148356960016,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 78,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.13362508058076883,
@@ -524,6 +527,7 @@
         "worst_net_trade_usdt": -4.94757926292033,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 76,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.24042355242076033,
@@ -691,6 +695,7 @@
         "worst_net_trade_usdt": -4.964148356960016,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 64,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 1,
         "monthly_cluster_mean_r_ci95": [
           -0.15036698843899937,
@@ -857,6 +862,7 @@
         "worst_net_trade_usdt": -4.804787857919279,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 64,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.2732541095418403,
@@ -1025,6 +1031,7 @@
         "worst_net_trade_usdt": -4.964148356960016,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 85,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 1,
         "monthly_cluster_mean_r_ci95": [
           -0.14837338286658158,
@@ -1192,6 +1199,7 @@
         "worst_net_trade_usdt": -4.941058304076442,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 82,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.2711565613173826,
@@ -1359,6 +1367,7 @@
         "worst_net_trade_usdt": -4.947947949975375,
         "ambiguous_bars": 1,
         "intrabar_funding_trades": 176,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.10331715462246069,
@@ -1526,6 +1535,7 @@
         "worst_net_trade_usdt": -3.074561835874847,
         "ambiguous_bars": 1,
         "intrabar_funding_trades": 181,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.2199872414428581,
@@ -1692,6 +1702,7 @@
         "worst_net_trade_usdt": -4.901589878619445,
         "ambiguous_bars": 1,
         "intrabar_funding_trades": 213,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.0970396907107062,
@@ -1859,6 +1870,7 @@
         "worst_net_trade_usdt": -3.1651845651064625,
         "ambiguous_bars": 1,
         "intrabar_funding_trades": 222,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.21112481549741824,
@@ -2025,6 +2037,7 @@
         "worst_net_trade_usdt": -4.745590777933932,
         "ambiguous_bars": 1,
         "intrabar_funding_trades": 195,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 1,
         "monthly_cluster_mean_r_ci95": [
           -0.12392077022970652,
@@ -2192,6 +2205,7 @@
         "worst_net_trade_usdt": -4.161706198224642,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 195,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.23549346932149356,
@@ -2359,6 +2373,7 @@
         "worst_net_trade_usdt": -4.7339304428883,
         "ambiguous_bars": 1,
         "intrabar_funding_trades": 240,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 1,
         "monthly_cluster_mean_r_ci95": [
           -0.11427270988385167,
@@ -2526,6 +2541,7 @@
         "worst_net_trade_usdt": -4.350002533535323,
         "ambiguous_bars": 0,
         "intrabar_funding_trades": 242,
+        "target_clamped_to_bar_trades": 0,
         "positive_months": 0,
         "monthly_cluster_mean_r_ci95": [
           -0.22412727703959254,

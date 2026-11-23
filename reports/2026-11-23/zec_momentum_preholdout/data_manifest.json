@@ -65,7 +65,7 @@
       "rows": 93,
       "min_time_ms": 1701388800000,
       "max_time_ms": 1704038400000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1701388800000,
       "max_scheduled_ms": 1704038400000
     },
@@ -90,7 +90,7 @@
       "rows": 8928,
       "min_time_ms": 1704067200000,
       "max_time_ms": 1706745300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1706745599999
     },
     {
@@ -102,7 +102,7 @@
       "rows": 93,
       "min_time_ms": 1704067200000,
       "max_time_ms": 1706716800000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1704067200000,
       "max_scheduled_ms": 1706716800000
     },
@@ -115,7 +115,7 @@
       "rows": 8352,
       "min_time_ms": 1706745600000,
       "max_time_ms": 1709250900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1709251199999
     },
     {
@@ -127,7 +127,7 @@
       "rows": 8352,
       "min_time_ms": 1706745600000,
       "max_time_ms": 1709250900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1709251199999
     },
     {
@@ -139,7 +139,7 @@
       "rows": 87,
       "min_time_ms": 1706745600000,
       "max_time_ms": 1709222400000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1706745600000,
       "max_scheduled_ms": 1709222400000
     },
@@ -152,7 +152,7 @@
       "rows": 8928,
       "min_time_ms": 1709251200000,
       "max_time_ms": 1711929300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1711929599999
     },
     {
@@ -164,7 +164,7 @@
       "rows": 8928,
       "min_time_ms": 1709251200000,
       "max_time_ms": 1711929300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1711929599999
     },
     {
@@ -176,7 +176,7 @@
       "rows": 93,
       "min_time_ms": 1709251200000,
       "max_time_ms": 1711900800001,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1709251200000,
       "max_scheduled_ms": 1711900800000
     },
@@ -189,7 +189,7 @@
       "rows": 8640,
       "min_time_ms": 1711929600000,
       "max_time_ms": 1714521300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1714521599999
     },
     {
@@ -201,7 +201,7 @@
       "rows": 8640,
       "min_time_ms": 1711929600000,
       "max_time_ms": 1714521300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1714521599999
     },
     {
@@ -213,7 +213,7 @@
       "rows": 90,
       "min_time_ms": 1711929600000,
       "max_time_ms": 1714492800000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1711929600000,
       "max_scheduled_ms": 1714492800000
     },
@@ -226,7 +226,7 @@
       "rows": 8928,
       "min_time_ms": 1714521600000,
       "max_time_ms": 1717199700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1717199999999
     },
     {
@@ -238,7 +238,7 @@
       "rows": 8928,
       "min_time_ms": 1714521600000,
       "max_time_ms": 1717199700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1717199999999
     },
     {
@@ -250,7 +250,7 @@
       "rows": 93,
       "min_time_ms": 1714521600000,
       "max_time_ms": 1717171200000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1714521600000,
       "max_scheduled_ms": 1717171200000
     },
@@ -263,7 +263,7 @@
       "rows": 8640,
       "min_time_ms": 1717200000000,
       "max_time_ms": 1719791700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1719791999999
     },
     {
@@ -275,7 +275,7 @@
       "rows": 8640,
       "min_time_ms": 1717200000000,
       "max_time_ms": 1719791700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1719791999999
     },
     {
@@ -287,7 +287,7 @@
       "rows": 90,
       "min_time_ms": 1717200000000,
       "max_time_ms": 1719763200000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1717200000000,
       "max_scheduled_ms": 1719763200000
     },
@@ -300,7 +300,7 @@
       "rows": 8928,
       "min_time_ms": 1719792000000,
       "max_time_ms": 1722470100000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1722470399999
     },
     {
@@ -312,7 +312,7 @@
       "rows": 8928,
       "min_time_ms": 1719792000000,
       "max_time_ms": 1722470100000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1722470399999
     },
     {
@@ -324,7 +324,7 @@
       "rows": 93,
       "min_time_ms": 1719792000000,
       "max_time_ms": 1722441600000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1719792000000,
       "max_scheduled_ms": 1722441600000
     },
@@ -337,7 +337,7 @@
       "rows": 8928,
       "min_time_ms": 1722470400000,
       "max_time_ms": 1725148500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1725148799999
     },
     {
@@ -349,7 +349,7 @@
       "rows": 8928,
       "min_time_ms": 1722470400000,
       "max_time_ms": 1725148500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1725148799999
     },
     {
@@ -361,7 +361,7 @@
       "rows": 93,
       "min_time_ms": 1722470400000,
       "max_time_ms": 1725120000000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1722470400000,
       "max_scheduled_ms": 1725120000000
     },
@@ -374,7 +374,7 @@
       "rows": 8640,
       "min_time_ms": 1725148800000,
       "max_time_ms": 1727740500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1727740799999
     },
     {
@@ -386,7 +386,7 @@
       "rows": 8640,
       "min_time_ms": 1725148800000,
       "max_time_ms": 1727740500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1727740799999
     },
     {
@@ -398,7 +398,7 @@
       "rows": 90,
       "min_time_ms": 1725148800000,
       "max_time_ms": 1727712000000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1725148800000,
       "max_scheduled_ms": 1727712000000
     },
@@ -411,7 +411,7 @@
       "rows": 8928,
       "min_time_ms": 1727740800000,
       "max_time_ms": 1730418900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1730419199999
     },
     {
@@ -423,7 +423,7 @@
       "rows": 8928,
       "min_time_ms": 1727740800000,
       "max_time_ms": 1730418900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1730419199999
     },
     {
@@ -435,7 +435,7 @@
       "rows": 93,
       "min_time_ms": 1727740800000,
       "max_time_ms": 1730390400000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1727740800000,
       "max_scheduled_ms": 1730390400000
     },
@@ -448,7 +448,7 @@
       "rows": 8640,
       "min_time_ms": 1730419200000,
       "max_time_ms": 1733010900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1733011199999
     },
     {
@@ -460,7 +460,7 @@
       "rows": 8640,
       "min_time_ms": 1730419200000,
       "max_time_ms": 1733010900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1733011199999
     },
     {
@@ -472,7 +472,7 @@
       "rows": 90,
       "min_time_ms": 1730419200000,
       "max_time_ms": 1732982400000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1730419200000,
       "max_scheduled_ms": 1732982400000
     },
@@ -485,7 +485,7 @@
       "rows": 8928,
       "min_time_ms": 1733011200000,
       "max_time_ms": 1735689300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1735689599999
     },
     {
@@ -497,7 +497,7 @@
       "rows": 8928,
       "min_time_ms": 1733011200000,
       "max_time_ms": 1735689300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1735689599999
     },
     {
@@ -509,7 +509,7 @@
       "rows": 93,
       "min_time_ms": 1733011200000,
       "max_time_ms": 1735660800000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1733011200000,
       "max_scheduled_ms": 1735660800000
     },
@@ -522,7 +522,7 @@
       "rows": 8928,
       "min_time_ms": 1735689600000,
       "max_time_ms": 1738367700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1738367999999
     },
     {
@@ -534,7 +534,7 @@
       "rows": 8928,
       "min_time_ms": 1735689600000,
       "max_time_ms": 1738367700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1738367999999
     },
     {
@@ -546,7 +546,7 @@
       "rows": 93,
       "min_time_ms": 1735689600015,
       "max_time_ms": 1738339200000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1735689600000,
       "max_scheduled_ms": 1738339200000
     },
@@ -559,7 +559,7 @@
       "rows": 8064,
       "min_time_ms": 1738368000000,
       "max_time_ms": 1740786900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1740787199999
     },
     {
@@ -571,7 +571,7 @@
       "rows": 8064,
       "min_time_ms": 1738368000000,
       "max_time_ms": 1740786900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1740787199999
     },
     {
@@ -583,7 +583,7 @@
       "rows": 84,
       "min_time_ms": 1738368000000,
       "max_time_ms": 1740758400000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1738368000000,
       "max_scheduled_ms": 1740758400000
     },
@@ -596,7 +596,7 @@
       "rows": 8928,
       "min_time_ms": 1740787200000,
       "max_time_ms": 1743465300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1743465599999
     },
     {
@@ -608,7 +608,7 @@
       "rows": 8928,
       "min_time_ms": 1740787200000,
       "max_time_ms": 1743465300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1743465599999
     },
     {
@@ -620,7 +620,7 @@
       "rows": 93,
       "min_time_ms": 1740787200000,
       "max_time_ms": 1743436800000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1740787200000,
       "max_scheduled_ms": 1743436800000
     },
@@ -633,7 +633,7 @@
       "rows": 8640,
       "min_time_ms": 1743465600000,
       "max_time_ms": 1746057300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1746057599999
     },
     {
@@ -645,7 +645,7 @@
       "rows": 8640,
       "min_time_ms": 1743465600000,
       "max_time_ms": 1746057300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1746057599999
     },
     {
@@ -657,7 +657,7 @@
       "rows": 90,
       "min_time_ms": 1743465600000,
       "max_time_ms": 1746028800003,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1743465600000,
       "max_scheduled_ms": 1746028800000
     },
@@ -670,7 +670,7 @@
       "rows": 8928,
       "min_time_ms": 1746057600000,
       "max_time_ms": 1748735700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1748735999999
     },
     {
@@ -682,7 +682,7 @@
       "rows": 8928,
       "min_time_ms": 1746057600000,
       "max_time_ms": 1748735700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1748735999999
     },
     {
@@ -694,7 +694,7 @@
       "rows": 93,
       "min_time_ms": 1746057600000,
       "max_time_ms": 1748707200000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1746057600000,
       "max_scheduled_ms": 1748707200000
     },
@@ -707,7 +707,7 @@
       "rows": 8640,
       "min_time_ms": 1748736000000,
       "max_time_ms": 1751327700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1751327999999
     },
     {
@@ -719,7 +719,7 @@
       "rows": 8640,
       "min_time_ms": 1748736000000,
       "max_time_ms": 1751327700000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1751327999999
     },
     {
@@ -731,7 +731,7 @@
       "rows": 90,
       "min_time_ms": 1748736000001,
       "max_time_ms": 1751299200002,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1748736000000,
       "max_scheduled_ms": 1751299200000
     },
@@ -744,7 +744,7 @@
       "rows": 8928,
       "min_time_ms": 1751328000000,
       "max_time_ms": 1754006100000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1754006399999
     },
     {
@@ -756,7 +756,7 @@
       "rows": 8928,
       "min_time_ms": 1751328000000,
       "max_time_ms": 1754006100000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1754006399999
     },
     {
@@ -768,7 +768,7 @@
       "rows": 93,
       "min_time_ms": 1751328000007,
       "max_time_ms": 1753977600000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1751328000000,
       "max_scheduled_ms": 1753977600000
     },
@@ -781,7 +781,7 @@
       "rows": 8928,
       "min_time_ms": 1754006400000,
       "max_time_ms": 1756684500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1756684799999
     },
     {
@@ -793,7 +793,7 @@
       "rows": 8928,
       "min_time_ms": 1754006400000,
       "max_time_ms": 1756684500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1756684799999
     },
     {
@@ -805,7 +805,7 @@
       "rows": 93,
       "min_time_ms": 1754006400001,
       "max_time_ms": 1756656000001,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1754006400000,
       "max_scheduled_ms": 1756656000000
     },
@@ -818,7 +818,7 @@
       "rows": 8640,
       "min_time_ms": 1756684800000,
       "max_time_ms": 1759276500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1759276799999
     },
     {
@@ -830,7 +830,7 @@
       "rows": 8640,
       "min_time_ms": 1756684800000,
       "max_time_ms": 1759276500000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1759276799999
     },
     {
@@ -842,7 +842,7 @@
       "rows": 90,
       "min_time_ms": 1756684800000,
       "max_time_ms": 1759248000000,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1756684800000,
       "max_scheduled_ms": 1759248000000
     },
@@ -855,7 +855,7 @@
       "rows": 8928,
       "min_time_ms": 1759276800000,
       "max_time_ms": 1761954900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1761955199999
     },
     {
@@ -867,7 +867,7 @@
       "rows": 8928,
       "min_time_ms": 1759276800000,
       "max_time_ms": 1761954900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1761955199999
     },
     {
@@ -879,7 +879,7 @@
       "rows": 93,
       "min_time_ms": 1759276800000,
       "max_time_ms": 1761926400007,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1759276800000,
       "max_scheduled_ms": 1761926400000
     },
@@ -892,7 +892,7 @@
       "rows": 8640,
       "min_time_ms": 1761955200000,
       "max_time_ms": 1764546900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1764547199999
     },
     {
@@ -904,7 +904,7 @@
       "rows": 8640,
       "min_time_ms": 1761955200000,
       "max_time_ms": 1764546900000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1764547199999
     },
     {
@@ -916,7 +916,7 @@
       "rows": 90,
       "min_time_ms": 1761955200001,
       "max_time_ms": 1764518400004,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1761955200000,
       "max_scheduled_ms": 1764518400000
     },
@@ -929,7 +929,7 @@
       "rows": 8928,
       "min_time_ms": 1764547200000,
       "max_time_ms": 1767225300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1767225599999
     },
     {
@@ -941,7 +941,7 @@
       "rows": 8928,
       "min_time_ms": 1764547200000,
       "max_time_ms": 1767225300000,
-      "origin": "download",
+      "origin": "cache",
       "max_close_time_ms": 1767225599999
     },
     {
@@ -953,7 +953,7 @@
       "rows": 93,
       "min_time_ms": 1764547200000,
       "max_time_ms": 1767196800001,
-      "origin": "download",
+      "origin": "cache",
       "min_scheduled_ms": 1764547200000,
       "max_scheduled_ms": 1767196800000
     }

@@ -16,3 +16,7 @@ python -m research.zec_momentum.run --cache-dir C:/isolated/zec-cache --output-d
 评估是连续数量、固定费用/滑点情景下的永续方向研究，未重建历史下单最小量、tick size、盘口、部分成交和完整强平制度；不能当作已经验收的实盘策略。2025 年验证结果不能用于本轮再次选参。
 
 输出：`report.md`、`summary.json`、`trades.csv`、`monthly.csv`、`equity.csv`、`data_manifest.json`、`run_manifest.json`。所有候选和成本情景均保留；不自动推荐最高收益组。
+
+## 本轮状态
+
+2024/2025固定协议回放完成；四组候选在常规成本下均为负期望，结论revert、不接入正式系统。71项合成测试通过，资金费与成交修复前运行保留。详见 `reports/2026-11-23/zec_momentum_preholdout/结论与边界.md`。整个2026年行情继续保留。
