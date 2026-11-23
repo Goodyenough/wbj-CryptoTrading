@@ -1,0 +1,11 @@
+{
+  "frozen_at_utc": "2026-11-23T16:05:23.551057+00:00",
+  "cutoff_ms": 1782144000000,
+  "source_sha256": {
+    "research/zec_momentum/PROTOCOL.md": "36a80da0d697f7c7caf4eb9beae74da4b5bf06296713c57a237dfed0956e3d2b",
+    "research/zec_momentum/engine.py": "80af44c210a75c6a8d01afb34e7bb7f1a9d4ee8e1f6a299b19bc20a9bb8824ab",
+    "research/zec_momentum/data.py": "4cdb9350be9e2ee07286956d653a353d971c82c4c73cb850db706a3942a680e0",
+    "research/zec_momentum/run.py": "180137db0e54910c67901a2dd2f0784c8ecc6e9ffb065dcefd184bb9b16ec66f",
+    "src/crypto_trading_system/indicators.py": "69d3bbde555efa5109ec4b5cfccfc746e2fdceeba37b3c960395a69ab32f14e6"
+  }
+}

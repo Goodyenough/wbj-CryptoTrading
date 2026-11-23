@@ -3,7 +3,9 @@
 All cutoffs are exclusive. OHLC bars include a close timestamp at index 6.
 Decisions occur at a completed 15m bar's right boundary; execution is delayed
 another 5m. Unknown intrabar ordering uses stop-first and the bar's final
-millisecond as an upper-bound exit timestamp. Funding aligns to 5m opens.
+millisecond as an upper-bound exit timestamp. Funding retains its exact original
+timestamp. Intrabar funding precedes unknown intrabar SL/TP as a fixed ordering
+assumption, with affected trades and events explicitly flagged.
 Fees and slippage are assumptions supplied by the caller, not exchange facts.
 """
 from __future__ import annotations
@@ -151,8 +153,8 @@ def run_replay(
     for event in funding:
         when = int(event["time_ms"])
         rate, mark = float(event["rate"]), float(event["mark_price"])
-        if when != event["time_ms"] or when % FIVE:
-            raise ValueError("Funding events must align to 5m opens")
+        if when != event["time_ms"]:
+            raise ValueError("Funding timestamp must be an integer millisecond")
         if when >= cutoff_ms:
             raise ValueError("Sealed cutoff: funding reaches reserved data")
         if not math.isfinite(rate) or not math.isfinite(mark) or mark <= 0:
@@ -179,6 +181,19 @@ def run_replay(
     skips = Counter()
     last_exit = -1
     funding_index = 0
+
+    def accrue_funding(event: dict, *, intrabar: bool = False) -> bool:
+        nonlocal balance
+        if position is None or event["time_ms"] <= position["entry_ms"]:
+            return False
+        cost = position["sign"] * position["quantity"] * event["mark_price"] * event["rate"]
+        balance -= cost
+        position["funding_usdt"] += cost
+        position["funding_events"].append(dict(event, paid_usdt=cost, intrabar_order_assumed=intrabar))
+        if intrabar:
+            position["funding_intrabar_order_assumed"] = True
+            position["funding_intrabar_event_count"] += 1
+        return True
 
     def close(raw_price: float, when: int, reason: str, ambiguous: bool = False) -> None:
         nonlocal balance, position, last_exit
@@ -207,11 +222,7 @@ def run_replay(
         now, opening, high, low = int(row[0]), row[1], row[2], row[3]
         while funding_index < len(funding_rows) and funding_rows[funding_index]["time_ms"] <= now:
             event = funding_rows[funding_index]
-            if position is not None and event["time_ms"] > position["entry_ms"]:
-                cost = position["sign"] * position["quantity"] * event["mark_price"] * event["rate"]
-                balance -= cost
-                position["funding_usdt"] += cost
-                position["funding_events"].append(dict(event, paid_usdt=cost))
+            accrue_funding(event)
             funding_index += 1
         # Opening gaps and funding at the same instant precede time exits.
         if position is not None:
@@ -250,6 +261,9 @@ def run_replay(
                                 entry_price=fill, quantity=quantity, entry_equity=balance,
                                 entry_fee_usdt=quantity * fill * fee, funding_usdt=0.0,
                                 funding_events=[], target_net_usdt=balance * target_pct,
+                                funding_intrabar_order_assumed=False,
+                                funding_intrabar_event_count=0,
+                                funding_intrabar_exit_order_assumed=False,
                                 planned_risk_usdt=quantity * unit_risk,
                                 notional_usdt=quantity * fill, reference_margin_usdt=quantity * fill / 2)
                 target = _target_raw(position, fee, slip)
@@ -260,10 +274,22 @@ def run_replay(
                 else:
                     balance -= position["entry_fee_usdt"]
             pending = None
+        # Funding after this open is booked at its original timestamp, after
+        # exact open exits/entries but before price touches of unknown timing.
+        # This fixed ordering can be favorable or unfavorable depending on rate
+        # and side, so it is disclosed rather than called universally conservative.
+        intrabar_funding_count = 0
+        while funding_index < len(funding_rows) and funding_rows[funding_index]["time_ms"] <= int(row[6]):
+            event = funding_rows[funding_index]
+            intrabar_funding_count += int(accrue_funding(event, intrabar=True))
+            funding_index += 1
         if position is not None:
             stop, target, sign = position["stop_price"], _target_raw(position, fee, slip), position["sign"]
+            position["target_raw"] = target
             sl_hit = low <= stop if sign == 1 else high >= stop
             tp_hit = high >= target if sign == 1 else low <= target
+            if intrabar_funding_count and (sl_hit or tp_hit):
+                position["funding_intrabar_exit_order_assumed"] = True
             if sl_hit:
                 close(stop, int(row[6]), "SL", ambiguous=bool(tp_hit))
             elif tp_hit:
@@ -290,6 +316,9 @@ def run_replay(
                    ambiguous_trades=sum(trade["ambiguous"] for trade in trades),
                    fees_usdt=sum(trade["entry_fee_usdt"] + trade["exit_fee_usdt"] for trade in trades),
                    funding_usdt=sum(trade["funding_usdt"] for trade in trades),
+                   funding_intrabar_order_assumed_trades=sum(trade["funding_intrabar_order_assumed"] for trade in trades),
+                   funding_intrabar_events=sum(trade["funding_intrabar_event_count"] for trade in trades),
+                   funding_intrabar_exit_order_assumed_trades=sum(trade["funding_intrabar_exit_order_assumed"] for trade in trades),
                    long_trades=sum(trade["side"] == "long" for trade in trades),
                    short_trades=sum(trade["side"] == "short" for trade in trades))
     return dict(trades=trades, equity_curve=curve, equity=balance, final_equity=balance,

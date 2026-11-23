@@ -1,0 +1,8 @@
+{
+  "stage": "historical_archive_validation",
+  "error": "official funding calc_time may have sub-bar millisecond offset; strict initial boundary assumption rejected",
+  "trades_simulated": 0,
+  "strategy_parameters_changed": false,
+  "frozen_code_commit": "4a10651",
+  "protected_market_data_loaded": false
+}

@@ -178,6 +178,15 @@ def _parse_prices(payload: bytes, filename: str, start: int, end: int, cutoff: i
     return rows
 
 
+def _validate_funding_continuity(rows: list[dict]) -> None:
+    for previous, current in zip(rows, rows[1:]):
+        if current["time_ms"] <= previous["time_ms"]:
+            raise ValueError("Duplicate or out-of-order raw funding timestamp.")
+        interval = int(current["funding_interval_hours"] * 3_600_000)
+        if current["scheduled_ms"] - previous["scheduled_ms"] != interval:
+            raise ValueError("Duplicate, overlapping or missing funding event.")
+
+
 def _parse_funding(payload: bytes, filename: str, start: int, end: int, cutoff: int) -> list[dict]:
     rows: list[dict] = []
     for source in _csv_rows(payload, filename, _FUNDING_HEADER):
@@ -188,14 +197,14 @@ def _parse_funding(payload: bytes, filename: str, start: int, end: int, cutoff: 
             raise ValueError("Cross-month or protected funding row rejected.")
         hours, rate = _number(source[1]), _number(source[2])
         interval = hours * 3_600_000
-        if hours <= 0 or interval != int(interval) or timestamp % STEP_MS:
-            raise ValueError("Invalid funding interval or funding timestamp.")
-        if rows and timestamp - rows[-1]["time_ms"] != int(interval):
-            raise ValueError("Duplicate, overlapping or missing funding event.")
-        rows.append({"time_ms": timestamp, "rate": rate, "funding_interval_hours": hours})
-    if not rows or rows[0]["time_ms"] != start:
+        if hours <= 0 or interval != int(interval):
+            raise ValueError("Invalid funding interval.")
+        rows.append({"time_ms": timestamp, "scheduled_ms": timestamp // STEP_MS * STEP_MS,
+                     "rate": rate, "funding_interval_hours": hours})
+    _validate_funding_continuity(rows)
+    if not rows or rows[0]["scheduled_ms"] != start:
         raise ValueError("Funding archive does not cover the beginning of the month.")
-    if rows[-1]["time_ms"] + int(rows[-1]["funding_interval_hours"] * 3_600_000) != end:
+    if rows[-1]["scheduled_ms"] + int(rows[-1]["funding_interval_hours"] * 3_600_000) != end:
         raise ValueError("Funding archive does not cover the end of the month.")
     return rows
 
@@ -232,6 +241,9 @@ def _load_archive(cache: Path, kind: str, month: str, start: int, end: int,
               "max_time_ms": max(timestamps), "origin": origin}
     if kind != "fundingRate":
         record["max_close_time_ms"] = rows[-1][6]
+    else:
+        record["min_scheduled_ms"] = rows[0]["scheduled_ms"]
+        record["max_scheduled_ms"] = rows[-1]["scheduled_ms"]
     return rows, record
 
 
@@ -266,16 +278,26 @@ def load_dataset(cache_dir: str | Path, *, months: list[str], cutoff_ms: int = C
     bars = [bar for month, _, _ in bounds for bar in loaded[("klines", month)]]
     marks = {bar[0]: bar[1] for month, _, _ in bounds for bar in loaded[("markPriceKlines", month)]}
     funding = [dict(row) for month, _, _ in bounds for row in loaded[("fundingRate", month)]]
+    # Check across month boundaries as well as within each archive. Raw exchange
+    # timestamps remain untouched; only schedule validation uses their 5m bucket.
+    _validate_funding_continuity(funding)
     for row in funding:
-        if row["time_ms"] not in marks:
-            raise ValueError("Funding has no exactly aligned historical mark-price candle.")
-        row["mark_price"] = marks[row["time_ms"]]
+        mark_open = row["scheduled_ms"]
+        if mark_open not in marks or mark_open > row["time_ms"]:
+            raise ValueError("Funding has no same-bucket historical mark-price candle; future marks are forbidden.")
+        row["mark_price"] = marks[mark_open]
+        row["mark_open_ms"] = mark_open
+        row["mark_proxy_age_ms"] = row["time_ms"] - mark_open
     manifest = {"symbol": SYMBOL, "market": "Binance_USDM", "interval": "5m",
                 "months": [month for month, _, _ in bounds], "cutoff_ms": cutoff_ms,
                 "reserved_2026_start_ms": RESERVED_2026_START_MS, "archives": records,
                 "bars": {"rows": len(bars), "min_time_ms": bars[0][0],
                          "max_time_ms": bars[-1][0], "max_close_time_ms": bars[-1][6]},
                 "funding": {"rows": len(funding), "min_time_ms": funding[0]["time_ms"],
-                            "max_time_ms": funding[-1]["time_ms"]},
-                "funding_mark_proxy": "Open of the markPriceKlines 5m candle at exactly funding time; not an exact settlement mark."}
+                            "max_time_ms": funding[-1]["time_ms"],
+                            "min_scheduled_ms": funding[0]["scheduled_ms"],
+                            "max_scheduled_ms": funding[-1]["scheduled_ms"],
+                            "max_mark_proxy_age_ms": max(row["mark_proxy_age_ms"] for row in funding)},
+                "funding_time_basis": "time_ms preserves raw calc_time; scheduled_ms floors it to its 5m bucket solely for coverage and continuity checks.",
+                "funding_mark_proxy": "Open of the markPriceKlines 5m candle containing raw funding time (mark_open_ms <= time_ms); mark_proxy_age_ms records the age. Not an exact settlement mark; never uses a future open."}
     return bars, funding, manifest

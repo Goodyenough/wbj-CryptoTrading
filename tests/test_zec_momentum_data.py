@@ -46,7 +46,8 @@ def archives():
         url = data._archive_url(kind, MONTH)
         filename = url.rsplit("/", 1)[1]
         if kind == "fundingRate":
-            rows = [[time_ms, 8, "0.0001"] for time_ms in range(START, END, 8 * 3_600_000)]
+            rows = [[time_ms + index % 2, 8, "0.0001"]
+                    for index, time_ms in enumerate(range(START, END, 8 * 3_600_000))]
             header = data._FUNDING_HEADER
         else:
             rows = [price_row(time_ms, 100 + index / 1000 if kind == "markPriceKlines" else 90)
@@ -102,14 +103,19 @@ def test_mock_download_hash_manifest_mark_alignment_and_offline_cache(tmp_path, 
     assert len(bars) == (END - START) // data.STEP_MS
     assert len(bars[0]) == 12
     assert funding[0]["mark_price"] == 100
-    assert funding[1]["time_ms"] == START + 8 * 3_600_000
+    assert funding[1]["time_ms"] == START + 8 * 3_600_000 + 1
+    assert funding[1]["scheduled_ms"] == START + 8 * 3_600_000
     assert funding[1]["mark_price"] == pytest.approx(100.096)
+    assert funding[1]["mark_open_ms"] == START + 8 * 3_600_000
+    assert funding[1]["mark_proxy_age_ms"] == 1
     assert funding[1]["rate"] == 0.0001
     assert manifest["funding"]["min_time_ms"] == START
     assert manifest["bars"]["max_close_time_ms"] == END - 1
     assert all(record["sha256"] == hashlib.sha256(archives[record["url"]]).hexdigest()
                for record in manifest["archives"])
-    assert "exactly funding time" in manifest["funding_mark_proxy"]
+    assert "never uses a future open" in manifest["funding_mark_proxy"]
+    assert "preserves raw calc_time" in manifest["funding_time_basis"]
+    assert manifest["funding"]["max_mark_proxy_age_ms"] == 1
     def no_network(*args, **kwargs):
         pytest.fail("download=False reached the network")
     monkeypatch.setattr(data, "urlopen", no_network)
@@ -169,24 +175,72 @@ def test_price_quality_errors_are_not_synthesized(issue):
 def test_funding_requires_exact_mark_instead_of_future_proxy(monkeypatch, tmp_path):
     def fake_load(cache, kind, month, start, end, cutoff, download, stop):
         if kind == "fundingRate":
-            rows = [{"time_ms": start, "rate": .0001, "funding_interval_hours": 8}]
+            rows = [{"time_ms": start + 1, "scheduled_ms": start,
+                     "rate": .0001, "funding_interval_hours": 8}]
         else:
             rows = [price_row(start + data.STEP_MS)]
         return rows, {"kind": kind}
     monkeypatch.setattr(data, "_load_archive", fake_load)
-    with pytest.raises(ValueError, match="exactly aligned"):
+    with pytest.raises(ValueError, match="future marks are forbidden"):
         data.load_dataset(tmp_path, months=[MONTH])
 
 
-def test_funding_off_grid_and_missing_event_rejected():
+def test_funding_preserves_raw_offsets_and_rate_without_synthesizing_records():
     filename = f"ZECUSDT-fundingRate-{MONTH}.zip"
-    offgrid = zip_csv(filename, data._FUNDING_HEADER, [[START + 1, 8, .0001]])
-    with pytest.raises(ValueError, match="funding timestamp"):
-        data._parse_funding(offgrid, filename, START, END, data.CUTOFF_MS)
+    source = [[timestamp + (1 if index % 2 else data.STEP_MS - 1), 8, .0001]
+              for index, timestamp in enumerate(range(START, END, 8 * 3_600_000))]
+    payload = zip_csv(filename, data._FUNDING_HEADER, source)
+    parsed = data._parse_funding(payload, filename, START, END, data.CUTOFF_MS)
+    assert [row["time_ms"] for row in parsed] == [row[0] for row in source]
+    assert [row["rate"] for row in parsed] == [row[2] for row in source]
+    assert [row["scheduled_ms"] for row in parsed] == list(range(START, END, 8 * 3_600_000))
+
+
+def test_funding_missing_event_is_still_rejected_with_raw_offsets():
+    filename = f"ZECUSDT-fundingRate-{MONTH}.zip"
     missing = zip_csv(filename, data._FUNDING_HEADER,
-                      [[START, 8, .0001], [START + 16 * 3_600_000, 8, .0001]])
+                      [[START + 1, 8, .0001], [START + 16 * 3_600_000, 8, .0001]])
     with pytest.raises(ValueError, match="missing funding"):
         data._parse_funding(missing, filename, START, END, data.CUTOFF_MS)
+
+
+@pytest.mark.parametrize("second_time", [START + 1, START + 2, START])
+def test_funding_raw_order_uniqueness_and_duplicate_bucket_are_enforced(second_time):
+    filename = f"ZECUSDT-fundingRate-{MONTH}.zip"
+    payload = zip_csv(filename, data._FUNDING_HEADER,
+                      [[START + 1, 8, .0001], [second_time, 8, .0001]])
+    with pytest.raises(ValueError, match="Duplicate"):
+        data._parse_funding(payload, filename, START, END, data.CUTOFF_MS)
+
+
+@pytest.mark.parametrize("timestamp,cutoff", [(END, data.CUTOFF_MS), (START + 1, START + 1)])
+def test_raw_funding_timestamp_cannot_cross_month_or_cutoff(timestamp, cutoff):
+    filename = f"ZECUSDT-fundingRate-{MONTH}.zip"
+    payload = zip_csv(filename, data._FUNDING_HEADER, [[timestamp, 8, .0001]])
+    with pytest.raises(ValueError, match="protected funding"):
+        data._parse_funding(payload, filename, START, END, cutoff)
+
+
+@pytest.mark.parametrize("bad_join", [False, True])
+def test_month_splice_checks_scheduled_continuity(tmp_path, monkeypatch, bad_join):
+    def fake_load(cache, kind, month, start, end, cutoff, download, stop):
+        schedule = list(range(start, end, 8 * 3_600_000))
+        if kind == "fundingRate":
+            source = [[timestamp + index % 2, 4 if bad_join and month == "2024-03" and index == 0 else 8, .0001]
+                      for index, timestamp in enumerate(schedule)]
+            filename = f"ZECUSDT-fundingRate-{month}.zip"
+            payload = zip_csv(filename, data._FUNDING_HEADER, source)
+            rows = data._parse_funding(payload, filename, start, end, cutoff)
+        else:
+            rows = [price_row(timestamp) for timestamp in schedule]
+        return rows, {"kind": kind}
+    monkeypatch.setattr(data, "_load_archive", fake_load)
+    if bad_join:
+        with pytest.raises(ValueError, match="missing funding"):
+            data.load_dataset(tmp_path, months=["2024-02", "2024-03"])
+    else:
+        _, funding, _ = data.load_dataset(tmp_path, months=["2024-02", "2024-03"])
+        assert all(row["mark_open_ms"] <= row["time_ms"] for row in funding)
 
 
 @pytest.mark.parametrize("status", [403, 451])

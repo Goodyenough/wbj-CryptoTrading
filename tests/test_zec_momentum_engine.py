@@ -155,13 +155,91 @@ def test_cutoff_bar_funding_signal_and_segment_are_rejected():
         replay(end_ms=cutoff + FIVE, cutoff_ms=cutoff)
 
 
-def test_missing_execution_bar_and_non_grid_funding_are_rejected():
+def test_missing_execution_bar_is_rejected():
     rows = candles()
     del rows[7]
     with pytest.raises(ValueError, match="missing"):
         replay(rows)
-    with pytest.raises(ValueError, match="align"):
-        replay(funding=[dict(time_ms=5 * FIVE + 1, rate=0.001, mark_price=100)])
+
+
+@pytest.mark.parametrize("side", ["long", "short"])
+def test_intrabar_funding_after_entry_retains_exact_time_and_recalculates_target(side):
+    rows = candles()
+    entry = 4 * FIVE
+    rows[4] = bar(entry, high=110 if side == "long" else 100.2,
+                  low=90 if side == "short" else 99.8)
+    funding = [dict(time_ms=entry, rate=0.5, mark_price=100),
+               dict(time_ms=entry + 1, rate=0.001, mark_price=101)]
+    result = replay(rows, [event(side=side)], funding)
+    trade = result["trades"][0]
+    assert trade["exit_reason"] == "TP"
+    assert trade["net_pnl_usdt"] == pytest.approx(1.1)
+    assert len(trade["funding_events"]) == 1
+    recorded = trade["funding_events"][0]
+    assert recorded["time_ms"] == entry + 1
+    assert recorded["intrabar_order_assumed"]
+    assert recorded["paid_usdt"] == pytest.approx((1 if side == "long" else -1) * trade["quantity"] * 101 * 0.001)
+    assert trade["funding_intrabar_order_assumed"]
+    assert trade["funding_intrabar_event_count"] == 1
+    assert trade["funding_intrabar_exit_order_assumed"]
+    assert result["metrics"]["funding_intrabar_events"] == 1
+    assert result["metrics"]["funding_intrabar_order_assumed_trades"] == 1
+    assert result["metrics"]["funding_intrabar_exit_order_assumed_trades"] == 1
+
+
+@pytest.mark.parametrize("exit_kind", ["TIME", "SL_GAP", "TP_GAP"])
+def test_intrabar_funding_after_exact_open_exit_is_not_charged(exit_kind):
+    rows = candles()
+    opened = 4 * FIVE + 2 * HOUR if exit_kind == "TIME" else 5 * FIVE
+    if exit_kind == "SL_GAP":
+        rows[opened // FIVE] = bar(opened, 95, 96, 94, 95)
+    elif exit_kind == "TP_GAP":
+        rows[opened // FIVE] = bar(opened, 105, 106, 104, 105)
+    funding = [dict(time_ms=opened, rate=0.001, mark_price=100),
+               dict(time_ms=opened + 1, rate=0.5, mark_price=100)]
+    trade = replay(rows, funding=funding)["trades"][0]
+    assert trade["exit_reason"] == exit_kind
+    assert trade["exit_ms"] == opened
+    assert [item["time_ms"] for item in trade["funding_events"]] == [opened]
+    assert not trade["funding_intrabar_order_assumed"]
+    assert trade["funding_intrabar_event_count"] == 0
+
+
+def test_intrabar_funding_at_close_is_booked_before_unknown_stop_and_not_shifted():
+    rows = candles()
+    opened = 5 * FIVE
+    rows[5] = bar(opened, high=100.2, low=97)
+    when = opened + FIVE - 1
+    funding = [dict(time_ms=when, rate=0.001, mark_price=102)]
+    trade = replay(rows, funding=funding)["trades"][0]
+    assert trade["exit_reason"] == "SL"
+    assert trade["exit_ms"] == when
+    assert trade["funding_events"][0]["time_ms"] == when
+    assert trade["funding_cost_usdt"] == pytest.approx(trade["quantity"] * 102 * 0.001)
+    assert trade["funding_intrabar_exit_order_assumed"]
+
+
+def test_intrabar_funding_in_nonexit_bar_is_flagged_and_cannot_leak_after_exit():
+    entry = 4 * FIVE
+    deadline = entry + 2 * HOUR
+    funding = [dict(time_ms=entry - 1, rate=0.5, mark_price=100),
+               dict(time_ms=entry + 1, rate=0.001, mark_price=101),
+               dict(time_ms=entry + 2, rate=-0.0005, mark_price=102),
+               dict(time_ms=deadline + 1, rate=0.5, mark_price=100)]
+    trade = replay(funding=funding)["trades"][0]
+    assert trade["exit_reason"] == "TIME"
+    assert [item["time_ms"] for item in trade["funding_events"]] == [entry + 1, entry + 2]
+    assert trade["funding_intrabar_event_count"] == 2
+    assert trade["funding_intrabar_order_assumed"]
+    assert not trade["funding_intrabar_exit_order_assumed"]
+    assert trade["funding_cost_usdt"] == pytest.approx(trade["quantity"] * (101 * 0.001 - 102 * 0.0005))
+
+
+def test_funding_timestamps_still_require_integer_unique_sorted_values():
+    with pytest.raises(ValueError, match="integer"):
+        replay(funding=[dict(time_ms=5 * FIVE + 0.5, rate=0.001, mark_price=100)])
+    with pytest.raises(ValueError, match="sorted and unique"):
+        replay(funding=[dict(time_ms=5 * FIVE + 1, rate=0.001, mark_price=100)] * 2)
 
 
 def trending(hours=26, side="long"):
