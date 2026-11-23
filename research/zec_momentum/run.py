@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import random
 import subprocess
+import sys
 from statistics import mean
 
 UTC = timezone.utc
@@ -115,6 +116,7 @@ def stats(trades: list[dict], curve: list[dict], final_equity: float, months: li
             "worst_net_trade_usdt": min(pnls) if pnls else None,
             "ambiguous_bars": sum(bool(t["ambiguous"]) for t in trades),
             "intrabar_funding_trades": sum(bool(t.get("funding_intrabar_order_assumed", False)) for t in trades),
+            "target_clamped_to_bar_trades": sum(bool(t.get("target_clamped_to_bar", False)) for t in trades),
             "positive_months": sum(m["net_pnl_usdt"] > 0 for m in months),
             "monthly_cluster_mean_r_ci95": monthly_bootstrap(months),
             "exit_reasons": dict(reasons), "by_side": by_side}
@@ -135,6 +137,9 @@ def verdict(normal: dict, stress: dict) -> tuple[str, str]:
     if any(n["by_side"][side]["net_pnl_usdt"] <= 0 or n["by_side"][side]["mean_net_r"] <= 0
            for side in ("long", "short")):
         return "insufficient", "多空方向的净期望结论矛盾，不能确认双边策略有效。"
+    if any(s["by_side"][side]["trades"] < 30 or s["by_side"][side]["net_pnl_usdt"] <= 0
+           or s["by_side"][side]["mean_net_r"] <= 0 for side in ("long", "short")):
+        return "insufficient", "压力成本下单方向样本或净期望不足，不能确认双边稳健性。"
     ci = n["monthly_cluster_mean_r_ci95"]
     if ci is None or ci[0] <= 0:
         return "insufficient", "月份分块区间仍包含零，不能确认稳定正期望。"
@@ -186,6 +191,7 @@ def render_report(results: list[dict], decisions: list[dict], manifest: dict) ->
               "- 使用连续数学数量，未重建历史最小下单量、最小名义、tick size、盘口、部分成交与完整强平制度；不证明110 USDT账户已经可实盘执行。",
               "- 止损是计划风险，跳空、资金费异常及实际成交可使亏损超过估计；最大回撤为5M采样的净清算权益，不含柱内更差路径。",
               "- 柱内资金费与未知柱内止盈止损采用固定先收资金费顺序；对收款方向并非一概保守，逐笔记录相关标记，不冒充逐笔成交重建。",
+              "- 资金费使净目标越过整根柱区间时，使用区间内最不利可见价代理并记录target_clamped_to_bar，不能视为精确成交价格。技术复算保留修正前运行，交易参数没有改变。",
               "- 只有12个验证月份；月份分块区间是描述性不确定性估计，不能保证独立同分布或覆盖未来市场。",
               "- 2025年属于本轮按时间顺序保留的验证段；旧系统的其他研究可能已使用过这些历史年份，不能称为从未接触过的全新留出集。珍贵封存期仍未启封。",
               "- ZEC为用户预先指定币种，结论不能外推所有币；本次没有模型训练或校准的未来涨跌概率。",
@@ -201,6 +207,9 @@ def render_report(results: list[dict], decisions: list[dict], manifest: dict) ->
 
 
 def main() -> None:
+    # The original project's editable venv may point at another worktree.
+    # Always use the source whose bytes are frozen in this run's manifest.
+    sys.path.insert(0, str(ROOT / "src"))
     from .data import load_dataset
     from .engine import run_replay, signals
     parser = argparse.ArgumentParser(description=__doc__)

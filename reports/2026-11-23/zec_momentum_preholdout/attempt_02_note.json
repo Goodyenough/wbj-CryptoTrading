@@ -1,0 +1,10 @@
+{
+  "reason": "independent synthetic audit found funding-adjusted target could be outside candle price range; correct fill proxy and replay identical frozen parameters",
+  "strategy_parameters_changed": false,
+  "original_decisions": [
+    "reject",
+    "reject",
+    "reject",
+    "reject"
+  ]
+}

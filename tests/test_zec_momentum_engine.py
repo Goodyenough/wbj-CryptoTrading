@@ -46,6 +46,7 @@ def test_two_sided_net_target_after_all_execution_costs(side, target, fee, slip)
     assert trade["entry_ms"] == fill_time
     assert trade["exit_ms"] == fill_time + FIVE - 1
     assert trade["exit_time_exact"] is False
+    assert trade["target_clamped_to_bar"] is False
 
 
 def test_strict_next_open_delay_does_not_trade_signal_or_decision_bar():
@@ -240,6 +241,31 @@ def test_funding_timestamps_still_require_integer_unique_sorted_values():
         replay(funding=[dict(time_ms=5 * FIVE + 0.5, rate=0.001, mark_price=100)])
     with pytest.raises(ValueError, match="sorted and unique"):
         replay(funding=[dict(time_ms=5 * FIVE + 1, rate=0.001, mark_price=100)] * 2)
+
+
+@pytest.mark.parametrize("side", ["long", "short"])
+def test_funding_income_cannot_create_raw_target_fill_outside_bar(side):
+    rows = candles()
+    entered = 4 * FIVE
+    # Income exceeds the net-profit goal, moving the recalculated long target
+    # below the candle's low (or the short target above its high).
+    funding = [dict(time_ms=entered + 1, rate=-0.05 if side == "long" else 0.05,
+                    mark_price=100)]
+    result = replay(rows, [event(side=side)], funding)
+    trade = result["trades"][0]
+    candle = rows[entered // FIVE]
+    assert trade["exit_reason"] == "TP"
+    assert candle[3] <= trade["raw_exit"] <= candle[2]
+    if side == "long":
+        assert trade["target_raw"] < candle[3]
+        assert trade["raw_exit"] == candle[3]
+    else:
+        assert trade["target_raw"] > candle[2]
+        assert trade["raw_exit"] == candle[2]
+    assert trade["target_clamped_to_bar"]
+    assert trade["funding_intrabar_exit_order_assumed"]
+    assert trade["net_pnl_usdt"] >= trade["target_net_usdt"]
+    assert result["metrics"]["target_clamped_to_bar_trades"] == 1
 
 
 def trending(hours=26, side="long"):

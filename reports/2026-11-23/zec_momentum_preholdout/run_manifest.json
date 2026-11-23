@@ -1,0 +1,18 @@
+{
+  "base_git_commit": "3994a4f12ccac17d7582dd3fbd1c1bb5dbc57006",
+  "generated_at_utc": "2026-11-23T16:09:43.952516+00:00",
+  "cutoff_ms": 1782144000000,
+  "holdout_start_beijing": "2026-06-23T00:00:00+08:00",
+  "max_loaded_bar_close_ms": 1767225599999,
+  "max_loaded_funding_time_ms": 1767196800001,
+  "all_2026_market_data_excluded": true,
+  "production_database_opened_by_this_runner": false,
+  "source_sha256": {
+    "research/zec_momentum/PROTOCOL.md": "7b901ab2865f3496533816123cc98fd4d58ecf2742815037ba6d0e00708408ef",
+    "research/zec_momentum/engine.py": "25b0cf642d6d60f3d84388e3ac2dac656be9f840323d653deb551dccefd94f9b",
+    "research/zec_momentum/data.py": "d5bbae69744941fdb258b8b3dd6fef3e1d1317ac5d3bcd982186553251b3ff5b",
+    "research/zec_momentum/run.py": "62180fc14b50ef3cce67ef6984e1fc038994e2c83cfeaf3f19d7e717f8f8c65c",
+    "src/crypto_trading_system/indicators.py": "69d3bbde555efa5109ec4b5cfccfc746e2fdceeba37b3c960395a69ab32f14e6"
+  },
+  "protocol": "All four predeclared candidates retained; no selection using 2025 validation."
+}

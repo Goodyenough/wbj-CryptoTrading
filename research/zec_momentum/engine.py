@@ -264,6 +264,7 @@ def run_replay(
                                 funding_intrabar_order_assumed=False,
                                 funding_intrabar_event_count=0,
                                 funding_intrabar_exit_order_assumed=False,
+                                target_clamped_to_bar=False,
                                 planned_risk_usdt=quantity * unit_risk,
                                 notional_usdt=quantity * fill, reference_margin_usdt=quantity * fill / 2)
                 target = _target_raw(position, fee, slip)
@@ -293,7 +294,13 @@ def run_replay(
             if sl_hit:
                 close(stop, int(row[6]), "SL", ambiguous=bool(tp_hit))
             elif tp_hit:
-                close(target, int(row[6]), "TP")
+                # Funding income can move the recalculated target beyond the
+                # candle's adverse edge. Use the least favorable observed raw
+                # price rather than inventing a fill outside the OHLC range.
+                # This remains a bar-level proxy under the funding-first rule.
+                raw_exit = max(target, low) if sign == 1 else min(target, high)
+                position["target_clamped_to_bar"] = raw_exit != target
+                close(raw_exit, int(row[6]), "TP")
         value = balance
         if position is not None:
             exit_mark = row[4] * (1 - position["sign"] * slip)
@@ -319,6 +326,7 @@ def run_replay(
                    funding_intrabar_order_assumed_trades=sum(trade["funding_intrabar_order_assumed"] for trade in trades),
                    funding_intrabar_events=sum(trade["funding_intrabar_event_count"] for trade in trades),
                    funding_intrabar_exit_order_assumed_trades=sum(trade["funding_intrabar_exit_order_assumed"] for trade in trades),
+                   target_clamped_to_bar_trades=sum(trade["target_clamped_to_bar"] for trade in trades),
                    long_trades=sum(trade["side"] == "long" for trade in trades),
                    short_trades=sum(trade["side"] == "short" for trade in trades))
     return dict(trades=trades, equity_curve=curve, equity=balance, final_equity=balance,

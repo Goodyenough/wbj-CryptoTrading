@@ -1,0 +1,2698 @@
+{
+  "results": [
+    {
+      "window": "development_2024",
+      "target_pct": 0.01,
+      "hold_hours": 2,
+      "cost": "normal",
+      "metrics": {
+        "trades": 2575,
+        "trades_per_month": 214.58333333333334,
+        "net_win_rate": 0.5009708737864078,
+        "average_net_win_usdt": 0.26197549082493726,
+        "average_net_loss_usdt": -0.34627969572906414,
+        "mean_net_r": -0.09297950974154001,
+        "profit_factor": 0.7594867789106174,
+        "final_equity": 2.978974152321546,
+        "net_pnl_usdt": -107.02102584767846,
+        "net_return_pct": -97.29184167970769,
+        "max_drawdown_pct": 97.92190644515995,
+        "longest_losing_streak": 10,
+        "mean_holding_hours": 1.2333331542610573,
+        "fees_usdt": 81.60156159873354,
+        "funding_cost_usdt": 0.042654814009855845,
+        "largest_win_usdt": 1.3194026724486252,
+        "worst_net_trade_usdt": -4.9449056832332285,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 59,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.1272327059379036,
+          -0.06215336971629831
+        ],
+        "exit_reasons": {
+          "TP": 1033,
+          "TIME": 912,
+          "SL": 627,
+          "SL_GAP": 3
+        },
+        "by_side": {
+          "long": {
+            "trades": 1287,
+            "net_pnl_usdt": -82.50587352514783,
+            "mean_net_r": -0.1067663094916798
+          },
+          "short": {
+            "trades": 1288,
+            "net_pnl_usdt": -24.515152322530525,
+            "mean_net_r": -0.07920341402847332
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 203,
+          "net_pnl_usdt": -4.432018125323516,
+          "net_r_sum": -11.762990060601512,
+          "wins": 100,
+          "fees_usdt": 23.32610835328735,
+          "funding_cost_usdt": -0.13750752984775066
+        },
+        {
+          "month": "2024-02",
+          "trades": 188,
+          "net_pnl_usdt": -24.125500242189812,
+          "net_r_sum": -24.481367117991077,
+          "wins": 87,
+          "fees_usdt": 17.892983132988675,
+          "funding_cost_usdt": 0.09557486032118247
+        },
+        {
+          "month": "2024-03",
+          "trades": 236,
+          "net_pnl_usdt": -27.497841030028297,
+          "net_r_sum": -24.48823085348869,
+          "wins": 122,
+          "fees_usdt": 15.681819929802854,
+          "funding_cost_usdt": 0.14542801035278943
+        },
+        {
+          "month": "2024-04",
+          "trades": 195,
+          "net_pnl_usdt": -22.237046849234122,
+          "net_r_sum": -29.18808483144613,
+          "wins": 89,
+          "fees_usdt": 8.257239472883485,
+          "funding_cost_usdt": -0.06411570606361781
+        },
+        {
+          "month": "2024-05",
+          "trades": 174,
+          "net_pnl_usdt": -9.947134200101189,
+          "net_r_sum": -33.25916855215319,
+          "wins": 70,
+          "fees_usdt": 4.66122946056942,
+          "funding_cost_usdt": 0.02866827904251281
+        },
+        {
+          "month": "2024-06",
+          "trades": 183,
+          "net_pnl_usdt": -7.1816289719958295,
+          "net_r_sum": -32.824225360009144,
+          "wins": 71,
+          "fees_usdt": 3.3339745192039434,
+          "funding_cost_usdt": -0.02103935210951835
+        },
+        {
+          "month": "2024-07",
+          "trades": 214,
+          "net_pnl_usdt": -6.2526438287268755,
+          "net_r_sum": -30.72131495022559,
+          "wins": 100,
+          "fees_usdt": 2.574024050488645,
+          "funding_cost_usdt": 0.005464783076951395
+        },
+        {
+          "month": "2024-08",
+          "trades": 201,
+          "net_pnl_usdt": -1.036477413802899,
+          "net_r_sum": -6.120964922771816,
+          "wins": 107,
+          "fees_usdt": 1.53968324637088,
+          "funding_cost_usdt": -0.012982629863120855
+        },
+        {
+          "month": "2024-09",
+          "trades": 198,
+          "net_pnl_usdt": -1.9146258128647236,
+          "net_r_sum": -19.66960321470163,
+          "wins": 91,
+          "fees_usdt": 1.2308931319506529,
+          "funding_cost_usdt": 0.0013090820765951042
+        },
+        {
+          "month": "2024-10",
+          "trades": 226,
+          "net_pnl_usdt": -1.2342150529668154,
+          "net_r_sum": -14.076632280606114,
+          "wins": 112,
+          "fees_usdt": 1.0828872954282731,
+          "funding_cost_usdt": -0.002827701683461817
+        },
+        {
+          "month": "2024-11",
+          "trades": 260,
+          "net_pnl_usdt": -0.3235393388426765,
+          "net_r_sum": -4.132922042179707,
+          "wins": 157,
+          "fees_usdt": 1.0485174119892429,
+          "funding_cost_usdt": 0.006991726976221658
+        },
+        {
+          "month": "2024-12",
+          "trades": 297,
+          "net_pnl_usdt": -0.8383549816016003,
+          "net_r_sum": -8.696733398290947,
+          "wins": 184,
+          "fees_usdt": 0.9722015937701164,
+          "funding_cost_usdt": -0.0023090082689275126
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 1412,
+        "invalid_entry_or_stop": 2,
+        "insufficient_full_horizon": 1
+      }
+    },
+    {
+      "window": "development_2024",
+      "target_pct": 0.01,
+      "hold_hours": 2,
+      "cost": "stress",
+      "metrics": {
+        "trades": 2412,
+        "trades_per_month": 201.0,
+        "net_win_rate": 0.4158374792703151,
+        "average_net_win_usdt": 0.11049394859544333,
+        "average_net_loss_usdt": -0.1567181835916056,
+        "mean_net_r": -0.21036358235853045,
+        "profit_factor": 0.5018905797175168,
+        "final_equity": 0.009509760657425334,
+        "net_pnl_usdt": -109.99049023934258,
+        "net_return_pct": -99.99135476303871,
+        "max_drawdown_pct": 99.99168542778753,
+        "longest_losing_streak": 13,
+        "mean_holding_hours": 1.3400703190068177,
+        "fees_usdt": 64.9825360569589,
+        "funding_cost_usdt": -0.04945885900586131,
+        "largest_win_usdt": 1.0999999999999834,
+        "worst_net_trade_usdt": -4.94757926292033,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 59,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.2525264846086956,
+          -0.17178618693599093
+        ],
+        "exit_reasons": {
+          "TP": 794,
+          "TIME": 1003,
+          "SL": 612,
+          "SL_GAP": 3
+        },
+        "by_side": {
+          "long": {
+            "trades": 1205,
+            "net_pnl_usdt": -66.47113886071679,
+            "mean_net_r": -0.21962785572673554
+          },
+          "short": {
+            "trades": 1207,
+            "net_pnl_usdt": -43.51935137862585,
+            "mean_net_r": -0.20111465989897195
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 191,
+          "net_pnl_usdt": -44.42363139482626,
+          "net_r_sum": -36.2836261232191,
+          "wins": 79,
+          "fees_usdt": 34.927179563343216,
+          "funding_cost_usdt": -0.1348483381078847
+        },
+        {
+          "month": "2024-02",
+          "trades": 179,
+          "net_pnl_usdt": -33.7164027025965,
+          "net_r_sum": -50.2706853077022,
+          "wins": 67,
+          "fees_usdt": 16.968724463388654,
+          "funding_cost_usdt": 0.037305816002467636
+        },
+        {
+          "month": "2024-03",
+          "trades": 223,
+          "net_pnl_usdt": -20.934611919196286,
+          "net_r_sum": -51.48791561576233,
+          "wins": 94,
+          "fees_usdt": 8.44719899418579,
+          "funding_cost_usdt": 0.05768299160158317
+        },
+        {
+          "month": "2024-04",
+          "trades": 187,
+          "net_pnl_usdt": -6.620647650917111,
+          "net_r_sum": -45.166546669425905,
+          "wins": 70,
+          "fees_usdt": 2.6959933349638914,
+          "funding_cost_usdt": -0.010405403246069266
+        },
+        {
+          "month": "2024-05",
+          "trades": 161,
+          "net_pnl_usdt": -2.2042600056060904,
+          "net_r_sum": -51.125743035586225,
+          "wins": 47,
+          "fees_usdt": 1.0267975860357155,
+          "funding_cost_usdt": 0.003235919928159377
+        },
+        {
+          "month": "2024-06",
+          "trades": 175,
+          "net_pnl_usdt": -1.218519811517558,
+          "net_r_sum": -57.47957572764732,
+          "wins": 49,
+          "fees_usdt": 0.5080503367721044,
+          "funding_cost_usdt": -0.0021844261715056124
+        },
+        {
+          "month": "2024-07",
+          "trades": 202,
+          "net_pnl_usdt": -0.5950028304687146,
+          "net_r_sum": -52.92574650006033,
+          "wins": 76,
+          "fees_usdt": 0.2281145229214237,
+          "funding_cost_usdt": 0.00010869378685895475
+        },
+        {
+          "month": "2024-08",
+          "trades": 191,
+          "net_pnl_usdt": -0.11635022732285662,
+          "net_r_sum": -26.153891896847735,
+          "wins": 88,
+          "fees_usdt": 0.0846805854252357,
+          "funding_cost_usdt": -0.000376715433787979
+        },
+        {
+          "month": "2024-09",
+          "trades": 190,
+          "net_pnl_usdt": -0.08561829419715475,
+          "net_r_sum": -42.69183965435206,
+          "wins": 72,
+          "fees_usdt": 0.045938430989601764,
+          "funding_cost_usdt": 4.1016535872390984e-05
+        },
+        {
+          "month": "2024-10",
+          "trades": 212,
+          "net_pnl_usdt": -0.04136635753971706,
+          "net_r_sum": -37.8462782634999,
+          "wins": 91,
+          "fees_usdt": 0.02645666507887632,
+          "funding_cost_usdt": -6.316894130619135e-05
+        },
+        {
+          "month": "2024-11",
+          "trades": 238,
+          "net_pnl_usdt": -0.020364957185648926,
+          "net_r_sum": -25.461473617559086,
+          "wins": 128,
+          "fees_usdt": 0.015765189087509054,
+          "funding_cost_usdt": 5.4354695477888606e-05
+        },
+        {
+          "month": "2024-12",
+          "trades": 263,
+          "net_pnl_usdt": -0.013714087968753265,
+          "net_r_sum": -30.50363823711327,
+          "wins": 142,
+          "fees_usdt": 0.007636384766889794,
+          "funding_cost_usdt": -9.599655726967971e-06
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 1575,
+        "invalid_entry_or_stop": 2,
+        "insufficient_full_horizon": 1
+      }
+    },
+    {
+      "window": "development_2024",
+      "target_pct": 0.01,
+      "hold_hours": 4,
+      "cost": "normal",
+      "metrics": {
+        "trades": 2343,
+        "trades_per_month": 195.25,
+        "net_win_rate": 0.539906103286385,
+        "average_net_win_usdt": 0.30648157663881814,
+        "average_net_loss_usdt": -0.45907654996559244,
+        "mean_net_r": -0.09801480962933841,
+        "profit_factor": 0.7834134593098421,
+        "final_equity": 2.814673585196326,
+        "net_pnl_usdt": -107.18532641480367,
+        "net_return_pct": -97.44120583163969,
+        "max_drawdown_pct": 98.15409365220852,
+        "longest_losing_streak": 14,
+        "mean_holding_hours": 1.717527154645042,
+        "fees_usdt": 77.29849484102367,
+        "funding_cost_usdt": 0.25257160941500734,
+        "largest_win_usdt": 1.3266023904265416,
+        "worst_net_trade_usdt": -4.964148356960016,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 78,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.13362508058076883,
+          -0.06718823086901035
+        ],
+        "exit_reasons": {
+          "TP": 1164,
+          "TIME": 381,
+          "SL": 792,
+          "SL_GAP": 4,
+          "TP_GAP": 2
+        },
+        "by_side": {
+          "long": {
+            "trades": 1173,
+            "net_pnl_usdt": -88.92070542372694,
+            "mean_net_r": -0.1223223050747166
+          },
+          "short": {
+            "trades": 1170,
+            "net_pnl_usdt": -18.264620991076775,
+            "mean_net_r": -0.07364498727256182
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 186,
+          "net_pnl_usdt": -6.705118249147054,
+          "net_r_sum": -12.119766704803224,
+          "wins": 103,
+          "fees_usdt": 21.305417628737608,
+          "funding_cost_usdt": -0.1606826038247619
+        },
+        {
+          "month": "2024-02",
+          "trades": 171,
+          "net_pnl_usdt": -19.80266936804093,
+          "net_r_sum": -15.43943997773991,
+          "wins": 87,
+          "fees_usdt": 16.837831938462955,
+          "funding_cost_usdt": 0.30067561559022243
+        },
+        {
+          "month": "2024-03",
+          "trades": 217,
+          "net_pnl_usdt": -26.844771409821874,
+          "net_r_sum": -21.855104230445665,
+          "wins": 124,
+          "fees_usdt": 15.29361531770262,
+          "funding_cost_usdt": 0.24075431108341916
+        },
+        {
+          "month": "2024-04",
+          "trades": 173,
+          "net_pnl_usdt": -21.728153069821982,
+          "net_r_sum": -25.897310478039838,
+          "wins": 86,
+          "fees_usdt": 7.675230764632329,
+          "funding_cost_usdt": -0.09543893164686873
+        },
+        {
+          "month": "2024-05",
+          "trades": 156,
+          "net_pnl_usdt": -10.143643954137563,
+          "net_r_sum": -30.19611498300955,
+          "wins": 63,
+          "fees_usdt": 4.727084171183228,
+          "funding_cost_usdt": 0.025983178763600352
+        },
+        {
+          "month": "2024-06",
+          "trades": 164,
+          "net_pnl_usdt": -8.507041769845914,
+          "net_r_sum": -31.768430266492206,
+          "wins": 67,
+          "fees_usdt": 3.4322928025176207,
+          "funding_cost_usdt": -0.026537454453034175
+        },
+        {
+          "month": "2024-07",
+          "trades": 193,
+          "net_pnl_usdt": -6.263880852462854,
+          "net_r_sum": -29.446527530919195,
+          "wins": 103,
+          "fees_usdt": 2.655015081671868,
+          "funding_cost_usdt": -0.01606987759353748
+        },
+        {
+          "month": "2024-08",
+          "trades": 184,
+          "net_pnl_usdt": -2.248967538486943,
+          "net_r_sum": -9.70745352868093,
+          "wins": 104,
+          "fees_usdt": 1.5962270386486295,
+          "funding_cost_usdt": -0.01738691790729143
+        },
+        {
+          "month": "2024-09",
+          "trades": 175,
+          "net_pnl_usdt": -2.4800478255542493,
+          "net_r_sum": -25.579824333511493,
+          "wins": 80,
+          "fees_usdt": 1.0741005586399353,
+          "funding_cost_usdt": 0.00035402523003451834
+        },
+        {
+          "month": "2024-10",
+          "trades": 202,
+          "net_pnl_usdt": -1.167380551357785,
+          "net_r_sum": -13.742134919886613,
+          "wins": 110,
+          "fees_usdt": 0.9546292246886542,
+          "funding_cost_usdt": -0.005439078140276413
+        },
+        {
+          "month": "2024-11",
+          "trades": 245,
+          "net_pnl_usdt": -0.6759651625442854,
+          "net_r_sum": -5.869974857110243,
+          "wins": 154,
+          "fees_usdt": 0.9315581436610004,
+          "funding_cost_usdt": 0.008840914166074862
+        },
+        {
+          "month": "2024-12",
+          "trades": 277,
+          "net_pnl_usdt": -0.617686663582277,
+          "net_r_sum": -8.02661715090102,
+          "wins": 184,
+          "fees_usdt": 0.8154921704772208,
+          "funding_cost_usdt": -0.002481571852573874
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 1645,
+        "invalid_entry_or_stop": 1,
+        "insufficient_full_horizon": 1
+      }
+    },
+    {
+      "window": "development_2024",
+      "target_pct": 0.01,
+      "hold_hours": 4,
+      "cost": "stress",
+      "metrics": {
+        "trades": 2153,
+        "trades_per_month": 179.41666666666666,
+        "net_win_rate": 0.48351137947050626,
+        "average_net_win_usdt": 0.14740962046791675,
+        "average_net_loss_usdt": -0.23689743543213485,
+        "mean_net_r": -0.20546260564886484,
+        "profit_factor": 0.5825207648383477,
+        "final_equity": 0.023466706567442274,
+        "net_pnl_usdt": -109.97653329343255,
+        "net_return_pct": -99.97866663039323,
+        "max_drawdown_pct": 99.97977559235625,
+        "longest_losing_streak": 14,
+        "mean_holding_hours": 1.923052882541157,
+        "fees_usdt": 68.82887184346009,
+        "funding_cost_usdt": 0.0975404005447917,
+        "largest_win_usdt": 1.1181076626430941,
+        "worst_net_trade_usdt": -4.94757926292033,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 76,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.24042355242076033,
+          -0.1746537597086501
+        ],
+        "exit_reasons": {
+          "TP": 949,
+          "TIME": 431,
+          "SL": 769,
+          "SL_GAP": 3,
+          "TP_GAP": 1
+        },
+        "by_side": {
+          "long": {
+            "trades": 1074,
+            "net_pnl_usdt": -67.25516018445221,
+            "mean_net_r": -0.2225319667176156
+          },
+          "short": {
+            "trades": 1079,
+            "net_pnl_usdt": -42.72137310898042,
+            "mean_net_r": -0.18847234263882007
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 171,
+          "net_pnl_usdt": -39.077938306570346,
+          "net_r_sum": -32.83002436582703,
+          "wins": 85,
+          "fees_usdt": 32.355115040998705,
+          "funding_cost_usdt": -0.14737423710972644
+        },
+        {
+          "month": "2024-02",
+          "trades": 156,
+          "net_pnl_usdt": -28.548772237335964,
+          "net_r_sum": -36.90729693726029,
+          "wins": 68,
+          "fees_usdt": 18.183292051735087,
+          "funding_cost_usdt": 0.1772614671468984
+        },
+        {
+          "month": "2024-03",
+          "trades": 196,
+          "net_pnl_usdt": -25.41785292690194,
+          "net_r_sum": -40.3328985799266,
+          "wins": 97,
+          "fees_usdt": 10.812959273510453,
+          "funding_cost_usdt": 0.09746343277775951
+        },
+        {
+          "month": "2024-04",
+          "trades": 163,
+          "net_pnl_usdt": -9.276430427878923,
+          "net_r_sum": -38.1048401898025,
+          "wins": 74,
+          "fees_usdt": 3.800041590736809,
+          "funding_cost_usdt": -0.027170213979621778
+        },
+        {
+          "month": "2024-05",
+          "trades": 136,
+          "net_pnl_usdt": -3.1658285094505594,
+          "net_r_sum": -38.87867180509366,
+          "wins": 50,
+          "fees_usdt": 1.729593181423934,
+          "funding_cost_usdt": 0.0050996566893943725
+        },
+        {
+          "month": "2024-06",
+          "trades": 156,
+          "net_pnl_usdt": -2.421682690057603,
+          "net_r_sum": -49.11274502402341,
+          "wins": 53,
+          "fees_usdt": 1.0197713814459317,
+          "funding_cost_usdt": -0.004592947994455647
+        },
+        {
+          "month": "2024-07",
+          "trades": 180,
+          "net_pnl_usdt": -1.3057549485169853,
+          "net_r_sum": -47.67430832702424,
+          "wins": 84,
+          "fees_usdt": 0.5196381579974059,
+          "funding_cost_usdt": -0.002050249775122538
+        },
+        {
+          "month": "2024-08",
+          "trades": 175,
+          "net_pnl_usdt": -0.37248709535107305,
+          "net_r_sum": -27.61615758707009,
+          "wins": 93,
+          "fees_usdt": 0.19805756271999933,
+          "funding_cost_usdt": -0.0010274768133021089
+        },
+        {
+          "month": "2024-09",
+          "trades": 168,
+          "net_pnl_usdt": -0.20104808434025465,
+          "net_r_sum": -38.668504253389386,
+          "wins": 71,
+          "fees_usdt": 0.09599872997035096,
+          "funding_cost_usdt": 6.301038740308298e-05
+        },
+        {
+          "month": "2024-10",
+          "trades": 191,
+          "net_pnl_usdt": -0.09968012136678109,
+          "net_r_sum": -32.61702182912945,
+          "wins": 94,
+          "fees_usdt": 0.06216736325675851,
+          "funding_cost_usdt": -0.0002136815131052633
+        },
+        {
+          "month": "2024-11",
+          "trades": 222,
+          "net_pnl_usdt": -0.05788593236490194,
+          "net_r_sum": -28.58267150365034,
+          "wins": 129,
+          "fees_usdt": 0.03519602156453224,
+          "funding_cost_usdt": 0.0001252166027624654
+        },
+        {
+          "month": "2024-12",
+          "trades": 239,
+          "net_pnl_usdt": -0.03117201329729442,
+          "net_r_sum": -31.03584955980903,
+          "wins": 143,
+          "fees_usdt": 0.01704148810013128,
+          "funding_cost_usdt": -4.357587409233718e-05
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 1835,
+        "invalid_entry_or_stop": 1,
+        "insufficient_full_horizon": 1
+      }
+    },
+    {
+      "window": "development_2024",
+      "target_pct": 0.02,
+      "hold_hours": 2,
+      "cost": "normal",
+      "metrics": {
+        "trades": 2167,
+        "trades_per_month": 180.58333333333334,
+        "net_win_rate": 0.41716658975542226,
+        "average_net_win_usdt": 0.3399653248948478,
+        "average_net_loss_usdt": -0.3273014530258211,
+        "mean_net_r": -0.10886542219946602,
+        "profit_factor": 0.7434500065111912,
+        "final_equity": 3.946918533330482,
+        "net_pnl_usdt": -106.05308146666951,
+        "net_return_pct": -96.41189224242683,
+        "max_drawdown_pct": 97.35779791331656,
+        "longest_losing_streak": 15,
+        "mean_holding_hours": 1.5246499279598011,
+        "fees_usdt": 67.74280827002931,
+        "funding_cost_usdt": -0.06005772128326524,
+        "largest_win_usdt": 2.6228198305880692,
+        "worst_net_trade_usdt": -4.964148356960016,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 64,
+        "positive_months": 1,
+        "monthly_cluster_mean_r_ci95": [
+          -0.15036698843899937,
+          -0.07105564905578389
+        ],
+        "exit_reasons": {
+          "TP": 394,
+          "SL": 588,
+          "TIME": 1182,
+          "SL_GAP": 3
+        },
+        "by_side": {
+          "long": {
+            "trades": 1084,
+            "net_pnl_usdt": -65.2301312429979,
+            "mean_net_r": -0.10792688316689848
+          },
+          "short": {
+            "trades": 1083,
+            "net_pnl_usdt": -40.82295022367167,
+            "mean_net_r": -0.10980482784240526
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 170,
+          "net_pnl_usdt": -4.549294306195205,
+          "net_r_sum": -13.827218169731875,
+          "wins": 72,
+          "fees_usdt": 19.5879968452234,
+          "funding_cost_usdt": -0.19632580195464452
+        },
+        {
+          "month": "2024-02",
+          "trades": 161,
+          "net_pnl_usdt": -30.622919859003805,
+          "net_r_sum": -30.79033043052802,
+          "wins": 59,
+          "fees_usdt": 14.484168688802193,
+          "funding_cost_usdt": 0.0921474022646074
+        },
+        {
+          "month": "2024-03",
+          "trades": 192,
+          "net_pnl_usdt": -25.840380664117124,
+          "net_r_sum": -25.104342010320554,
+          "wins": 78,
+          "fees_usdt": 11.535954254038128,
+          "funding_cost_usdt": 0.09860993598651896
+        },
+        {
+          "month": "2024-04",
+          "trades": 172,
+          "net_pnl_usdt": -19.399611004764264,
+          "net_r_sum": -27.929514236453056,
+          "wins": 67,
+          "fees_usdt": 6.703591845907276,
+          "funding_cost_usdt": -0.04644822608814182
+        },
+        {
+          "month": "2024-05",
+          "trades": 154,
+          "net_pnl_usdt": -7.512443254656582,
+          "net_r_sum": -29.778619968045167,
+          "wins": 55,
+          "fees_usdt": 4.074783451846734,
+          "funding_cost_usdt": 0.02412208183089609
+        },
+        {
+          "month": "2024-06",
+          "trades": 164,
+          "net_pnl_usdt": -7.98153055367116,
+          "net_r_sum": -37.682269300567306,
+          "wins": 54,
+          "fees_usdt": 2.9770001797328,
+          "funding_cost_usdt": -0.020122380239647335
+        },
+        {
+          "month": "2024-07",
+          "trades": 182,
+          "net_pnl_usdt": -5.7164833747257076,
+          "net_r_sum": -28.351408952863288,
+          "wins": 68,
+          "fees_usdt": 2.245753949223194,
+          "funding_cost_usdt": 0.0034417952107816214
+        },
+        {
+          "month": "2024-08",
+          "trades": 178,
+          "net_pnl_usdt": -0.4070742197755404,
+          "net_r_sum": -3.476361094968857,
+          "wins": 85,
+          "fees_usdt": 1.466755145653452,
+          "funding_cost_usdt": -0.016566171886444887
+        },
+        {
+          "month": "2024-09",
+          "trades": 171,
+          "net_pnl_usdt": -1.5371839332225432,
+          "net_r_sum": -16.915220272968213,
+          "wins": 70,
+          "fees_usdt": 1.2518365177813053,
+          "funding_cost_usdt": 0.001812486938279264
+        },
+        {
+          "month": "2024-10",
+          "trades": 191,
+          "net_pnl_usdt": -0.528046163115873,
+          "net_r_sum": -7.3447168573572785,
+          "wins": 82,
+          "fees_usdt": 1.1815244805914618,
+          "funding_cost_usdt": -0.006966808030294837
+        },
+        {
+          "month": "2024-11",
+          "trades": 202,
+          "net_pnl_usdt": 0.044142849185005904,
+          "net_r_sum": -2.4927520815743507,
+          "wins": 104,
+          "fees_usdt": 1.1884136443823194,
+          "funding_cost_usdt": 0.007680255660294968
+        },
+        {
+          "month": "2024-12",
+          "trades": 230,
+          "net_pnl_usdt": -2.0022569826067773,
+          "net_r_sum": -12.218616530864882,
+          "wins": 110,
+          "fees_usdt": 1.0450292668470507,
+          "funding_cost_usdt": -0.0014422909754701384
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 1820,
+        "invalid_entry_or_stop": 2,
+        "insufficient_full_horizon": 1
+      }
+    },
+    {
+      "window": "development_2024",
+      "target_pct": 0.02,
+      "hold_hours": 2,
+      "cost": "stress",
+      "metrics": {
+        "trades": 2121,
+        "trades_per_month": 176.75,
+        "net_win_rate": 0.3404054691183404,
+        "average_net_win_usdt": 0.16020263474472868,
+        "average_net_loss_usdt": -0.16128794578489228,
+        "mean_net_r": -0.22815192744653062,
+        "profit_factor": 0.5126101801761257,
+        "final_equity": 0.02446613262994263,
+        "net_pnl_usdt": -109.97553386737006,
+        "net_return_pct": -99.97775806124551,
+        "max_drawdown_pct": 99.97952677278803,
+        "longest_losing_streak": 28,
+        "mean_holding_hours": 1.5599558775996647,
+        "fees_usdt": 61.278644170048956,
+        "funding_cost_usdt": -0.07765044001587042,
+        "largest_win_usdt": 2.3026649239317023,
+        "worst_net_trade_usdt": -4.804787857919279,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 64,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.2732541095418403,
+          -0.18579950357484912
+        ],
+        "exit_reasons": {
+          "TIME": 1216,
+          "SL": 578,
+          "TP": 323,
+          "SL_GAP": 3,
+          "TP_GAP": 1
+        },
+        "by_side": {
+          "long": {
+            "trades": 1062,
+            "net_pnl_usdt": -61.003633540441804,
+            "mean_net_r": -0.22411548406493828
+          },
+          "short": {
+            "trades": 1059,
+            "net_pnl_usdt": -48.97190032692838,
+            "mean_net_r": -0.23219980551192348
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 168,
+          "net_pnl_usdt": -40.024040275249945,
+          "net_r_sum": -35.58770883379384,
+          "wins": 60,
+          "fees_usdt": 32.233772579543626,
+          "funding_cost_usdt": -0.1666512366540497
+        },
+        {
+          "month": "2024-02",
+          "trades": 159,
+          "net_pnl_usdt": -37.54409821540858,
+          "net_r_sum": -49.901251238392035,
+          "wins": 47,
+          "fees_usdt": 15.995215532332594,
+          "funding_cost_usdt": 0.048727606377935315
+        },
+        {
+          "month": "2024-03",
+          "trades": 188,
+          "net_pnl_usdt": -19.338380934110187,
+          "net_r_sum": -45.65464949821344,
+          "wins": 60,
+          "fees_usdt": 7.891267503675788,
+          "funding_cost_usdt": 0.05132845444476623
+        },
+        {
+          "month": "2024-04",
+          "trades": 168,
+          "net_pnl_usdt": -8.182926956695283,
+          "net_r_sum": -48.16376699218985,
+          "wins": 48,
+          "fees_usdt": 2.8375081929081465,
+          "funding_cost_usdt": -0.01165841224510351
+        },
+        {
+          "month": "2024-05",
+          "trades": 154,
+          "net_pnl_usdt": -2.4384307580337774,
+          "net_r_sum": -51.22360038620128,
+          "wins": 39,
+          "fees_usdt": 1.1311178894966354,
+          "funding_cost_usdt": 0.0034542143584390243
+        },
+        {
+          "month": "2024-06",
+          "trades": 162,
+          "net_pnl_usdt": -1.3862995272116607,
+          "net_r_sum": -58.711328745760284,
+          "wins": 38,
+          "fees_usdt": 0.5663140593410021,
+          "funding_cost_usdt": -0.002153273110960148
+        },
+        {
+          "month": "2024-07",
+          "trades": 178,
+          "net_pnl_usdt": -0.5961074499360718,
+          "net_r_sum": -43.35054575961079,
+          "wins": 57,
+          "fees_usdt": 0.2971607282269098,
+          "funding_cost_usdt": 0.00016702219257926974
+        },
+        {
+          "month": "2024-08",
+          "trades": 175,
+          "net_pnl_usdt": -0.16433612490110985,
+          "net_r_sum": -22.172696202545062,
+          "wins": 70,
+          "fees_usdt": 0.14622720389526767,
+          "funding_cost_usdt": -0.0008480185004849987
+        },
+        {
+          "month": "2024-09",
+          "trades": 170,
+          "net_pnl_usdt": -0.15251809913107628,
+          "net_r_sum": -40.4548436408335,
+          "wins": 62,
+          "fees_usdt": 0.0841622653456157,
+          "funding_cost_usdt": 4.8508817838897106e-05
+        },
+        {
+          "month": "2024-10",
+          "trades": 181,
+          "net_pnl_usdt": -0.07253530532493634,
+          "net_r_sum": -34.292947005832744,
+          "wins": 62,
+          "fees_usdt": 0.04771247544168598,
+          "funding_cost_usdt": -0.0001586545028754099
+        },
+        {
+          "month": "2024-11",
+          "trades": 194,
+          "net_pnl_usdt": -0.03667488056641669,
+          "net_r_sum": -21.602554451565133,
+          "wins": 85,
+          "fees_usdt": 0.031463909567690886,
+          "funding_cost_usdt": 9.303576116157644e-05
+        },
+        {
+          "month": "2024-12",
+          "trades": 224,
+          "net_pnl_usdt": -0.03918534080114322,
+          "net_r_sum": -32.7943453591535,
+          "wins": 94,
+          "fees_usdt": 0.01672183027399235,
+          "funding_cost_usdt": 3.1304488304859596e-07
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 1865,
+        "invalid_entry_or_stop": 2,
+        "wait_next_signal_after_exit": 1,
+        "insufficient_full_horizon": 1
+      }
+    },
+    {
+      "window": "development_2024",
+      "target_pct": 0.02,
+      "hold_hours": 4,
+      "cost": "normal",
+      "metrics": {
+        "trades": 1839,
+        "trades_per_month": 153.25,
+        "net_win_rate": 0.4274061990212072,
+        "average_net_win_usdt": 0.5320056761289153,
+        "average_net_loss_usdt": -0.4963813787850973,
+        "mean_net_r": -0.1071764659748478,
+        "profit_factor": 0.8000091602144677,
+        "final_equity": 5.466869576620021,
+        "net_pnl_usdt": -104.53313042337997,
+        "net_return_pct": -95.03011856670908,
+        "max_drawdown_pct": 96.61862153081462,
+        "longest_losing_streak": 19,
+        "mean_holding_hours": 2.37262080297263,
+        "fees_usdt": 69.17181920509171,
+        "funding_cost_usdt": 0.18414567388633127,
+        "largest_win_usdt": 2.783752428325425,
+        "worst_net_trade_usdt": -4.964148356960016,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 85,
+        "positive_months": 1,
+        "monthly_cluster_mean_r_ci95": [
+          -0.14837338286658158,
+          -0.06863714463819504
+        ],
+        "exit_reasons": {
+          "TP": 513,
+          "SL": 723,
+          "TIME": 599,
+          "SL_GAP": 3,
+          "TP_GAP": 1
+        },
+        "by_side": {
+          "long": {
+            "trades": 921,
+            "net_pnl_usdt": -78.52492106102959,
+            "mean_net_r": -0.12197481060643955
+          },
+          "short": {
+            "trades": 918,
+            "net_pnl_usdt": -26.00820936235052,
+            "mean_net_r": -0.09232976073988482
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 146,
+          "net_pnl_usdt": 4.501596401101118,
+          "net_r_sum": -9.256183747092871,
+          "wins": 62,
+          "fees_usdt": 17.4753655780346,
+          "funding_cost_usdt": -0.12275974222307139
+        },
+        {
+          "month": "2024-02",
+          "trades": 129,
+          "net_pnl_usdt": -21.871603016810546,
+          "net_r_sum": -18.09761536049712,
+          "wins": 49,
+          "fees_usdt": 13.773359321794837,
+          "funding_cost_usdt": 0.360185848621742
+        },
+        {
+          "month": "2024-03",
+          "trades": 163,
+          "net_pnl_usdt": -32.03874492674121,
+          "net_r_sum": -22.425363961906186,
+          "wins": 69,
+          "fees_usdt": 12.205183730184567,
+          "funding_cost_usdt": 0.1037753355624349
+        },
+        {
+          "month": "2024-04",
+          "trades": 143,
+          "net_pnl_usdt": -22.098829126374092,
+          "net_r_sum": -23.733196812149046,
+          "wins": 58,
+          "fees_usdt": 7.096776594609392,
+          "funding_cost_usdt": -0.10488565297965777
+        },
+        {
+          "month": "2024-05",
+          "trades": 123,
+          "net_pnl_usdt": -9.44732939426927,
+          "net_r_sum": -29.569710131189666,
+          "wins": 41,
+          "fees_usdt": 4.268115548238548,
+          "funding_cost_usdt": 0.037599733546569904
+        },
+        {
+          "month": "2024-06",
+          "trades": 138,
+          "net_pnl_usdt": -8.925038821998331,
+          "net_r_sum": -30.015968376600277,
+          "wins": 42,
+          "fees_usdt": 3.474789885853142,
+          "funding_cost_usdt": -0.031065586149922535
+        },
+        {
+          "month": "2024-07",
+          "trades": 160,
+          "net_pnl_usdt": -5.922466698649745,
+          "net_r_sum": -24.760519669324967,
+          "wins": 69,
+          "fees_usdt": 3.148725931046401,
+          "funding_cost_usdt": -0.0220965676395925
+        },
+        {
+          "month": "2024-08",
+          "trades": 149,
+          "net_pnl_usdt": -1.1561470178786692,
+          "net_r_sum": 0.8666498923179828,
+          "wins": 75,
+          "fees_usdt": 1.9276726797515322,
+          "funding_cost_usdt": -0.026464690398223977
+        },
+        {
+          "month": "2024-09",
+          "trades": 142,
+          "net_pnl_usdt": -3.0245461228632564,
+          "net_r_sum": -17.581960693198116,
+          "wins": 58,
+          "fees_usdt": 1.6111287590406482,
+          "funding_cost_usdt": 0.0034777406468307825
+        },
+        {
+          "month": "2024-10",
+          "trades": 162,
+          "net_pnl_usdt": -1.1574302991977428,
+          "net_r_sum": -5.994934560646871,
+          "wins": 71,
+          "fees_usdt": 1.551415203713663,
+          "funding_cost_usdt": -0.014537923921870907
+        },
+        {
+          "month": "2024-11",
+          "trades": 180,
+          "net_pnl_usdt": -1.781525762757339,
+          "net_r_sum": -8.352123876577403,
+          "wins": 84,
+          "fees_usdt": 1.409212172654646,
+          "funding_cost_usdt": 0.010967374942669183
+        },
+        {
+          "month": "2024-12",
+          "trades": 204,
+          "net_pnl_usdt": -1.6110656369410166,
+          "net_r_sum": -8.176593630880568,
+          "wins": 108,
+          "fees_usdt": 1.230073800169738,
+          "funding_cost_usdt": -0.010050196121576462
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 2148,
+        "invalid_entry_or_stop": 2,
+        "wait_next_signal_after_exit": 1
+      }
+    },
+    {
+      "window": "development_2024",
+      "target_pct": 0.02,
+      "hold_hours": 4,
+      "cost": "stress",
+      "metrics": {
+        "trades": 1779,
+        "trades_per_month": 148.25,
+        "net_win_rate": 0.3822372119168072,
+        "average_net_win_usdt": 0.2395948025168566,
+        "average_net_loss_usdt": -0.24825320397538767,
+        "mean_net_r": -0.22470276235625647,
+        "profit_factor": 0.5971641820147258,
+        "final_equity": 0.09419454251144971,
+        "net_pnl_usdt": -109.90580545748855,
+        "net_return_pct": -99.91436859771686,
+        "max_drawdown_pct": 99.93004308930279,
+        "longest_losing_streak": 18,
+        "mean_holding_hours": 2.4669288092561366,
+        "fees_usdt": 62.496391634211854,
+        "funding_cost_usdt": 0.09675680331760717,
+        "largest_win_usdt": 2.5320537959094276,
+        "worst_net_trade_usdt": -4.941058304076442,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 82,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.2711565613173826,
+          -0.18092331381290283
+        ],
+        "exit_reasons": {
+          "TIME": 641,
+          "SL": 710,
+          "TP": 424,
+          "SL_GAP": 3,
+          "TP_GAP": 1
+        },
+        "by_side": {
+          "long": {
+            "trades": 898,
+            "net_pnl_usdt": -70.28012265533344,
+            "mean_net_r": -0.2320891190545222
+          },
+          "short": {
+            "trades": 881,
+            "net_pnl_usdt": -39.62568280215513,
+            "mean_net_r": -0.21717387664111162
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2024-01",
+          "trades": 141,
+          "net_pnl_usdt": -33.17326355527575,
+          "net_r_sum": -28.810948165213944,
+          "wins": 54,
+          "fees_usdt": 28.684831373081977,
+          "funding_cost_usdt": -0.14504368534207246
+        },
+        {
+          "month": "2024-02",
+          "trades": 127,
+          "net_pnl_usdt": -31.1482678650877,
+          "net_r_sum": -33.42290627877773,
+          "wins": 43,
+          "fees_usdt": 15.977773088421962,
+          "funding_cost_usdt": 0.2160026001709962
+        },
+        {
+          "month": "2024-03",
+          "trades": 159,
+          "net_pnl_usdt": -25.414918313417836,
+          "net_r_sum": -39.48262695957628,
+          "wins": 59,
+          "fees_usdt": 9.8719754128238,
+          "funding_cost_usdt": 0.06207700710173071
+        },
+        {
+          "month": "2024-04",
+          "trades": 136,
+          "net_pnl_usdt": -11.618732636424815,
+          "net_r_sum": -39.4992178951013,
+          "wins": 45,
+          "fees_usdt": 3.7929999320507366,
+          "funding_cost_usdt": -0.0323838348980247
+        },
+        {
+          "month": "2024-05",
+          "trades": 122,
+          "net_pnl_usdt": -3.958499133479556,
+          "net_r_sum": -46.16552378090184,
+          "wins": 32,
+          "fees_usdt": 1.6300862116567594,
+          "funding_cost_usdt": 0.006042317589949211
+        },
+        {
+          "month": "2024-06",
+          "trades": 136,
+          "net_pnl_usdt": -2.1214739830035567,
+          "net_r_sum": -44.78722320911812,
+          "wins": 39,
+          "fees_usdt": 1.0074164388562539,
+          "funding_cost_usdt": -0.0043537021447494
+        },
+        {
+          "month": "2024-07",
+          "trades": 155,
+          "net_pnl_usdt": -1.1333391142126368,
+          "net_r_sum": -36.90025166703227,
+          "wins": 62,
+          "fees_usdt": 0.6869819844513468,
+          "funding_cost_usdt": -0.002770878017043877
+        },
+        {
+          "month": "2024-08",
+          "trades": 143,
+          "net_pnl_usdt": -0.3660883020869562,
+          "net_r_sum": -12.872424620245955,
+          "wins": 71,
+          "fees_usdt": 0.34838551375190074,
+          "funding_cost_usdt": -0.0025279239734360376
+        },
+        {
+          "month": "2024-09",
+          "trades": 139,
+          "net_pnl_usdt": -0.492422688613679,
+          "net_r_sum": -39.21834059842714,
+          "wins": 46,
+          "fees_usdt": 0.2206124514022231,
+          "funding_cost_usdt": 0.00023104449301268397
+        },
+        {
+          "month": "2024-10",
+          "trades": 151,
+          "net_pnl_usdt": -0.22200653447006685,
+          "net_r_sum": -26.361357823426875,
+          "wins": 58,
+          "fees_usdt": 0.13551204507041473,
+          "funding_cost_usdt": -0.0006115787790505465
+        },
+        {
+          "month": "2024-11",
+          "trades": 171,
+          "net_pnl_usdt": -0.17124250952927858,
+          "net_r_sum": -29.021388111021615,
+          "wins": 73,
+          "fees_usdt": 0.08779926169194653,
+          "funding_cost_usdt": 0.0002666300020041336
+        },
+        {
+          "month": "2024-12",
+          "trades": 199,
+          "net_pnl_usdt": -0.08555082188673276,
+          "net_r_sum": -23.204005122937204,
+          "wins": 98,
+          "fees_usdt": 0.052017920952534775,
+          "funding_cost_usdt": -0.00017119288570874042
+        }
+      ],
+      "signal_count": 3990,
+      "skip_counts": {
+        "position_or_pending": 2208,
+        "invalid_entry_or_stop": 2,
+        "wait_next_signal_after_exit": 1
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.01,
+      "hold_hours": 2,
+      "cost": "normal",
+      "metrics": {
+        "trades": 2794,
+        "trades_per_month": 232.83333333333334,
+        "net_win_rate": 0.5483178239083751,
+        "average_net_win_usdt": 0.2800891394938319,
+        "average_net_loss_usdt": -0.42502944458569686,
+        "mean_net_r": -0.0760414106306075,
+        "profit_factor": 0.7999754551373082,
+        "final_equity": 2.709402637401135,
+        "net_pnl_usdt": -107.29059736259886,
+        "net_return_pct": -97.5369066932717,
+        "max_drawdown_pct": 97.94228894830972,
+        "longest_losing_streak": 13,
+        "mean_holding_hours": 1.1374669993239481,
+        "fees_usdt": 91.29579614365277,
+        "funding_cost_usdt": -0.04766198875708142,
+        "largest_win_usdt": 1.3021422447925912,
+        "worst_net_trade_usdt": -4.947947949975375,
+        "ambiguous_bars": 1,
+        "intrabar_funding_trades": 176,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.10331715462246069,
+          -0.049995406170760946
+        ],
+        "exit_reasons": {
+          "TIME": 857,
+          "SL": 636,
+          "TP": 1298,
+          "TP_GAP": 1,
+          "SL_GAP": 2
+        },
+        "by_side": {
+          "long": {
+            "trades": 1432,
+            "net_pnl_usdt": -65.97880959933696,
+            "mean_net_r": -0.07473211801848553
+          },
+          "short": {
+            "trades": 1362,
+            "net_pnl_usdt": -41.31178776326193,
+            "mean_net_r": -0.07741799434614251
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 225,
+          "net_pnl_usdt": -4.4320274821399845,
+          "net_r_sum": -4.700513757429293,
+          "wins": 122,
+          "fees_usdt": 23.3161428498398,
+          "funding_cost_usdt": -0.05822762844956773
+        },
+        {
+          "month": "2025-02",
+          "trades": 222,
+          "net_pnl_usdt": -30.159764423995647,
+          "net_r_sum": -18.221063744300302,
+          "wins": 120,
+          "fees_usdt": 21.577998953370976,
+          "funding_cost_usdt": -0.03254687182913743
+        },
+        {
+          "month": "2025-03",
+          "trades": 228,
+          "net_pnl_usdt": -18.759781623354396,
+          "net_r_sum": -19.74307827358909,
+          "wins": 115,
+          "fees_usdt": 14.906691076930784,
+          "funding_cost_usdt": -0.06423764528652542
+        },
+        {
+          "month": "2025-04",
+          "trades": 205,
+          "net_pnl_usdt": -16.27879310819312,
+          "net_r_sum": -23.2875987565164,
+          "wins": 109,
+          "fees_usdt": 9.155969386722568,
+          "funding_cost_usdt": 0.18253086752333805
+        },
+        {
+          "month": "2025-05",
+          "trades": 223,
+          "net_pnl_usdt": -17.14095120421088,
+          "net_r_sum": -33.54255351558693,
+          "wins": 100,
+          "fees_usdt": 6.95394554035317,
+          "funding_cost_usdt": 0.029492563291650224
+        },
+        {
+          "month": "2025-06",
+          "trades": 212,
+          "net_pnl_usdt": -8.59503739796954,
+          "net_r_sum": -32.413334262329414,
+          "wins": 94,
+          "fees_usdt": 3.927078394101554,
+          "funding_cost_usdt": -0.05208539937542045
+        },
+        {
+          "month": "2025-07",
+          "trades": 220,
+          "net_pnl_usdt": -3.860613115550494,
+          "net_r_sum": -21.59820388788529,
+          "wins": 105,
+          "fees_usdt": 2.8218261149852504,
+          "funding_cost_usdt": 0.010089436298630863
+        },
+        {
+          "month": "2025-08",
+          "trades": 209,
+          "net_pnl_usdt": -2.410206736941206,
+          "net_r_sum": -17.704795834449104,
+          "wins": 91,
+          "fees_usdt": 2.00422770921787,
+          "funding_cost_usdt": -0.0013125213112347128
+        },
+        {
+          "month": "2025-09",
+          "trades": 217,
+          "net_pnl_usdt": -0.4214645721224092,
+          "net_r_sum": -7.331428803477891,
+          "wins": 112,
+          "fees_usdt": 1.6818684923103,
+          "funding_cost_usdt": -0.0017158261852481158
+        },
+        {
+          "month": "2025-10",
+          "trades": 326,
+          "net_pnl_usdt": -1.2607368502158203,
+          "net_r_sum": -1.3204118037924861,
+          "wins": 245,
+          "fees_usdt": 2.680804192748482,
+          "funding_cost_usdt": -0.01658447085722692
+        },
+        {
+          "month": "2025-11",
+          "trades": 285,
+          "net_pnl_usdt": -2.9694033534649775,
+          "net_r_sum": -15.532192231367548,
+          "wins": 196,
+          "fees_usdt": 1.5409276631377413,
+          "funding_cost_usdt": -0.04093855965186008
+        },
+        {
+          "month": "2025-12",
+          "trades": 222,
+          "net_pnl_usdt": -1.0018174944404192,
+          "net_r_sum": -17.064526431193613,
+          "wins": 123,
+          "fees_usdt": 0.728315769934276,
+          "funding_cost_usdt": -0.002125932924479712
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 1434,
+        "invalid_entry_or_stop": 5,
+        "wait_next_signal_after_exit": 1
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.01,
+      "hold_hours": 2,
+      "cost": "stress",
+      "metrics": {
+        "trades": 2628,
+        "trades_per_month": 219.0,
+        "net_win_rate": 0.476027397260274,
+        "average_net_win_usdt": 0.1126430079338141,
+        "average_net_loss_usdt": -0.18221379286794867,
+        "mean_net_r": -0.17646498869190688,
+        "profit_factor": 0.5616249076579423,
+        "final_equity": 0.008010146036208676,
+        "net_pnl_usdt": -109.99198985396379,
+        "net_return_pct": -99.992718049058,
+        "max_drawdown_pct": 99.99287305366845,
+        "longest_losing_streak": 13,
+        "mean_holding_hours": 1.2329399539151022,
+        "fees_usdt": 70.02839061356111,
+        "funding_cost_usdt": 0.027919504595917327,
+        "largest_win_usdt": 1.1114860043259702,
+        "worst_net_trade_usdt": -3.074561835874847,
+        "ambiguous_bars": 1,
+        "intrabar_funding_trades": 181,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.2199872414428581,
+          -0.1333978584293981
+        ],
+        "exit_reasons": {
+          "TIME": 940,
+          "SL": 630,
+          "TP": 1054,
+          "TP_GAP": 2,
+          "SL_GAP": 2
+        },
+        "by_side": {
+          "long": {
+            "trades": 1342,
+            "net_pnl_usdt": -69.67198425123573,
+            "mean_net_r": -0.1697862270255396
+          },
+          "short": {
+            "trades": 1286,
+            "net_pnl_usdt": -40.320005602728166,
+            "mean_net_r": -0.18343458290362144
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 208,
+          "net_pnl_usdt": -41.214339941647864,
+          "net_r_sum": -28.793985605444544,
+          "wins": 101,
+          "fees_usdt": 35.09593859259357,
+          "funding_cost_usdt": -0.04662795022175495
+        },
+        {
+          "month": "2025-02",
+          "trades": 204,
+          "net_pnl_usdt": -40.45019068852166,
+          "net_r_sum": -40.644115173348474,
+          "wins": 89,
+          "fees_usdt": 20.93838312624131,
+          "funding_cost_usdt": -0.04073884124723769
+        },
+        {
+          "month": "2025-03",
+          "trades": 219,
+          "net_pnl_usdt": -16.937851209136493,
+          "net_r_sum": -44.66864981571992,
+          "wins": 94,
+          "fees_usdt": 8.511791956098863,
+          "funding_cost_usdt": -0.016561266425676246
+        },
+        {
+          "month": "2025-04",
+          "trades": 196,
+          "net_pnl_usdt": -5.690238745522225,
+          "net_r_sum": -38.29126800473234,
+          "wins": 92,
+          "fees_usdt": 3.1086732311297602,
+          "funding_cost_usdt": 0.1359075721441841
+        },
+        {
+          "month": "2025-05",
+          "trades": 210,
+          "net_pnl_usdt": -3.7492871179935645,
+          "net_r_sum": -55.83968077414588,
+          "wins": 82,
+          "fees_usdt": 1.5013183342015548,
+          "funding_cost_usdt": 0.0014064163277688762
+        },
+        {
+          "month": "2025-06",
+          "trades": 203,
+          "net_pnl_usdt": -1.2876839585937894,
+          "net_r_sum": -60.47191729139903,
+          "wins": 62,
+          "fees_usdt": 0.48481870949431677,
+          "funding_cost_usdt": -0.005077695928618072
+        },
+        {
+          "month": "2025-07",
+          "trades": 196,
+          "net_pnl_usdt": -0.3652144803030649,
+          "net_r_sum": -45.48578650546719,
+          "wins": 70,
+          "fees_usdt": 0.19040369464491672,
+          "funding_cost_usdt": 0.0002862615213165997
+        },
+        {
+          "month": "2025-08",
+          "trades": 194,
+          "net_pnl_usdt": -0.16339252160045017,
+          "net_r_sum": -44.91856633538857,
+          "wins": 68,
+          "fees_usdt": 0.08320119009140263,
+          "funding_cost_usdt": -7.82692149370264e-05
+        },
+        {
+          "month": "2025-09",
+          "trades": 204,
+          "net_pnl_usdt": -0.05055053592174605,
+          "net_r_sum": -28.34124292533378,
+          "wins": 90,
+          "fees_usdt": 0.04443335205019585,
+          "funding_cost_usdt": -3.2846464348747655e-05
+        },
+        {
+          "month": "2025-10",
+          "trades": 309,
+          "net_pnl_usdt": -0.04243001544850317,
+          "net_r_sum": -14.13337984314304,
+          "wins": 225,
+          "fees_usdt": 0.046720698056663706,
+          "funding_cost_usdt": -0.00016265253308353858
+        },
+        {
+          "month": "2025-11",
+          "trades": 272,
+          "net_pnl_usdt": -0.032184844064192177,
+          "net_r_sum": -27.936461336907495,
+          "wins": 176,
+          "fees_usdt": 0.017245210682328916,
+          "funding_cost_usdt": -0.000393421028930162
+        },
+        {
+          "month": "2025-12",
+          "trades": 213,
+          "net_pnl_usdt": -0.008625795210338114,
+          "net_r_sum": -34.22493667130107,
+          "wins": 102,
+          "fees_usdt": 0.0054625182762427045,
+          "funding_cost_usdt": -7.802332765829995e-06
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 1601,
+        "invalid_entry_or_stop": 5
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.01,
+      "hold_hours": 4,
+      "cost": "normal",
+      "metrics": {
+        "trades": 2564,
+        "trades_per_month": 213.66666666666666,
+        "net_win_rate": 0.5978939157566303,
+        "average_net_win_usdt": 0.30469549205420327,
+        "average_net_loss_usdt": -0.555663217647318,
+        "mean_net_r": -0.07220736846868454,
+        "profit_factor": 0.8153383479487095,
+        "final_equity": 4.209411924708775,
+        "net_pnl_usdt": -105.79058807529123,
+        "net_return_pct": -96.1732618866284,
+        "max_drawdown_pct": 96.32230913352807,
+        "longest_losing_streak": 8,
+        "mean_holding_hours": 1.5330535794765123,
+        "fees_usdt": 83.92696504795624,
+        "funding_cost_usdt": -0.5609668283481706,
+        "largest_win_usdt": 1.1263703066726858,
+        "worst_net_trade_usdt": -4.901589878619445,
+        "ambiguous_bars": 1,
+        "intrabar_funding_trades": 213,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.0970396907107062,
+          -0.04974988025928274
+        ],
+        "exit_reasons": {
+          "TIME": 322,
+          "TP": 1456,
+          "SL": 784,
+          "SL_GAP": 1,
+          "TP_GAP": 1
+        },
+        "by_side": {
+          "long": {
+            "trades": 1319,
+            "net_pnl_usdt": -65.26844888308534,
+            "mean_net_r": -0.07068783137232221
+          },
+          "short": {
+            "trades": 1245,
+            "net_pnl_usdt": -40.522139192205806,
+            "mean_net_r": -0.07381722343262183
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 208,
+          "net_pnl_usdt": -19.64264196220792,
+          "net_r_sum": -10.05113752121067,
+          "wins": 118,
+          "fees_usdt": 20.40841327406582,
+          "funding_cost_usdt": -0.03576163561454364
+        },
+        {
+          "month": "2025-02",
+          "trades": 209,
+          "net_pnl_usdt": -20.206034041120336,
+          "net_r_sum": -13.474409630230964,
+          "wins": 126,
+          "fees_usdt": 18.03716303456153,
+          "funding_cost_usdt": -0.022886586859588724
+        },
+        {
+          "month": "2025-03",
+          "trades": 206,
+          "net_pnl_usdt": -14.1375603122681,
+          "net_r_sum": -12.255961537391398,
+          "wins": 117,
+          "fees_usdt": 12.667496279887859,
+          "funding_cost_usdt": -0.027119300713917605
+        },
+        {
+          "month": "2025-04",
+          "trades": 191,
+          "net_pnl_usdt": -15.217093182457532,
+          "net_r_sum": -21.386459378854518,
+          "wins": 105,
+          "fees_usdt": 8.758936852712873,
+          "funding_cost_usdt": -0.35314924625665295
+        },
+        {
+          "month": "2025-05",
+          "trades": 199,
+          "net_pnl_usdt": -15.025756007128077,
+          "net_r_sum": -28.26912737536923,
+          "wins": 102,
+          "fees_usdt": 6.570455549956798,
+          "funding_cost_usdt": 0.0069388979932369105
+        },
+        {
+          "month": "2025-06",
+          "trades": 191,
+          "net_pnl_usdt": -9.661974103958766,
+          "net_r_sum": -29.13812700895076,
+          "wins": 90,
+          "fees_usdt": 4.00596501256113,
+          "funding_cost_usdt": -0.047825142446305535
+        },
+        {
+          "month": "2025-07",
+          "trades": 194,
+          "net_pnl_usdt": -2.191838401062181,
+          "net_r_sum": -10.368501127645754,
+          "wins": 103,
+          "fees_usdt": 2.9161963671416755,
+          "funding_cost_usdt": 0.009148381867175042
+        },
+        {
+          "month": "2025-08",
+          "trades": 180,
+          "net_pnl_usdt": -3.0131333754783243,
+          "net_r_sum": -14.805257340489367,
+          "wins": 90,
+          "fees_usdt": 2.256160714928976,
+          "funding_cost_usdt": 0.005554096935846893
+        },
+        {
+          "month": "2025-09",
+          "trades": 199,
+          "net_pnl_usdt": -0.6964048910758458,
+          "net_r_sum": -15.19041136888006,
+          "wins": 111,
+          "fees_usdt": 1.8783445129399217,
+          "funding_cost_usdt": -0.0007280332962640359
+        },
+        {
+          "month": "2025-10",
+          "trades": 308,
+          "net_pnl_usdt": -1.199502562112058,
+          "net_r_sum": -2.1516973763680514,
+          "wins": 242,
+          "fees_usdt": 3.2980222663805305,
+          "funding_cost_usdt": -0.02769954147820664
+        },
+        {
+          "month": "2025-11",
+          "trades": 274,
+          "net_pnl_usdt": -3.756921941777603,
+          "net_r_sum": -15.253251996592569,
+          "wins": 201,
+          "fees_usdt": 2.109041193630601,
+          "funding_cost_usdt": -0.06550030103046305
+        },
+        {
+          "month": "2025-12",
+          "trades": 205,
+          "net_pnl_usdt": -1.0417272946444005,
+          "net_r_sum": -12.795351091723811,
+          "wins": 128,
+          "fees_usdt": 1.0207699891885351,
+          "funding_cost_usdt": -0.0019384174484872521
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 1665,
+        "invalid_entry_or_stop": 4,
+        "wait_next_signal_after_exit": 1
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.01,
+      "hold_hours": 4,
+      "cost": "stress",
+      "metrics": {
+        "trades": 2373,
+        "trades_per_month": 197.75,
+        "net_win_rate": 0.540244416350611,
+        "average_net_win_usdt": 0.12406094260701535,
+        "average_net_loss_usdt": -0.24658491309613698,
+        "mean_net_r": -0.1698108390722951,
+        "profit_factor": 0.5911964937834815,
+        "final_equity": 0.02198823430823761,
+        "net_pnl_usdt": -109.97801176569176,
+        "net_return_pct": -99.98001069608343,
+        "max_drawdown_pct": 99.9805307396978,
+        "longest_losing_streak": 10,
+        "mean_holding_hours": 1.7266818869691436,
+        "fees_usdt": 63.32243037199498,
+        "funding_cost_usdt": -0.04229783341113734,
+        "largest_win_usdt": 1.1182001103345003,
+        "worst_net_trade_usdt": -3.1651845651064625,
+        "ambiguous_bars": 1,
+        "intrabar_funding_trades": 222,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.21112481549741824,
+          -0.12903161492049517
+        ],
+        "exit_reasons": {
+          "TIME": 394,
+          "TP": 1205,
+          "SL": 771,
+          "SL_GAP": 1,
+          "TP_GAP": 2
+        },
+        "by_side": {
+          "long": {
+            "trades": 1213,
+            "net_pnl_usdt": -68.49650308392278,
+            "mean_net_r": -0.1641243165024341
+          },
+          "short": {
+            "trades": 1160,
+            "net_pnl_usdt": -41.48150868176897,
+            "mean_net_r": -0.1757571768975032
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 195,
+          "net_pnl_usdt": -49.47247418839249,
+          "net_r_sum": -30.512296617638295,
+          "wins": 101,
+          "fees_usdt": 32.55841472020981,
+          "funding_cost_usdt": -0.027606385258850383
+        },
+        {
+          "month": "2025-02",
+          "trades": 190,
+          "net_pnl_usdt": -33.052767382690966,
+          "net_r_sum": -33.539255236469515,
+          "wins": 102,
+          "fees_usdt": 17.548233644796163,
+          "funding_cost_usdt": -0.04609988711227745
+        },
+        {
+          "month": "2025-03",
+          "trades": 194,
+          "net_pnl_usdt": -15.781101225281333,
+          "net_r_sum": -36.95991997364858,
+          "wins": 93,
+          "fees_usdt": 7.31211211256426,
+          "funding_cost_usdt": -0.009303717394873923
+        },
+        {
+          "month": "2025-04",
+          "trades": 178,
+          "net_pnl_usdt": -4.976018639623865,
+          "net_r_sum": -31.626556048022177,
+          "wins": 96,
+          "fees_usdt": 3.0314849840667484,
+          "funding_cost_usdt": 0.04873816982345867
+        },
+        {
+          "month": "2025-05",
+          "trades": 183,
+          "net_pnl_usdt": -4.026847021175864,
+          "net_r_sum": -47.71615519542594,
+          "wins": 82,
+          "fees_usdt": 1.635737118527118,
+          "funding_cost_usdt": -0.0007447741516272795
+        },
+        {
+          "month": "2025-06",
+          "trades": 176,
+          "net_pnl_usdt": -1.647253721291033,
+          "net_r_sum": -49.62221834839834,
+          "wins": 70,
+          "fees_usdt": 0.6121293759349061,
+          "funding_cost_usdt": -0.006275172891354405
+        },
+        {
+          "month": "2025-07",
+          "trades": 169,
+          "net_pnl_usdt": -0.47055988060234816,
+          "net_r_sum": -33.672471286766225,
+          "wins": 71,
+          "fees_usdt": 0.26862969339287823,
+          "funding_cost_usdt": 0.0003901155723488276
+        },
+        {
+          "month": "2025-08",
+          "trades": 165,
+          "net_pnl_usdt": -0.2720437490716841,
+          "net_r_sum": -36.047645298887566,
+          "wins": 71,
+          "fees_usdt": 0.13984059121649722,
+          "funding_cost_usdt": 4.718456896591304e-05
+        },
+        {
+          "month": "2025-09",
+          "trades": 184,
+          "net_pnl_usdt": -0.1286533882504296,
+          "net_r_sum": -38.08137481695339,
+          "wins": 84,
+          "fees_usdt": 0.07693420791952434,
+          "funding_cost_usdt": -1.7543961441874954e-05
+        },
+        {
+          "month": "2025-10",
+          "trades": 289,
+          "net_pnl_usdt": -0.06866450440715526,
+          "net_r_sum": -13.14058297883057,
+          "wins": 223,
+          "fees_usdt": 0.08684593684920218,
+          "funding_cost_usdt": -0.00037293342671109527
+        },
+        {
+          "month": "2025-11",
+          "trades": 256,
+          "net_pnl_usdt": -0.061458016557742606,
+          "net_r_sum": -23.598192444414938,
+          "wins": 183,
+          "fees_usdt": 0.03885105874004277,
+          "funding_cost_usdt": -0.0010139861050132621
+        },
+        {
+          "month": "2025-12",
+          "trades": 194,
+          "net_pnl_usdt": -0.020170048346840632,
+          "net_r_sum": -28.444452873100715,
+          "wins": 106,
+          "fees_usdt": 0.013216927777829051,
+          "funding_cost_usdt": -3.8903073761066696e-05
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 1857,
+        "invalid_entry_or_stop": 4
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.02,
+      "hold_hours": 2,
+      "cost": "normal",
+      "metrics": {
+        "trades": 2362,
+        "trades_per_month": 196.83333333333334,
+        "net_win_rate": 0.45850973751058427,
+        "average_net_win_usdt": 0.3353780783519194,
+        "average_net_loss_usdt": -0.36668041059239304,
+        "mean_net_r": -0.09021074535610692,
+        "profit_factor": 0.774470491521015,
+        "final_equity": 4.230213707457893,
+        "net_pnl_usdt": -105.76978629254211,
+        "net_return_pct": -96.15435117503827,
+        "max_drawdown_pct": 96.52697478747164,
+        "longest_losing_streak": 13,
+        "mean_holding_hours": 1.4224878592765078,
+        "fees_usdt": 65.50657140168305,
+        "funding_cost_usdt": -0.7699414654608835,
+        "largest_win_usdt": 2.385474834916004,
+        "worst_net_trade_usdt": -4.745590777933932,
+        "ambiguous_bars": 1,
+        "intrabar_funding_trades": 195,
+        "positive_months": 1,
+        "monthly_cluster_mean_r_ci95": [
+          -0.12392077022970652,
+          -0.05462024855162958
+        ],
+        "exit_reasons": {
+          "TIME": 1124,
+          "SL": 637,
+          "TP": 598,
+          "TP_GAP": 1,
+          "SL_GAP": 2
+        },
+        "by_side": {
+          "long": {
+            "trades": 1214,
+            "net_pnl_usdt": -59.875916687741736,
+            "mean_net_r": -0.07795004538300988
+          },
+          "short": {
+            "trades": 1148,
+            "net_pnl_usdt": -45.893869604800244,
+            "mean_net_r": -0.1031763287771346
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 179,
+          "net_pnl_usdt": -12.97559012279737,
+          "net_r_sum": -12.588959426891426,
+          "wins": 84,
+          "fees_usdt": 17.902894699353574,
+          "funding_cost_usdt": -0.06681811019400304
+        },
+        {
+          "month": "2025-02",
+          "trades": 179,
+          "net_pnl_usdt": -34.280168919940216,
+          "net_r_sum": -23.347546659733577,
+          "wins": 74,
+          "fees_usdt": 15.133493424622765,
+          "funding_cost_usdt": -0.04966403503724335
+        },
+        {
+          "month": "2025-03",
+          "trades": 191,
+          "net_pnl_usdt": -21.57333856466895,
+          "net_r_sum": -21.00503018555541,
+          "wins": 77,
+          "fees_usdt": 9.737141163824953,
+          "funding_cost_usdt": -0.06262390744475521
+        },
+        {
+          "month": "2025-04",
+          "trades": 176,
+          "net_pnl_usdt": -10.544282223340309,
+          "net_r_sum": -18.20406900915834,
+          "wins": 78,
+          "fees_usdt": 6.18493998691832,
+          "funding_cost_usdt": -0.419614890642224
+        },
+        {
+          "month": "2025-05",
+          "trades": 184,
+          "net_pnl_usdt": -12.618465973738095,
+          "net_r_sum": -34.2932164233962,
+          "wins": 72,
+          "fees_usdt": 4.365056989539745,
+          "funding_cost_usdt": 0.012730318241460311
+        },
+        {
+          "month": "2025-06",
+          "trades": 182,
+          "net_pnl_usdt": -6.426776424198828,
+          "net_r_sum": -26.960146536710262,
+          "wins": 71,
+          "fees_usdt": 2.640700196266132,
+          "funding_cost_usdt": -0.021093290166132816
+        },
+        {
+          "month": "2025-07",
+          "trades": 182,
+          "net_pnl_usdt": -3.1716077930834388,
+          "net_r_sum": -24.375398034132115,
+          "wins": 75,
+          "fees_usdt": 1.8342406302905523,
+          "funding_cost_usdt": 0.006177819159148983
+        },
+        {
+          "month": "2025-08",
+          "trades": 184,
+          "net_pnl_usdt": -2.2553821739641524,
+          "net_r_sum": -23.389452113146355,
+          "wins": 68,
+          "fees_usdt": 1.361081401417774,
+          "funding_cost_usdt": 0.00013660793286192417
+        },
+        {
+          "month": "2025-09",
+          "trades": 184,
+          "net_pnl_usdt": -0.013568921667535655,
+          "net_r_sum": -7.000876931436009,
+          "wins": 83,
+          "fees_usdt": 1.0764410886411788,
+          "funding_cost_usdt": -0.0025013625656215063
+        },
+        {
+          "month": "2025-10",
+          "trades": 278,
+          "net_pnl_usdt": 2.3036439349357076,
+          "net_r_sum": 6.872123597205086,
+          "wins": 178,
+          "fees_usdt": 2.5767907958497234,
+          "funding_cost_usdt": -0.032778684435308784
+        },
+        {
+          "month": "2025-11",
+          "trades": 247,
+          "net_pnl_usdt": -3.892706343855488,
+          "net_r_sum": -17.641987696962147,
+          "wins": 136,
+          "fees_usdt": 1.715979653572301,
+          "funding_cost_usdt": -0.13158688629467258
+        },
+        {
+          "month": "2025-12",
+          "trades": 196,
+          "net_pnl_usdt": -0.32154276622330247,
+          "net_r_sum": -11.143221111207772,
+          "wins": 87,
+          "fees_usdt": 0.9778113713860256,
+          "funding_cost_usdt": -0.0023050440143934153
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 1866,
+        "invalid_entry_or_stop": 5,
+        "wait_next_signal_after_exit": 1
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.02,
+      "hold_hours": 2,
+      "cost": "stress",
+      "metrics": {
+        "trades": 2300,
+        "trades_per_month": 191.66666666666666,
+        "net_win_rate": 0.3917391304347826,
+        "average_net_win_usdt": 0.13344756614414885,
+        "average_net_loss_usdt": -0.16455874455528338,
+        "mean_net_r": -0.19209440787996443,
+        "profit_factor": 0.5222720305345213,
+        "final_equity": 0.018573463036784095,
+        "net_pnl_usdt": -109.98142653696321,
+        "net_return_pct": -99.98311503360291,
+        "max_drawdown_pct": 99.98341431311827,
+        "longest_losing_streak": 13,
+        "mean_holding_hours": 1.4628984128019324,
+        "fees_usdt": 56.36761591253583,
+        "funding_cost_usdt": -0.21228497901465646,
+        "largest_win_usdt": 1.8514793898458288,
+        "worst_net_trade_usdt": -4.161706198224642,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 195,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.23549346932149356,
+          -0.1454898073166776
+        ],
+        "exit_reasons": {
+          "TIME": 1155,
+          "SL": 632,
+          "TP": 510,
+          "TP_GAP": 1,
+          "SL_GAP": 2
+        },
+        "by_side": {
+          "long": {
+            "trades": 1182,
+            "net_pnl_usdt": -59.705089533380026,
+            "mean_net_r": -0.17510583354452305
+          },
+          "short": {
+            "trades": 1118,
+            "net_pnl_usdt": -50.27633700358329,
+            "mean_net_r": -0.2100554945208336
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 176,
+          "net_pnl_usdt": -50.64544498760681,
+          "net_r_sum": -35.08583302204553,
+          "wins": 71,
+          "fees_usdt": 27.627163581343126,
+          "funding_cost_usdt": -0.04188766487242654
+        },
+        {
+          "month": "2025-02",
+          "trades": 174,
+          "net_pnl_usdt": -30.130344981960928,
+          "net_r_sum": -33.85472496932104,
+          "wins": 64,
+          "fees_usdt": 15.726558380393943,
+          "funding_cost_usdt": -0.035198151624087834
+        },
+        {
+          "month": "2025-03",
+          "trades": 185,
+          "net_pnl_usdt": -16.590233489468375,
+          "net_r_sum": -41.05704264251333,
+          "wins": 65,
+          "fees_usdt": 7.081848780309834,
+          "funding_cost_usdt": -0.019457730556785097
+        },
+        {
+          "month": "2025-04",
+          "trades": 173,
+          "net_pnl_usdt": -6.088317095644367,
+          "net_r_sum": -35.6740756781994,
+          "wins": 62,
+          "fees_usdt": 3.193582431046849,
+          "funding_cost_usdt": -0.11400946034365655
+        },
+        {
+          "month": "2025-05",
+          "trades": 181,
+          "net_pnl_usdt": -4.054165335370617,
+          "net_r_sum": -54.38568138175309,
+          "wins": 60,
+          "fees_usdt": 1.5187265047219982,
+          "funding_cost_usdt": 0.002401289979670895
+        },
+        {
+          "month": "2025-06",
+          "trades": 182,
+          "net_pnl_usdt": -1.4367417661459394,
+          "net_r_sum": -49.037579002410475,
+          "wins": 55,
+          "fees_usdt": 0.6138448611332472,
+          "funding_cost_usdt": -0.002839737495474019
+        },
+        {
+          "month": "2025-07",
+          "trades": 179,
+          "net_pnl_usdt": -0.5576228636893964,
+          "net_r_sum": -46.83899042255901,
+          "wins": 55,
+          "fees_usdt": 0.27553530316007263,
+          "funding_cost_usdt": 0.0004980436554409449
+        },
+        {
+          "month": "2025-08",
+          "trades": 179,
+          "net_pnl_usdt": -0.2552005606385264,
+          "net_r_sum": -46.48494074995809,
+          "wins": 52,
+          "fees_usdt": 0.12836170987128206,
+          "funding_cost_usdt": 2.7907935701732286e-06
+        },
+        {
+          "month": "2025-09",
+          "trades": 180,
+          "net_pnl_usdt": -0.07692433655806778,
+          "net_r_sum": -29.156886415697542,
+          "wins": 68,
+          "fees_usdt": 0.06814530902810129,
+          "funding_cost_usdt": -6.25438908244352e-05
+        },
+        {
+          "month": "2025-10",
+          "trades": 262,
+          "net_pnl_usdt": -0.05887329149766502,
+          "net_r_sum": -11.20949693215622,
+          "wins": 158,
+          "fees_usdt": 0.09136506688336923,
+          "funding_cost_usdt": -0.0005061870579274516
+        },
+        {
+          "month": "2025-11",
+          "trades": 241,
+          "net_pnl_usdt": -0.0737626836488628,
+          "net_r_sum": -30.383905442249066,
+          "wins": 122,
+          "fees_usdt": 0.03181250988272666,
+          "funding_cost_usdt": -0.0012163006508491257
+        },
+        {
+          "month": "2025-12",
+          "trades": 188,
+          "net_pnl_usdt": -0.013795144733766916,
+          "net_r_sum": -28.64798146505542,
+          "wins": 69,
+          "fees_usdt": 0.010671474761285603,
+          "funding_cost_usdt": -9.326951307413754e-06
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 1928,
+        "invalid_entry_or_stop": 5,
+        "wait_next_signal_after_exit": 1
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.02,
+      "hold_hours": 4,
+      "cost": "normal",
+      "metrics": {
+        "trades": 2023,
+        "trades_per_month": 168.58333333333334,
+        "net_win_rate": 0.4809688581314879,
+        "average_net_win_usdt": 0.4896078299965531,
+        "average_net_loss_usdt": -0.5489130272942364,
+        "mean_net_r": -0.07410424130850198,
+        "profit_factor": 0.8265485299797872,
+        "final_equity": 10.029739927697902,
+        "net_pnl_usdt": -99.9702600723021,
+        "net_return_pct": -90.88205461118373,
+        "max_drawdown_pct": 93.05881238792273,
+        "longest_losing_streak": 11,
+        "mean_holding_hours": 2.1667488504421377,
+        "fees_usdt": 63.67399421520041,
+        "funding_cost_usdt": -0.8476544652517717,
+        "largest_win_usdt": 2.290418130949921,
+        "worst_net_trade_usdt": -4.7339304428883,
+        "ambiguous_bars": 1,
+        "intrabar_funding_trades": 240,
+        "positive_months": 1,
+        "monthly_cluster_mean_r_ci95": [
+          -0.11427270988385167,
+          -0.03764864063314203
+        ],
+        "exit_reasons": {
+          "TIME": 549,
+          "SL": 737,
+          "TP": 735,
+          "SL_GAP": 1,
+          "TP_GAP": 1
+        },
+        "by_side": {
+          "long": {
+            "trades": 1051,
+            "net_pnl_usdt": -59.95405822950022,
+            "mean_net_r": -0.06478355522034558
+          },
+          "short": {
+            "trades": 972,
+            "net_pnl_usdt": -40.016201842801806,
+            "mean_net_r": -0.08418247287090154
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 157,
+          "net_pnl_usdt": -27.787092860349333,
+          "net_r_sum": -11.361478756701366,
+          "wins": 66,
+          "fees_usdt": 15.136496872013277,
+          "funding_cost_usdt": -0.026458394392854617
+        },
+        {
+          "month": "2025-02",
+          "trades": 155,
+          "net_pnl_usdt": -15.76976007440175,
+          "net_r_sum": -7.4632860511926955,
+          "wins": 72,
+          "fees_usdt": 12.205238884359405,
+          "funding_cost_usdt": -0.0404979182169479
+        },
+        {
+          "month": "2025-03",
+          "trades": 156,
+          "net_pnl_usdt": -16.9350391459185,
+          "net_r_sum": -7.322101367920661,
+          "wins": 68,
+          "fees_usdt": 8.911921195921192,
+          "funding_cost_usdt": -0.01832041397627591
+        },
+        {
+          "month": "2025-04",
+          "trades": 152,
+          "net_pnl_usdt": -13.500944126505578,
+          "net_r_sum": -22.811788305589364,
+          "wins": 63,
+          "fees_usdt": 6.361523422678569,
+          "funding_cost_usdt": -0.4106510158126298
+        },
+        {
+          "month": "2025-05",
+          "trades": 155,
+          "net_pnl_usdt": -12.494942961651212,
+          "net_r_sum": -28.431407435971874,
+          "wins": 62,
+          "fees_usdt": 4.430438080954843,
+          "funding_cost_usdt": -0.004947648201040934
+        },
+        {
+          "month": "2025-06",
+          "trades": 153,
+          "net_pnl_usdt": -9.369582672855046,
+          "net_r_sum": -25.612340277356665,
+          "wins": 56,
+          "fees_usdt": 2.82752146873407,
+          "funding_cost_usdt": -0.03972369989530182
+        },
+        {
+          "month": "2025-07",
+          "trades": 139,
+          "net_pnl_usdt": -1.4608326108730696,
+          "net_r_sum": -5.17741338673022,
+          "wins": 63,
+          "fees_usdt": 1.8317044730138416,
+          "funding_cost_usdt": 0.012364499381696077
+        },
+        {
+          "month": "2025-08",
+          "trades": 145,
+          "net_pnl_usdt": -2.299601217203099,
+          "net_r_sum": -15.351872602482857,
+          "wins": 59,
+          "fees_usdt": 1.7274966065616408,
+          "funding_cost_usdt": 0.0021270125582360682
+        },
+        {
+          "month": "2025-09",
+          "trades": 157,
+          "net_pnl_usdt": -1.3225049153955875,
+          "net_r_sum": -19.22204929025659,
+          "wins": 63,
+          "fees_usdt": 1.4379050737893164,
+          "funding_cost_usdt": -0.001961871078544461
+        },
+        {
+          "month": "2025-10",
+          "trades": 258,
+          "net_pnl_usdt": 4.441791660213738,
+          "net_r_sum": 7.162409959832941,
+          "wins": 179,
+          "fees_usdt": 3.7569969382208512,
+          "funding_cost_usdt": -0.06582919737197504
+        },
+        {
+          "month": "2025-11",
+          "trades": 224,
+          "net_pnl_usdt": -3.377210982493512,
+          "net_r_sum": -9.11589862687175,
+          "wins": 140,
+          "fees_usdt": 3.024019144298941,
+          "funding_cost_usdt": -0.24513827644098546
+        },
+        {
+          "month": "2025-12",
+          "trades": 172,
+          "net_pnl_usdt": -0.09454016486907633,
+          "net_r_sum": -5.205654025858412,
+          "wins": 82,
+          "fees_usdt": 2.02273205465446,
+          "funding_cost_usdt": -0.008617541805147868
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 2206,
+        "invalid_entry_or_stop": 4,
+        "wait_next_signal_after_exit": 1
+      }
+    },
+    {
+      "window": "validation_2025",
+      "target_pct": 0.02,
+      "hold_hours": 4,
+      "cost": "stress",
+      "metrics": {
+        "trades": 1959,
+        "trades_per_month": 163.25,
+        "net_win_rate": 0.43440530883103623,
+        "average_net_win_usdt": 0.19774816266579898,
+        "average_net_loss_usdt": -0.25107473903595384,
+        "mean_net_r": -0.17584135389057348,
+        "profit_factor": 0.6049218013826562,
+        "final_equity": 0.09287557675821358,
+        "net_pnl_usdt": -109.90712442324178,
+        "net_return_pct": -99.91556765749253,
+        "max_drawdown_pct": 99.91839355963677,
+        "longest_losing_streak": 12,
+        "mean_holding_hours": 2.2519991251205265,
+        "fees_usdt": 54.17364887813896,
+        "funding_cost_usdt": -0.3642679309553975,
+        "largest_win_usdt": 2.2233370312989966,
+        "worst_net_trade_usdt": -4.350002533535323,
+        "ambiguous_bars": 0,
+        "intrabar_funding_trades": 242,
+        "positive_months": 0,
+        "monthly_cluster_mean_r_ci95": [
+          -0.22412727703959254,
+          -0.12928097208979134
+        ],
+        "exit_reasons": {
+          "TIME": 586,
+          "SL": 732,
+          "TP": 638,
+          "SL_GAP": 2,
+          "TP_GAP": 1
+        },
+        "by_side": {
+          "long": {
+            "trades": 1021,
+            "net_pnl_usdt": -63.76181773054755,
+            "mean_net_r": -0.1575131560785955
+          },
+          "short": {
+            "trades": 938,
+            "net_pnl_usdt": -46.14530669269437,
+            "mean_net_r": -0.1957913431933768
+          }
+        }
+      },
+      "monthly": [
+        {
+          "month": "2025-01",
+          "trades": 149,
+          "net_pnl_usdt": -55.15530719713532,
+          "net_r_sum": -30.681657757721737,
+          "wins": 54,
+          "fees_usdt": 23.712943856329694,
+          "funding_cost_usdt": -0.03771323105255886
+        },
+        {
+          "month": "2025-02",
+          "trades": 150,
+          "net_pnl_usdt": -18.957225737721917,
+          "net_r_sum": -18.953462388471603,
+          "wins": 66,
+          "fees_usdt": 14.211937041697984,
+          "funding_cost_usdt": -0.026119817862786505
+        },
+        {
+          "month": "2025-03",
+          "trades": 153,
+          "net_pnl_usdt": -16.976584625221676,
+          "net_r_sum": -26.243365619294092,
+          "wins": 58,
+          "fees_usdt": 8.04526239032413,
+          "funding_cost_usdt": -0.005605060685664011
+        },
+        {
+          "month": "2025-04",
+          "trades": 150,
+          "net_pnl_usdt": -9.577823750407626,
+          "net_r_sum": -37.849950216221515,
+          "wins": 58,
+          "fees_usdt": 4.107693734115211,
+          "funding_cost_usdt": -0.2792371688151098
+        },
+        {
+          "month": "2025-05",
+          "trades": 152,
+          "net_pnl_usdt": -4.993949857865315,
+          "net_r_sum": -45.03152688136569,
+          "wins": 54,
+          "fees_usdt": 1.9193992128750843,
+          "funding_cost_usdt": -0.0017410376858496303
+        },
+        {
+          "month": "2025-06",
+          "trades": 151,
+          "net_pnl_usdt": -2.426014740391188,
+          "net_r_sum": -42.182489172921564,
+          "wins": 49,
+          "fees_usdt": 0.8953564389276917,
+          "funding_cost_usdt": -0.008464398198989741
+        },
+        {
+          "month": "2025-07",
+          "trades": 137,
+          "net_pnl_usdt": -0.718589668435722,
+          "net_r_sum": -25.69746047699305,
+          "wins": 49,
+          "fees_usdt": 0.4141028415937876,
+          "funding_cost_usdt": 0.0016554544865497642
+        },
+        {
+          "month": "2025-08",
+          "trades": 141,
+          "net_pnl_usdt": -0.477231592095392,
+          "net_r_sum": -32.85781175925753,
+          "wins": 52,
+          "fees_usdt": 0.2764318550779046,
+          "funding_cost_usdt": 0.00011681139511732118
+        },
+        {
+          "month": "2025-09",
+          "trades": 153,
+          "net_pnl_usdt": -0.23374644281430962,
+          "net_r_sum": -30.661918560492158,
+          "wins": 57,
+          "fees_usdt": 0.16722895006468794,
+          "funding_cost_usdt": -7.057547052150941e-06
+        },
+        {
+          "month": "2025-10",
+          "trades": 242,
+          "net_pnl_usdt": -0.14006589657587715,
+          "net_r_sum": -10.088061741477867,
+          "wins": 157,
+          "fees_usdt": 0.26831138908926133,
+          "funding_cost_usdt": -0.00201741446416814
+        },
+        {
+          "month": "2025-11",
+          "trades": 216,
+          "net_pnl_usdt": -0.19500065554731513,
+          "net_r_sum": -21.276890887288012,
+          "wins": 130,
+          "fees_usdt": 0.10845235308517602,
+          "funding_cost_usdt": -0.004911429539338118
+        },
+        {
+          "month": "2025-12",
+          "trades": 165,
+          "net_pnl_usdt": -0.05558425903025185,
+          "net_r_sum": -22.94861681012862,
+          "wins": 67,
+          "fees_usdt": 0.046528814958352274,
+          "funding_cost_usdt": -0.00022358098554763054
+        }
+      ],
+      "signal_count": 4234,
+      "skip_counts": {
+        "position_or_pending": 2269,
+        "invalid_entry_or_stop": 5,
+        "wait_next_signal_after_exit": 1
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "target_pct": 0.01,
+      "hold_hours": 2,
+      "verdict": "reject",
+      "reason": "时间顺序验证段在常规成本下没有正向净期望。"
+    },
+    {
+      "target_pct": 0.01,
+      "hold_hours": 4,
+      "verdict": "reject",
+      "reason": "时间顺序验证段在常规成本下没有正向净期望。"
+    },
+    {
+      "target_pct": 0.02,
+      "hold_hours": 2,
+      "verdict": "reject",
+      "reason": "时间顺序验证段在常规成本下没有正向净期望。"
+    },
+    {
+      "target_pct": 0.02,
+      "hold_hours": 4,
+      "verdict": "reject",
+      "reason": "时间顺序验证段在常规成本下没有正向净期望。"
+    }
+  ]
+}
