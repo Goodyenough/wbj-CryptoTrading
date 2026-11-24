@@ -2697,3 +2697,14 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 验证：检查三轮真实回复、状态迁移、设计与最终结论一致；未运行新测试/行情实验，未读2026行情，未改生产/模拟盘/调度。
 - 更新：TODO、项目/Obsidian开发计划；实验日志仅追加方向决策说明，无虚构指标。原目录既有两处修改不纳入。
 - 文件：claude-discussions/2026-11-24-2311-short-trend-high-winrate-strategy.md；reports/2026-11-24/short_trend_design/strategy_design.md。关联前序提交f4753a9；本次提交以本条所属Git提交为准，计划提交说明 docs: record Claude-reviewed short-trend strategy design。
+
+
+## 2026-11-24 23:52 +08:00 - 短期趋势历史审计、协议及metadata门禁
+
+- 变更：新增research/short_trend协议/JSON/metadata预检与18项合成测试，保存历史使用、执行规则、数学审核及三项读取边界事件。
+- 结论：2023–2025已用；交易规则只有零散锚点，真实账户验收证据不足。研究规格冻结/retest，不运行新策略或改生产。
+- 修复：锁定必需字段防删空绕过；局部filters覆盖不能当账户验收；明确简单ATR与Wilder差异、到达只减量、精确净目标与统计口径。
+- 验证：18项测试通过；metadata预检PASS仅指该进程，历史filters/账户验收均false。没有新行情下载或新回测。
+- 边界：审计中发生提交标题/网络摘要暴露、跨2026冻结JSON整体载入；嵌套是否含行情未知，不能声称整次零暴露，已通知用户并记录，不用作选参依据。
+- 记忆：更新TODO、项目与Obsidian开发计划；实验日志仅记方法审计、无虚构指标。原仓库既有两处tracked修改不纳入。
+- 证据：reports/2026-11-24/short_trend_preflight/；前序设计提交91e7c5a，本次提交以本条所属Git提交为准。

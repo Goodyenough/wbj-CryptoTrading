@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "strategy_id": "short_trend_48h_v1",
+  "purpose": "known_years_recheck_not_independent_validation",
+  "primary_symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+  "exploratory_symbols": ["ZECUSDT"],
+  "data": {
+    "warmup_start_utc": "2023-12-01T00:00:00Z",
+    "exclusive_end_utc": "2026-01-01T00:00:00Z",
+    "hard_seal_start_ms": 1782144000000,
+    "effective_exclusive_end_ms": 1767225600000,
+    "archive_first_month": "2023-12",
+    "archive_last_month": "2025-12",
+    "archive_base": "https://data.binance.vision/data/futures/um/monthly",
+    "archive_kinds": ["klines", "markPriceKlines", "fundingRate"],
+    "base_interval": "5m",
+    "production_database_allowed": false,
+    "live_endpoints_allowed": false,
+    "archive_discovery_allowed": false,
+    "redirects_allowed": false,
+    "checksum_required": true
+  },
+  "segments": [
+    {"name": "known_2024", "start_utc": "2024-01-01T00:00:00Z", "end_utc": "2025-01-01T00:00:00Z"},
+    {"name": "known_2025", "start_utc": "2025-01-01T00:00:00Z", "end_utc": "2026-01-01T00:00:00Z"}
+  ],
+  "signal": {
+    "bar_minutes": 60,
+    "lookback_bars": 48,
+    "first_close_cross_only": true,
+    "atr_period": 14,
+    "atr_method": "wilder_seed_mean_of_first_14_true_ranges",
+    "atr_seed_start_utc": "2023-12-01T00:00:00Z",
+    "stop_atr_multiple": 1.0,
+    "execution_delay_minutes": 5,
+    "holding_minutes": 240
+  },
+  "risk": {
+    "initial_equity_usdt": 110.0,
+    "target_fraction": 0.01,
+    "planned_risk_fraction": 0.015,
+    "planned_risk_cap_usdt": 5.0,
+    "notional_cap_multiple": 2.0,
+    "account_reference_margin_leverage": 2.0,
+    "account_initial_margin_plus_entry_fee_must_fit_equity": true,
+    "funding_reserve_fraction": 0.0005,
+    "arrival_resize": "reduce_only_using_both_arms",
+    "event_equity_mode": "fixed_no_compounding",
+    "account_equity_mode": "reset_to_initial_each_year"
+  },
+  "cost_regimes": {
+    "normal": {"fee_bps_per_side": 5.0, "slippage_bps_per_side": 3.0},
+    "stress": {"fee_bps_per_side": 10.0, "slippage_bps_per_side": 10.0}
+  },
+  "account": {
+    "max_positions": 1,
+    "simultaneous_priority": ["ETHUSDT", "SOLUSDT", "BTCUSDT"],
+    "round_quantity": "down_only",
+    "unknown_historical_rules": "block_historical_account_acceptance",
+    "max_research_drawdown_fraction": 0.15,
+    "funding_before_exact_open_exit": true,
+    "intrabar_order": "funding_before_unknown_stop_then_target",
+    "favorable_target_gap_improvement": false
+  },
+  "statistics": {
+    "paired_metric": "net_R_signal_minus_half_sum_signal_mirror",
+    "R_denominator": "common_risk_budget_not_realized_loss",
+    "bootstrap_calendar": "UTC_MONDAY_00_00_entry_week_all_symbols_together",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20261124,
+    "interval": "two_sided_percentile_95",
+    "dependence_sensitivity": "four_calendar_week_circular_moving_blocks_same_seed",
+    "dependence_sensitivity_must_preserve_support_decision": true,
+    "net_R_and_delta_lower_bounds_required": 0.0,
+    "stress_mean_net_R_min": 0.0,
+    "annual_and_leave_one_symbol_out_positive_metrics": ["net_R", "delta"],
+    "account_winning_fraction_target": 0.65,
+    "minimum_account_trades_total": 100,
+    "minimum_account_trades_each_year": 30,
+    "minimum_occupied_weeks_total": 26,
+    "minimum_occupied_weeks_each_year": 10,
+    "maximum_account_win_interval_width": 0.20,
+    "maximum_zero_trade_bootstrap_fraction": 0.01
+  },
+  "execution_coverage": {
+    "required_fields": ["tickSize", "stepSize", "minQty", "maxQty", "marketStepSize", "marketMinQty", "marketMaxQty", "minNotional", "contractStatus"],
+    "rule_intervals_must_cover": "2024-01-01T00:00:00Z/2026-01-01T00:00:00Z",
+    "no_forward_fill_without_evidence": true,
+    "current_rules_cannot_substitute": true
+  },
+  "execution_order_sensitivity": {
+    "primary": "funding_before_unknown_stop_then_target",
+    "alternative": "unknown_stop_then_target_before_intrabar_funding",
+    "same_support_gates_required": true,
+    "strict_mathematical_bounds_claimed": false
+  }
+}

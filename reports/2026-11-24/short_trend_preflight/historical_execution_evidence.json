@@ -1,0 +1,116 @@
+{
+  "audit_id": "historical_execution_conditions_20261124",
+  "audited_at_beijing": "2026-11-24T23:37:00+08:00",
+  "purpose": "Historical execution metadata audit only; no signal evaluation or backtest",
+  "fixed_scope": {
+    "venue": "Binance USD-M perpetual",
+    "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+    "historical_start_inclusive_utc": "2024-01-01T00:00:00Z",
+    "historical_end_exclusive_utc": "2026-01-01T00:00:00Z",
+    "initial_equity_usdt": "110",
+    "initial_max_notional_usdt": "220",
+    "initial_planned_risk_cap_usdt": "1.65"
+  },
+  "gate": {
+    "historical_executable_replay_proven": false,
+    "status": "INSUFFICIENT_METADATA",
+    "reason": "No complete point-in-time LOT_SIZE, MARKET_LOT_SIZE, minQty, PRICE_FILTER, MIN_NOTIONAL or historical trading-status coverage for the three fixed contracts"
+  },
+  "evidence": [
+    {
+      "id": "E1",
+      "source_url": "https://www.binance.com/en/blog/all/421499824684900356",
+      "source_owner": "Binance",
+      "source_publication_date": "2020-01-16",
+      "access_status": "OPENED",
+      "claims": ["BTCUSDT perpetual existed in 2019", "ETHUSDT perpetual existed in 2019", "USDT settlement and base-asset contract units described"],
+      "limitation": "Does not prove uninterrupted 2024-2025 trading status"
+    },
+    {
+      "id": "E2",
+      "source_url": "https://www.binance.com/en/support/announcement/detail/e4384cba297a4bd2a154be644d5d76f9",
+      "source_owner": "Binance",
+      "source_publication_date": "2023-10-27",
+      "access_status": "OPENED",
+      "effective_deadline_utc": "2023-11-02T10:00:00Z",
+      "changes": [
+        {"symbol": "BTCUSDT", "field": "MIN_NOTIONAL.notional", "old": "5.0", "new": "100.0", "unit": "USDT"},
+        {"symbol": "ETHUSDT", "field": "MIN_NOTIONAL.notional", "old": "5.0", "new": "20.0", "unit": "USDT"}
+      ],
+      "valid_to_utc": null,
+      "limitation": "Historical announcement anchor; no proof of no further changes during the full study period"
+    },
+    {
+      "id": "E3",
+      "source_url": "https://www.binance.com/en/support/announcement/detail/8bfe2e9b86734cd08f3cbcdb82b79f51",
+      "source_owner": "Binance",
+      "source_publication_date": "2024-10-01",
+      "access_status": "OPENED",
+      "effective_utc": "2024-10-14T06:30:00Z",
+      "changes": [
+        {"symbol": "SOLUSDT", "field": "PRICE_FILTER.tickSize", "old": "0.001", "new": "0.01", "unit": "USDT"}
+      ],
+      "existing_orders_preserve_old_tick": true,
+      "valid_to_utc": null,
+      "limitation": "Proves this change point; no complete all-period filters coverage"
+    },
+    {
+      "id": "E4",
+      "source_url": "https://www.binance.com/en/square/post/23394853587906",
+      "source_owner": "Binance Announcement verified official account",
+      "source_publication_date": "2025-04-25",
+      "access_status": "OPENED",
+      "effective_utc": "2025-05-02T08:00:00Z",
+      "claims": ["Funding intervals can change from 8h or 4h to 1h after a prior settlement reaches cap or floor", "The announcement does not prove that any of the fixed three contracts actually switched"],
+      "limitation": "Policy evidence only, not actual settlement observations; use actual historical fundingTime records for cash flows"
+    },
+    {
+      "id": "E5",
+      "source_url": "https://www.binance.com/en/support/announcement/detail/6d707b1f7ae34f419621b4c807464ab1",
+      "source_owner": "Binance",
+      "source_publication_date": "2025-08-31",
+      "access_status": "PARTIAL_ACCESS_OFFICIAL_SEARCH_INDEX_ONLY",
+      "direct_open_redirected_to": "https://www.binance.com/en/support/announcement",
+      "effective_utc": "2025-09-01T00:00:00Z",
+      "claims": ["Official search index reports reversion from 1h to 4h on cycle 37 after 36 consecutive absolute funding rates not exceeding 0.002%"],
+      "limitation": "Original full article was not retrievable by direct open during this audit"
+    },
+    {
+      "id": "E6",
+      "source_url": "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Exchange-Information",
+      "source_owner": "Binance",
+      "access_status": "OPENED_CURRENT_DOCUMENTATION",
+      "claims": ["pricePrecision must not be used as tickSize", "quantityPrecision must not be used as stepSize"],
+      "limitation": "Schema semantics only; current documentation and examples are not historical parameter evidence"
+    },
+    {
+      "id": "E7",
+      "source_url": "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Get-Funding-Rate-History",
+      "source_owner": "Binance",
+      "access_status": "OPENED_CURRENT_DOCUMENTATION",
+      "claims": ["Historical funding endpoint has inclusive startTime and endTime", "Omitting time bounds returns recent records", "Returned fields include fundingTime and settlement-associated markPrice"],
+      "limitation": "No market-data API call was performed"
+    }
+  ],
+  "unknown_by_symbol": {
+    "BTCUSDT": ["Full-period MIN_NOTIONAL continuity", "LOT_SIZE", "MARKET_LOT_SIZE", "PRICE_FILTER", "Continuous trading status", "Historical margin and order-trigger constraints"],
+    "ETHUSDT": ["Full-period MIN_NOTIONAL continuity", "LOT_SIZE", "MARKET_LOT_SIZE", "PRICE_FILTER", "Continuous trading status", "Historical margin and order-trigger constraints"],
+    "SOLUSDT": ["Pre-2024 listing primary announcement not recovered in this audit", "MIN_NOTIONAL", "LOT_SIZE", "MARKET_LOT_SIZE", "All other PRICE_FILTER changes", "Continuous trading status", "Historical margin and order-trigger constraints"]
+  },
+  "local_inspection": {
+    "repo_mutations": false,
+    "sqlite_mode": "ro",
+    "sqlite_queries": ["sqlite_master table names", "sqlite_master schema for names matching exchange/symbol/metadata/instrument"],
+    "raw_market_rows_read": false,
+    "strategy_result_rows_read": false,
+    "historical_filter_snapshots_found": false
+  },
+  "boundary_incident": {
+    "occurred": true,
+    "description": "A historical listing search without tool-level official-domain restriction incidentally returned a third-party recent-market snippet. No linked third-party page was opened; no market values were copied into artifacts or messages. Fixed-scope metadata-only work continued, with official-domain restrictions.",
+    "recent_market_values_recorded_here": false,
+    "used_for_symbol_or_parameter_selection": false,
+    "raw_2026_market_data_downloaded": false,
+    "parent_notified": true
+  }
+}

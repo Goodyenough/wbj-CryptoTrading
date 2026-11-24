@@ -1,0 +1,37 @@
+{
+  "created_beijing": "2026-11-24 23:52 +08:00",
+  "status": "FROZEN_SPEC_EXECUTION_EVIDENCE_INCOMPLETE",
+  "decision": "retest",
+  "design_base_commit": "91e7c5abe7465a4e1e4ff26dc7cdc73ec903d0ec",
+  "freeze_commit": "the Git commit containing this receipt",
+  "protocol_sha256": "240e2a60cdbfc3eda09615063114cb04a2277ff9d034a5286e021cfced5e8462",
+  "protocol_hash_mode": "canonical_json_utf8_sorted_compact",
+  "synthetic_tests_passed": 18,
+  "new_strategy_backtest_run": false,
+  "new_market_downloads": false,
+  "whole_audit_zero_recent_information_exposure_claimed": false,
+  "boundary_incidents": [
+    "B1",
+    "B2",
+    "B3"
+  ],
+  "data_roles": "known_years_recheck_not_independent_validation",
+  "historical_account_acceptance_allowed": false,
+  "file_hash_mode": "sha256_after_CRLF_to_LF_normalization",
+  "files": {
+    "reports/2026-11-24/short_trend_preflight/DATA_BOUNDARY_INCIDENTS.md": "134f3eaa50408b7062c42817360f9cc0c7e88fc563449f855ee1101973b85fff",
+    "reports/2026-11-24/short_trend_preflight/historical_execution_audit.md": "2bf571eb32c4b254fab95a59b855dbf4d6751562026157fcf800c1c7c4d792d7",
+    "reports/2026-11-24/short_trend_preflight/historical_execution_evidence.json": "590aa7cc257bc5b28a26eb9d8cda9ccd108c582b35c8758373dce2f889082426",
+    "reports/2026-11-24/short_trend_preflight/historical_usage_audit.md": "791347f9283b7be13022389a21497479e908027d668dfc08378bb52a901ad430",
+    "reports/2026-11-24/short_trend_preflight/preflight_receipt.json": "f4623ecc5b83a7754cbb6eb7481ce7c6349c6845671f718a4ae70b7f8ea4cdfc",
+    "reports/2026-11-24/short_trend_preflight/protocol_math_audit.md": "f04854916376b7ba52932f80bf8005f6fe6bb323b458207db5616af4d230fd3e",
+    "reports/2026-11-24/short_trend_preflight/QA.md": "1de26b9eeae4b00a4fa0c78ef5dc305b332ac3a3da64740a2fca5bb4e9c088f9",
+    "reports/2026-11-24/short_trend_preflight/结论与下一步.md": "bae6210b9a72c74afe7c6ea436e7b339117c2063f703decd63318e2105cbc47a",
+    "research/short_trend/__init__.py": "f07a7ed045b2f52c480e38c7dc22b4d72517289290eaaa439c5f5571733d18e9",
+    "research/short_trend/preflight.py": "d116c54dc8fda649d8cc4df712f83c24c72d26977f5348fc6c7b4f3a6605d043",
+    "research/short_trend/protocol.json": "2580b5a13eda859249d09e8f825f64ff26326bee832d503f6423ed3dbb274a35",
+    "research/short_trend/PROTOCOL.md": "381d4a8b584fa8e710f8fcaf67eacbd19a2cdc4b66144df6bbb64becbaaa6767",
+    "research/short_trend/README.md": "f4b2cff983e00f22b71b273c1c8df176be2031c916324599993fae968736504a",
+    "tests/test_short_trend_preflight.py": "e65d6259adb4424f4ff2815834fd71390d40a10ef7d404da1d7d3c187cad5c86"
+  }
+}

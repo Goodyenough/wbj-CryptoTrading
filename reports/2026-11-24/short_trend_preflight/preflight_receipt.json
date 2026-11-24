@@ -1,0 +1,30 @@
+{
+  "strategy_id": "short_trend_48h_v1",
+  "scope": "metadata_preflight_process_only_not_whole_audit",
+  "protocol_sha256": "240e2a60cdbfc3eda09615063114cb04a2277ff9d034a5286e021cfced5e8462",
+  "protocol_hash_mode": "canonical_json_utf8_sorted_compact",
+  "data_boundary_check": "PASS",
+  "market_data_read": false,
+  "network_used": false,
+  "backtest_run": false,
+  "dated_order_filter_coverage_pass": false,
+  "historical_account_acceptance_allowed": false,
+  "account_acceptance_status": "BLOCKED_MISSING_ORDER_FILTERS",
+  "issues": [
+    {
+      "symbol": "BTCUSDT",
+      "reason": "incomplete_dated_historical_rules",
+      "verified_contiguous_through_ms": 1704067200000
+    },
+    {
+      "symbol": "ETHUSDT",
+      "reason": "incomplete_dated_historical_rules",
+      "verified_contiguous_through_ms": 1704067200000
+    },
+    {
+      "symbol": "SOLUSDT",
+      "reason": "incomplete_dated_historical_rules",
+      "verified_contiguous_through_ms": 1704067200000
+    }
+  ]
+}
