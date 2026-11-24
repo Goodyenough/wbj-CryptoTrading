@@ -2687,3 +2687,13 @@ dynamic universe 回测（1 年窗口，418 symbols，全缓存）约 644 秒。
 - 验证：71项合成测试；16分支逐笔数量和净PnL对账通过。
 - 更新TODO、项目/Obsidian开发计划及实验日志；历史日志只追加，不读取其市场结论。
 - 原工作目录既有修改未纳入，本次只提交隔离研究分支。关联冻结提交b1b7d78。
+
+
+## 2026-11-24 23:30 +08:00 - Claude三轮讨论：短期趋势高胜率研究设计
+
+- 变更：保存真实Claude CLI三轮讨论与唯一策略设计草案，DONE / retest；不是新回测结果。
+- 方向：1H首次48H突破、净账户1%目标、4H退出、计划风险min(1.5%权益,5USDT)、名义≤2E；主池BTC/ETH/SOL，ZEC探索单列。
+- 纠正：不把简化随机游走胜率当实证；不自动称旧年份干净；双边taker；到达时风险核对只减量；65%目标由实际账户成交验证。
+- 验证：检查三轮真实回复、状态迁移、设计与最终结论一致；未运行新测试/行情实验，未读2026行情，未改生产/模拟盘/调度。
+- 更新：TODO、项目/Obsidian开发计划；实验日志仅追加方向决策说明，无虚构指标。原目录既有两处修改不纳入。
+- 文件：claude-discussions/2026-11-24-2311-short-trend-high-winrate-strategy.md；reports/2026-11-24/short_trend_design/strategy_design.md。关联前序提交f4753a9；本次提交以本条所属Git提交为准，计划提交说明 docs: record Claude-reviewed short-trend strategy design。
